@@ -1,0 +1,30 @@
+# Ignore Temporary Documentation
+doc/~*
+plugins/
+project/vs2012/Debug/
+project/vs2012/x64/Debug/
+project/vs2015/Debug/
+project/vs2015/x64/Debug/
+
+# Ignore Visual Studio Code Artifacts
+.vscode
+
+# Ignore all Visual Studio Build Artifacts
+*.exp
+*.ipdb
+*.res
+*.idb
+*.pdb
+*.ilk
+*.db
+*.suo
+*.sdf
+*.obj
+*.iobj
+*.log
+*.tlog
+*.lastbuildstate
+
+*.opensdf
+*.o
+
