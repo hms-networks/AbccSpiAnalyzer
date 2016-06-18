@@ -1,17 +1,33 @@
 # AbccSpiAnalyzer
 
-## &copy; Copyright HMS Industrial Networks, Inc.
+
+## Copyright &copy; 2016 HMS Industrial Networks, Inc.
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT    
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR     
 THAT THE OPERATION OF THE CODE WILL BE UNINTERRUPTED OR ERROR-FREE, OR     
 THAT DEFECTS IN IT CAN BE CORRECTED.
 
+#### Disclaimer
 If a feature is desired or a bug has been identified comments/concerns 
 are welcome to be shared to help improve this free software for the 
 general public but no guarantee of adding/resolving such requests will
 be made.
 
-----------
+---
+
+## Table of Contents
+1. [Description](#description)
+2. [System Requirements](#system-requirements)
+3. [Installation](#installation)
+	1. [Windows](#windows)
+	2. [Linux](#linux)
+	3. [OS X](#os-x)
+4. [Documentation](#documentation)
+5. [Future Improvements](#future-improvements)
+6. [Change Log](#changelog)
+	1. [Revision 1.0.0.0 (beta)](#revision-1000-beta)
+
+---
 
 ## Description
 
@@ -39,21 +55,21 @@ development efforts.
 
 ### Windows
 
-To compile the project please ensure the additional requirements are met:
+To compile the project please ensure the **additional** requirements are met:
 
-* Visual Studio 2012 or later (retargetting project may be neccessary)
+* Visual Studio 2012 or later *(retargetting project may be neccessary)*
 
 When compiling the project, please ensure that the correct library is linked
 for your Windows OS.
 
-- If you are using `Win64` please specify `Analyzer64.lib` in your linker input.
-  The configuration manager has this setup as x64.
-- If you are using `Win32` please specify `Analyzer.lib` in your linker input.
-  The configuration manager has this setup as Win32.
+- If you are using **Win64**, specify `Analyzer64.lib` in your linker input.
+  - The configuration manager has this setup as x64.
+- If you are using **Win32**, specify `Analyzer.lib` in your linker input.
+  - The configuration manager has this setup as Win32.
 
-Once compiled, a file called `AbccSpiAnalyzer.dll` should reside in the output
-folder. Copy this DLL to your Saleae Logic software installation in the
-"Analyzers" folder:
+Once compiled, a file called `AbccSpiAnalyzer.dll` or 
+`AbccSpiAnalyzer64.dll` will reside in the output folder. 
+Copy this DLL to your Saleae Logic software installation in the "Analyzers" folder:
 
 - Example: `C:\Program Files\Saleae LLC\Analyzers\AbccSpiAnalyzer.dll`
 
@@ -64,7 +80,7 @@ other protocol analyzers are added to the Logic software.
 
 * TODO
 
-### OSX
+### OS X
 
 * TODO
 
@@ -129,7 +145,7 @@ included in this repository's documenation folder.
 * Byte counter to logic-frames that are part of process data.
 * Byte counter to logic-frames that are part of message data
   this will be particularly helpful for tracking long segmented messages.
-* Supports bubble-text enumeration of 'most' the following SPI telegram fields:
+* Supports bubble-text enumeration for 'most' of the following SPI telegram fields:
   - SPI control/status
   - Application status
   - Anybus status
