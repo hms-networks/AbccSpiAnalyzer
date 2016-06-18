@@ -58,7 +58,7 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData( U64 largest_sample_reque
 	{
 		CreateSpiTransaction();
 
-		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 10.0 ) ); //insert 10 bit-periods of idle
+		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 5.0 ) ); //insert 5 bit-periods of idle
 	}
 
 	*simulation_channels = mSpiSimulationChannels.GetArray();
@@ -198,7 +198,9 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	if( mEnable != NULL )
 		mEnable->Transition();
 	
+	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(100.0));
 	OutputWord_CPHA1( mValue, mValue+1 );
+	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(100.0));
 	mValue++;
 }
 
@@ -207,8 +209,7 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0( U64 mosi_data, U64 miso_data 
 	BitExtractor mosi_bits( mosi_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer );
 	BitExtractor miso_bits( miso_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer );
 
-	U32 count = mSettings->mBitsPerTransfer;
-	for( U32 i=0; i<count; i++ )
+	for( U32 i=0; i<mSettings->mBitsPerTransfer; i++ )
 	{
 		if( mMosi != NULL )
 			mMosi->TransitionIfNeeded( mosi_bits.GetNextBit() );
@@ -216,10 +217,10 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0( U64 mosi_data, U64 miso_data 
 		if( mMiso != NULL )
 			mMiso->TransitionIfNeeded( miso_bits.GetNextBit() );
 
-		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( .5 ) );
+		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
 		mClock->Transition();  //data valid
 
-		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( .5 ) );
+		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
 		mClock->Transition();  //data invalid
 	}
 
@@ -229,16 +230,15 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0( U64 mosi_data, U64 miso_data 
 	if( mMiso != NULL )
 		mMiso->TransitionIfNeeded( BIT_LOW );
 
-	mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 1.0 ) );
-		}
+	mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
+}
 
 void SpiSimulationDataGenerator::OutputWord_CPHA1( U64 mosi_data, U64 miso_data )
 {
 	BitExtractor mosi_bits( mosi_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer );
 	BitExtractor miso_bits( miso_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer );
 
-	U32 count = mSettings->mBitsPerTransfer;
-	for( U32 i=0; i<count; i++ )
+	for( U32 i=0; i<mSettings->mBitsPerTransfer; i++ )
 	{
 		mClock->Transition();  //data invalid
 		if( mMosi != NULL )
@@ -246,10 +246,10 @@ void SpiSimulationDataGenerator::OutputWord_CPHA1( U64 mosi_data, U64 miso_data 
 		if( mMiso != NULL )
 			mMiso->TransitionIfNeeded( miso_bits.GetNextBit() );
 
-		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( .5 ) );
+		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
 		mClock->Transition();  //data valid
 
-		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( .5 ) );
+		mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
 	}
 
 	if( mMosi != NULL )
@@ -257,5 +257,5 @@ void SpiSimulationDataGenerator::OutputWord_CPHA1( U64 mosi_data, U64 miso_data 
 	if( mMiso != NULL )
 		mMiso->TransitionIfNeeded( BIT_LOW );
 
-	mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 1.0 ) );
+	mSpiSimulationChannels.AdvanceAll( mClockGenerator.AdvanceByHalfPeriod( 0.5 ) );
 }
