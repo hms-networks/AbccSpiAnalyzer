@@ -18,3 +18,7 @@ vs2012/AbccSpiAnalyzer/AbccSpiAnalyzer.vcxproj.user
 vs2012/AbccSpiAnalyzer/Win32/
 vs2012/AbccSpiAnalyzer/x64/
 vs2012/AbccSpiAnalyzer/Debug/
+/.vscode
+/vs2012/AbccSpiAnalyzer/AbccSpiAnalyzer.VC.VC.opendb
+/vs2012/AbccSpiAnalyzer/AbccSpiAnalyzer.VC.db
+/vs2012/AbccSpiAnalyzer/.vs/AbccSpiAnalyzer/v14/.suo
