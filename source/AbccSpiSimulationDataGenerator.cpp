@@ -13,6 +13,45 @@
 #include "AbccSpiAnalyzerSettings.h"
 #include "AbccCrc.h"
 
+static tAbccMosiPacket sMosiData = { 0x1F, /* SPI_CTRL */
+0x00, /* RESERVED */
+0x0008, /* MSG_LEN */
+0x0002, /* PD_LEN */
+0x00, /* APP_STAT */
+0x10, /* INT_MSK */
+0x0000, /* MD_SIZE */
+0x0000, /* RESERVED */
+0x01, /* SRC_ID */
+0xFE, /* OBJ */
+0x0001, /* INST */
+0x41, /* CMD */
+0x00, /* RESVERED */
+0x0005, /* CMDEXT */
+{ 0x00, 0x00, 0x00, 0x00 }, /* MSG_DATA */
+{ 0x11, 0x22, 0x33, 0x44 }, /* PROCESS_DATA */
+0x0000, /* CRC32 LOW */
+0x0000, /* CRC32 HIGH */
+0x0000 }; /* PAD */
+
+static tAbccMisoPacket sMisoData = { 0x0000, /* RESERVED */
+0x0000, /* LED_STAT */
+0x0C, /* ANB_STAT */
+0x3E, /* SPI_STAT */
+0x0000, /* NET_TIME LOW */
+0x0000, /* NET_TIME HIGH */
+0x0004, /* MD_SIZE */
+0x0000, /* RESERVED */
+0x00, /* SRC_ID */
+0xFE, /* OBJ */
+0x0001, /* INST */
+0x01, /* CMD */
+0x00, /* RESERVED */
+0x0005, /* CMDEXT */
+{ 0x11, 0x22, 0x33, 0x44 }, /* MSG_DATA */
+{ 0xAA, 0xBB, 0xCC, 0xDD }, /* PROCESS_DATA */
+0x0000, /* CRC32 LOW */
+0x0000 }; /* CRC32 HIGH */
+
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
 }
@@ -64,97 +103,6 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData( U64 largest_sample_reque
 	*simulation_channels = mSpiSimulationChannels.GetArray();
 	return mSpiSimulationChannels.GetCount();
 }
-
-typedef struct
-{
-	U8 spiCtrl;
-	U8 res1;
-	U16 msgLen;
-	U16 pdLen;
-	U8 appStat;
-	U8 intMask;
-	U16 msgSize;
-	U16 res2;
-	U8 srcId;
-	U8 obj;
-	U16 inst;
-	U8 cmd;
-	U8 res3;
-	U16 cmdExt;
-	U8 msgData[4];
-	U8 processData[4];
-	U16 crc32_lo;
-	U16 crc32_hi;
-	U16 pad;
-}tAbccMosiPacket;
-
-typedef struct
-{
-	U16 res1;
-	U16 ledStat;
-	U8 anbStat;
-	U8 spiStat;
-	U16 netTime_lo;
-	U16 netTime_hi;
-	U16 msgSize;
-	U16 res2;
-	U8 srcId;
-	U8 obj;
-	U16 inst;
-	U8 cmd;
-	U8 res3;
-	U16 cmdExt;
-	U8 msgData[4];
-	U8 processData[4];
-	U16 crc32_lo;
-	U16 crc32_hi;
-}tAbccMisoPacket;
-
-typedef union
-{
-	tAbccMisoPacket miso;
-	tAbccMosiPacket mosi;
-	U8 raw[28];
-}uAbccPacket;
-
-static tAbccMosiPacket sMosiData = {  0x1F, /* SPI_CTRL */
-									  0x00, /* RESERVED */
-									  0x0008, /* MSG_LEN */
-									  0x0002, /* PD_LEN */
-									  0x00, /* APP_STAT */
-									  0x10, /* INT_MSK */
-									  0x0000, /* MD_SIZE */
-									  0x0000, /* RESERVED */
-									  0x01, /* SRC_ID */
-									  0xFE, /* OBJ */
-									  0x0001, /* INST */
-									  0x41, /* CMD */
-									  0x00, /* RESVERED */
-									  0x0005, /* CMDEXT */
-									  {0x00, 0x00, 0x00, 0x00}, /* MSG_DATA */
-									  {0x11, 0x22, 0x33, 0x44}, /* PROCESS_DATA */
-									  0x0000, /* CRC32 LOW */
-									  0x0000, /* CRC32 HIGH */
-									  0x0000 }; /* PAD */
-
-static tAbccMisoPacket sMisoData = { 0x0000, /* RESERVED */
-									 0x0000, /* LED_STAT */
-									 0x0C, /* ANB_STAT */
-									 0x3E, /* SPI_STAT */
-									 0x0000, /* NET_TIME LOW */
-									 0x0000, /* NET_TIME HIGH */
-									 0x0004, /* MD_SIZE */
-									 0x0000, /* RESERVED */
-									 0x00, /* SRC_ID */
-									 0xFE, /* OBJ */
-									 0x0001, /* INST */
-									 0x01, /* CMD */
-									 0x00, /* RESERVED */
-									 0x0005, /* CMDEXT */
-									 {0x11, 0x22, 0x33, 0x44}, /* MSG_DATA */
-									 {0xAA, 0xBB, 0xCC, 0xDD}, /* PROCESS_DATA */
-									 0x0000, /* CRC32 LOW */
-									 0x0000 }; /* CRC32 HIGH */
 
 void SpiSimulationDataGenerator::CreateSpiTransaction()
 {

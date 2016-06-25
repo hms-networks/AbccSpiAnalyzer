@@ -14,6 +14,58 @@
 
 #include <AnalyzerHelpers.h>
 
+typedef struct
+{
+	U8 spiCtrl;
+	U8 res1;
+	U16 msgLen;
+	U16 pdLen;
+	U8 appStat;
+	U8 intMask;
+	U16 msgSize;
+	U16 res2;
+	U8 srcId;
+	U8 obj;
+	U16 inst;
+	U8 cmd;
+	U8 res3;
+	U16 cmdExt;
+	U8 msgData[4];
+	U8 processData[4];
+	U16 crc32_lo;
+	U16 crc32_hi;
+	U16 pad;
+}tAbccMosiPacket;
+
+typedef struct
+{
+	U16 res1;
+	U16 ledStat;
+	U8 anbStat;
+	U8 spiStat;
+	U16 netTime_lo;
+	U16 netTime_hi;
+	U16 msgSize;
+	U16 res2;
+	U8 srcId;
+	U8 obj;
+	U16 inst;
+	U8 cmd;
+	U8 res3;
+	U16 cmdExt;
+	U8 msgData[4];
+	U8 processData[4];
+	U16 crc32_lo;
+	U16 crc32_hi;
+}tAbccMisoPacket;
+
+typedef union
+{
+	tAbccMisoPacket miso;
+	tAbccMosiPacket mosi;
+	U8 raw[28];
+}uAbccPacket;
+
 class SpiAnalyzerSettings;
 
 class SpiSimulationDataGenerator
