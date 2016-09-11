@@ -34,7 +34,7 @@
 
 
 
-t_ABCC_MOSI_INFO asMosiStates[] =
+tAbccMosiInfo asMosiStates[] =
 {
 	{ e_ABCC_MOSI_IDLE,						"",			0 },
 	{ e_ABCC_MOSI_SPI_CTRL,					"SPI_CTL",	1 },
@@ -58,7 +58,7 @@ t_ABCC_MOSI_INFO asMosiStates[] =
 	{ e_ABCC_MOSI_PAD,						"PAD",		2 }
 };
 
-t_ABCC_MISO_INFO asMisoStates[] =
+tAbccMisoInfo asMisoStates[] =
 {
 	{ e_ABCC_MISO_IDLE,						"",			0 },
 	{ e_ABCC_MISO_Reserved1,				"RES",		1 },
@@ -81,7 +81,7 @@ t_ABCC_MISO_INFO asMisoStates[] =
 	{ e_ABCC_MISO_CRC32,					"CRC32",	4 },
 };
 
-t_ABCC_MSG_INFO asMsgStates[] =
+tAbccMsgInfo asMsgStates[] =
 {
 	{ e_ABCC_MSG_SIZE,		"MD_SIZE",	ABCC_MSG_SIZE_FIELD_SIZE },
 	{ e_ABCC_MSG_RESERVED1,	"RES",		ABCC_MSG_RES1_FIELD_SIZE },
@@ -94,8 +94,8 @@ t_ABCC_MSG_INFO asMsgStates[] =
 	{ e_ABCC_MSG_DATA,		"MD",		ABCC_MSG_DATA_FIELD_SIZE }
 };
 
-static t_ABCC_MOSI_STATES eMosiState = e_ABCC_MOSI_IDLE;
-static t_ABCC_MISO_STATES eMisoState = e_ABCC_MISO_IDLE;
+static tAbccMosiStates eMosiState = e_ABCC_MOSI_IDLE;
+static tAbccMisoStates eMisoState = e_ABCC_MISO_IDLE;
 static U8  bLastAnbSts = 0xFF;
 static U8  bLastApplSts = 0xFF;
 static U8  bMosiLastToggleState = 0xFF;
@@ -459,9 +459,9 @@ bool SpiAnalyzer::IsEnableActive(void)
 	}
 }
 
-bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t_ABCC_MOSI_STATES* peMosiMsgSubState)
+bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMosiStates* peMosiMsgSubState)
 {
-	static t_ABCC_MOSI_STATES eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+	static tAbccMosiStates eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
 	static U8 bByteCnt = 0;
 	if (fReset)
 	{
@@ -564,7 +564,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 	return true;
 }
 
-void SpiAnalyzer::ProcessMisoFrame(t_ABCC_MISO_STATES eState, U64 lFrameData, S64 lFramesFirstSample)
+void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
 	static U8  bMisoObjCode = 0x00;
 	static U8  bMisoCmd = 0x00;
@@ -720,7 +720,7 @@ void SpiAnalyzer::ProcessMisoFrame(t_ABCC_MISO_STATES eState, U64 lFrameData, S6
 	mResults->CommitResults();
 }
 
-void SpiAnalyzer::ProcessMosiFrame(t_ABCC_MOSI_STATES eState, U64 lFrameData, S64 lFramesFirstSample)
+void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
 	static U8  bMosiObjCode = 0x00;
 	static U8  bMosiCmd = 0x00;
@@ -931,8 +931,8 @@ void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLas
 
 bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiData, S64 lFirstSample)
 {
-	t_ABCC_MOSI_STATES eMosiState_Current = e_ABCC_MOSI_IDLE;
-	static t_ABCC_MOSI_STATES eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+	tAbccMosiStates eMosiState_Current = e_ABCC_MOSI_IDLE;
+	static tAbccMosiStates eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
 	bool fAddFrame = false;
 	static U32 dwByteCnt = 0;
 	static U32 dwPdCnt = 0;
@@ -1187,9 +1187,9 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	}
 }
 
-bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t_ABCC_MISO_STATES *peMisoMsgSubState)
+bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMisoStates *peMisoMsgSubState)
 {
-	static t_ABCC_MISO_STATES eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+	static tAbccMisoStates eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
 	static U8 bByteCnt = 0;
 	if (fReset)
 	{
@@ -1293,8 +1293,8 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 
 bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoData, S64 lFirstSample)
 {
-	t_ABCC_MISO_STATES eMisoState_Current = e_ABCC_MISO_IDLE;
-	static t_ABCC_MISO_STATES eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+	tAbccMisoStates eMisoState_Current = e_ABCC_MISO_IDLE;
+	static tAbccMisoStates eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
 	bool fAddFrame = false;
 	static U32 dwByteCnt = 0;
 	static U64 lFrameData = 0;

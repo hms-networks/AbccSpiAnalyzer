@@ -3,7 +3,7 @@
 *******************************************************************************
 **
 **       File: AbccCrc.cpp
-**    Summary: ABCC Crc-Unit source
+**    Summary: ABCC Crc-Unit source. Uses ABCC40 defined CRC algorithms.
 **     Author: Jon Carrier
 **
 *******************************************************************************
@@ -13,10 +13,10 @@
 
 static const U8 abBitReverseTable16[] =
 {
-	0x0, 0x8, 0x4, 0xC,
-	0x2, 0xA, 0x6, 0xE,
-	0x1, 0x9, 0x5, 0xD,
-	0x3, 0xB, 0x7, 0xF
+	0x00, 0x08, 0x04, 0x0C,
+	0x02, 0x0A, 0x06, 0x0E,
+	0x01, 0x09, 0x05, 0x0D,
+	0x03, 0x0B, 0x07, 0x0F
 };
 
 static const U32 adwCrcTable32[] =
@@ -104,10 +104,12 @@ U32 AbccCrc::CRC_Crc32(U32 iInitCrc, U8* pbBufferStart, U16 iLength)
 	U32 lCrc = iInitCrc;
 	for (i = 0; i < iLength; i++)
 	{
-		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 4) & 0xf]);
-		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0xf];
-		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[*pbBufferStart & 0xf]);
-		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0xf];
+		/* Process upper-nibble */
+		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 4) & 0x0F]);
+		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
+		/* Process lower-nibble */
+		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 0) & 0x0F]);
+		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
 		pbBufferStart++;
 	}
 	return lCrc;

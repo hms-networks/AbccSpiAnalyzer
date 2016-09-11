@@ -15,11 +15,11 @@
 #include <AnalyzerSettings.h>
 #include <AnalyzerTypes.h>
 
-typedef enum
+typedef enum tDecodeVerbosityLevel
 {
 	e_VERBOSITY_LEVEL_COMPACT,
 	e_VERBOSITY_LEVEL_DETAILED
-}t_DecodeVerbosityLevel;
+}tDecodeVerbosityLevel;
 
 class SpiAnalyzerSettings : public AnalyzerSettings
 {

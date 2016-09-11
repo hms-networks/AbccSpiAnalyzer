@@ -14,7 +14,7 @@
 
 #include <AnalyzerHelpers.h>
 
-typedef struct
+typedef struct tAbccMosiPacket
 {
 	U8	spiCtrl;
 	U8	res1;
@@ -37,7 +37,7 @@ typedef struct
 	U16	pad;
 }tAbccMosiPacket;
 
-typedef struct
+typedef struct tAbccMisoPacket
 {
 	U16	res1;
 	U16	ledStat;
@@ -59,7 +59,7 @@ typedef struct
 	U16	crc32_hi;
 }tAbccMisoPacket;
 
-typedef union
+typedef union uAbccPacket
 {
 	tAbccMisoPacket miso;
 	tAbccMosiPacket mosi;

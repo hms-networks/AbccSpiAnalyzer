@@ -58,7 +58,7 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
-typedef enum
+typedef enum tAbccMosiStates
 {
 	e_ABCC_MOSI_IDLE,
 	e_ABCC_MOSI_SPI_CTRL,
@@ -80,9 +80,9 @@ typedef enum
 	e_ABCC_MOSI_WR_PD_FIELD,
 	e_ABCC_MOSI_CRC32,
 	e_ABCC_MOSI_PAD
-}t_ABCC_MOSI_STATES;
+}tAbccMosiStates;
 
-typedef enum
+typedef enum tAbccMisoStates
 {
 	e_ABCC_MISO_IDLE,
 	e_ABCC_MISO_Reserved1,
@@ -103,16 +103,16 @@ typedef enum
 	e_ABCC_MISO_RD_MSG_SUBFIELD_data,
 	e_ABCC_MISO_RD_PD_FIELD,
 	e_ABCC_MISO_CRC32
-}t_ABCC_MISO_STATES;
+}tAbccMisoStates;
 
-typedef union
+typedef union uAbccSpiStates
 {
 	U8					bState;
-	t_ABCC_MISO_STATES	eMiso;
-	t_ABCC_MOSI_STATES	eMosi;
-}u_ABCC_SPI_STATES;
+	tAbccMisoStates	eMiso;
+	tAbccMosiStates	eMosi;
+}uAbccSpiStates;
 
-typedef enum
+typedef enum tAbccMsgField
 {
 	e_ABCC_MSG_SIZE,
 	e_ABCC_MSG_RESERVED1,
@@ -123,35 +123,36 @@ typedef enum
 	e_ABCC_MSG_RESERVED2,
 	e_ABCC_MSG_CMD_EXT,
 	e_ABCC_MSG_DATA
-}t_ABCC_MSG_FIELD;
+}tAbccMsgField;
 
-typedef struct
+//TODO joca consider adding a "full name" element here that would be used for printing to tabular text
+typedef struct tAbccMosiInfo
 {
-	t_ABCC_MOSI_STATES eMosiState;
+	tAbccMosiStates eMosiState;
 	char* tag;
 	U8 frameSize;
-}t_ABCC_MOSI_INFO;
+}tAbccMosiInfo;
 
-typedef struct
+typedef struct tAbccMisoInfo
 {
-	t_ABCC_MISO_STATES eMisoState;
+	tAbccMisoStates eMisoState;
 	char* tag;
 	U8 frameSize;
-}t_ABCC_MISO_INFO;
+}tAbccMisoInfo;
 
-typedef struct
+typedef struct tAbccMsgInfo
 {
-	t_ABCC_MSG_FIELD eMsgState;
+	tAbccMsgField eMsgState;
 	char* tag;
 	U8 frameSize;
-}t_ABCC_MSG_INFO;
+}tAbccMsgInfo;
 
-typedef struct
+typedef struct tValueName
 {
 	U16		value;
 	char*	name;
 	bool	alert;
-}t_ValueName;
+}tValueName;
 
 class SpiAnalyzerSettings;
 class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
@@ -183,14 +184,14 @@ protected: /* functions */
 	void AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLastSample);
 	void SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket);
 
-	void ProcessMosiFrame(t_ABCC_MOSI_STATES eMosiState, U64 lFrameData, S64 lFramesFirstSample);
-	void ProcessMisoFrame(t_ABCC_MISO_STATES eMisoState, U64 lFrameData, S64 lFramesFirstSample);
+	void ProcessMosiFrame(tAbccMosiStates eMosiState, U64 lFrameData, S64 lFramesFirstSample);
+	void ProcessMisoFrame(tAbccMisoStates eMisoState, U64 lFrameData, S64 lFramesFirstSample);
 
 	bool RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiData, S64 lFirstSample);
 	bool RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoData, S64 lFirstSample);
 
-	bool RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t_ABCC_MISO_STATES *peMisoMsgSubState);
-	bool RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t_ABCC_MOSI_STATES *peMosiMsgSubState);
+	bool RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMisoStates* peMisoMsgSubState);
+	bool RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMosiStates* peMosiMsgSubState);
 
 
 #pragma warning( push )

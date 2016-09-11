@@ -44,11 +44,11 @@
 #define IS_CMD_OBJECT_SPECIFIC(cmd) 	(((cmd >= 0x10) && (cmd <= 0x30)) || \
 										(cmd == 0x3F))
 
-extern t_ABCC_MOSI_INFO asMosiStates[];
-extern t_ABCC_MISO_INFO asMisoStates[];
-extern t_ABCC_MSG_INFO asMsgStates[];
+extern tAbccMosiInfo asMosiStates[];
+extern tAbccMisoInfo asMisoStates[];
+extern tAbccMsgInfo asMsgStates[];
 
-t_ValueName asAnbInstAttrNames[] =
+tValueName asAnbInstAttrNames[] =
 {
 	{ ABP_ANB_IA_MODULE_TYPE,		"Module Type",				false },
 	{ ABP_ANB_IA_FW_VERSION,		"Firmware Version",			false },
@@ -73,13 +73,13 @@ t_ValueName asAnbInstAttrNames[] =
 	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		false }
 };
 
-t_ValueName asDiObjAttrNames[] =
+tValueName asDiObjAttrNames[] =
 {
 	{ ABP_DI_OA_MAX_INST,		"Maximum Number of Instances",	false },
 	{ ABP_DI_OA_SUPPORT_FUNC,	"Supported Functionality",		false }
 };
 
-t_ValueName asDiInstAttrNames[] =
+tValueName asDiInstAttrNames[] =
 {
 	{ ABP_DI_IA_SEVERITY,			"Severity",						false },
 	{ ABP_DI_IA_EVENT_CODE,			"Event Code",					false },
@@ -90,7 +90,7 @@ t_ValueName asDiInstAttrNames[] =
 	{ ABP_DI_IA_BIT,				"Bit",							false }
 };
 
-t_ValueName asNwInstAttrNames[] =
+tValueName asNwInstAttrNames[] =
 {
 	{ ABP_NW_IA_NW_TYPE,		"Network Type",				false },
 	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		false },
@@ -101,12 +101,12 @@ t_ValueName asNwInstAttrNames[] =
 	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	false }
 };
 
-t_ValueName asSocObjAttrNames[] =
+tValueName asSocObjAttrNames[] =
 {
 	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	false }
 };
 
-t_ValueName asSocInstAttrNames[] =
+tValueName asSocInstAttrNames[] =
 {
 	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			false },
 	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			false },
@@ -124,14 +124,14 @@ t_ValueName asSocInstAttrNames[] =
 	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	false }
 };
 
-t_ValueName asSmtpObjAttrNames[] =
+tValueName asSmtpObjAttrNames[] =
 {
 	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	false },
 	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					false },
 	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		false }
 };
 
-t_ValueName asSmtpInstAttrNames[] =
+tValueName asSmtpInstAttrNames[] =
 {
 	{ ABP_SMTP_IA_FROM,		"From Address",		false },
 	{ ABP_SMTP_IA_TO,		"To Address",		false },
@@ -139,7 +139,7 @@ t_ValueName asSmtpInstAttrNames[] =
 	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		false }
 };
 
-t_ValueName asNcInstAttrNames[] =
+tValueName asNcInstAttrNames[] =
 {
 	{ ABP_NC_VAR_IA_NAME,			"Name",					false },
 	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			false },
@@ -149,7 +149,7 @@ t_ValueName asNcInstAttrNames[] =
 	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		false }
 };
 
-t_ValueName asNwEtnInstAttrNames[] =
+tValueName asNwEtnInstAttrNames[] =
 {
 	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",				false },
 	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",				false },
@@ -170,12 +170,12 @@ t_ValueName asNwEtnInstAttrNames[] =
 	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,	"IP Address Byte 0-2",		false }
 };
 
-t_ValueName asCpcObjAttrNames[] =
+tValueName asCpcObjAttrNames[] =
 {
 	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	false }
 };
 
-t_ValueName asCpcInstAttrNames[] =
+tValueName asCpcInstAttrNames[] =
 {
 	{ ABP_CPC_IA_PORT_TYPE,			"Port Type",		false },
 	{ ABP_CPC_IA_PORT_NUMBER,		"Port Number",		false },
@@ -185,7 +185,7 @@ t_ValueName asCpcInstAttrNames[] =
 	{ ABP_CPC_IA_PORT_NODE_RANGE,	"Port Node Range",	false }
 };
 
-t_ValueName asCipIdInstAttrNames[] =
+tValueName asCipIdInstAttrNames[] =
 {
 	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		false },
 	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		false },
@@ -196,7 +196,7 @@ t_ValueName asCipIdInstAttrNames[] =
 	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		false }
 };
 
-t_ValueName asEplInstAttrNames[] =
+tValueName asEplInstAttrNames[] =
 {
 	{ ABP_EPL_IA_VENDOR_ID,		"Vendor ID",						false },
 	{ ABP_EPL_IA_PRODUCT_CODE,	"Product Code",						false },
@@ -210,7 +210,7 @@ t_ValueName asEplInstAttrNames[] =
 	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
 };
 
-t_ValueName asPnioInstAttrNames[] =
+tValueName asPnioInstAttrNames[] =
 {
 	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						false },
 	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	false },
@@ -238,7 +238,7 @@ t_ValueName asPnioInstAttrNames[] =
 	{ 0x18,									"Custom Station Name",				false } /* TODO: ABP macro does not exist yet */
 };
 
-t_ValueName asEipInstAttrNames[] =
+tValueName asEipInstAttrNames[] =
 {
 	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										false },
 	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										false },
@@ -272,7 +272,7 @@ t_ValueName asEipInstAttrNames[] =
 	{ 0x1F,										"Enable DLR",										false } /* TODO: ABP macro does not exist yet */
 };
 
-t_ValueName asEtcInstAttrNames[] =
+tValueName asEtcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
 	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								false },
@@ -294,13 +294,13 @@ t_ValueName asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",false }
 };
 
-t_ValueName asAppdObjAttrNames[] =
+tValueName asAppdObjAttrNames[] =
 {
 	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	false },
 	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false }
 };
 
-t_ValueName asAppdInstAttrNames[] =
+tValueName asAppdInstAttrNames[] =
 {
 	{ ABP_APPD_IA_NAME,			"Name",						false },
 	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				false },
@@ -314,7 +314,7 @@ t_ValueName asAppdInstAttrNames[] =
 	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				false }
 };
 
-t_ValueName asAppInstAttrNames[] =
+tValueName asAppInstAttrNames[] =
 {
 	{ ABP_APP_IA_CONFIGURED,	"Configured",						false },
 	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				false },
@@ -324,7 +324,7 @@ t_ValueName asAppInstAttrNames[] =
 	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false }
 };
 
-t_ValueName asFsiObjAttrNames[] =
+tValueName asFsiObjAttrNames[] =
 {
 	{ ABP_FSI_OA_MAX_INST,						"Max Number of Instances",		false },
 	{ ABP_FSI_OA_DISABLE_VFS,					"Disable Virtual File System",	false },
@@ -335,20 +335,20 @@ t_ValueName asFsiObjAttrNames[] =
 	{ ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL,	"Disc Fault Tolerance Level",	false }
 };
 
-t_ValueName asFsiInstAttrNames[] =
+tValueName asFsiInstAttrNames[] =
 {
 	{ ABP_FSI_IA_TYPE,		"Instance Type",			false },
 	{ ABP_FSI_IA_FILE_SIZE,	"File Size",				false },
 	{ ABP_FSI_IA_PATH,		"Current Instance Path",	false }
 };
 
-t_ValueName asAsmObjAttrNames[] =
+tValueName asAsmObjAttrNames[] =
 {
 	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	false },
 	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	false }
 };
 
-t_ValueName asAsmInstAttrNames[] =
+tValueName asAsmInstAttrNames[] =
 {
 	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	false },
 	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			false },
@@ -364,13 +364,13 @@ t_ValueName asAsmInstAttrNames[] =
 	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false }
 };
 
-t_ValueName asMddObjAttrNames[] =
+tValueName asMddObjAttrNames[] =
 {
 	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			false },
 	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	false }
 };
 
-t_ValueName asSyncInstAttrNames[] =
+tValueName asSyncInstAttrNames[] =
 {
 	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",				false },
 	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",				false },
@@ -382,7 +382,7 @@ t_ValueName asSyncInstAttrNames[] =
 	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",		false }
 };
 
-t_ValueName asFusmInstAttrNames[] =
+tValueName asFusmInstAttrNames[] =
 {
 	{ ABP_FUSM_IA_STATE,		"State",					false },
 	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				false },
@@ -397,7 +397,7 @@ t_ValueName asFusmInstAttrNames[] =
 	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		false }
 };
 
-t_ValueName asSafeInstAttrNames[] =
+tValueName asSafeInstAttrNames[] =
 {
 	{ ABP_SAFE_IA_SAFETY_ENABLE,	"Safety Enabled",		false },
 	{ ABP_SAFE_IA_BAUD_RATE,		"Baud Rate",			false },
@@ -405,7 +405,7 @@ t_ValueName asSafeInstAttrNames[] =
 };
 
 
-t_ValueName asObjAttrNames[] =
+tValueName asObjAttrNames[] =
 {
 	{ ABP_OA_NAME,			"Name",						false },
 	{ ABP_OA_REV,			"Revision",					false },
@@ -413,7 +413,7 @@ t_ValueName asObjAttrNames[] =
 	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	false }
 };
 
-t_ValueName asObjectNames[] =
+tValueName asObjectNames[] =
 {
 	/*------------------------------------------------------------------------------
 	** Anybus module objects
@@ -468,7 +468,7 @@ t_ValueName asObjectNames[] =
 	{ ABP_OBJ_NUM_APP,		"Application Object",							false }
 };
 
-t_ValueName asCmdNames[] =
+tValueName asCmdNames[] =
 {
 	{ ABP_CMD_GET_ATTR,			"Get_Attribute",			false },
 	{ ABP_CMD_SET_ATTR,			"Set_Attribute",			false },
@@ -481,18 +481,18 @@ t_ValueName asCmdNames[] =
 };
 
 
-t_ValueName asMddCmdNames[] =
+tValueName asMddCmdNames[] =
 {
 	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false },
 };
 
-t_ValueName asAsmCmdNames[] =
+tValueName asAsmCmdNames[] =
 {
 	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	false },
 	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	false }
 };
 
-t_ValueName asFsiCmdNames[] =
+tValueName asFsiCmdNames[] =
 {
 	{ ABP_FSI_CMD_FILE_OPEN,			"File_Open",		false },
 	{ ABP_FSI_CMD_FILE_CLOSE,			"File_Close",		false },
@@ -510,7 +510,7 @@ t_ValueName asFsiCmdNames[] =
 	{ ABP_FSI_CMD_FORMAT_DISC,			"Format_Disc",		false }
 };
 
-t_ValueName asEipCmdNames[] =
+tValueName asEipCmdNames[] =
 {
 	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		false },
 	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				false },
@@ -519,7 +519,7 @@ t_ValueName asEipCmdNames[] =
 	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	false }
 };
 
-t_ValueName asPnioCmdNames[] =
+tValueName asPnioCmdNames[] =
 {
 	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
 	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			false },
@@ -537,14 +537,14 @@ t_ValueName asPnioCmdNames[] =
 	{ 0x1E,								"Indicate_Device",		false } /* TODO: ABP macro does not exist yet */
 };
 
-t_ValueName asAppCmdNames[] =
+tValueName asAppCmdNames[] =
 {
 	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			false },
 	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	false },
 	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
 };
 
-t_ValueName asAppDataCmdNames[] =
+tValueName asAppDataCmdNames[] =
 {
 	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	false },
 	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		false },
@@ -554,7 +554,7 @@ t_ValueName asAppDataCmdNames[] =
 	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			false }
 };
 
-t_ValueName asNetCmdNames[] =
+tValueName asNetCmdNames[] =
 {
 	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		false },
 	{ ABP_NW_CMD_MAP_ADI_READ_AREA,			"Map_ADI_Read_Area",		false },
@@ -562,7 +562,7 @@ t_ValueName asNetCmdNames[] =
 	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	false }
 };
 
-t_ValueName asIntMaskNames[] =
+tValueName asIntMaskNames[] =
 {
 	{ ABP_INTMASK_RDPDIEN,		"RDPD",		false },
 	{ ABP_INTMASK_RDMSGIEN,		"RDMSG",	false },
@@ -574,7 +574,7 @@ t_ValueName asIntMaskNames[] =
 	{ 0x80,						"RESERVED",	true  }  /* No ABP mask exists */
 };
 
-t_ValueName asLedStsNames[] =
+tValueName asLedStsNames[] =
 {
 	{ 0x0001, "LED1A",		false },
 	{ 0x0002, "LED1B",		false },
@@ -587,7 +587,7 @@ t_ValueName asLedStsNames[] =
 	{ 0xFF00, "RESERVED",	true }
 };
 
-t_ValueName asErrorRspNames[] =
+tValueName asErrorRspNames[] =
 {
 	{ ABP_ERR_INV_MSG_FORMAT,					"Invalid message format",							true },
 	{ ABP_ERR_UNSUP_OBJ,						"Unsupported object",								true },
@@ -612,7 +612,7 @@ t_ValueName asErrorRspNames[] =
 	{ 0xFF,										"Object specific error",							true }
 };
 
-t_ValueName asAnybusStsNames[] =
+tValueName asAnybusStsNames[] =
 {
 	{ ABP_ANB_STATE_SETUP,			"SETUP",			false },
 	{ ABP_ANB_STATE_NW_INIT,		"NW_INIT",			false },
@@ -623,7 +623,7 @@ t_ValueName asAnybusStsNames[] =
 	{ ABP_ANB_STATE_EXCEPTION,		"EXCEPTION",		true  }
 };
 
-t_ValueName asApplStsNames[] =
+tValueName asApplStsNames[] =
 {
 	{ ABP_APPSTAT_NO_ERROR,			"No Error",									false },
 	{ ABP_APPSTAT_NOT_SYNCED,		"Not yet synchronized",						false },
@@ -635,7 +635,7 @@ t_ValueName asApplStsNames[] =
 	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								true  }
 };
 
-t_ValueName asSpiStsNames[] =
+tValueName asSpiStsNames[] =
 {
 	{ 0xC0,							"RESERVED",		true  }, /* No ABP mask exists */
 	{ ABP_SPI_STATUS_NEW_PD,		"NEW_PD",		false },
@@ -645,7 +645,7 @@ t_ValueName asSpiStsNames[] =
 	{ ABP_SPI_STATUS_WRMSG_FULL,	"WRMSG_FULL",	true  }
 };
 
-t_ValueName asSpiCtrlNames[] =
+tValueName asSpiCtrlNames[] =
 {
 	{ ABP_SPI_CTRL_T,			"TOGGLE",		false },
 	{ 0x60,						"RESERVED",		true  }, /* No ABP mask exists */
@@ -717,7 +717,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			{
 				SNPRINTF(str, sizeof(str), "%s: [%s]", tag, value);
 			}
-			if(alert)
+			if (alert)
 			{
 				AddResultString("!ALERT - ", str);
 			}
@@ -771,7 +771,7 @@ bool GetSpiCtrlString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 	const char separatorStr[] = " | ";
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asSpiCtrlNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asSpiCtrlNames) / sizeof(tValueName)); i++)
 	{
 		if (((asSpiCtrlNames[i].value & val) != 0) || (asSpiCtrlNames[i].value == ABP_SPI_CTRL_CMDCNT))
 		{
@@ -810,7 +810,7 @@ bool GetSpiStsString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asSpiStsNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asSpiStsNames) / sizeof(tValueName)); i++)
 	{
 		if (((asSpiStsNames[i].value & val) != 0) || (asSpiStsNames[i].value == ABP_SPI_STATUS_CMDCNT))
 		{
@@ -847,7 +847,7 @@ bool GetApplStsString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 	bool alert = false;
 	bool found = false;
 
-	for (U8 i = 0; i < (sizeof(asApplStsNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asApplStsNames) / sizeof(tValueName)); i++)
 	{
 		if (asApplStsNames[i].value == val)
 		{
@@ -875,7 +875,7 @@ bool GetAbccStatusString(U8 val, char* str, U16 maxLen, DisplayBase display_base
 	bool found = false;
 	char tmpstr[FORMATTED_STRING_BUFFER_SIZE];
 
-	for (U8 i = 0; i < (sizeof(asAnybusStsNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asAnybusStsNames) / sizeof(tValueName)); i++)
 	{
 		if (asAnybusStsNames[i].value == (val & (ABCC_STATUS_CODE_MASK | ABCC_STATUS_RESERVED_MASK)))
 		{
@@ -908,7 +908,7 @@ bool GetAbccStatusString(U8 val, char* str, U16 maxLen, DisplayBase display_base
 bool GetErrorRspString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	for (U8 i = 0; i < (sizeof(asErrorRspNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asErrorRspNames) / sizeof(tValueName)); i++)
 	{
 		if (asErrorRspNames[i].value == val)
 		{
@@ -930,7 +930,7 @@ bool GetIntMaskString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asIntMaskNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asIntMaskNames) / sizeof(tValueName)); i++)
 	{
 		if ((asIntMaskNames[i].value & val) != 0)
 		{
@@ -963,7 +963,7 @@ bool GetLedStatusString(U16 val, char* str, U16 maxLen, DisplayBase display_base
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asLedStsNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asLedStsNames) / sizeof(tValueName)); i++)
 	{
 		if ((asLedStsNames[i].value & val) != 0)
 		{
@@ -989,23 +989,23 @@ bool GetLedStatusString(U16 val, char* str, U16 maxLen, DisplayBase display_base
 }
 
 bool GetNamedAttrString(U16 inst, U8 val,
-						char* str, U16 maxLen,
-						DisplayBase display_base,
-						t_ValueName* pasObjNames, U8 NoObjNames,
-						t_ValueName* pasInstNames, U8 NoInstNames)
+	char* str, U16 maxLen,
+	DisplayBase display_base,
+	tValueName* pasObjNames, U8 NoObjNames,
+	tValueName* pasInstNames, U8 NoInstNames)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	t_ValueName* pasAttrNames = NULL;
+	tValueName* pasAttrNames = NULL;
 	U8 bNoAttrs = 0;
 	bool alert = false;
 	bool found = false;
 
 	if (inst == ABP_INST_OBJ)
 	{
-		if (val <= asObjAttrNames[(sizeof(asObjAttrNames) / sizeof(t_ValueName))-1].value)
+		if (val <= asObjAttrNames[(sizeof(asObjAttrNames) / sizeof(tValueName)) - 1].value)
 		{
 			pasAttrNames = &asObjAttrNames[0];
-			bNoAttrs = (sizeof(asObjAttrNames) / sizeof(t_ValueName));
+			bNoAttrs = (sizeof(asObjAttrNames) / sizeof(tValueName));
 		}
 		else
 		{
@@ -1059,7 +1059,7 @@ bool GetObjectString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
-	for (U8 i = 0; i < (sizeof(asObjectNames) / sizeof(t_ValueName)); i++)
+	for (U8 i = 0; i < (sizeof(asObjectNames) / sizeof(tValueName)); i++)
 	{
 		if (asObjectNames[i].value == val)
 		{
@@ -1073,7 +1073,7 @@ bool GetObjectString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 	return true;
 }
 
-bool GetObjSpecificCmdString(U8 val, char* str, U16 maxLen, t_ValueName* pasCmdNames, U8 bNoCmds, DisplayBase display_base)
+bool GetObjSpecificCmdString(U8 val, char* str, U16 maxLen, tValueName* pasCmdNames, U8 bNoCmds, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < bNoCmds; i++)
@@ -1098,7 +1098,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 
 	if (IS_CMD_STANDARD(cmd))
 	{
-		for (U8 i = 0; i < (sizeof(asCmdNames) / sizeof(t_ValueName)); i++)
+		for (U8 i = 0; i < (sizeof(asCmdNames) / sizeof(tValueName)); i++)
 		{
 			if (asCmdNames[i].value == cmd)
 			{
@@ -1109,58 +1109,53 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 	}
 	else if (IS_CMD_OBJECT_SPECIFIC(cmd))
 	{
-		if (obj == ABP_OBJ_NUM_NW)
+		switch(obj)
 		{
+		case ABP_OBJ_NUM_NW:
 			/* Network Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNetCmdNames[0], (sizeof(asNetCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if ((obj == ABP_OBJ_NUM_FSI) || (obj == ABP_OBJ_NUM_AFSI))
-		{
+				&asNetCmdNames[0], (sizeof(asNetCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_FSI:
+		case ABP_OBJ_NUM_AFSI:
 			/* (Application/Anybus) File System Interface Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asFsiCmdNames[0], (sizeof(asFsiCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_ASM)
-		{
+				&asFsiCmdNames[0], (sizeof(asFsiCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_ASM:
 			/* Assembly Mapping Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAsmCmdNames[0], (sizeof(asAsmCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_MDD)
-		{
+				&asAsmCmdNames[0], (sizeof(asAsmCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_MDD:
 			/* Modular Device Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asMddCmdNames[0], (sizeof(asMddCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_PNIO)
-		{
+				&asMddCmdNames[0], (sizeof(asMddCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_PNIO:
 			/* PROFINET IO Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asPnioCmdNames[0], (sizeof(asPnioCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_EIP)
-		{
+				&asPnioCmdNames[0], (sizeof(asPnioCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_EIP:
 			/* EtherNet/IP Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asEipCmdNames[0], (sizeof(asEipCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_APPD)
-		{
+				&asEipCmdNames[0], (sizeof(asEipCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_APPD:
 			/* Application Data Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAppDataCmdNames[0], (sizeof(asAppDataCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else if (obj == ABP_OBJ_NUM_APP)
-		{
+				&asAppDataCmdNames[0], (sizeof(asAppDataCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_APP:
 			/* Application Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAppCmdNames[0], (sizeof(asAppCmdNames) / sizeof(t_ValueName)), display_base);
-		}
-		else
-		{
+				&asAppCmdNames[0], (sizeof(asAppCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
 			alert = true; //TODO: We only alert here because we have not implmented all object specific commands yet.
+			break;
 		}
 		SNPRINTF(str, maxLen, "Object Specific: %s", strBuffer);
 	}
@@ -1214,168 +1209,123 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 	switch (obj)
 	{
 	case ABP_OBJ_NUM_ANB:
-	{
 		/* Anybus Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asAnbInstAttrNames[0], sizeof(asAnbInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asAnbInstAttrNames[0], sizeof(asAnbInstAttrNames) / sizeof(tValueName));
 		break;
-	}
-
 	case ABP_OBJ_NUM_DI:
-	{
 		/* Diagnostic Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asDiObjAttrNames[0], sizeof(asDiObjAttrNames) / sizeof(t_ValueName),
-			&asDiInstAttrNames[0], sizeof(asDiInstAttrNames) / sizeof(t_ValueName));
+			&asDiObjAttrNames[0], sizeof(asDiObjAttrNames) / sizeof(tValueName),
+			&asDiInstAttrNames[0], sizeof(asDiInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_NW:
-	{
 		/* Network Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asNwInstAttrNames[0], sizeof(asNwInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asNwInstAttrNames[0], sizeof(asNwInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_NC:
-	{
 		/* Network Configuration Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asNcInstAttrNames[0], sizeof(asNcInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asNcInstAttrNames[0], sizeof(asNcInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_SOC:
-	{
 		/* Socket Interface Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asSocObjAttrNames[0], sizeof(asSocObjAttrNames) / sizeof(t_ValueName),
-			&asSocInstAttrNames[0], sizeof(asSocInstAttrNames) / sizeof(t_ValueName));
+			&asSocObjAttrNames[0], sizeof(asSocObjAttrNames) / sizeof(tValueName),
+			&asSocInstAttrNames[0], sizeof(asSocInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_SMTP:
-	{
 		/* SMTP Client Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asSmtpObjAttrNames[0], sizeof(asSmtpObjAttrNames) / sizeof(t_ValueName),
-			&asSmtpInstAttrNames[0], sizeof(asSmtpInstAttrNames) / sizeof(t_ValueName));
+			&asSmtpObjAttrNames[0], sizeof(asSmtpObjAttrNames) / sizeof(tValueName),
+			&asSmtpInstAttrNames[0], sizeof(asSmtpInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_FSI:
 	case ABP_OBJ_NUM_AFSI:
-	{
 		/* File system objects */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asFsiObjAttrNames[0], sizeof(asFsiObjAttrNames) / sizeof(t_ValueName),
-			&asFsiInstAttrNames[0], sizeof(asFsiInstAttrNames) / sizeof(t_ValueName));
+			&asFsiObjAttrNames[0], sizeof(asFsiObjAttrNames) / sizeof(tValueName),
+			&asFsiInstAttrNames[0], sizeof(asFsiInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_FUSM:
-	{
 		/* Functional Safety Module Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asFusmInstAttrNames[0], sizeof(asFusmInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asFusmInstAttrNames[0], sizeof(asFusmInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_NWETN:
 	case ABP_OBJ_NUM_ETN:
-	{
 		/* Network Ethernet Object / Ethernet Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_CPC:
-	{
 		/* CIP Port Configuration Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asCpcObjAttrNames[0], sizeof(asCpcObjAttrNames) / sizeof(t_ValueName),
-			&asCpcInstAttrNames[0], sizeof(asCpcInstAttrNames) / sizeof(t_ValueName));
+			&asCpcObjAttrNames[0], sizeof(asCpcObjAttrNames) / sizeof(tValueName),
+			&asCpcInstAttrNames[0], sizeof(asCpcInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_SAFE:
-	{
 		/* Functional Safety Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asSafeInstAttrNames[0], sizeof(asSafeInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asSafeInstAttrNames[0], sizeof(asSafeInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_EPL:
-	{
 		/* Ethernet POWERLINK Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asEplInstAttrNames[0], sizeof(asEplInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asEplInstAttrNames[0], sizeof(asEplInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_ASM:
-	{
 		/* Assembly Mapping Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asAsmObjAttrNames[0], sizeof(asAsmObjAttrNames) / sizeof(t_ValueName),
-			&asAsmInstAttrNames[0], sizeof(asAsmInstAttrNames) / sizeof(t_ValueName));
+			&asAsmObjAttrNames[0], sizeof(asAsmObjAttrNames) / sizeof(tValueName),
+			&asAsmInstAttrNames[0], sizeof(asAsmInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_MDD:
-	{
 		/* Modular Device Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asMddObjAttrNames[0], sizeof(asMddObjAttrNames) / sizeof(t_ValueName),
+			&asMddObjAttrNames[0], sizeof(asMddObjAttrNames) / sizeof(tValueName),
 			NULL, 0);
 		break;
-	}
 	case ABP_OBJ_NUM_CIPID:
-	{
 		/* CIP Identity Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asCipIdInstAttrNames[0], sizeof(asCipIdInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asCipIdInstAttrNames[0], sizeof(asCipIdInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_SYNC:
-	{
 		/* Sync Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asSyncInstAttrNames[0], sizeof(asSyncInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asSyncInstAttrNames[0], sizeof(asSyncInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_ECT:
-	{
 		/* EtherCAT Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asEtcInstAttrNames[0], sizeof(asEtcInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asEtcInstAttrNames[0], sizeof(asEtcInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_PNIO:
-	{
 		/* PROFINET IO Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asPnioInstAttrNames[0], sizeof(asPnioInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asPnioInstAttrNames[0], sizeof(asPnioInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_EIP:
-	{
 		/* EtherNet/IP Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asEipInstAttrNames[0], sizeof(asEipInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asEipInstAttrNames[0], sizeof(asEipInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_APPD:
-	{
 		/* Application Data Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			&asAppdObjAttrNames[0], sizeof(asAppdObjAttrNames) / sizeof(t_ValueName),
-			&asAppdInstAttrNames[0], sizeof(asAppdInstAttrNames) / sizeof(t_ValueName));
+			&asAppdObjAttrNames[0], sizeof(asAppdObjAttrNames) / sizeof(tValueName),
+			&asAppdInstAttrNames[0], sizeof(asAppdInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	case ABP_OBJ_NUM_APP:
-	{
 		/* Application Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asAppInstAttrNames[0], sizeof(asAppInstAttrNames) / sizeof(t_ValueName));
+			NULL, 0, &asAppInstAttrNames[0], sizeof(asAppInstAttrNames) / sizeof(tValueName));
 		break;
-	}
 	default:
-	{
 		objFound = false;
 		break;
-	}
 	}
 
 	return objFound;
@@ -1470,9 +1420,11 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 {
 	ClearResultStrings();
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+	bool alert = false;
 	Frame frame = GetFrame(frame_index);
-	u_ABCC_SPI_STATES uState;
-	uState.eMosi = (t_ABCC_MOSI_STATES)frame.mType;
+	uAbccSpiStates uState;
+	uState.eMosi = (tAbccMosiStates)frame.mType;
 
 	if ((frame.mFlags & (SPI_FRAG_ERROR_FLAG | SPI_ERROR_FLAG)) == 0)
 	{
@@ -1487,24 +1439,20 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				break;
 			case e_ABCC_MOSI_RESERVED1:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MOSI_MSG_LEN:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
+
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
-			}
-			break;
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+				break;
 			case e_ABCC_MOSI_PD_LEN:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
-			}
-			break;
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+				break;
 			case e_ABCC_MOSI_APP_STAT:
 				BuildApplStatus((U8)frame.mData1, display_base);
 				break;
@@ -1519,49 +1467,47 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				}
 				else
 				{
-					char str[FORMATTED_STRING_BUFFER_SIZE];
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
+					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
 				}
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_size:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				if(frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, true);
+					alert = true;
 				}
 				else
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes", (U16)frame.mData1);
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
 				}
-			}
-			break;
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_res1:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, false);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, alert);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_obj:
 				BuildObjectString((U8)frame.mData1, display_base);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, false);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, alert);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd:
 				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_res2:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
 				if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
@@ -1579,41 +1525,37 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, false);
+					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, alert);
 				}
 				break;
 			case e_ABCC_MOSI_WR_PD_FIELD:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
-			}
-			break;
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+				break;
 			case e_ABCC_MOSI_CRC32:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, true);
+					alert = true;
 				}
 				else
 				{
 
 					SNPRINTF(str, sizeof(str), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, false);
 				}
-			}
-			break;
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+				break;
 			case e_ABCC_MOSI_PAD:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, alert);
 				break;
 			default:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, number_str, sizeof(number_str));
-				StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", true);
+				alert = true;
+				StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", alert);
 				break;
 			}
 		}
@@ -1625,19 +1567,18 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				break;
 			case e_ABCC_MISO_Reserved1:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MISO_Reserved2:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", (frame.mData1 != 0));
+
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MISO_LED_STAT:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
-				bool alert = GetLedStatusString((U16)frame.mData1, str, sizeof(str), display_base);
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
+				alert = GetLedStatusString((U16)frame.mData1, str, sizeof(str), display_base);
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
-			}
 			break;
 			case e_ABCC_MISO_ANB_STAT:
 				BuildAbccStatus((U8)frame.mData1, display_base);
@@ -1647,7 +1588,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				break;
 			case e_ABCC_MISO_NET_TIME:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, false);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, alert);
 				break;
 			case e_ABCC_MISO_RD_MSG_FIELD:
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
@@ -1657,49 +1598,47 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				}
 				else
 				{
-					char str[FORMATTED_STRING_BUFFER_SIZE];
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, false);
+					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
 				}
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				if(frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, true);
+					alert = true;
 				}
 				else
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes", (U16)frame.mData1);
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, false);
 				}
-			}
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
 			break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_res1:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, false);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, alert);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
 				BuildObjectString((U8)frame.mData1, display_base);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, false);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, alert);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
 				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_res2:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", (frame.mData1 != 0));
+				alert = (frame.mData1 != 0);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
 				if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
@@ -1717,49 +1656,47 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, false);
+					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, alert);
 				}
 				break;
 			case e_ABCC_MISO_RD_PD_FIELD:
-			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, false);
-			}
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
 			break;
 			case e_ABCC_MISO_CRC32:
 			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, true);
+					alert = true;
 				}
 				else
 				{
 					SNPRINTF(str, sizeof(str), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, false);
 				}
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
 			}
 			break;
 			default:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, number_str, sizeof(number_str));
-				StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", true);
+				alert = true;
+				StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", alert);
 				break;
 			}
 		}
 	}
 	else
 	{
+		alert = true;
 		if ((frame.mFlags & SPI_FRAG_ERROR_FLAG) == SPI_FRAG_ERROR_FLAG)
 		{
-			StringBuilder("FRAG", NULL, "Fragmented ABCC SPI Packet", true);
+			StringBuilder("FRAG", NULL, "Fragmented ABCC SPI Packet", alert);
 		}
 		else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
-			StringBuilder("ERROR", NULL, "Settings mismatch, The initial (idle) state of the CLK line does not match the settings.", true);
+			StringBuilder("ERROR", NULL, "Settings mismatch, The initial (idle) state of the CLK line does not match the settings.", alert);
 		}
 	}
 }
