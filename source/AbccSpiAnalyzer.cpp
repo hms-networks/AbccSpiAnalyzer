@@ -156,6 +156,8 @@ void SpiAnalyzer::WorkerThread()
 	U64 lMosiData;
 	U64 lMisoData;
 	U64 lFirstSample;
+	tGetWordStatus eWordStatus;
+	bool fReset;
 	bool fError;
 	bool fReady1 = true;
 	bool fReady2 = true;
@@ -171,21 +173,36 @@ void SpiAnalyzer::WorkerThread()
 	bLastAnbSts = 0xFF;
 	bLastApplSts = 0xFF;
 
-	for (; ; )
+	for ( ; ; )
 	{
 		/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
-		fError = GetWord(&lMosiData, &lMisoData, &lFirstSample);
-
+		eWordStatus = GetWord(&lMosiData, &lMisoData, &lFirstSample);
+		switch(eWordStatus)
+		{
+		case e_GET_WORD_OK:
+			fError = false;
+			fReset = false;
+			break;
+		case e_GET_WORD_RESET:
+			fError = false;
+			fReset = true;
+			break;
+		default:
+		case e_GET_WORD_ERROR:
+			fError = true;
+			fReset = true;
+			break;
+		}
 		/* Run the ABCC MOSI state machine */
-		fReady1 = RunAbccMosiStateMachine((fReady1), fError, lMosiData, lFirstSample);
+		fReady1 = RunAbccMosiStateMachine((fReset||fReady1), fError, lMosiData, lFirstSample);
 
 		/* Run the ABCC MISO state machine */
-		fReady2 = RunAbccMisoStateMachine((fReady2), fError, lMisoData, lFirstSample);
+		fReady2 = RunAbccMisoStateMachine((fReset||fReady2), fError, lMisoData, lFirstSample);
 
 		if (fError == true)
 		{
 			/* Signal error, do not commit packet */
-			SignalReadyForNewPacket(false, true);
+			SignalReadyForNewPacket(false, fError);
 			mResults->CommitResults();
 			/* Advance to the next enabled state */
 			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
@@ -329,13 +346,13 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
 	}
 }
 
-bool SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
+tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 {
 	/* We're assuming we come into this function with the clock in the idle state */
 	U32 bits_per_transfer = mSettings->mBitsPerTransfer;
 	DataBuilder mosi_result;
 	DataBuilder miso_result;
-	bool need_reset = false;
+	tGetWordStatus status = e_GET_WORD_OK;
 
 	mosi_result.Reset(plMosiData, mSettings->mShiftOrder, bits_per_transfer);
 	miso_result.Reset(plMisoData, mSettings->mShiftOrder, bits_per_transfer);
@@ -360,7 +377,7 @@ bool SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 			else
 			{
 				/* Reset everything and return. */
-				need_reset = true;
+				status = e_GET_WORD_RESET;
 				break;
 			}
 		}
@@ -376,8 +393,8 @@ bool SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 
 		if (WouldAdvancingTheClockToggleEnable() == true)
 		{
-			/* Reset everything and return. */
-			need_reset = true;
+			/* Error: reset everything and return. */
+			status = e_GET_WORD_ERROR;
 			break;
 		}
 
@@ -394,14 +411,17 @@ bool SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 
 	}
 
+	if(status == e_GET_WORD_OK)
+	{
 	/* Add sample markers to the results */
 	U32 count = (U32)mArrowLocations.size();
 	for (U32 i = 0; i < count; i++)
 	{
 		mResults->AddMarker(mArrowLocations[i], mArrowMarker, mSettings->mClockChannel);
+		}
 	}
 
-	return need_reset;
+	return status;
 }
 
 bool SpiAnalyzer::NeedsRerun()

@@ -58,6 +58,13 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
+typedef enum tGetWordStatus
+{
+	e_GET_WORD_OK,		/* WORD was successfully read */
+	e_GET_WORD_ERROR,	/* Reading WORD resulted in a logical error (requires statemachine reset) */
+	e_GET_WORD_RESET	/* Reading WORD resulted in a event that requires state machine reset */
+}tGetWordStatus;
+
 typedef enum tAbccMosiStates
 {
 	e_ABCC_MOSI_IDLE,
@@ -179,7 +186,7 @@ protected: /* functions */
 
 	bool WouldAdvancingTheClockToggleEnable();
 
-	bool GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
+	tGetWordStatus GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
 
 	void AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLastSample);
 	void SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket);
