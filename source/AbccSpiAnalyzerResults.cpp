@@ -1964,6 +1964,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		** then add as a single text entry. */
 		if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
 		{
+			static char size_str[2][FORMATTED_STRING_BUFFER_SIZE] = { "" };
 			static char src_str[2][FORMATTED_STRING_BUFFER_SIZE] = { "" };
 			static char obj_str[2][FORMATTED_STRING_BUFFER_SIZE] = { "" };
 			static char inst_str[2][FORMATTED_STRING_BUFFER_SIZE] = { "" };
@@ -2008,6 +2009,16 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 						}
 						return;
+					}
+					break;
+				case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
+					if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+					{
+						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "MISO-!Size: %u Bytes", (U16)frame.mData1);
+					}
+					else
+					{
+						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "MISO-Size: %u Bytes", (U16)frame.mData1);
 					}
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
@@ -2129,6 +2140,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							{
 								SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "MISO-Extension: %s", str);
 							}
+							AddTabularText(size_str[ABCC_MISO_CHANNEL]);
 							AddTabularText(obj_str[ABCC_MISO_CHANNEL]);
 							AddTabularText(inst_str[ABCC_MISO_CHANNEL]);
 							AddTabularText(cmd_str[ABCC_MISO_CHANNEL]);
@@ -2203,6 +2215,16 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 						}
 						return;
+					}
+					break;
+				case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
+					if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+					{
+						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "MOSI-!Size: %u Bytes", (U16)frame.mData1);
+					}
+					else
+					{
+						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "MOSI-Size: %u Bytes", (U16)frame.mData1);
 					}
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
@@ -2324,6 +2346,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							{
 								SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "MOSI-Extension: %s", str);
 							}
+							AddTabularText(size_str[ABCC_MOSI_CHANNEL]);
 							AddTabularText(obj_str[ABCC_MOSI_CHANNEL]);
 							AddTabularText(inst_str[ABCC_MOSI_CHANNEL]);
 							AddTabularText(cmd_str[ABCC_MOSI_CHANNEL]);
