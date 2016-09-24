@@ -17,6 +17,7 @@
 
 typedef enum tDecodeVerbosityLevel
 {
+	e_VERBOSITY_LEVEL_DISABLED,
 	e_VERBOSITY_LEVEL_COMPACT,
 	e_VERBOSITY_LEVEL_DETAILED
 }tDecodeVerbosityLevel;
@@ -42,8 +43,7 @@ public:
 	BitState mClockInactiveState;
 	AnalyzerEnums::Edge mDataValidEdge;
 	BitState mEnableActiveState;
-	U32 mVerbosityLevel;
-	bool mMessageIndexing;
+	U32 mMessageIndexingVerbosityLevel;
 	bool mMessageSrcIdIndexing;
 	bool mErrorIndexing;
 	bool mTimestampIndexing;
@@ -56,13 +56,12 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mMisoChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mClockChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mVerbosityLevelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexMessagesInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexMessageSrcIdInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexErrorsInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexTimestampsInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexAnybusStatusInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexApplStatusInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexMessageSrcIdInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexAnybusStatusInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexApplStatusInterface;
 };
 
 #endif /* ABCC_SPI_ANALYZER_SETTINGS_H */

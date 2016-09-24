@@ -25,8 +25,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mClockInactiveState(BIT_HIGH),
 	mDataValidEdge(AnalyzerEnums::TrailingEdge),
 	mEnableActiveState(BIT_LOW),
-	mVerbosityLevel(e_VERBOSITY_LEVEL_COMPACT),
-	mMessageIndexing(true),
+	mMessageIndexingVerbosityLevel(e_VERBOSITY_LEVEL_DETAILED),
 	mMessageSrcIdIndexing(false),
 	mErrorIndexing(true),
 	mTimestampIndexing(false),
@@ -51,17 +50,6 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
 
-	mVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mVerbosityLevelInterface->SetTitleAndTooltip("Decoded Verbosity Level :", "Specifies how detailed the decoded protcols entries are.");
-	mVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_COMPACT,  "Compact Results", "Message header information is added to a single tabular result.");
-	mVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DETAILED, "Verbose Results", "Message header information is added to tabular results individually.");
-	mVerbosityLevelInterface->SetNumber(mVerbosityLevel);
-
-
-	mIndexMessagesInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexMessagesInterface->SetTitleAndTooltip("ABCC Message Indexing :", "Enable indexed searching of ABCC messages.");
-	mIndexMessagesInterface->SetValue(mMessageIndexing);
-
 	mIndexMessageSrcIdInterface.reset(new AnalyzerSettingInterfaceBool());
 	mIndexMessageSrcIdInterface->SetTitleAndTooltip("ABCC Message 'Source ID' Indexing :", "Enable indexed searching of the source ID associated with an ABCC message.");
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
@@ -82,18 +70,23 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mIndexApplStatusInterface->SetTitleAndTooltip("Application Status Indexing :", "Enable indexed searching of application status.");
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
 
+	mMessageIndexingVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :", "Specifies how detailed the decoded protcols entries are.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DISABLED,  "Disabled", "Messages will not be indexed in searchable results.\nUse when object messaging is of no interest.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_COMPACT,  "Compact Results", "Message header information is added to a single tabular result.\nThis option is useful when looking for very specific messages.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DETAILED, "Verbose Results", "Message header information is added to tabular results individually.\nRecommended setting for general use.");
+	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
 	AddInterface(mMosiChannelInterface.get());
 	AddInterface(mMisoChannelInterface.get());
 	AddInterface(mClockChannelInterface.get());
 	AddInterface(mEnableChannelInterface.get());
 
-	AddInterface(mVerbosityLevelInterface.get());
-	AddInterface(mIndexMessagesInterface.get());
 	AddInterface(mIndexMessageSrcIdInterface.get());
 	AddInterface(mIndexErrorsInterface.get());
 	AddInterface(mIndexTimestampsInterface.get());
 	AddInterface(mIndexAnybusStatusInterface.get());
 	AddInterface(mIndexApplStatusInterface.get());
+	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 
 	//AddExportOption( 0, "Export as text/csv file", "text (*.txt);;csv (*.csv)" );
 	AddExportOption(0, "Export as text/csv file");
@@ -141,8 +134,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mClockChannel = mClockChannelInterface->GetChannel();
 	mEnableChannel = mEnableChannelInterface->GetChannel();
 
-	mVerbosityLevel = U32(mVerbosityLevelInterface->GetNumber());
-	mMessageIndexing = bool(mIndexMessagesInterface->GetValue());
+	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
 	mMessageSrcIdIndexing = bool(mIndexMessageSrcIdInterface->GetValue());
 	mErrorIndexing = bool(mIndexErrorsInterface->GetValue());
 	mTimestampIndexing = bool(mIndexTimestampsInterface->GetValue());
@@ -177,8 +169,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	text_archive >> mClockChannel;
 	text_archive >> mEnableChannel;
 
-	text_archive >> mVerbosityLevel;
-	text_archive >> mMessageIndexing;
+	text_archive >> mMessageIndexingVerbosityLevel;
 	text_archive >> mMessageSrcIdIndexing;
 	text_archive >> mErrorIndexing;
 	text_archive >> mTimestampIndexing;
@@ -208,8 +199,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mClockChannel;
 	text_archive << mEnableChannel;
 
-	text_archive << mVerbosityLevel;
-	text_archive << mMessageIndexing;
+	text_archive << mMessageIndexingVerbosityLevel;
 	text_archive << mMessageSrcIdIndexing;
 	text_archive << mErrorIndexing;
 	text_archive << mTimestampIndexing;
@@ -226,8 +216,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mClockChannelInterface->SetChannel(mClockChannel);
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 
-	mVerbosityLevelInterface->SetNumber(mVerbosityLevel);
-	mIndexMessagesInterface->SetValue(mMessageIndexing);
+	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 	mIndexTimestampsInterface->SetValue(mTimestampIndexing);
