@@ -555,6 +555,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
+	case e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid:
 		if (bByteCnt >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
 		{
 			*pfAddFrame = true;
@@ -591,6 +592,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	static U16 wMisoInst = 0x00;
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
+	static U16 wMdSize = 0;
 	Frame result_frame;
 	result_frame.mFlags = 0x00;
 	result_frame.mType = (U8)eState;
@@ -633,11 +635,16 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_size)
 	{
-		if (lFrameData > ABP_MAX_MSG_DATA_BYTES)
+		if ((U16)lFrameData > ABP_MAX_MSG_DATA_BYTES)
 		{
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			wMdSize = 0;
 		}
+		else
+		{
+			wMdSize = (U16)lFrameData;
+	}
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_data)
 	{
@@ -650,6 +657,12 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		** in the results for easy tracking of specific values */
 		result_frame.mData2 = (U64)dwMdCnt;
 		dwMdCnt++;
+		/* Check if the message data counter has reached the end of valid data */
+		if(dwMdCnt > wMdSize)
+		{
+			/* Override frame type */
+			result_frame.mType = (U8)e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid;
+	}
 	}
 	else if (eState == e_ABCC_MISO_ANB_STAT)
 	{
@@ -747,6 +760,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	static U16 wMosiInst = 0x00;
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
+	static U16 wMdSize = 0;
 	Frame result_frame;
 	result_frame.mFlags = SPI_MOSI_FLAG;
 	result_frame.mType = (U8)eState;
@@ -789,11 +803,16 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_size)
 	{
-		if (lFrameData > ABP_MAX_MSG_DATA_BYTES)
+		if ((U16)lFrameData > ABP_MAX_MSG_DATA_BYTES)
 		{
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			wMdSize = 0;
 		}
+		else
+		{
+			wMdSize = (U16)lFrameData;
+	}
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_data)
 	{
@@ -806,6 +825,12 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		** in the results for easy tracking of specific values */
 		result_frame.mData2 = (U64)dwMdCnt;
 		dwMdCnt++;
+		/* Check if the message data counter has reached the end of valid data */
+		if(dwMdCnt > wMdSize)
+		{
+			/* Override frame type */
+			result_frame.mType = (U8)e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid;
+		}
 	}
 	else if (eState == e_ABCC_MOSI_APP_STAT)
 	{
@@ -1283,6 +1308,7 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
+	case e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid:
 		if (bByteCnt >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
 		{
 			*pfAddFrame = true;

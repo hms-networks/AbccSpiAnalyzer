@@ -1483,6 +1483,10 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
 				}
 				break;
+			case e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid:
+				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MOSI_WR_MSG_SUBFIELD_data), number_str, sizeof(number_str));
+				StringBuilder("--", number_str, NULL, alert, false);
+				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_size:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
@@ -1613,6 +1617,10 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
 					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
 				}
+				break;
+			case e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid:
+				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MISO_RD_MSG_SUBFIELD_data), number_str, sizeof(number_str));
+				StringBuilder("--", number_str, NULL, alert, false);
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));

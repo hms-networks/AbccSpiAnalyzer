@@ -86,7 +86,8 @@ typedef enum tAbccMosiStates
 	e_ABCC_MOSI_WR_MSG_SUBFIELD_data,
 	e_ABCC_MOSI_WR_PD_FIELD,
 	e_ABCC_MOSI_CRC32,
-	e_ABCC_MOSI_PAD
+	e_ABCC_MOSI_PAD,
+	e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid
 }tAbccMosiStates;
 
 typedef enum tAbccMisoStates
@@ -109,7 +110,8 @@ typedef enum tAbccMisoStates
 	e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt,
 	e_ABCC_MISO_RD_MSG_SUBFIELD_data,
 	e_ABCC_MISO_RD_PD_FIELD,
-	e_ABCC_MISO_CRC32
+	e_ABCC_MISO_CRC32,
+	e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid
 }tAbccMisoStates;
 
 typedef union uAbccSpiStates
