@@ -26,11 +26,11 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mDataValidEdge(AnalyzerEnums::TrailingEdge),
 	mEnableActiveState(BIT_LOW),
 	mMessageIndexingVerbosityLevel(e_VERBOSITY_LEVEL_DETAILED),
-	mMessageSrcIdIndexing(false),
+	mMessageSrcIdIndexing(true),
 	mErrorIndexing(true),
 	mTimestampIndexing(false),
-	mAnybusStatusIndexing(false),
-	mApplStatusIndexing(false)
+	mAnybusStatusIndexing(true),
+	mApplStatusIndexing(true)
 
 {
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
