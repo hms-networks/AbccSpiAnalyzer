@@ -151,23 +151,24 @@ tValueName asNcInstAttrNames[] =
 
 tValueName asNwEtnInstAttrNames[] =
 {
-	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",				false },
-	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",				false },
-	{ ABP_ETN_IA_ENABLE_WEB,			"Enable Web Server",		false },
-	{ ABP_ETN_IA_ENABLE_MOD_TCP ,		"Enable Modbus TCP",		false },
-	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,	"Enable Web ADI Access",	false },
-	{ ABP_ETN_IA_ENABLE_FTP,			"Enable FTP Server",		false },
-	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,		"Enable Admin Mode",		false },
-	{ ABP_ETN_IA_NETWORK_STATUS,		"Network Status",			false },
-	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",		false },
-	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",		false },
-	{ ABP_ETN_IA_ENABLE_ACD,			"Enable ACD",				false },
-	{ ABP_ETN_IA_PORT1_STATE,			"Port 1 State",				false },
-	{ ABP_ETN_IA_PORT2_STATE,			"Port 2 State",				false },
-	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,		"Enable Web Update",		false },
-	{ ABP_ETN_IA_ENABLE_HICP_RESET,		"Enable Reset From HICP",	false },
-	{ ABP_ETN_IA_IP_CONFIGURATION,		"IP Configuration",			false },
-	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,	"IP Address Byte 0-2",		false }
+	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",					false },
+	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",					false },
+	{ ABP_ETN_IA_ENABLE_WEB,			"Enable Web Server",			false },
+	{ ABP_ETN_IA_ENABLE_MOD_TCP ,		"Enable Modbus TCP",			false },
+	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,	"Enable Web ADI Access",		false },
+	{ ABP_ETN_IA_ENABLE_FTP,			"Enable FTP Server",			false },
+	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,		"Enable Admin Mode",			false },
+	{ ABP_ETN_IA_NETWORK_STATUS,		"Network Status",				false },
+	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",			false },
+	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",			false },
+	{ ABP_ETN_IA_ENABLE_ACD,			"Enable ACD",					false },
+	{ ABP_ETN_IA_PORT1_STATE,			"Port 1 State",					false },
+	{ ABP_ETN_IA_PORT2_STATE,			"Port 2 State",					false },
+	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,		"Enable Web Update",			false },
+	{ ABP_ETN_IA_ENABLE_HICP_RESET,		"Enable Reset From HICP",		false },
+	{ ABP_ETN_IA_IP_CONFIGURATION,		"IP Configuration",				false },
+	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,	"IP Address Byte 0-2",			false },
+	{ ABP_ETN_IA_ETH_PHY_CONFIG,		"PHY Duplex Fallback Config",	false }
 };
 
 tValueName asCpcObjAttrNames[] =
