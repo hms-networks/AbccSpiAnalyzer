@@ -493,6 +493,11 @@ tValueName asAsmCmdNames[] =
 	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	false }
 };
 
+tValueName asFusmCmdNames[] =
+{
+	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,	"Error_Confirmation",	true }
+};
+
 tValueName asFsiCmdNames[] =
 {
 	{ ABP_FSI_CMD_FILE_OPEN,			"File_Open",		false },
@@ -1116,6 +1121,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			/* Network Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asNetCmdNames[0], (sizeof(asNetCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_FUSM:
+			/* Functional Safety Module Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asFusmCmdNames[0], (sizeof(asFusmCmdNames) / sizeof(tValueName)), display_base);
 			break;
 		case ABP_OBJ_NUM_FSI:
 		case ABP_OBJ_NUM_AFSI:
