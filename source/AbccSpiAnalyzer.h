@@ -116,7 +116,7 @@ typedef enum tAbccMisoStates
 
 typedef union uAbccSpiStates
 {
-	U8					bState;
+	U8				bState;
 	tAbccMisoStates	eMiso;
 	tAbccMosiStates	eMosi;
 }uAbccSpiStates;

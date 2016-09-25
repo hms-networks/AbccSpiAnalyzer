@@ -1510,7 +1510,6 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, "Reserved", alert);
 				break;
 			case e_ABCC_MOSI_MSG_LEN:
-
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
@@ -1613,7 +1612,6 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				}
 				else
 				{
-
 					SNPRINTF(str, sizeof(str), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
 				}
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
@@ -2121,7 +2119,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			static char ext_str[2][FORMATTED_STRING_BUFFER_SIZE] = { "" };
 			static bool fMsgValid[2];
 			static bool fMsgErrorRsp[2];
-
 			if (IS_MISO_FRAME(frame))
 			{
 				switch (frame.mType)
@@ -2339,6 +2336,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					{
 						fMsgValid[ABCC_MOSI_CHANNEL] = false;
 					}
+
 					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG)) == SPI_PROTO_EVENT_FLAG)
 					{
 						if (frame_index != 0)
