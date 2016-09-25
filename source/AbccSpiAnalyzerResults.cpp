@@ -1846,6 +1846,31 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 	AnalyzerHelpers::EndFile(f);
 }
 
+U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type)
+{
+	U64 frame_index = INVALID_RESULT_INDEX;
+	U64 first_frame_index;
+	U64 last_frame_index;
+
+	if(packet_index != INVALID_RESULT_INDEX)
+	{
+		GetFramesContainedInPacket(packet_index, &first_frame_index, &last_frame_index);
+		if((first_frame_index != INVALID_RESULT_INDEX) && (last_frame_index != INVALID_RESULT_INDEX))
+		{
+			for(frame_index = first_frame_index; frame_index <= last_frame_index; frame_index++)
+			{
+				Frame frame = GetFrame(frame_index);
+				if( ((fMosiChannel) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
+					((!fMosiChannel) && IS_MISO_FRAME(frame) && (frame.mType == type)) )
+				{
+					break;
+				}
+			}
+		}
+	}
+	return frame_index;
+}
+
 void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase display_base)
 {
 	ClearTabularText();
@@ -1961,17 +1986,85 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 		}
 
-		if (mSettings->mTimestampIndexing == true)
-		{
 			if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
 			{
 				char tmp[35];
+			Frame frame_lookup;
+			U64 frame_index_lookup = INVALID_RESULT_INDEX;
+			U64 packet_index_lookup = GetPacketContainingFrame(frame_index);
+			switch(mSettings->mTimestampIndexing)
+			{
+			case e_TIMESTAMP_ALL_PACKETS:
 				SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
 				AddTabularText("Time : ", tmp);
-				//SNPRINTF(tmp,sizeof(tmp),"0x%08X", (U32)frame.mData1);
-				//AddTabularText("Network Time : ",tmp);
-				return;
+				SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
+				AddTabularText(tmp);
+				break;
+			case e_TIMESTAMP_WRITE_PROCESS_DATA_VALID:
+				if(packet_index_lookup != INVALID_RESULT_INDEX)
+				{
+					frame_index_lookup = GetFrameIdOfAbccFieldContainedInPacket(packet_index_lookup, true, (U8)e_ABCC_MOSI_SPI_CTRL);
+					if(frame_index_lookup != INVALID_RESULT_INDEX)
+					{
+						frame_lookup = GetFrame(frame_index_lookup);
+						if ((frame_lookup.mData1 & ABP_SPI_CTRL_WRPD_VALID) != 0)
+						{
+							//TODO joca: adapt delta, to measure delta between "New Write Process Data"
+							SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
+							AddTabularText("Time : ", tmp);
+							SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
+							AddTabularText(tmp);
+						}
+					}
+					else
+					{
+						/* Print out an Error indicator so that the user can check on this event */
+						SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", frame_index_lookup);
+						AddTabularText("Frame : !", tmp);
+					}
+				}
+				else
+				{
+					/* Print out an Error indicator so that the user can check on this event */
+					SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", packet_index_lookup);
+					AddTabularText("Packet : !", tmp);
+				}
+				break;
+			case e_TIMESTAMP_NEW_READ_PROCESS_DATA:
+				if(packet_index_lookup != INVALID_RESULT_INDEX)
+				{
+					frame_index_lookup = GetFrameIdOfAbccFieldContainedInPacket(packet_index_lookup, false, (U8)e_ABCC_MOSI_SPI_CTRL);
+					if(frame_index_lookup != INVALID_RESULT_INDEX)
+					{
+						frame_lookup = GetFrame(frame_index_lookup);
+						if ((frame_lookup.mData1 & ABP_SPI_STATUS_NEW_PD) != 0)
+						{
+							//TODO joca: adapt delta, to measure delta between "New Write Process Data"
+							SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
+							AddTabularText("Time : ", tmp);
+							SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
+							AddTabularText(tmp);
+						}
+					}
+					else
+					{
+						/* Print out an Error indicator so that the user can check on this event */
+						SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", frame_index_lookup);
+						AddTabularText("Frame : !", tmp);
+					}
+				}
+				else
+				{
+					/* Print out an Error indicator so that the user can check on this event */
+					SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", packet_index_lookup);
+					AddTabularText("Packet : !", tmp);
+				}
+				break;
+			default:
+			case e_TIMESTAMP_DISABLED:
+				break;
 			}
+			return;
 		}
 
 		if (mSettings->mApplStatusIndexing == true)

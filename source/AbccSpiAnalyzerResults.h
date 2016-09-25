@@ -62,6 +62,8 @@ public:
 	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
 	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
 
+	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type);
+
 protected: /* functions */
 
 protected:  /* variables */

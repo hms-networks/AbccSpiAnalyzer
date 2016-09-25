@@ -22,6 +22,14 @@ typedef enum tDecodeVerbosityLevel
 	e_VERBOSITY_LEVEL_DETAILED
 }tDecodeVerbosityLevel;
 
+typedef enum tDecodeTimestampMode
+{
+	e_TIMESTAMP_DISABLED,
+	e_TIMESTAMP_ALL_PACKETS,
+	e_TIMESTAMP_WRITE_PROCESS_DATA_VALID,
+	e_TIMESTAMP_NEW_READ_PROCESS_DATA,
+}tDecodeTimestampMode;
+
 typedef enum tMsgDataPriority
 {
 	e_MSG_DATA_PRIORITIZE_DATA,
@@ -53,7 +61,7 @@ public:
 	U32 mMsgDataPriority;
 	bool mMessageSrcIdIndexing;
 	bool mErrorIndexing;
-	bool mTimestampIndexing;
+	U32 mTimestampIndexing;
 	bool mAnybusStatusIndexing;
 	bool mApplStatusIndexing;
 
@@ -64,8 +72,8 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mClockChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexTimestampsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMsgDataPriorityInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mIndexTimestampsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexMessageSrcIdInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexAnybusStatusInterface;

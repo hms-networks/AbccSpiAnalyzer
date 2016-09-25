@@ -29,7 +29,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMsgDataPriority(e_MSG_DATA_PRIORITIZE_DATA),
 	mMessageSrcIdIndexing(true),
 	mErrorIndexing(true),
-	mTimestampIndexing(false),
+	mTimestampIndexing(e_TIMESTAMP_DISABLED),
 	mAnybusStatusIndexing(true),
 	mApplStatusIndexing(true)
 
@@ -59,10 +59,6 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mIndexErrorsInterface->SetTitleAndTooltip("Error Indexing :", "Enable indexed searching of errors.");
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 
-	mIndexTimestampsInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexTimestampsInterface->SetTitleAndTooltip("Timestamp Indexing :", "Enable indexed searching of timestamps.");
-	mIndexTimestampsInterface->SetValue(mTimestampIndexing);
-
 	mIndexAnybusStatusInterface.reset(new AnalyzerSettingInterfaceBool());
 	mIndexAnybusStatusInterface->SetTitleAndTooltip("Anybus Status Indexing :", "Enable indexed searching of Anybus status.");
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
@@ -70,6 +66,14 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mIndexApplStatusInterface.reset(new AnalyzerSettingInterfaceBool());
 	mIndexApplStatusInterface->SetTitleAndTooltip("Application Status Indexing :", "Enable indexed searching of application status.");
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
+
+	mIndexTimestampsInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mIndexTimestampsInterface->SetTitleAndTooltip("Index - Network Timestamp :", "Enable indexed searching of ABCC network timestamps.\nUseful for benchmarking; otherwise it is recommended to keep this option disabled.");
+	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_DISABLED,  "Disabled", "No network timestamps will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_ALL_PACKETS,  "All Packets", "The timestamp from every ABCC SPI packet will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_WRITE_PROCESS_DATA_VALID, "Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_NEW_READ_PROCESS_DATA, "New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
+	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
 
 	mMessageIndexingVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :", "Specifies how detailed the decoded protcols entries are.");
@@ -89,11 +93,11 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mClockChannelInterface.get());
 	AddInterface(mEnableChannelInterface.get());
 
-	AddInterface(mIndexMessageSrcIdInterface.get());
 	AddInterface(mIndexErrorsInterface.get());
 	AddInterface(mIndexTimestampsInterface.get());
 	AddInterface(mIndexAnybusStatusInterface.get());
 	AddInterface(mIndexApplStatusInterface.get());
+	AddInterface(mIndexMessageSrcIdInterface.get());
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 	AddInterface(mMsgDataPriorityInterface.get());
 
@@ -147,7 +151,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mMsgDataPriority = U32(mMsgDataPriorityInterface->GetNumber());
 	mMessageSrcIdIndexing = bool(mIndexMessageSrcIdInterface->GetValue());
 	mErrorIndexing = bool(mIndexErrorsInterface->GetValue());
-	mTimestampIndexing = bool(mIndexTimestampsInterface->GetValue());
+	mTimestampIndexing = U32(mIndexTimestampsInterface->GetNumber());
 	mAnybusStatusIndexing = bool(mIndexAnybusStatusInterface->GetValue());
 	mApplStatusIndexing = bool(mIndexApplStatusInterface->GetValue());
 
@@ -232,7 +236,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
-	mIndexTimestampsInterface->SetValue(mTimestampIndexing);
+	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
 }
