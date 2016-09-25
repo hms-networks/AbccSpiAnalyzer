@@ -51,20 +51,16 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
 
-	mIndexMessageSrcIdInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexMessageSrcIdInterface->SetTitleAndTooltip("ABCC Message 'Source ID' Indexing :", "Enable indexed searching of the source ID associated with an ABCC message.");
-	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
-
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexErrorsInterface->SetTitleAndTooltip("Error Indexing :", "Enable indexed searching of errors.");
+	mIndexErrorsInterface->SetTitleAndTooltip("Index - Errors :", "Enable indexed searching of errors.");
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 
 	mIndexAnybusStatusInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexAnybusStatusInterface->SetTitleAndTooltip("Anybus Status Indexing :", "Enable indexed searching of Anybus status.");
+	mIndexAnybusStatusInterface->SetTitleAndTooltip("Index - Anybus Status :", "Enable indexed searching of Anybus status.\nEntries are added on status change events.\nFirst valid packet in capture will always trigger this event.");
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 
 	mIndexApplStatusInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexApplStatusInterface->SetTitleAndTooltip("Application Status Indexing :", "Enable indexed searching of application status.");
+	mIndexApplStatusInterface->SetTitleAndTooltip("Index - Application Status :", "Enable indexed searching of application status.\nEntries are added on status change events.\nFirst valid packet in capture will always trigger this event.");
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
 
 	mIndexTimestampsInterface.reset(new AnalyzerSettingInterfaceNumberList());
@@ -74,6 +70,10 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_WRITE_PROCESS_DATA_VALID, "Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
 	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_NEW_READ_PROCESS_DATA, "New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
 	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
+
+	mIndexMessageSrcIdInterface.reset(new AnalyzerSettingInterfaceBool());
+	mIndexMessageSrcIdInterface->SetTitleAndTooltip("Index - Message 'Source ID' :", "Enable indexed searching of the source ID associated with an ABCC transaction.");
+	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 
 	mMessageIndexingVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :", "Specifies how detailed the decoded protcols entries are.");
