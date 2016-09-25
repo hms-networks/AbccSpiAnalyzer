@@ -45,6 +45,7 @@ public:
 	virtual void GenerateExportFile(const char* file, DisplayBase display_base, U32 export_type_user_id);
 
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert);
+	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue);
 
 	virtual void BuildSpiCtrlString(U8 val, DisplayBase display_base);
 	virtual void BuildSpiStsString(U8 val, DisplayBase display_base);

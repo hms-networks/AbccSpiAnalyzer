@@ -22,6 +22,12 @@ typedef enum tDecodeVerbosityLevel
 	e_VERBOSITY_LEVEL_DETAILED
 }tDecodeVerbosityLevel;
 
+typedef enum tMsgDataPriority
+{
+	e_MSG_DATA_PRIORITIZE_DATA,
+	e_MSG_DATA_PRIORITIZE_TAG
+}tMsgDataPriority;
+
 class SpiAnalyzerSettings : public AnalyzerSettings
 {
 public:
@@ -44,6 +50,7 @@ public:
 	AnalyzerEnums::Edge mDataValidEdge;
 	BitState mEnableActiveState;
 	U32 mMessageIndexingVerbosityLevel;
+	U32 mMsgDataPriority;
 	bool mMessageSrcIdIndexing;
 	bool mErrorIndexing;
 	bool mTimestampIndexing;
@@ -58,6 +65,7 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > mIndexTimestampsInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMsgDataPriorityInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexMessageSrcIdInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexAnybusStatusInterface;

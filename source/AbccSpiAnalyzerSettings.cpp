@@ -26,6 +26,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mDataValidEdge(AnalyzerEnums::TrailingEdge),
 	mEnableActiveState(BIT_LOW),
 	mMessageIndexingVerbosityLevel(e_VERBOSITY_LEVEL_DETAILED),
+	mMsgDataPriority(e_MSG_DATA_PRIORITIZE_DATA),
 	mMessageSrcIdIndexing(true),
 	mErrorIndexing(true),
 	mTimestampIndexing(false),
@@ -76,6 +77,13 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_COMPACT,  "Compact Results", "Message header information is added to a single tabular result.\nThis option is useful when looking for very specific messages.");
 	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DETAILED, "Verbose Results", "Message header information is added to tabular results individually.\nRecommended setting for general use.");
 	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
+
+	mMsgDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Proirity :", "Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
+	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_DATA, "Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
+
 	AddInterface(mMosiChannelInterface.get());
 	AddInterface(mMisoChannelInterface.get());
 	AddInterface(mClockChannelInterface.get());
@@ -87,6 +95,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mIndexAnybusStatusInterface.get());
 	AddInterface(mIndexApplStatusInterface.get());
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
+	AddInterface(mMsgDataPriorityInterface.get());
 
 	//AddExportOption( 0, "Export as text/csv file", "text (*.txt);;csv (*.csv)" );
 	AddExportOption(0, "Export as text/csv file");
@@ -135,6 +144,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mEnableChannel = mEnableChannelInterface->GetChannel();
 
 	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
+	mMsgDataPriority = U32(mMsgDataPriorityInterface->GetNumber());
 	mMessageSrcIdIndexing = bool(mIndexMessageSrcIdInterface->GetValue());
 	mErrorIndexing = bool(mIndexErrorsInterface->GetValue());
 	mTimestampIndexing = bool(mIndexTimestampsInterface->GetValue());
@@ -170,6 +180,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	text_archive >> mEnableChannel;
 
 	text_archive >> mMessageIndexingVerbosityLevel;
+	text_archive >> mMsgDataPriority;
 	text_archive >> mMessageSrcIdIndexing;
 	text_archive >> mErrorIndexing;
 	text_archive >> mTimestampIndexing;
@@ -200,6 +211,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mEnableChannel;
 
 	text_archive << mMessageIndexingVerbosityLevel;
+	text_archive << mMsgDataPriority;
 	text_archive << mMessageSrcIdIndexing;
 	text_archive << mErrorIndexing;
 	text_archive << mTimestampIndexing;
@@ -217,6 +229,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 
 	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
+	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 	mIndexTimestampsInterface->SetValue(mTimestampIndexing);

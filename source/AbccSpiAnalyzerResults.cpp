@@ -674,14 +674,24 @@ SpiAnalyzerResults::~SpiAnalyzerResults()
 
 void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert)
 {
+	StringBuilder(tag, value, verbose, alert, false);
+}
+
+void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue)
+{
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	U16 len2, len3;
 	char pad[32] = "";
+	const char alert_str[] = "!ALERT - ";
 	bool apply_pad = false;
 
 	if (verbose && value)
 	{
 		len2 = (U16)strlen(value);
+		if(alert)
+		{
+			len2 += sizeof(alert_str);
+		}
 		len3 = (U16)strlen(verbose);
 		if (len3 <= len2)
 		{
@@ -702,11 +712,49 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			str[0] = tag[0];
 		}
 
-		str[1] = NULL;
+		if (alert || !prioritizeValue)
+		{
+			str[1] = '\0';
+			AddResultString(str);
+		}
+
+		if (prioritizeValue)
+		{
+			if (value)
+			{
+				if (alert)
+				{
+					AddResultString(alert_str, value);
+				}
+				else
+				{
+					AddResultString(value);
+				}
+			}
+
+			if (verbose)
+			{
+				SNPRINTF(str, sizeof(str), "%s: %s", tag, value);
+			}
+			else
+			{
+				SNPRINTF(str, sizeof(str), "%s: [%s]", tag, value);
+		}
+
+			if (alert)
+			{
+				AddResultString(alert_str, str);
+			}
+			else
+			{
 		AddResultString(str);
+			}
+		}
+		else
+		{
 		if (alert)
 		{
-			AddResultString("!ALERT - ", tag);
+				AddResultString(alert_str, tag);
 		}
 		else
 		{
@@ -725,7 +773,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			}
 			if (alert)
 			{
-				AddResultString("!ALERT - ", str);
+					AddResultString(alert_str, str);
 			}
 			else
 			{
@@ -733,12 +781,20 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			}
 		}
 	}
+	}
 	else
 	{
 		if (value)
 		{
 			SNPRINTF(str, sizeof(str), "%s", value);
+			if (alert)
+			{
+				AddResultString(alert_str, str);
+			}
+			else
+			{
 			AddResultString(str);
+			}
 		}
 	}
 
@@ -1480,7 +1536,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
 				}
 				break;
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid:
@@ -1615,7 +1671,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
+					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
 				}
 				break;
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid:
