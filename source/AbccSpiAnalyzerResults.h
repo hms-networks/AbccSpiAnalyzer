@@ -46,6 +46,7 @@ public:
 
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert);
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue);
+	virtual void TableBuilder(bool fMosiChannel, char* text, bool alert);
 
 	virtual void BuildSpiCtrlString(U8 val, DisplayBase display_base);
 	virtual void BuildSpiStsString(U8 val, DisplayBase display_base);

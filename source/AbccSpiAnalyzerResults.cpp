@@ -826,6 +826,31 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 	}
 }
 
+void SpiAnalyzerResults::TableBuilder(bool fMosiChannel, char* text, bool alert)
+{
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char* prefix;
+	char mosi_prefix[] = "MOSI-";
+	char miso_prefix[] = "MISO-";
+	if(fMosiChannel)
+	{
+		prefix = &mosi_prefix[0];
+	}
+	else
+	{
+		prefix = &miso_prefix[0];
+	}
+	if(alert)
+	{
+		SNPRINTF(str, sizeof(str), "%s!%s", prefix, text);
+	}
+	else
+	{
+		SNPRINTF(str, sizeof(str), "%s%s", prefix, text);
+	}
+	AddTabularText(str);
+}
+
 bool GetSpiCtrlString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 {
 	bool firstFlag = true;
