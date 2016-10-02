@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\AbccCrc.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzer.cpp" />
+    <ClCompile Include="..\..\source\AbccSpiAnalyzerLookup.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzerResults.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzerSettings.cpp" />
     <ClCompile Include="..\..\source\AbccSpiSimulationDataGenerator.cpp" />
@@ -179,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\AbccCrc.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzer.h" />
+    <ClInclude Include="..\..\source\AbccSpiAnalyzerLookup.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerResults.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerSettings.h" />
     <ClInclude Include="..\..\source\AbccSpiSimulationDataGenerator.h" />
