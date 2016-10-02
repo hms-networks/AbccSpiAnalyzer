@@ -105,7 +105,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			else
 			{
 				SNPRINTF(str, sizeof(str), "%s: [%s]", tag, value);
-		}
+			}
 
 			if (alert)
 			{
@@ -113,40 +113,40 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			}
 			else
 			{
-		AddResultString(str);
-			}
-		}
-		else
-		{
-		if (alert)
-		{
-				AddResultString(alert_str, tag);
-		}
-		else
-		{
-			AddResultString(tag);
-		}
-
-		if (value)
-		{
-			if (verbose)
-			{
-				SNPRINTF(str, sizeof(str), "%s: %s", tag, value);
-			}
-			else
-			{
-				SNPRINTF(str, sizeof(str), "%s: [%s]", tag, value);
-			}
-			if (alert)
-			{
-					AddResultString(alert_str, str);
-			}
-			else
-			{
 				AddResultString(str);
 			}
 		}
-	}
+		else
+		{
+			if (alert)
+			{
+				AddResultString(alert_str, tag);
+			}
+			else
+			{
+				AddResultString(tag);
+			}
+
+			if (value)
+			{
+				if (verbose)
+				{
+					SNPRINTF(str, sizeof(str), "%s: %s", tag, value);
+				}
+				else
+				{
+					SNPRINTF(str, sizeof(str), "%s: [%s]", tag, value);
+				}
+				if (alert)
+				{
+					AddResultString(alert_str, str);
+				}
+				else
+				{
+					AddResultString(str);
+				}
+			}
+		}
 	}
 	else
 	{
@@ -159,7 +159,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			}
 			else
 			{
-			AddResultString(str);
+				AddResultString(str);
 			}
 		}
 	}
