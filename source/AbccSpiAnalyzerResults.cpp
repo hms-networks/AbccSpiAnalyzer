@@ -1973,37 +1973,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					return;
 				}
 			}
-
-			/* TODO: disabled as this results in a lot of extra messages in certain driver implmentations, consider adding a verbose debug-level option for decodes.
-			if(IS_MOSI_FRAME(frame))
-			{
-				if ((frame.mType == e_ABCC_MOSI_RESERVED1) ||
-					(frame.mType == e_ABCC_MOSI_WR_MSG_SUBFIELD_res1) ||
-					(frame.mType == e_ABCC_MOSI_WR_MSG_SUBFIELD_res2) ||
-					(frame.mType == e_ABCC_MOSI_PAD))
-				{
-					if(frame.mData1 != 0)
-					{
-						AddTabularText("!Reserved");
-					}
-				}
 			}
-			else
-			{
-				if ((frame.mType == e_ABCC_MISO_RD_MSG_SUBFIELD_res1) ||
-					(frame.mType == e_ABCC_MISO_RD_MSG_SUBFIELD_res2) ||
-					(frame.mType == e_ABCC_MISO_Reserved1) ||
-					(frame.mType == e_ABCC_MISO_Reserved2))
-				{
-					if(frame.mData1 != 0)
-					{
-						AddTabularText("!Reserved");
-					}
-				}
-			}
-			*/
-
-		}
 
 			if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
 			{
