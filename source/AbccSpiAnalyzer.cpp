@@ -214,9 +214,6 @@ void SpiAnalyzer::WorkerThread()
 
 void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 {
-	//mResults->CommitPacketAndStartNewPacket();
-	//mResults->CommitResults();
-
 	AdvanceToActiveEnableEdge();
 
 	for (;;)
