@@ -173,7 +173,10 @@ void SpiAnalyzer::WorkerThread()
 	bLastAnbSts = 0xFF;
 	bLastApplSts = 0xFF;
 
-	for ( ; ; )
+	RunAbccMosiMsgSubStateMachine(true, NULL, NULL);
+	RunAbccMisoMsgSubStateMachine(true, NULL, NULL);
+
+	for (;;)
 	{
 		/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
 		eWordStatus = GetWord(&lMosiData, &lMisoData, &lFirstSample);
