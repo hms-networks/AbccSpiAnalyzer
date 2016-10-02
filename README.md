@@ -50,7 +50,7 @@ difficult-to-diagnose issues that arise during initial development efforts.
 
 To compile the project please ensure the **additional** requirements are met:
 
-* Visual Studio 2012 or later *(retargetting project may be neccessary)*
+* Visual Studio 2012 or later *(retargetting project may be necessary)*
 
 When compiling the project, please ensure that the correct library is linked</br>
 for your Windows OS.
@@ -71,7 +71,7 @@ other protocol analyzers are added to the Logic software.
 
 ### [Linux](#table-of-contents)
 
-* To comiple simply run the `build_analyzer.py` python script. This script will</br>
+* To compile simply run the `build_analyzer.py` python script. This script will</br>
   compile the appropriate shared object library based on the host system.
 
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`</br>
@@ -81,7 +81,7 @@ installation in the "Analyzers" folder.
 
 ### [OS X](#table-of-contents)
 
-* To comiple simply run the `build_analyzer.py` python script.
+* To compile simply run the `build_analyzer.py` python script.
 
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside</br>
 in the `./plugins/OSX/` folder. Copy this dynamic object to your Saleae Logic</br>
@@ -90,17 +90,17 @@ software installation in the "Analyzers" folder.
 ## [Documentation](#table-of-contents)
 
 For information on how to get started please consult the quick start guide</br>
-included in this repository's documenation folder.
+included in this repository's documentation folder.
 
 ## [Future Improvements](#table-of-contents)
 
 * Further expand on the options for indexed searching:
   - Index a subset of message data with an 'offset' and 'size' (or all data)
   - Index a subset of process data with an 'offset' and 'size' (or all data)
-* Improve data generator (simulation) as of now it is very primative.
+* Improve data generator (simulation) as of now it is very primitive.
 * Add (better) support for exporting data
 * Improve 3-wire transaction alignment by including an inter-packet gap</br>
-  parameter. Without this, bad captures are likely in this mode if the begining</br>
+  parameter. Without this, bad captures are likely in this mode if the beginning</br>
   of the capture takes place in the middle of a transaction. That said the user</br>
   can use the built-in feature "Re-run starting at timing marker..." option.
 * Support multiple instances of the analyzer plugin.
@@ -108,11 +108,11 @@ included in this repository's documenation folder.
   command and response messages as a transaction based on the source IDs.
 * Support the enumeration of object specific error response information.
 * Refrain from ending SPI message fragmentation until the next valid message is</br>
-  received. This will improve readablity of messages that are left in the</br>
+  received. This will improve readability of messages that are left in the</br>
   message buffer.
 * Add inter-sample state change detection and warn the user of possible jitter,</br>
-  signal-integrity, or baudrate settings issue.
-* Improve the useage of "Error Markers".
+  signal-integrity, or baud rate settings issue.
+* Improve the usage of "Error Markers".
 * Include reserved/unknown/error values seen in other fields as part of error</br>
   indexing.
 * Add mechanism to detect mismatch of command message header and response</br>
@@ -136,7 +136,7 @@ included in this repository's documenation folder.
 * First implementation of the ABCC SPI protocol analyzer
 * Supports basic messaging and error indication
 * Supports CRC32 computation and indication on invalid checksum.
-* Identifies fragmented SPI telegrams (not to be confussed with the ABCC SPI</br>
+* Identifies fragmented SPI telegrams (not to be confused with the ABCC SPI</br>
   protocol's message fragmentation or segmentation).
 * Supports both 3-wire and 4-wire Full Duplex configurations. 4-wire is</br>
   recommended for improved reliability in protocol analysis.
