@@ -1913,13 +1913,9 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		{
 			if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 			{
-				if ((frame.mType == e_ABCC_MISO_CRC32) && IS_MISO_FRAME(frame))
+				if (frame.mType == e_ABCC_MISO_CRC32)
 				{
-					AddTabularText("MISO-!CRC32");
-				}
-				else if ((frame.mType == e_ABCC_MOSI_CRC32) && IS_MOSI_FRAME(frame))
-				{
-					AddTabularText("MOSI-!CRC32");
+					TableBuilder(IS_MOSI_FRAME(frame), "CRC32", true);
 				}
 				return;
 			}
@@ -1968,12 +1964,12 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				}
 				else if ((frame.mType == e_ABCC_MISO_RD_MSG_SUBFIELD_size) && IS_MISO_FRAME(frame))
 				{
-					AddTabularText("MISO-!Message Size : Exceeds Maximum");
+					TableBuilder(false, "Message Size : Exceeds Maximum", true);
 					return;
 				}
 				else if ((frame.mType == e_ABCC_MOSI_WR_MSG_SUBFIELD_size) && IS_MOSI_FRAME(frame))
 				{
-					AddTabularText("MOSI-!Message Size : Exceeds Maximum");
+					TableBuilder(true, "Message Size : Exceeds Maximum", true);
 					return;
 				}
 			}
@@ -2160,7 +2156,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG)) == SPI_PROTO_EVENT_FLAG)
 					{
-						AddTabularText("MISO-{Write Message Buffer Full}");
+						TableBuilder(false, "{Write Message Buffer Full}", false);
 						return;
 					}
 					else if ((frame.mFlags & (SPI_MSG_FRAG_FLAG | SPI_MSG_FIRST_FRAG_FLAG)) == SPI_MSG_FRAG_FLAG)
@@ -2171,12 +2167,12 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
 							{
 								/* Last fragment */
-								AddTabularText("MISO-{Message Fragment}");
+								TableBuilder(false, "{Message Fragment}", false);
 							}
 							else
 							{
 								/* More fragments follow */
-								AddTabularText("MISO-{Message Fragment}++");
+								TableBuilder(false, "{Message Fragment}++", false);
 							}
 						}
 						return;
@@ -2185,15 +2181,15 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
 					if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 					{
-						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "MISO-!Size: %u Bytes", (U16)frame.mData1);
+						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "!Size: %u Bytes", (U16)frame.mData1);
 					}
 					else
 					{
-						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "MISO-Size: %u Bytes", (U16)frame.mData1);
+						SNPRINTF(size_str[ABCC_MISO_CHANNEL], sizeof(size_str[ABCC_MISO_CHANNEL]), "Size: %u Bytes", (U16)frame.mData1);
 					}
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
-					SNPRINTF(src_str[ABCC_MISO_CHANNEL], sizeof(src_str[ABCC_MISO_CHANNEL]), "MISO-Source ID: 0x%02X", (U8)frame.mData1);
+					SNPRINTF(src_str[ABCC_MISO_CHANNEL], sizeof(src_str[ABCC_MISO_CHANNEL]), "Source ID: 0x%02X", (U8)frame.mData1);
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
@@ -2202,11 +2198,11 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						bool alert = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
 						if (alert)
 						{
-							SNPRINTF(obj_str[ABCC_MISO_CHANNEL], sizeof(obj_str[ABCC_MISO_CHANNEL]), "MISO-!Object: %s", str);
+							SNPRINTF(obj_str[ABCC_MISO_CHANNEL], sizeof(obj_str[ABCC_MISO_CHANNEL]), "!Object: %s", str);
 						}
 						else
 						{
-							SNPRINTF(obj_str[ABCC_MISO_CHANNEL], sizeof(obj_str[ABCC_MISO_CHANNEL]), "MISO-Object: %s", str);
+							SNPRINTF(obj_str[ABCC_MISO_CHANNEL], sizeof(obj_str[ABCC_MISO_CHANNEL]), "Object: %s", str);
 						}
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
@@ -2217,7 +2213,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(inst_str[ABCC_MISO_CHANNEL], sizeof(inst_str[ABCC_MISO_CHANNEL]), "MISO-Instance: 0x%04X", (U16)frame.mData1);
+						SNPRINTF(inst_str[ABCC_MISO_CHANNEL], sizeof(inst_str[ABCC_MISO_CHANNEL]), "Instance: 0x%04X", (U16)frame.mData1);
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{
@@ -2241,22 +2237,22 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						{
 							if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
 							{
-								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "MISO-!Command: %s", str);
+								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "!Command: %s", str);
 							}
 							else
 							{
-								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "MISO-!Response: %s", str);
+								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "!Response: %s", str);
 							}
 						}
 						else
 						{
 							if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
 							{
-								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "MISO-Command: %s", str);
+								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "Command: %s", str);
 							}
 							else
 							{
-								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "MISO-Response: %s", str);
+								SNPRINTF(cmd_str[ABCC_MISO_CHANNEL], sizeof(cmd_str[ABCC_MISO_CHANNEL]), "Response: %s", str);
 							}
 						}
 					}
@@ -2281,7 +2277,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						if (mSettings->mMessageSrcIdIndexing == true)
 						{
-							AddTabularText(src_str[ABCC_MISO_CHANNEL]);
+							TableBuilder(false, src_str[ABCC_MISO_CHANNEL], false);
 						}
 						if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 						{
@@ -2305,20 +2301,20 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (alert)
 							{
-								SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "MISO-!Extension: %s", str);
+								SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "!Extension: %s", str);
 							}
 							else
 							{
-								SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "MISO-Extension: %s", str);
+								SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "Extension: %s", str);
 							}
-							AddTabularText(size_str[ABCC_MISO_CHANNEL]);
-							AddTabularText(obj_str[ABCC_MISO_CHANNEL]);
-							AddTabularText(inst_str[ABCC_MISO_CHANNEL]);
-							AddTabularText(cmd_str[ABCC_MISO_CHANNEL]);
-							AddTabularText(ext_str[ABCC_MISO_CHANNEL]);
+							TableBuilder(false, size_str[ABCC_MISO_CHANNEL], false);
+							TableBuilder(false, obj_str[ABCC_MISO_CHANNEL], false);
+							TableBuilder(false, inst_str[ABCC_MISO_CHANNEL], false);
+							TableBuilder(false, cmd_str[ABCC_MISO_CHANNEL], false);
+							TableBuilder(false, ext_str[ABCC_MISO_CHANNEL], false);
 							if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
 							{
-								AddTabularText("MISO-First Fragment, More Follow");
+								TableBuilder(false, "First Fragment, More Follow", false);
 							}
 						}
 						else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
@@ -2366,7 +2362,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					{
 						if (frame_index != 0)
 						{
-							AddTabularText("MOSI-{Message Retransmit}");
+							TableBuilder(true, "{Message Retransmit}", false);
 							return;
 						}
 					}
@@ -2378,12 +2374,12 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
 							{
 								/* Last fragment */
-								AddTabularText("MOSI-{Message Fragment}");
+								TableBuilder(true, "{Message Fragment}", false);
 							}
 							else
 							{
 								/* More fragments follow */
-								AddTabularText("MOSI-{Message Fragment}++");
+								TableBuilder(true, "{Message Fragment}++", false);
 							}
 						}
 						return;
@@ -2392,15 +2388,15 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
 					if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 					{
-						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "MOSI-!Size: %u Bytes", (U16)frame.mData1);
+						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "!Size: %u Bytes", (U16)frame.mData1);
 					}
 					else
 					{
-						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "MOSI-Size: %u Bytes", (U16)frame.mData1);
+						SNPRINTF(size_str[ABCC_MOSI_CHANNEL], sizeof(size_str[ABCC_MOSI_CHANNEL]), "Size: %u Bytes", (U16)frame.mData1);
 					}
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
-					SNPRINTF(src_str[ABCC_MOSI_CHANNEL], sizeof(src_str[ABCC_MOSI_CHANNEL]), "MOSI-Source ID: 0x%02X", (U8)frame.mData1);
+					SNPRINTF(src_str[ABCC_MOSI_CHANNEL], sizeof(src_str[ABCC_MOSI_CHANNEL]), "Source ID: 0x%02X", (U8)frame.mData1);
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
@@ -2409,11 +2405,11 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						bool alert = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
 						if (alert)
 						{
-							SNPRINTF(obj_str[ABCC_MOSI_CHANNEL], sizeof(obj_str[ABCC_MOSI_CHANNEL]), "MOSI-!Object: %s", str);
+							SNPRINTF(obj_str[ABCC_MOSI_CHANNEL], sizeof(obj_str[ABCC_MOSI_CHANNEL]), "!Object: %s", str);
 						}
 						else
 						{
-							SNPRINTF(obj_str[ABCC_MOSI_CHANNEL], sizeof(obj_str[ABCC_MOSI_CHANNEL]), "MOSI-Object: %s", str);
+							SNPRINTF(obj_str[ABCC_MOSI_CHANNEL], sizeof(obj_str[ABCC_MOSI_CHANNEL]), "Object: %s", str);
 						}
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
@@ -2424,7 +2420,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(inst_str[ABCC_MOSI_CHANNEL], sizeof(inst_str[ABCC_MOSI_CHANNEL]), "MOSI-Instance: 0x%04X", (U16)frame.mData1);
+						SNPRINTF(inst_str[ABCC_MOSI_CHANNEL], sizeof(inst_str[ABCC_MOSI_CHANNEL]), "Instance: 0x%04X", (U16)frame.mData1);
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{
@@ -2448,22 +2444,22 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						{
 							if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
 							{
-								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "MOSI-!Command: %s", str);
+								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "!Command: %s", str);
 							}
 							else
 							{
-								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "MOSI-!Response: %s", str);
+								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "!Response: %s", str);
 							}
 						}
 						else
 						{
 							if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
 							{
-								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "MOSI-Command: %s", str);
+								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "Command: %s", str);
 							}
 							else
 							{
-								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "MOSI-Response: %s", str);
+								SNPRINTF(cmd_str[ABCC_MOSI_CHANNEL], sizeof(cmd_str[ABCC_MOSI_CHANNEL]), "Response: %s", str);
 							}
 						}
 					}
@@ -2488,7 +2484,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						if (mSettings->mMessageSrcIdIndexing == true)
 						{
-							AddTabularText(src_str[ABCC_MOSI_CHANNEL]);
+							TableBuilder(true, src_str[ABCC_MOSI_CHANNEL], false);
 						}
 						if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 						{
@@ -2512,20 +2508,20 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (alert)
 							{
-								SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "MOSI-!Extension: %s", str);
+								SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "!Extension: %s", str);
 							}
 							else
 							{
-								SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "MOSI-Extension: %s", str);
+								SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "Extension: %s", str);
 							}
-							AddTabularText(size_str[ABCC_MOSI_CHANNEL]);
-							AddTabularText(obj_str[ABCC_MOSI_CHANNEL]);
-							AddTabularText(inst_str[ABCC_MOSI_CHANNEL]);
-							AddTabularText(cmd_str[ABCC_MOSI_CHANNEL]);
-							AddTabularText(ext_str[ABCC_MOSI_CHANNEL]);
+							TableBuilder(true, size_str[ABCC_MOSI_CHANNEL], false);
+							TableBuilder(true, obj_str[ABCC_MOSI_CHANNEL], false);
+							TableBuilder(true, inst_str[ABCC_MOSI_CHANNEL], false);
+							TableBuilder(true, cmd_str[ABCC_MOSI_CHANNEL], false);
+							TableBuilder(true, ext_str[ABCC_MOSI_CHANNEL], false);
 							if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
 							{
-								AddTabularText("MOSI-First Fragment, More Follow");
+								TableBuilder(true, "First Fragment, More Follow", false);
 							}
 						}
 						else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
