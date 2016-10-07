@@ -930,8 +930,6 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 		{
 			AddFragFrame(true, (U8)eMosiState, lFirstSample, mEnable->GetSampleOfNextEdge());
 		}
-		//lFrameData = 0;
-		//dwByteCnt = 0;
 		return true;
 	}
 
@@ -1292,8 +1290,6 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 		{
 			AddFragFrame(false, (U8)eMisoState, lFirstSample, mEnable->GetSampleOfNextEdge());
 		}
-		//lFrameData = 0;
-		//dwByteCnt = 0;
 		return true;
 	}
 
