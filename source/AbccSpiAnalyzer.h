@@ -46,18 +46,6 @@
 #define GET_MOSI_FRAME_BITSIZE(x)		((asMosiStates[x].frameSize)*8)
 #define GET_MISO_FRAME_BITSIZE(x)		((asMisoStates[x].frameSize)*8)
 
-#define ABCC_MSG_SIZE_FIELD_SIZE		2
-#define ABCC_MSG_RES1_FIELD_SIZE		2
-#define ABCC_MSG_SRC_ID_FIELD_SIZE		1
-#define ABCC_MSG_OBJ_FIELD_SIZE			1
-#define ABCC_MSG_INST_FIELD_SIZE		2
-#define ABCC_MSG_CMD_FIELD_SIZE			1
-#define ABCC_MSG_RES2_FIELD_SIZE		1
-#define ABCC_MSG_CMDEXT_FIELD_SIZE		2
-#define ABCC_MSG_CMDEXT0_FIELD_SIZE		1
-#define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
-#define ABCC_MSG_DATA_FIELD_SIZE		1
-
 typedef enum tGetWordStatus
 {
 	e_GET_WORD_OK,		/* WORD was successfully read */
