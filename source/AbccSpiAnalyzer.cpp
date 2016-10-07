@@ -144,10 +144,13 @@ void SpiAnalyzer::WorkerThread()
 		{
 			/* Signal error, do not commit packet */
 			SignalReadyForNewPacket(false, fError);
-			mResults->CommitResults();
+
 			/* Advance to the next enabled state */
 			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 		}
+
+		mResults->CommitResults();
+		ReportProgress(mClock->GetSampleNumber());
 
 		CheckIfThreadShouldExit();
 	}
@@ -245,8 +248,6 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 		error_frame.mEndingSampleInclusive = mCurrentSample;
 		error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
 		mResults->AddFrame(error_frame);
-		mResults->CommitResults();
-		ReportProgress(error_frame.mEndingSampleInclusive);
 
 		/* move to the next enable-active edge */
 		mEnable->AdvanceToNextEdge();
@@ -295,8 +296,6 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 	mosi_result.Reset(plMosiData, mSettings->mShiftOrder, bits_per_transfer);
 	miso_result.Reset(plMisoData, mSettings->mShiftOrder, bits_per_transfer);
 	mArrowLocations.clear();
-
-	ReportProgress(mClock->GetSampleNumber());
 
 	*plFirstSample = mClock->GetSampleNumber();
 
@@ -688,7 +687,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	{
 		SignalReadyForNewPacket(false, false);
 	}
-	mResults->CommitResults();
 }
 
 void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 lFramesFirstSample)
@@ -853,7 +851,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	{
 		SignalReadyForNewPacket(true, false);
 	}
-	mResults->CommitResults();
 }
 
 void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
@@ -909,7 +906,6 @@ void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLas
 		mResults->AddMarker(lLastSample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 	}
 	mResults->AddFrame(frag_frame);
-	mResults->CommitResults();
 }
 
 bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiData, S64 lFirstSample)
