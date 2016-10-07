@@ -163,6 +163,10 @@ typedef struct tValueName
 	bool	alert;
 }tValueName;
 
+extern tAbccMosiInfo asMosiStates[];
+extern tAbccMisoInfo asMisoStates[];
+extern tAbccMsgInfo asMsgStates[];
+
 class SpiAnalyzerSettings;
 class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
 {

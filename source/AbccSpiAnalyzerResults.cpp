@@ -23,10 +23,6 @@
 #define IS_MISO_FRAME(frame) 			((frame.mFlags & SPI_MOSI_FLAG)!=SPI_MOSI_FLAG)
 #define IS_MOSI_FRAME(frame)			((frame.mFlags & SPI_MOSI_FLAG)==SPI_MOSI_FLAG)
 
-extern tAbccMosiInfo asMosiStates[];
-extern tAbccMisoInfo asMisoStates[];
-extern tAbccMsgInfo asMsgStates[];
-
 SpiAnalyzerResults::SpiAnalyzerResults(SpiAnalyzer* analyzer, SpiAnalyzerSettings* settings)
 	: AnalyzerResults(),
 	mSettings(settings),
