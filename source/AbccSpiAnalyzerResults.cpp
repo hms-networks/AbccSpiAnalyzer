@@ -426,14 +426,14 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 					((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR))
 				{
-					//TODO joca consider making a type for the data stored here
-					BuildAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, false, display_base);
+					tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, false, display_base);
 				}
 				else if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 					((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 				{
-					//TODO joca consider making a type for the data stored here
-					BuildAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, true, display_base);
+					tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, true, display_base);
 				}
 				else
 				{
@@ -560,14 +560,14 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 					((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR))
 				{
-					//TODO joca consider making a type for the data stored here
-					BuildAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, false, display_base);
+					tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, false, display_base);
 				}
 				else if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 					((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 				{
-					//TODO joca consider making a type for the data stored here
-					BuildAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, true, display_base);
+					tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, true, display_base);
 				}
 				else
 				{
@@ -1080,8 +1080,8 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 								((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR));
 							if (attrCmd)
 							{
-								//TODO joca consider making a type for the data stored here
-								found = GetAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, str, sizeof(str), attrIdx, &alert, display_base);
+								tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+								found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, str, sizeof(str), attrIdx, &alert, display_base);
 							}
 							if (!found)
 							{
@@ -1287,8 +1287,8 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 								((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR));
 							if (attrCmd)
 							{
-								//TODO joca consider making a type for the data stored here
-								found = GetAttrString((U8)(frame.mData2 >> 8), (U16)(frame.mData2 >> 16), (U16)frame.mData1, str, sizeof(str), attrIdx, &alert, display_base);
+								tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+								found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, str, sizeof(str), attrIdx, &alert, display_base);
 							}
 							if (!found)
 							{

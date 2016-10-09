@@ -524,9 +524,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 
 void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
-	static U8  bMisoObjCode = 0x00;
-	static U8  bMisoCmd = 0x00;
-	static U16 wMisoInst = 0x00;
+	static tMsgHeaderInfo sMsgHeader = {0x00};
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
 	static U16 wMdSize = 0;
@@ -540,19 +538,19 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_obj)
 	{
-		bMisoObjCode = (U8)lFrameData;
+		sMsgHeader.obj = (U8)lFrameData;
 		dwMdCnt = 0;
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_inst)
 	{
-		wMisoInst = (U16)lFrameData;
+		sMsgHeader.inst = (U16)lFrameData;
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_cmd)
 	{
-		bMisoCmd = (U8)lFrameData;
+		sMsgHeader.cmd = (U8)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = bMisoObjCode;
+		result_frame.mData2 = sMsgHeader.obj;
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
@@ -568,7 +566,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	{
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
-		result_frame.mData2 = (wMisoInst << 16) | (bMisoObjCode << 8) | bMisoCmd;
+		memcpy(&result_frame.mData2, &sMsgHeader, sizeof(sMsgHeader));
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_size)
 	{
@@ -691,9 +689,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
-	static U8  bMosiObjCode = 0x00;
-	static U8  bMosiCmd = 0x00;
-	static U16 wMosiInst = 0x00;
+	static tMsgHeaderInfo sMsgHeader = {0x00};
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
 	static U16 wMdSize = 0;
@@ -707,19 +703,19 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_obj)
 	{
-		bMosiObjCode = (U8)lFrameData;
+		sMsgHeader.obj = (U8)lFrameData;
 		dwMdCnt = 0;
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_inst)
 	{
-		wMosiInst = (U16)lFrameData;
+		sMsgHeader.inst = (U16)lFrameData;
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd)
 	{
-		bMosiCmd = (U8)lFrameData;
+		sMsgHeader.cmd = (U8)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = bMosiObjCode;
+		result_frame.mData2 = sMsgHeader.obj;
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
@@ -735,7 +731,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	{
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
-		result_frame.mData2 = (wMosiInst << 16) | (bMosiObjCode << 8) | bMosiCmd;
+		memcpy(&result_frame.mData2, &sMsgHeader, sizeof(sMsgHeader));
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_size)
 	{

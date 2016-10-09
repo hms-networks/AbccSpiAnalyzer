@@ -151,6 +151,14 @@ typedef struct tValueName
 	bool	alert;
 }tValueName;
 
+typedef struct tMsgHeaderInfo
+{
+	U8  cmd;
+	U8  obj;
+	U16 inst;
+	U16 cmdExt;
+}tMsgHeaderInfo;
+
 extern tAbccMosiInfo asMosiStates[];
 extern tAbccMisoInfo asMisoStates[];
 extern tAbccMsgInfo asMsgStates[];
