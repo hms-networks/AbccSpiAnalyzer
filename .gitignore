@@ -24,6 +24,8 @@ project/vs2015/x64/Debug/
 *.log
 *.tlog
 *.lastbuildstate
+*.user
+*.opendb
 
 *.opensdf
 *.o
