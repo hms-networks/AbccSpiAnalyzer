@@ -524,6 +524,10 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			wMdSize = 0;
+			//TODO joca: the last state (where a valid packet was received) should be restored
+			fMisoFirstFrag = false;
+			fMisoLastFrag = false;
+			fMisoFragmentation = false;
 		}
 		else
 		{
@@ -580,6 +584,10 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			//TODO joca: the last state (where a valid packet was received) should be restored
+			fMisoFirstFrag = false;
+			fMisoLastFrag = false;
+			fMisoFragmentation = false;
 		}
 	}
 
@@ -689,6 +697,10 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			wMdSize = 0;
+			//TODO joca: the last state (where a valid packet was received) should be restored
+			fMosiFirstFrag = false;
+			fMosiLastFrag = false;
+			fMosiFragmentation = false;
 		}
 		else
 		{
@@ -742,6 +754,10 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			//TODO joca: the last state (where a valid packet was received) should be restored
+			fMosiFirstFrag = false;
+			fMosiLastFrag = false;
+			fMosiFragmentation = false;
 		}
 	}
 
