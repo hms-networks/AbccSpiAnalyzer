@@ -181,7 +181,11 @@ extern const tAbccMisoInfo asMisoStates[];
 extern const tAbccMsgInfo asMsgStates[];
 
 class SpiAnalyzerSettings;
+#if _DEBUG
+class SpiAnalyzer : public Analyzer2
+#else
 class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
+#endif
 {
 public:
 	SpiAnalyzer();

@@ -1,6 +1,9 @@
 # Ignore Temporary Documentation
 doc/~*
 
+# Ignore debug version of Logic software
+debug/Logic/
+
 # Ignore Visual Studio Code Artifacts
 .vscode
 

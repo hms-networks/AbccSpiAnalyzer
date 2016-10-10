@@ -26,6 +26,12 @@
 #define MOSI_TAG_STR "MOSI-"
 #define MISO_TAG_STR "MISO-"
 
+#ifdef _DEBUG
+/* Dummy macros, the old SDK does not support these */
+#define AddTabularText(...)
+#define ClearTabularText(...)
+#endif
+
 SpiAnalyzerResults::SpiAnalyzerResults(SpiAnalyzer* analyzer, SpiAnalyzerSettings* settings)
 	: AnalyzerResults(),
 	mSettings(settings),
