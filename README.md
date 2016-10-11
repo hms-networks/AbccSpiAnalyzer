@@ -16,8 +16,7 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 	2. [Linux](#linux)
 	3. [OS X](#os-x)
 4. [Documentation](#documentation)
-5. [Future Improvements](#future-improvements)
-6. [Change Log](#changelog)
+5. [Change Log](#changelog)
 	1. [Revision 1.0.0.0 (beta)](#revision-1000-beta)
 
 ---
@@ -91,43 +90,6 @@ software installation in the "Analyzers" folder.
 
 For information on how to get started please consult the quick start guide</br>
 included in this repository's documentation folder.
-
-## [Future Improvements](#table-of-contents)
-
-* Further expand on the options for indexed searching:
-  - Index a subset of message data with an 'offset' and 'size' (or all data)
-  - Index a subset of process data with an 'offset' and 'size' (or all data)
-* Improve data generator (simulation) as of now it is very primitive.
-* Add (better) support for exporting data
-* Improve 3-wire transaction alignment by including an inter-packet gap</br>
-  parameter. Without this, bad captures are likely in this mode if the beginning</br>
-  of the capture takes place in the middle of a transaction. That said the user</br>
-  can use the built-in feature "Re-run starting at timing marker..." option.
-* Support multiple instances of the analyzer plugin.
-* Once software supports the message transactions concept, associate ABCC</br>
-  command and response messages as a transaction based on the source IDs.
-* Support the enumeration of object specific error response information.
-* Refrain from ending SPI message fragmentation until the next valid message is</br>
-  received. This will improve readability of messages that are left in the</br>
-  message buffer.
-* Add inter-sample state change detection and warn the user of possible jitter,</br>
-  signal-integrity, or baud rate settings issue.
-* Improve the usage of "Error Markers".
-* Include reserved/unknown/error values seen in other fields as part of error</br>
-  indexing.
-* Add mechanism to detect mismatch of command message header and response</br>
-  message header when Source IDs are related.
-* Add support for message segmentation for the subset of objects/cmds that</br>
-   support this mechanism. This includes:
-   - Write_Assembly_Data (0x10) (Asm Object)
-   - Receive (0x15) (Socket Interface Object)
-   - Receive_Form (0x16) (Socket Interface Object)
-   - Send (0x17) (Socket Interface Object)
-   - Send_To (0x18) (Socket Interface Object)
-   - Set_Configuration_Data (0x11) (EIP Host Object)
-   - Get_Configuration_Data (0x13) (EIP Host Object)
-* Support ABCC message fragmentation that occurs before, a complete header is</br>
-  received (the ABCC profile driver does this in some cases).
 
 ## [Changelog](#table-of-contents)
 
