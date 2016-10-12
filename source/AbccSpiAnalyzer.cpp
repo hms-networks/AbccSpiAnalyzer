@@ -434,6 +434,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 	{
 		fResetFlags = true;
 		mResults->CancelPacketAndStartNewPacket();
+		mResults->AddMarker(mCurrentSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
 	}
 	else if (fMisoReady && fMosiReady)
 	{
