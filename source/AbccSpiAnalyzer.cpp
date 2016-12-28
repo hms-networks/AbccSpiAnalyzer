@@ -568,7 +568,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	{
 		static U32 last_timestamp = 0;
 		/* Compute delta from last timestamp and save it */
-		((tNetworkTimeInfo*)&result_frame.mData2)->deltaTime = result_frame.mData1 - last_timestamp;
+		((tNetworkTimeInfo*)&result_frame.mData2)->deltaTime = (U32)result_frame.mData1 - last_timestamp;
 		((tNetworkTimeInfo*)&result_frame.mData2)->newRdPd = fMisoNewRdPd;
 		((tNetworkTimeInfo*)&result_frame.mData2)->wrPdValid = fMosiWrPdValid;
 		fMisoNewRdPd = false;
