@@ -34,28 +34,28 @@
 
 static tAbccMosiStates eMosiState = e_ABCC_MOSI_IDLE;
 static tAbccMisoStates eMisoState = e_ABCC_MISO_IDLE;
-static U8  bLastAnbSts = 0xFF;
-static U8  bLastApplSts = 0xFF;
-static U8  bMosiLastToggleState = 0xFF;
+static U8  bLastAnbSts            = 0xFF;
+static U8  bLastApplSts           = 0xFF;
+static U8  bMosiLastToggleState   = 0xFF;
 
-static U32 dwMosiMsgLen = 0;
-static U32 dwMosiPdLen = 0;
-static U32 dwMisoMsgLen = 0;
-static U32 dwMisoPdLen = 0;
+static U32 dwMosiMsgLen           = 0;
+static U32 dwMosiPdLen            = 0;
+static U32 dwMisoMsgLen           = 0;
+static U32 dwMisoPdLen            = 0;
 
-static bool fMisoNewMsg = false;
-static bool fMisoErrorRsp = true;
-static bool fMisoFragmentation = false;
-static bool fMisoFirstFrag = false;
-static bool fMisoLastFrag = false;
-static bool fMisoNewRdPd = false;
+static bool fMisoNewMsg           = false;
+static bool fMisoErrorRsp         = true;
+static bool fMisoFragmentation    = false;
+static bool fMisoFirstFrag        = false;
+static bool fMisoLastFrag         = false;
+static bool fMisoNewRdPd          = false;
 
-static bool fMosiNewMsg = false;
-static bool fMosiErrorRsp = true;
-static bool fMosiFragmentation = false;
-static bool fMosiFirstFrag = false;
-static bool fMosiLastFrag = false;
-static bool fMosiWrPdValid = false;
+static bool fMosiNewMsg           = false;
+static bool fMosiErrorRsp         = true;
+static bool fMosiFragmentation    = false;
+static bool fMosiFirstFrag        = false;
+static bool fMosiLastFrag         = false;
+static bool fMosiWrPdValid        = false;
 
 AbccCrc mMisoChecksum, mMosiChecksum;
 
