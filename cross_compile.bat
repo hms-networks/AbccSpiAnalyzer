@@ -6,10 +6,10 @@ REM $sudo apt-get upgrade
 REM $sudo apt-get install g++
 REM $sudo apt-get install g++-multilib
 
-@echo Entering Ubuntu bash on Windows
-@echo Cross-compiling for Linux...
+@echo ----- Entering Ubuntu bash on Windows -----
+bash --version
+@echo.
 @echo python build_analyzer.py
 @echo.
-@echo.
 bash -c "python build_analyzer.py"
-pause
+REM pause
