@@ -48,12 +48,14 @@ static bool fMisoErrorRsp = true;
 static bool fMisoFragmentation = false;
 static bool fMisoFirstFrag = false;
 static bool fMisoLastFrag = false;
+static bool fMisoNewRdPd = false;
 
 static bool fMosiNewMsg = false;
 static bool fMosiErrorRsp = true;
 static bool fMosiFragmentation = false;
 static bool fMosiFirstFrag = false;
 static bool fMosiLastFrag = false;
+static bool fMosiWrPdValid = false;
 
 AbccCrc mMisoChecksum, mMosiChecksum;
 
@@ -566,7 +568,11 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	{
 		static U32 last_timestamp = 0;
 		/* Compute delta from last timestamp and save it */
-		result_frame.mData2 = result_frame.mData1 - last_timestamp;
+		((tNetworkTimeInfo*)&result_frame.mData2)->deltaTime = result_frame.mData1 - last_timestamp;
+		((tNetworkTimeInfo*)&result_frame.mData2)->newRdPd = fMisoNewRdPd;
+		((tNetworkTimeInfo*)&result_frame.mData2)->wrPdValid = fMosiWrPdValid;
+		fMisoNewRdPd = false;
+		fMosiWrPdValid = false;
 		last_timestamp = (U32)result_frame.mData1;
 	}
 	else if (eState == e_ABCC_MISO_SPI_STAT)
@@ -900,6 +906,14 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	case e_ABCC_MISO_SPI_STAT:
 		if (dwByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
 		{
+			if((lFrameData & ABP_SPI_STATUS_NEW_PD) == ABP_SPI_STATUS_NEW_PD)
+			{
+				fMisoNewRdPd = true;
+			}
+			else
+			{
+				fMisoNewRdPd = false;
+			}
 			if ((lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == ABP_SPI_STATUS_M)
 			{
 				/* New message but not the last */
@@ -1118,6 +1132,15 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	case e_ABCC_MOSI_SPI_CTRL:
 		if (dwByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
 		{
+			if((lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
+			{
+				fMosiWrPdValid = true;
+			}
+			else
+			{
+				fMosiWrPdValid = false;
+			}
+
 			if ((lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == ABP_SPI_CTRL_M)
 			{
 				/* New message but not the last */

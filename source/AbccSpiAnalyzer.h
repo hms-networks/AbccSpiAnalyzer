@@ -159,6 +159,14 @@ typedef struct tMsgHeaderInfo
 	U16 cmdExt;
 }tMsgHeaderInfo;
 
+typedef struct tNetworkTimeInfo
+{
+	U32 deltaTime;
+	U16 pad;
+	bool newRdPd;
+	bool wrPdValid;
+}tNetworkTimeInfo;
+
 extern tAbccMosiInfo asMosiStates[];
 extern tAbccMisoInfo asMisoStates[];
 extern tAbccMsgInfo asMsgStates[];

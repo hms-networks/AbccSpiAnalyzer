@@ -715,6 +715,7 @@ U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index,
 void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase display_base)
 {
 	ClearTabularText();
+	U64 packet_id = GetPacketContainingFrame(frame_index);
 	Frame frame = GetFrame(frame_index);
 	bool mosi_used = true;
 	bool miso_used = true;
@@ -793,78 +794,37 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			}
 			}
 
-			if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
-			{
-				char tmp[35];
-			Frame frame_lookup;
-			U64 frame_index_lookup = INVALID_RESULT_INDEX;
-			U64 packet_index_lookup = GetPacketContainingFrame(frame_index);
+		if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
+		{
+			char str[FORMATTED_STRING_BUFFER_SIZE];
 			switch(mSettings->mTimestampIndexing)
 			{
 			case e_TIMESTAMP_ALL_PACKETS:
-				SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
-				AddTabularText("Time : ", tmp);
-				SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
-				AddTabularText(tmp);
+				SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
+				AddTabularText("Time : ", str);
+				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+				AddTabularText(str);
 				break;
 			case e_TIMESTAMP_WRITE_PROCESS_DATA_VALID:
-				if(packet_index_lookup != INVALID_RESULT_INDEX)
+				if (((tNetworkTimeInfo*)&frame.mData2)->wrPdValid)
 				{
-					frame_index_lookup = GetFrameIdOfAbccFieldContainedInPacket(packet_index_lookup, true, (U8)e_ABCC_MOSI_SPI_CTRL);
-					if(frame_index_lookup != INVALID_RESULT_INDEX)
-					{
-						frame_lookup = GetFrame(frame_index_lookup);
-						if ((frame_lookup.mData1 & ABP_SPI_CTRL_WRPD_VALID) != 0)
-						{
-							//TODO joca: adapt delta, to measure delta between "New Write Process Data"
-							SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
-							AddTabularText("Time : ", tmp);
-							SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
-							AddTabularText(tmp);
-						}
-					}
-					else
-					{
-						/* Print out an Error indicator so that the user can check on this event */
-						SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", frame_index_lookup);
-						AddTabularText("Frame : !", tmp);
-					}
-				}
-				else
-				{
-					/* Print out an Error indicator so that the user can check on this event */
-					SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", packet_index_lookup);
-					AddTabularText("Packet : !", tmp);
+					//TODO joca: adapt delta, to measure delta between "New Write Process Data"
+					SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
+					//SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)\nPacket : 0x%016llX", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime, packet_index_lookup);
+					AddTabularText("Time : ", str);
+					SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+					AddTabularText(str);
 				}
 				break;
 			case e_TIMESTAMP_NEW_READ_PROCESS_DATA:
-				if(packet_index_lookup != INVALID_RESULT_INDEX)
+				if (((tNetworkTimeInfo*)&frame.mData2)->newRdPd)
 				{
-					frame_index_lookup = GetFrameIdOfAbccFieldContainedInPacket(packet_index_lookup, false, (U8)e_ABCC_MOSI_SPI_CTRL);
-					if(frame_index_lookup != INVALID_RESULT_INDEX)
-					{
-						frame_lookup = GetFrame(frame_index_lookup);
-						if ((frame_lookup.mData1 & ABP_SPI_STATUS_NEW_PD) != 0)
-						{
-							//TODO joca: adapt delta, to measure delta between "New Write Process Data"
-							SNPRINTF(tmp, sizeof(tmp), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
-							AddTabularText("Time : ", tmp);
-							SNPRINTF(tmp, sizeof(tmp), "Packet : 0x%016llX", packet_index_lookup);
-							AddTabularText(tmp);
-						}
-					}
-					else
-					{
-						/* Print out an Error indicator so that the user can check on this event */
-						SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", frame_index_lookup);
-						AddTabularText("Frame : !", tmp);
-					}
-				}
-				else
-				{
-					/* Print out an Error indicator so that the user can check on this event */
-					SNPRINTF(tmp, sizeof(tmp), "(0x%016llX)", packet_index_lookup);
-					AddTabularText("Packet : !", tmp);
+					//TODO joca: adapt delta, to measure delta between "New Write Process Data"
+					SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
+					//SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)\nPacket : 0x%016llX", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime, packet_index_lookup);
+					AddTabularText("Time : ", str);
+					SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+					AddTabularText(str);
 				}
 				break;
 			default:
