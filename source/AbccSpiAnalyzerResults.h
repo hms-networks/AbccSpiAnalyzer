@@ -44,6 +44,13 @@ public:
 	virtual void GenerateBubbleText(U64 frame_index, Channel& channel, DisplayBase display_base);
 	virtual void GenerateExportFile(const char* file, DisplayBase display_base, U32 export_type_user_id);
 
+	virtual void GenerateFrameTabularText(U64 frame_index, DisplayBase display_base);
+	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
+	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
+
+	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type);
+
+protected: /* functions */
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert);
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue);
 	virtual void TableBuilder(bool fMosiChannel, char* text, bool alert);
@@ -58,14 +65,6 @@ public:
 	virtual void BuildObjectString(U8 val, DisplayBase display_base);
 
 	virtual void BuildAttrString(U8 obj, U16 inst, U16 val, bool indexed, DisplayBase display_base);
-
-	virtual void GenerateFrameTabularText(U64 frame_index, DisplayBase display_base);
-	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
-	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
-
-	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type);
-
-protected: /* functions */
 
 protected:  /* variables */
 	SpiAnalyzerSettings* mSettings;
