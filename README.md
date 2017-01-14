@@ -1,6 +1,7 @@
 # Anybus CompactCom SPI Protocol Analyzer Plugin
 
 ## Copyright &copy; 2016 HMS Industrial Networks, Inc.
+
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT</br>
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR</br>
 THAT THE OPERATION OF THE CODE WILL BE UNINTERRUPTED OR ERROR-FREE, OR</br>
@@ -9,15 +10,16 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 ---
 
 ## [Table of Contents](#table-of-contents)
+
 1. [Description](#description)
 2. [System Requirements](#system-requirements)
 3. [Installation](#installation)
-	1. [Windows](#windows)
-	2. [Linux](#linux)
-	3. [OS X](#os-x)
+    * [Windows](#windows)
+    * [Linux](#linux)
+    * [OS X](#os-x)
 4. [Documentation](#documentation)
 5. [Change Log](#changelog)
-	1. [Revision 1.0.0.0 (beta)](#revision-1000-beta)
+    * [Revision 1.0.0.0 (beta)](#revision-1000-beta)
 
 ---
 
@@ -36,12 +38,12 @@ difficult-to-diagnose issues that arise during initial development efforts.
 ## [System Requirements](#table-of-contents)
 
 * Saleae Logic Software (version 1.2.7)
-	* Other versions will work so long as **Analyzer SDK version 1.1.32** is</br>
+  * Other versions will work so long as **Analyzer SDK version 1.1.32** is</br>
     compatible
 * PC running:
-	* Windows 7 or later
-	* Ubuntu 12.04.2+
-	* Mac OSX 10.7 Lion+
+  * Windows 7 or later
+  * Ubuntu 12.04.2+
+  * Mac OSX 10.7 Lion+
 
 ## [Installation](#table-of-contents)
 
@@ -54,16 +56,16 @@ To compile the project please ensure the **additional** requirements are met:
 When compiling the project, please ensure that the correct library is linked</br>
 for your Windows OS.
 
-- If you are using **Win64**, specify `Analyzer64.lib` in your linker input.
-  - The configuration manager has this setup as x64.
-- If you are using **Win32**, specify `Analyzer.lib` in your linker input.
-  - The configuration manager has this setup as Win32.
+* If you are using **Win64**, specify `Analyzer64.lib` in your linker input.
+  * The configuration manager has this setup as x64.
+* If you are using **Win32**, specify `Analyzer.lib` in your linker input.
+  * The configuration manager has this setup as Win32.
 
 Once compiled, a file called `AbccSpiAnalyzer.dll` or `AbccSpiAnalyzer64.dll`</br>
 will reside in the output folder. Copy this DLL to your Saleae Logic software</br>
 installation in the "Analyzers" folder:
 
-- Example: `C:\Program Files\Saleae LLC\Analyzers\AbccSpiAnalyzer.dll`
+* Example: `C:\Program Files\Saleae LLC\Analyzers\AbccSpiAnalyzer.dll`
 
 The analyzer is now ready to be used and can be found in the same way that</br>
 other protocol analyzers are added to the Logic software.
@@ -109,19 +111,19 @@ included in this repository's documentation folder.
   particularly helpful for tracking long segmented messages.
 * Supports bubble-text enumeration for 'most' of the following SPI telegram</br>
   fields:
-  - SPI control/status
-  - Application status
-  - Anybus status
-  - LED status
-  - Interrupt Mask
-  - Message Object Number
-  - Command Byte
-  - Command Extension Word (for object/instance attributes)
+  * SPI control/status
+  * Application status
+  * Anybus status
+  * LED status
+  * Interrupt Mask
+  * Message Object Number
+  * Command Byte
+  * Command Extension Word (for object/instance attributes)
 * Supports filtering options to indexed decoded protocol information. Currently</br>
   the DLL supports indexing:
-  - Message Object and Command information (only "new" messages are indexed)
-  - Message Source ID (only "new" messages are indexed)
-  - Anybus status
-  - Application status
-  - Network time
-  - Protocol/Logical errors (always prefixed by '!')
+  * Message Object and Command information (only "new" messages are indexed)
+  * Message Source ID (only "new" messages are indexed)
+  * Anybus status
+  * Application status
+  * Network time
+  * Protocol/Logical errors (always prefixed by '!')
