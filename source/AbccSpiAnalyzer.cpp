@@ -440,8 +440,20 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 	}
 	else if (fMisoReady && fMosiReady)
 	{
+		U64 packet_id;
 		fResetFlags = true;
-		mResults->CommitPacketAndStartNewPacket();
+		packet_id = mResults->CommitPacketAndStartNewPacket();
+		if(packet_id == INVALID_RESULT_INDEX)
+		{
+			mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorX, mSettings->mEnableChannel);
+		}
+		else
+		{
+			if (fMisoNewMsg || fMosiNewMsg)
+			{
+				mResults->AddMarker(mCurrentSample, AnalyzerResults::Start, mSettings->mEnableChannel);
+			}
+		}
 		/* check if the source id is new */
 		/* if new source id, allocate a new transaction id */
 		/* if not a new source id, check that the header information matches the one in progress */
