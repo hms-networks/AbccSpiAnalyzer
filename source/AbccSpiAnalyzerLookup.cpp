@@ -358,13 +358,16 @@ tValueName asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_ENABLE_FOE,			"Enable FoE",								false },
 	{ ABP_ECT_IA_ENABLE_EOE,			"Enable EoE",								false },
 	{ ABP_ECT_IA_CHANGE_SR_SWITCH,		"Change Shift Register Switch",				false },
-	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",false }
+	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",false },
+	{ ABP_ECT_IA_ETHERCAT_STATE,		"EtherCAT State",							false },
+	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							false },
 };
 
 tValueName asAppdObjAttrNames[] =
 {
 	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	false },
-	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false }
+	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false },
+	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	false }
 };
 
 tValueName asAppdInstAttrNames[] =
@@ -591,6 +594,11 @@ tValueName asEipCmdNames[] =
 	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	false }
 };
 
+tValueName asEctCmdNames[] =
+{
+	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	false }
+};
+
 tValueName asPnioCmdNames[] =
 {
 	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
@@ -681,6 +689,7 @@ tValueName asErrorRspNames[] =
 	{ ABP_ERR_CONTROLLED_FROM_OTHER_CHANNEL,	"NAK writes to \"read process data\" mapped attr.",	true },
 	{ ABP_ERR_MSG_CHANNEL_TOO_SMALL,			"Response does not fit",							true },
 	{ ABP_ERR_GENERAL_ERROR,					"General error",									true },
+	{ ABP_ERR_PROTECTED_ACCESS,					"Protected access",									true },
 	{ 0xFF,										"Object specific error",							true }
 };
 
@@ -1110,6 +1119,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asEipCmdNames[0], (sizeof(asEipCmdNames) / sizeof(tValueName)), display_base);
 			break;
+		case ABP_OBJ_NUM_ECT:
+			/* EtherNet/IP Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asEctCmdNames[0], (sizeof(asEctCmdNames) / sizeof(tValueName)), display_base);
+			break;
 		case ABP_OBJ_NUM_APPD:
 			/* Application Data Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
@@ -1125,7 +1139,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			alert = true; //TODO: We only alert here because we have not implmented all object specific commands yet.
 			break;
 		}
-		SNPRINTF(str, maxLen, "Object Specific: %s", strBuffer);
+		SNPRINTF(str, maxLen, "Obj: %s", strBuffer);
 	}
 	else
 	{
