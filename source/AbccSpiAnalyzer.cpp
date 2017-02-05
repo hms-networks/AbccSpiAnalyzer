@@ -655,9 +655,12 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			fMisoNewMsg = false;
 			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
 			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
 			}
-			//mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorX, mSettings->mMisoChannel);
+			}
+		else
+		{
+			mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
 		}
 	}
 
@@ -833,9 +836,12 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 			fMosiNewMsg = false;
 			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
 			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
 			}
-			//mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorX, mSettings->mMosiChannel);
+			}
+		else
+		{
+			mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
 		}
 	}
 
