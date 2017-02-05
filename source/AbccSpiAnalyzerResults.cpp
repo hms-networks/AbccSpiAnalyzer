@@ -640,7 +640,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 		}
 		else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
-			StringBuilder("ERROR", NULL, "Settings mismatch, The initial (idle) state of the CLK line does not match the settings.", alert);
+			StringBuilder("ERROR", NULL, "Settings mismatch, The ABCC SPI protocol expects the clock to idle HI.", alert);
 		}
 	}
 }
@@ -744,6 +744,11 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			else if ((frame.mFlags & (SPI_FRAG_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_FRAG_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG))
 			{
 				AddTabularText("!Fragmented ABCC SPI Packet");
+				return;
+			}
+			else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
+			{
+				AddTabularText("!ABCC SPI Setting Mismatch");
 				return;
 			}
 

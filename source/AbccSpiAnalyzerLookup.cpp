@@ -1356,7 +1356,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			alert = true; //TODO: We only alert here because we have not implmented all object specific commands yet.
 			break;
 		}
-		SNPRINTF(str, maxLen, "Obj: %s", strBuffer);
+		SNPRINTF(str, maxLen, "%s", strBuffer);
 	}
 	else
 	{
