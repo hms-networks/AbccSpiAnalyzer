@@ -98,6 +98,8 @@
 #define ABP_ECT_IA_ENABLE_EOE             17
 #define ABP_ECT_IA_CHANGE_SR_SWITCH       18
 #define ABP_ECT_IA_SET_DEV_ID_AS_CSA      19
+#define ABP_ECT_IA_ETHERCAT_STATE         20
+#define ABP_ECT_IA_STATE_TIMEOUTS         21
 
 
 /*------------------------------------------------------------------------------
@@ -127,6 +129,18 @@
 #define ABP_ECT_IA_ENABLE_EOE_DS                ABP_BOOL_SIZEOF
 #define ABP_ECT_IA_CHANGE_SR_SWITCH_DS          ABP_BOOL_SIZEOF
 #define ABP_ECT_IA_SET_DEV_ID_AS_CSA_DS         ABP_BOOL_SIZEOF
+#define ABP_ECT_IA_ETHERCAT_STATE_DS            ABP_UINT8_SIZEOF
+#define ABP_ECT_IA_STATE_TIMEOUTS_DS            ( ABP_UINT32_SIZEOF * 4 )
+
+
+/*------------------------------------------------------------------------------
+**
+** The Anybus CompactCom EtherCAT Object specific commands.
+**
+**------------------------------------------------------------------------------
+*/
+
+#define ABP_ECT_CMD_GET_OBJECT_DESC             0x10
 
 
 /*******************************************************************************
@@ -152,6 +166,7 @@
 #define ABP_ECT_NW_EXCPT_ASM_MAP_ERROR                                    6
 #define ABP_ECT_NW_EXCPT_GET_INST_NUMBERS_ERROR                           7
 #define ABP_ECT_NW_EXCPT_MDD_ERROR                                        8
+#define ABP_ECT_NW_EXCPT_NO_MAC_ADDR                                      9
 
 /*******************************************************************************
 **
