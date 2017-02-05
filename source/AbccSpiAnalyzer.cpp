@@ -488,7 +488,7 @@ void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLas
 
 void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
-	static tMsgHeaderInfo sMsgHeader = {0x00};
+	static tMsgHeaderInfo sMsgHeader = {0x00, 0x00, 0x0000, 0x0000};
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
 	static U16 wMdSize = 0;
@@ -673,7 +673,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 lFramesFirstSample)
 {
-	static tMsgHeaderInfo sMsgHeader = {0x00};
+	static tMsgHeaderInfo sMsgHeader = {0x00, 0x00, 0x0000, 0x0000};
 	static U32 dwPdCnt = 0;
 	static U32 dwMdCnt = 0;
 	static U16 wMdSize = 0;
