@@ -554,7 +554,13 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		if (fMisoErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			/* Check if data is 0xFF, if so delay deasserssion of fMisoErrorRsp
+			** so that the object specific error response can be detected */
+			if ((((U8)lFrameData != (U8)0xFF) && (dwMdCnt == 0)) ||
+				(dwMdCnt > 1))
+			{
 			fMisoErrorRsp = false;
+		}
 		}
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
@@ -731,11 +737,19 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		if (fMosiErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
+			/* Check if data is 0xFF, if so delay deasserssion of fMosiErrorRsp
+			** so that the object specific error response can be detected */
+			if ((((U8)lFrameData != (U8)0xFF) && (dwMdCnt == 0)) ||
+				(dwMdCnt > 1))
+			{
 			fMosiErrorRsp = false;
+			}
 		}
+		result_frame.mData2 = ((U64)sMsgHeader.obj) << (8 * sizeof(U32));
+
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		result_frame.mData2 = (U64)dwMdCnt;
+		result_frame.mData2 |= (U64)dwMdCnt;
 		dwMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
 		if(dwMdCnt > wMdSize)

@@ -642,6 +642,137 @@ tValueName asNetCmdNames[] =
 	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	false }
 };
 
+tValueName asAnbErrNames[] =
+{
+	{ ABP_ANB_ERR_INV_PRD_CFG,		"Invalid process data config",		true },
+	{ ABP_ANB_ERR_INV_DEV_ADDR,		"Invalid device address",			true },
+	{ ABP_ANB_ERR_INV_COM_SETTINGS,	"Invalid communication settings",	true }
+};
+
+tValueName asDiErrNames[] =
+{
+	{ ABP_DI_ERR_NOT_REMOVED,		"Event could not be removed",		true },
+	{ ABP_DI_LATCH_NOT_SUPPORTED,	"Latching events not supported",	true },
+	{ ABP_DI_ERR_NW_SPECIFIC,		"Network specific error",			true }
+};
+
+tValueName asNwErrNames[] =
+{
+	{ ABP_NW_ERR_INVALID_ADI_DATA_TYPE,	"Invalid ADI data type",		true },
+	{ ABP_NW_ERR_INVALID_NUM_ELEMENTS,	"Invalid number of elements",	true },
+	{ ABP_NW_ERR_INVALID_TOTAL_SIZE,	"Invalid total size",			true },
+	{ ABP_NW_ERR_MULTIPLE_MAPPING,		"Multiple mapping",				true },
+	{ ABP_NW_ERR_INVALID_ORDER_NUM,		"Invalid ADI order number",		true },
+	{ ABP_NW_ERR_INVALID_MAP_CMD_SEQ,	"Invalid map cmd sequence",		true },
+	{ ABP_NW_ERR_INVALID_MAP_CMD,		"Command impossible to parse",	true },
+	{ ABP_NW_ERR_BAD_ALIGNMENT,			"Invalid data alignment",		true },
+	{ ABP_NW_ERR_INVALID_ADI_0,			"Invalid use of ADI 0",			true },
+	{ ABP_NW_ERR_NW_SPEC_RESTRICTION,	"Network specific restriction",	true }
+};
+
+tValueName asAppdErrNames[] =
+{
+	{ ABP_APPD_ERR_MAPPING_ITEM_NAK,				"Mapping item NAK",				true },
+	{ ABP_APPD_ERR_INVALID_TOTAL_SIZE,				"Invalid total size",			true },
+	{ ABP_APPD_ERR_ATTR_CTRL_FROM_OTHER_CHANNEL,	"Attr ctrl from other channel",	true }
+};
+
+tValueName asSmtpErrNames[] =
+{
+	{ ABP_SMTP_NO_EMAIL_SERVER,			"No e-mail server",			true },
+	{ ABP_SMTP_SERVER_NOT_READY,		"Server not ready",			true },
+	{ ABP_SMTP_AUTHENTICATION_ERROR,	"Authentiacation error",	true },
+	{ ABP_SMTP_SOCKET_ERROR,			"Socket error",				true },
+	{ ABP_SMTP_SSI_SCAN_ERROR,			"SSI scan error",			true },
+	{ ABP_SMTP_FILE_ERROR,				"File error",				true },
+	{ ABP_SMTP_OTHER,					"Other",					true }
+};
+
+tValueName asEipErrNames[] =
+{
+	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
+	{ ABP_EIP_ERR_INVALID_CONFIG,		"Invalid configuration",	true }
+};
+
+tValueName asPnioErrNames[] =
+{
+	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI write not mapped",				true },
+	{ ABP_NWPNIO_ERR_ADI_READ_NOT_MAPPED,		"ADI read not mapped",				true },
+	{ ABP_NWPNIO_ERR_ADI_ELEM_NOT_PRESENT,		"Element is not present",			true },
+	{ ABP_NWPNIO_ERR_ADI_ALREADY_MAPPED,		"ADI is already mapped",			true },
+	{ ABP_NWPNIO_ERR_API_0_NOT_ADDED,			"API 0 not added",					true },
+	{ ABP_NWPNIO_ERR_API_NOT_PRESENT,			"API not present",					true },
+	{ ABP_NWPNIO_ERR_API_ALREADY_PRESENT,		"API already present",				true },
+	{ ABP_NWPNIO_ERR_API_CANNOT_BE_ADDED,		"API cannot be added",				true },
+	{ ABP_NWPNIO_ERR_NO_IO_IN_SLOT_0,			"No I/O in slot 0",					true },
+	{ ABP_NWPNIO_ERR_SLOT_0_NOT_PROP_PLUGGED,	"Slot 0 not properly plugged",		true },
+	{ ABP_NWPNIO_ERR_SLOT_OCCUPIED,				"Slot occupied",					true },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OCCUPIED,			"Subslot occupied",					true },
+	{ ABP_NWPNIO_ERR_NO_MODULE_SPECIFIED_SLOT,	"No module specified slot",			true },
+	{ ABP_NWPNIO_ERR_NO_SUBMOD_SPECIFIED_SLOT,	"No submodule specified slot",		true },
+	{ ABP_NWPNIO_ERR_SLOT_OUT_OF_RANGE,			"Slot out of range",				true },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OUT_OF_RANGE,		"Subslot out of range",				true },
+	{ ABP_NWPNIO_ERR_AR_NOT_VALID,				"AR not valid",						true },
+	{ ABP_NWPNIO_ERR_NO_PEND_APPL_READY,		"No pend appl ready",				true },
+	{ ABP_NWPNIO_ERR_UNKNOWN_STACK_ERROR,		"Unknown stack error",				true },
+	{ ABP_NWPNIO_ERR_MAX_NBR_OF_PLUGGED_SUBMOD,	"Max number of plugged submodules",	true },
+	{ ABP_NWPNIO_ERR_SAFETY_NOT_ENABLED,		"Safety not enabled",				true },
+	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true }
+};
+
+tValueName asSocErrNames[] =
+{
+	{ SOC_ERR_ENOBUFS,			"ENOBUFS",			true },
+	{ SOC_ERR_ETIMEDOUT,		"ETIMEDOUT",		true },
+	{ SOC_ERR_EISCONN,			"EISCONN",			true },
+	{ SOC_ERR_EOPNOTSUPP,		"EOPNOTSUPP",		true },
+	{ SOC_ERR_ECONNABORTED,		"ECONNABORTED",		true },
+	{ SOC_ERR_EWOULDBLOCK,		"EWOULDBLOCK",		true },
+	{ SOC_ERR_ECONNREFUSED,		"ECONNREFUSED",		true },
+	{ SOC_ERR_ECONNRESET,		"ECONNRESET",		true },
+	{ SOC_ERR_ENOTCONN,			"ENOTCONN",			true },
+	{ SOC_ERR_EALREADY,			"EALREADY",			true },
+	{ SOC_ERR_EINVAL,			"EINVAL",			true },
+	{ SOC_ERR_EMSGSIZE,			"EMSGSIZE",			true },
+	{ SOC_ERR_EPIPE,			"EPIPE",			true },
+	{ SOC_ERR_EDESTADDRREQ,		"EDESTADDRREQ",		true },
+	{ SOC_ERR_ESHUTDOWN,		"ESHUTDOWN",		true },
+	{ SOC_ERR_EHAVEOOB,			"EHAVEOOB",			true },
+	{ SOC_ERR_ENOMEM,			"ENOMEM",			true },
+	{ SOC_ERR_EADDRNOTAVAIL,	"EADDRNOTAVAIL",	true },
+	{ SOC_ERR_EADDRINUSE,		"EADDRINUSE",		true },
+	{ SOC_ERR_EINPROGRESS,		"EINPROGRESS",		true },
+	{ SOC_ERR_ETOOMANYREFS,		"ETOOMANYREFS",		true },
+	{ SOC_ERR_CMD_ABORTED,		"CMD_ABORTED",		true },
+	{ SOC_ERR_DNS_NAME,			"DNS_NAME",			true },
+	{ SOC_ERR_DNS_TIMEOUT,		"DNS_TIMEOUT",		true },
+	{ SOC_ERR_DNS_CMD_FAILED,	"DNS_CMD_FAILED",	true }
+
+};
+
+tValueName asFusmErrNames[] =
+{
+	{ ABP_FUSM_ERR_REJECT_BY_MODULE,	"Rejected by module",			true },
+	{ ABP_FUSM_ERR_MODULE_RSP_FAULTY,	"Module response is faulty",	true }
+};
+
+
+tValueName asFsiErrNames[] =
+{
+	{ ABP_FSI_ERR_FILE_OPEN_FAILED,				"File_Open Failed",			true },
+	{ ABP_FSI_ERR_FILE_CLOSE_FAILED,			"File_Close Failed",		true },
+	{ ABP_FSI_ERR_FILE_DELETE_FAILED,			"File_Delete Failed",		true },
+	{ ABP_FSI_ERR_DIRECTORY_OPEN_FAILED,		"Directory_Open Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CLOSE_FAILED,		"Directory_Close Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CREATE_FAILED,		"Directory_Create Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_DELETE_FAILED,		"Directory_Delete Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CHANGE_FAILED,		"Directory_Change Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED,	"Copy Open Read Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_OPEN_WRITE_FAILED,	"Copy Open Write Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_WRITE_FAILED,		"Copy Write Failed",		true },
+	{ ABP_FSI_ERR_FILE_RENAME_FAILED,			"File_Rename Failed",		true }
+};
+
 tValueName asIntMaskNames[] =
 {
 	{ ABP_INTMASK_RDPDIEN,		"RDPD",		false },
@@ -891,6 +1022,92 @@ bool GetErrorRspString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 
 	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
 	SNPRINTF(str, maxLen, "Reserved: %s", number_str);
+	return true;
+}
+
+bool GetObjSpecificErrString(U8 val, char* str, U16 maxLen, tValueName* pasErrNames, U8 bNoErrors, DisplayBase display_base)
+{
+	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	for (U8 i = 0; i < bNoErrors; i++)
+	{
+		if (pasErrNames[i].value == val)
+		{
+			SNPRINTF(str, maxLen, pasErrNames[i].name);
+			return pasErrNames[i].alert;
+		}
+	}
+
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
+	SNPRINTF(str, maxLen, "Unknown: %s", number_str);
+	return true;
+}
+
+bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase display_base)
+{
+	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+	switch (obj)
+	{
+	case ABP_OBJ_NUM_FSI:
+	case ABP_OBJ_NUM_AFSI:
+		/* (Application/Anybus) File System Interface Object */
+		GetObjSpecificErrString(val, str, maxLen, &asFsiErrNames[0],
+			(sizeof(asFsiErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_FUSM:
+		/* Functional Safety Module Object */
+		GetObjSpecificErrString(val, str, maxLen, &asFusmErrNames[0],
+			(sizeof(asFusmErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_ANB:
+		/* Anybus Object */
+		GetObjSpecificErrString(val, str, maxLen, &asAnbErrNames[0],
+			(sizeof(asAnbErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_DI:
+		/* Diagnostic Object */
+		GetObjSpecificErrString(val, str, maxLen, &asDiErrNames[0],
+			(sizeof(asDiErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_NW:
+		/* Network Object */
+		GetObjSpecificErrString(val, str, maxLen, &asNwErrNames[0],
+			(sizeof(asNwErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_APPD:
+		/* Application Data Object */
+		GetObjSpecificErrString(val, str, maxLen, &asAppdErrNames[0],
+			(sizeof(asAppdErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_SMTP:
+		/* SMTP Object */
+		GetObjSpecificErrString(val, str, maxLen, &asSmtpErrNames[0],
+			(sizeof(asSmtpErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_SOC:
+		/* Socket Object */
+		GetObjSpecificErrString(val, str, maxLen, &asSocErrNames[0],
+			(sizeof(asSocErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_EIP:
+		/* EtherNet/IP Object */
+		GetObjSpecificErrString(val, str, maxLen, &asEipErrNames[0],
+			(sizeof(asEipErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_PNIO:
+		/* PROFINET IO Object */
+		GetObjSpecificErrString(val, str, maxLen, &asPnioErrNames[0],
+			(sizeof(asPnioErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_CCL:
+		/* CC-Link Object */
+	case ABP_OBJ_NUM_DPV1:
+		/* DPV1 Object */
+	default:
+		AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, maxLen);
+		SNPRINTF(str, maxLen, "Unknown: %s", obj, number_str);
+		break;
+	}
 	return true;
 }
 

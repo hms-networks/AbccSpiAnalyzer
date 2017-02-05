@@ -298,6 +298,15 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
 	StringBuilder("ERR_CODE", number_str, str, alert);
 }
 
+void SpiAnalyzerResults::BuildErrorRsp(U8 obj, U8 val, DisplayBase display_base)
+{
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	bool alert = GetErrorRspString(obj, val, &str[0], sizeof(str), display_base);
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
+	StringBuilder("OBJ_ERR", number_str, str, alert);
+}
+
 void SpiAnalyzerResults::BuildIntMask(U8 val, DisplayBase display_base)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
@@ -372,12 +381,20 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 			case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
-					BuildErrorRsp((U8)frame.mData1, display_base);
+					if ((U32)frame.mData2 == 0)
+					{
+						BuildErrorRsp((U8)frame.mData1, display_base);
+					}
+					else
+					{
+						U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
+						BuildErrorRsp(obj, (U8)frame.mData1, display_base);
+					}
 				}
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
+					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", number_str, (U32)frame.mData2);
 					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
 				}
 				break;
@@ -506,12 +523,20 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 			case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
-					BuildErrorRsp((U8)frame.mData1, display_base);
+					if ((U32)frame.mData2 == 0)
+					{
+						BuildErrorRsp((U8)frame.mData1, display_base);
+					}
+					else
+					{
+						U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
+						BuildErrorRsp(obj, (U8)frame.mData1, display_base);
+					}
 				}
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
+					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", number_str, (U32)frame.mData2);
 					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
 				}
 				break;

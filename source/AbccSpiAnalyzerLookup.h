@@ -21,6 +21,8 @@ bool GetAbccStatusString(U8 val, char* str, U16 maxLen, DisplayBase display_base
 
 bool GetErrorRspString(U8 val, char* str, U16 maxLen, DisplayBase display_base);
 
+bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase display_base);
+
 bool GetIntMaskString(U8 val, char* str, U16 maxLen, DisplayBase display_base);
 
 bool GetLedStatusString(U16 val, char* str, U16 maxLen, DisplayBase display_base);
