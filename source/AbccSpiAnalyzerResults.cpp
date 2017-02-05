@@ -654,48 +654,33 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 
 	U64 trigger_sample = mAnalyzer->GetTriggerSample();
 	U32 sample_rate = mAnalyzer->GetSampleRate();
+	U64 num_frames = GetNumFrames();
 
 	ss << "Time [s],Packet ID,MOSI,MISO" << std::endl;
 
-	bool mosi_used = true;
-	bool miso_used = true;
-
-	if (mSettings->mMosiChannel == UNDEFINED_CHANNEL)
-		mosi_used = false;
-
-	if (mSettings->mMisoChannel == UNDEFINED_CHANNEL)
-		miso_used = false;
-
-	U64 num_frames = GetNumFrames();
 	for (U32 i = 0; i < num_frames; i++)
 	{
 		Frame frame = GetFrame(i);
+		U64 packet_id = GetPacketContainingFrameSequential(i);
+		char time_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+		char mosi_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
+		char miso_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
 
 		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 			continue;
 
-		char time_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 		AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
 
-		char mosi_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
-		if (mosi_used == true)
+		if ((frame.mFlags & SPI_MOSI_FLAG) == SPI_MOSI_FLAG)
 		{
-			if ((frame.mFlags & SPI_MOSI_FLAG) == SPI_MOSI_FLAG)
-			{
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 32, mosi_str, sizeof(mosi_str));
-			}
+			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 32, mosi_str, sizeof(mosi_str));
 		}
 
-		char miso_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
-		if (miso_used == true)
+		if ((frame.mFlags & SPI_MOSI_FLAG) != SPI_MOSI_FLAG)
 		{
-			if ((frame.mFlags & SPI_MOSI_FLAG) != SPI_MOSI_FLAG)
-			{
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 32, miso_str, sizeof(miso_str));
-			}
+			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 32, miso_str, sizeof(miso_str));
 		}
 
-		U64 packet_id = GetPacketContainingFrameSequential(i);
 		if (packet_id != INVALID_RESULT_INDEX)
 			ss << time_str << "," << packet_id << "," << mosi_str << "," << miso_str << std::endl;
 		else
@@ -745,17 +730,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	ClearTabularText();
 	U64 packet_id = GetPacketContainingFrame(frame_index);
 	Frame frame = GetFrame(frame_index);
-	bool mosi_used = true;
-	bool miso_used = true;
 
-	if (mSettings->mMosiChannel == UNDEFINED_CHANNEL)
-		mosi_used = false;
-
-	if (mSettings->mMisoChannel == UNDEFINED_CHANNEL)
-		miso_used = false;
-
-	if (miso_used || mosi_used)
-	{
 		if (mSettings->mErrorIndexing == true)
 		{
 			if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
@@ -1324,7 +1299,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					break;
 				default:
 					break;
-				}
 			}
 		}
 	}
