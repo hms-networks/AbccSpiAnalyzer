@@ -23,6 +23,9 @@
 #define IS_MISO_FRAME(frame) 			((frame.mFlags & SPI_MOSI_FLAG)!=SPI_MOSI_FLAG)
 #define IS_MOSI_FRAME(frame)			((frame.mFlags & SPI_MOSI_FLAG)==SPI_MOSI_FLAG)
 
+#define MOSI_TAG_STR "MOSI-"
+#define MISO_TAG_STR "MISO-"
+
 SpiAnalyzerResults::SpiAnalyzerResults(SpiAnalyzer* analyzer, SpiAnalyzerSettings* settings)
 	: AnalyzerResults(),
 	mSettings(settings),
@@ -192,8 +195,8 @@ void SpiAnalyzerResults::TableBuilder(bool fMosiChannel, char* text, bool alert)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char* prefix;
-	char mosi_prefix[] = "MOSI-";
-	char miso_prefix[] = "MISO-";
+	char mosi_prefix[] = MOSI_TAG_STR;
+	char miso_prefix[] = MISO_TAG_STR;
 	if(fMosiChannel)
 	{
 		prefix = &mosi_prefix[0];
@@ -1095,17 +1098,17 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							SNPRINTF(ext_str[ABCC_MISO_CHANNEL], sizeof(ext_str[ABCC_MISO_CHANNEL]), "%04Xh}", (U16)frame.mData1);
 							if (fMsgErrorRsp[ABCC_MISO_CHANNEL])
 							{
-								AddTabularText("MISO-!", obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL]);
+								AddTabularText(MISO_TAG_STR, "!", obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL]);
 							}
 							else
 							{
 								if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
 								{
-									AddTabularText("MISO-", obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL], "++");
+									AddTabularText(MISO_TAG_STR, obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL], "++");
 								}
 								else
 								{
-									AddTabularText("MISO-", obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL]);
+									AddTabularText(MISO_TAG_STR, obj_str[ABCC_MISO_CHANNEL], inst_str[ABCC_MISO_CHANNEL], cmd_str[ABCC_MISO_CHANNEL], ext_str[ABCC_MISO_CHANNEL]);
 								}
 							}
 						}
@@ -1302,17 +1305,17 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							SNPRINTF(ext_str[ABCC_MOSI_CHANNEL], sizeof(ext_str[ABCC_MOSI_CHANNEL]), "%04Xh}", (U16)frame.mData1);
 							if (fMsgErrorRsp[ABCC_MOSI_CHANNEL])
 							{
-								AddTabularText("MOSI-!", obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL]);
+								AddTabularText(MISO_TAG_STR, "!", obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL]);
 							}
 							else
 							{
 								if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
 								{
-									AddTabularText("MOSI-", obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL], "++");
+									AddTabularText(MISO_TAG_STR, obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL], "++");
 								}
 								else
 								{
-									AddTabularText("MOSI-", obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL]);
+									AddTabularText(MISO_TAG_STR, obj_str[ABCC_MOSI_CHANNEL], inst_str[ABCC_MOSI_CHANNEL], cmd_str[ABCC_MOSI_CHANNEL], ext_str[ABCC_MOSI_CHANNEL]);
 								}
 							}
 						}
