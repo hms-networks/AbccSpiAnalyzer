@@ -5,6 +5,7 @@ REM $sudo apt-get update
 REM $sudo apt-get upgrade
 REM $sudo apt-get install g++
 REM $sudo apt-get install g++-multilib
+REM $sudo apt-get install gcc-multilib
 
 @echo ----- Entering Ubuntu bash on Windows -----
 bash --version

@@ -518,7 +518,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
-			//result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			fMisoErrorRsp = true;
 		}
 		else
@@ -828,10 +827,10 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		}
 	}
 
-	/* Handle high-level error indication (error-dots) */
+	/* Handle high-level error indication (error-dots), only permit one dot per message to improve rendering chances */
 	if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 	{
-		if (fMosiNewMsg) /* TODO: this marker should not be exclusive to "valid messages" */
+		if (fMosiNewMsg) /* TODO: this marker should not be exclusive to "valid messages" such that information outside of messages can be indicated through this mechanism */
 		{
 			fMosiNewMsg = false;
 			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
