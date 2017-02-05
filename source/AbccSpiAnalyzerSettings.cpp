@@ -83,7 +83,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
 
 	mMsgDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Proirity :", "Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
+	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Priority :", "Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
 	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_DATA, "Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
 	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
 	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
