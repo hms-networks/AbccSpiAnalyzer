@@ -16,6 +16,7 @@
 #include <Analyzer.h>
 #include "AbccSpiAnalyzerResults.h"
 #include "AbccSpiSimulationDataGenerator.h"
+#include "AbccCrc.h"
 
 #ifdef _WIN32
 #define SNPRINTF sprintf_s
@@ -227,6 +228,70 @@ protected: /* variables */
 	U64 mCurrentSample;
 	AnalyzerResults::MarkerType mArrowMarker;
 	std::vector<U64> mArrowLocations;
+
+	tAbccMosiStates eMosiState;
+	tAbccMisoStates eMisoState;
+
+	AbccCrc mMisoChecksum;
+	AbccCrc mMosiChecksum;
+
+	U32 dwMisoPdLen;
+	U32 dwMosiPdLen;
+
+	U32 dwMisoMsgLen;
+	U32 dwMosiMsgLen;
+
+	bool fMisoNewMsg;
+	bool fMosiNewMsg;
+
+	bool fMisoErrorRsp;
+	bool fMosiErrorRsp;
+
+	bool fMisoFragmentation;
+	bool fMosiFragmentation;
+
+	bool fMisoFirstFrag;
+	bool fMosiFirstFrag;
+
+	bool fMisoLastFrag;
+	bool fMosiLastFrag;
+
+	bool fMisoNewRdPd;
+	bool fMosiWrPdValid;
+
+	bool fAnalyzerNeedsReset;
+
+	bool fMisoReadyForNewPacket;
+	bool fMosiReadyForNewPacket;
+
+	tMsgHeaderInfo sMisoMsgHeader;
+	U32 dwMisoPdCnt;
+	U32 dwMisoMdCnt;
+	U16 wMisoMdSize;
+
+	tMsgHeaderInfo sMosiMsgHeader;
+	U32 dwMosiPdCnt;
+	U32 dwMosiMdCnt;
+	U16 wMosiMdSize;
+
+	U8 bLastAnbSts;
+	U8 bLastApplSts;
+	U8 bMosiLastToggleState;
+
+	U32 dwLastMisoTimestamp;
+
+	tAbccMisoStates eMisoMsgSubState;
+	U32 dwMisoByteCnt;
+	U64 lMisoFrameData;
+	S64 lMisoFramesFirstSample;
+
+	tAbccMosiStates eMosiMsgSubState;
+	U32 dwMosiByteCnt;
+	U64 lMosiFrameData;
+	S64 lMosiFramesFirstSample;
+
+	U8 bMisoByteCnt2;
+	U8 bMosiByteCnt2;
 
 #pragma warning( pop )
 };
