@@ -20,8 +20,6 @@
 #define SPI_MSG_FIRST_FRAG_FLAG ( 1 << 2 ) /* Indicates the first message in a fragmented message transfer */
 #define SPI_MSG_FRAG_FLAG ( 1 << 3 ) /* Indicates that message fragmentation is in progress */
 
-#define SPI_FRAG_ERROR_FLAG ( 1 << 4 )  /* Error flag to indicate an error occurred due to a fragmented SPI transaction.
-										** This means that chipselect was brought high before the statemachine reached idle */
 #define SPI_PROTO_EVENT_FLAG ( 1 << 5 ) /* Event flag to indicate any critical events that are part of the ABCC SPI protocol
 										** This flag is field-specific.
 										** This flag is relevant for the following fields (not all supported yet):

@@ -273,6 +273,7 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 
 		error_frame.mEndingSampleInclusive = mCurrentSample;
 		error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+		error_frame.mType = e_ABCC_SPI_ERROR_SETTINGS;
 		mResults->AddFrame(error_frame);
 
 		/* move to the next enable-active edge */
@@ -526,8 +527,8 @@ void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLas
 	frag_frame.mStartingSampleInclusive = lFirstSample;
 	frag_frame.mEndingSampleInclusive = lLastSample;
 	frag_frame.mData1 = 0;
-	frag_frame.mType = (U8)bState;
-	frag_frame.mFlags = (SPI_FRAG_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+	frag_frame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
+	frag_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
 	if (fMosi)
 	{
 		frag_frame.mFlags |= SPI_MOSI_FLAG;
