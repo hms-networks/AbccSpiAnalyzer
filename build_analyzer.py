@@ -3,7 +3,12 @@ import os, glob, platform
 # Find out if we're running on mac or linux and set the dynamic library extension
 dylib_ext = ""
 arch = ""
-if platform.system().lower() == "darwin":
+if platform.system().lower() == "windows":
+    dylib_ext = ".dll"
+    tmp = platform.architecture()
+    if tmp[0] == "64bit":
+        arch = "64"
+elif platform.system().lower() == "darwin":
     dylib_ext = ".dylib"
 else:
     dylib_ext = ".so"
@@ -18,7 +23,20 @@ release_path = ""
 # Make sure the release folder exists
 if not os.path.exists( "plugins" ):
     os.makedirs( "plugins" )
-if platform.system().lower() == "darwin":
+if platform.system().lower() == "windows":
+    # Regardless of architecture always build the 32-bit variant
+    release_path32 = "./plugins/Win32/"
+    if not os.path.exists( release_path32 ):
+        os.makedirs( release_path32 )
+        print("Made 32-bit OS plugin directory")
+    if arch == "64":
+        release_path = "./plugins/Win64/"
+        if not os.path.exists( release_path ):
+            os.makedirs( release_path )
+            print("Made 64-bit OS plugin directory")
+    else:
+         release_path = "./plugins/Win32/"
+elif platform.system().lower() == "darwin":
     release_path = "./plugins/OSX/"
     if not os.path.exists( release_path ):
         os.makedirs( release_path )
@@ -28,12 +46,12 @@ else:
     release_path32 = "./plugins/Linux32/"
     if not os.path.exists( release_path32 ):
         os.makedirs( release_path32 )
-        print("Made OS plugin directory")
+        print("Made 32-bit OS plugin directory")
     if arch == "64":
         release_path = "./plugins/Linux64/"
         if not os.path.exists( release_path ):
             os.makedirs( release_path )
-            print("Made OS plugin directory")
+            print("Made 64-bit OS plugin directory")
     else:
          release_path = "./plugins/Linux32/"
 
@@ -64,7 +82,7 @@ os.chdir( "Debug" )
 debug_path = release_path + "Debug/"
 
 # Clean the debug folder of .o/.so object files
-o_files = glob.glob( "*.o" );
+o_files = glob.glob( "*.o" )
 o_files.extend( glob.glob( "*" + dylib_ext ) )
 for o_file in o_files:
     os.remove( o_file )
@@ -72,7 +90,7 @@ os.chdir( "../../.." )
 
 # Find all the cpp files in /source folder
 os.chdir( "source" )
-cpp_files = glob.glob( "*.cpp" );
+cpp_files = glob.glob( "*.cpp" )
 os.chdir( ".." )
 
 # Specify the search paths/dependencies/options for gcc
