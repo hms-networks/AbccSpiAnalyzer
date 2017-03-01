@@ -14,6 +14,10 @@
 
 #include <AnalyzerResults.h>
 
+#ifndef FORMATTED_STRING_BUFFER_SIZE
+#define FORMATTED_STRING_BUFFER_SIZE		256
+#endif
+
 #define SPI_ERROR_FLAG ( 1 << 0 ) /* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
 #define SPI_MOSI_FLAG ( 1 << 1 )  /* Direction flag. When asserted, MOSI, when de-asserted MISO */
 
@@ -68,6 +72,14 @@ protected: /* functions */
 protected:  /* variables */
 	SpiAnalyzerSettings* mSettings;
 	SpiAnalyzer* mAnalyzer;
+	char acMsgSizeStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char acMsgSrcStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char acMsgObjStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char acMsgInstStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char acMsgCmdStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char acMsgExtStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	bool fMsgValid[2];
+	bool fMsgErrorRsp[2];
 };
 
 #endif /* ABCC_SPI_ANALYZER_RESULTS_H */
