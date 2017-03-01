@@ -1105,7 +1105,7 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase displa
 		/* DPV1 Object */
 	default:
 		AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, maxLen);
-		SNPRINTF(str, maxLen, "Unknown: %s", obj, number_str);
+		SNPRINTF(str, maxLen, "Unknown: 0x%02X, %s", obj, number_str);
 		break;
 	}
 	return true;
