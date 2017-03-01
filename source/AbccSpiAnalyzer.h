@@ -266,7 +266,7 @@ protected: /* variables */
 	bool fMisoNewRdPd;
 	bool fMosiWrPdValid;
 
-	bool fAnalyzerNeedsReset;
+	U8 bSettingsChangeID;
 
 	bool fMisoReadyForNewPacket;
 	bool fMosiReadyForNewPacket;

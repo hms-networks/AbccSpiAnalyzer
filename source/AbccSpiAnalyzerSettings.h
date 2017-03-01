@@ -48,6 +48,9 @@ public:
 
 	void UpdateInterfacesFromSettings();
 
+	U8 SaveSettingChangeID();
+	U8 mChangeID;
+
 	Channel mMosiChannel;
 	Channel mMisoChannel;
 	Channel mClockChannel;

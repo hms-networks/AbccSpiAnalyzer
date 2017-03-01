@@ -31,8 +31,8 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mErrorIndexing(true),
 	mTimestampIndexing(e_TIMESTAMP_DISABLED),
 	mAnybusStatusIndexing(true),
-	mApplStatusIndexing(true)
-
+	mApplStatusIndexing(true),
+	mChangeID(0)
 {
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
 	mMosiChannelInterface->SetTitleAndTooltip("SPI MOSI Channel :", "Master Out, Slave In (Host to Module)");
@@ -222,6 +222,8 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mAnybusStatusIndexing;
 	text_archive << mApplStatusIndexing;
 
+	SaveSettingChangeID();
+
 	return SetReturnString(text_archive.GetString());
 }
 
@@ -239,4 +241,10 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
+}
+
+U8 SpiAnalyzerSettings::SaveSettingChangeID( void )
+{
+	mChangeID++;
+	return mChangeID;
 }

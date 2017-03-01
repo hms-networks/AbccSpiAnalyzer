@@ -43,7 +43,7 @@ SpiAnalyzer::SpiAnalyzer()
 {
 	SetAnalyzerSettings(mSettings.get());
 
-	fAnalyzerNeedsReset   = false;
+	bSettingsChangeID   = mSettings->mChangeID;
 
 	eMosiState              = e_ABCC_MOSI_IDLE;
 	eMisoState              = e_ABCC_MISO_IDLE;
@@ -389,7 +389,15 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 
 bool SpiAnalyzer::NeedsRerun()
 {
-	return false;
+	if (bSettingsChangeID != mSettings->mChangeID)
+	{
+		bSettingsChangeID = mSettings->mChangeID;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 U32 SpiAnalyzer::GenerateSimulationData(U64 minimum_sample_index, U32 device_sample_rate, SimulationChannelDescriptor** simulation_channels)
@@ -473,7 +481,10 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 		{
 			if (fMisoNewMsg || fMosiNewMsg)
 			{
-				mResults->AddMarker(mCurrentSample, AnalyzerResults::Start, mSettings->mEnableChannel);
+				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				{
+					mResults->AddMarker(mCurrentSample, AnalyzerResults::Start, mSettings->mEnableChannel);
+				}
 			}
 		}
 		/* check if the source id is new */
@@ -498,7 +509,10 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
 				mResults->AddFrame(error_frame);
 
-				mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+				if (mSettings->mErrorIndexing)
+				{
+					mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+				}
 			}
 
 			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
@@ -689,12 +703,18 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			fMisoNewMsg = false;
 			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
 			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				{
+					mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+				}
 			}
 		}
 		else
 		{
-			mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
+			if (mSettings->mErrorIndexing)
+			{
+				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
+			}
 		}
 	}
 
@@ -866,12 +886,18 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 			fMosiNewMsg = false;
 			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
 			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				{
+					mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+				}
 			}
 		}
 		else
 		{
-			mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
+			if (mSettings->mErrorIndexing)
+			{
+				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
+			}
 		}
 	}
 
