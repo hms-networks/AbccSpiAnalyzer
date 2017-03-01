@@ -103,6 +103,13 @@ typedef enum tAbccMisoStates
 	e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid
 }tAbccMisoStates;
 
+typedef enum tAbccSpiError
+{
+	e_ABCC_SPI_ERROR_GENERIC,
+	e_ABCC_SPI_ERROR_SETTINGS,
+	e_ABCC_SPI_ERROR_END_OF_TRANSFER,
+}tAbccSpiError;
+
 typedef union uAbccSpiStates
 {
 	U8				bState;

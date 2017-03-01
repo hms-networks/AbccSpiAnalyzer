@@ -640,7 +640,18 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 		}
 		else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
-			StringBuilder("ERROR", NULL, "Settings mismatch, The ABCC SPI protocol expects the clock to idle HI.", alert);
+			switch (frame.mType)
+			{
+				case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
+					StringBuilder("ERROR", NULL, "ABCC SPI Clocking. The ABCC SPI protocol expects one transaction per 'Active Enable' phase.", alert);
+					break;
+				case e_ABCC_SPI_ERROR_SETTINGS:
+					StringBuilder("ERROR", NULL, "ABCC SPI Settings Mismatch. The ABCC SPI protocol expects the clock to idle HI.", alert);
+					break;
+				default:
+					StringBuilder("ERROR", NULL, "ABCC SPI Error.", alert);
+					break;
+			}
 		}
 	}
 }
@@ -748,7 +759,18 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			}
 			else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 			{
-				AddTabularText("!ABCC SPI Setting Mismatch");
+				switch (frame.mType)
+				{
+					case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
+						AddTabularText("!ABCC SPI Clocking");
+						break;
+					case e_ABCC_SPI_ERROR_SETTINGS:
+						AddTabularText("!ABCC SPI Settings Mismatch");
+						break;
+					default:
+						AddTabularText("!ABCC SPI Error");
+						break;
+				}
 				return;
 			}
 
