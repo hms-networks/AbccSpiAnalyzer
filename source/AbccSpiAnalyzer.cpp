@@ -164,6 +164,7 @@ void SpiAnalyzer::WorkerThread()
 			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
 			break;
 		}
+
 		/* Run the ABCC MOSI state machine */
 		fReady1 = RunAbccMosiStateMachine((fReset||fReady1), fError, lMosiData, lFirstSample);
 

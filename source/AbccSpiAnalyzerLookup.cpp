@@ -747,7 +747,6 @@ static const tValueName asSocErrNames[] =
 	{ SOC_ERR_DNS_NAME,			"DNS_NAME",			true },
 	{ SOC_ERR_DNS_TIMEOUT,		"DNS_TIMEOUT",		true },
 	{ SOC_ERR_DNS_CMD_FAILED,	"DNS_CMD_FAILED",	true }
-
 };
 
 static const tValueName asFusmErrNames[] =
