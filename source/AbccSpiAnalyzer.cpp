@@ -186,12 +186,16 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 {
 	AdvanceToActiveEnableEdge();
 
-	for (;;)
+	/* 3-wire requires IDLE HI, 4-wire does not matter */
+	if (mEnable != NULL)
 	{
-		/* If false, this function moves to the next enable-active edge. */
-		if (IsInitialClockPolarityCorrect() == true)
+		for (;;)
 		{
-			break;
+			/* If false, this function moves to the next enable-active edge. */
+			if (IsInitialClockPolarityCorrect() == true)
+			{
+				break;
+			}
 		}
 	}
 }
@@ -319,6 +323,7 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 	DataBuilder mosi_result;
 	DataBuilder miso_result;
 	tGetWordStatus status = e_GET_WORD_OK;
+	bool fClkIdleHigh = false;
 
 	mosi_result.Reset(plMosiData, mSettings->mShiftOrder, bits_per_transfer);
 	miso_result.Reset(plMisoData, mSettings->mShiftOrder, bits_per_transfer);
@@ -326,11 +331,18 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 
 	*plFirstSample = mClock->GetSampleNumber();
 
+	if (mClock->GetBitState() == BIT_HIGH)
+	{
+		fClkIdleHigh = true;
+	}
+
 	for (U32 i = 0; i < bits_per_transfer; i++)
 	{
 		/* On every single edge, we need to check that "enable" doesn't toggle. */
-		/* Note that we can't just advance the enable line to the next edge, becuase there may not be another edge */
+		/* Note that we can't just advance the enable line to the next edge, because there may not be another edge */
 
+		/* Clock IDLES HI. Since we must sample on rising edge,
+		** there is an additional phase jump */
 		if (WouldAdvancingTheClockToggleEnable() == true)
 		{
 			if (i == 0)
@@ -346,8 +358,12 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 			}
 		}
 
-		/* Jump to the next clock phase */
-		mClock->AdvanceToNextEdge();
+		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
+		if (fClkIdleHigh || (i > 0))
+		{
+			/* Jump to the next clock phase */
+			mClock->AdvanceToNextEdge();
+		}
 
 		if (i == 0)
 		{
