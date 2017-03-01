@@ -54,7 +54,7 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
-tAbccMosiInfo asMosiStates[] =
+const tAbccMosiInfo asMosiStates[] =
 {
 	{ e_ABCC_MOSI_IDLE,						"",			0 },
 	{ e_ABCC_MOSI_SPI_CTRL,					"SPI_CTL",	1 },
@@ -78,7 +78,7 @@ tAbccMosiInfo asMosiStates[] =
 	{ e_ABCC_MOSI_PAD,						"PAD",		2 }
 };
 
-tAbccMisoInfo asMisoStates[] =
+const tAbccMisoInfo asMisoStates[] =
 {
 	{ e_ABCC_MISO_IDLE,						"",			0 },
 	{ e_ABCC_MISO_Reserved1,				"RES",		1 },
@@ -101,7 +101,7 @@ tAbccMisoInfo asMisoStates[] =
 	{ e_ABCC_MISO_CRC32,					"CRC32",	4 },
 };
 
-tAbccMsgInfo asMsgStates[] =
+const tAbccMsgInfo asMsgStates[] =
 {
 	{ e_ABCC_MSG_SIZE,		"MD_SIZE",	ABCC_MSG_SIZE_FIELD_SIZE },
 	{ e_ABCC_MSG_RESERVED1,	"RES",		ABCC_MSG_RES1_FIELD_SIZE },
@@ -114,7 +114,7 @@ tAbccMsgInfo asMsgStates[] =
 	{ e_ABCC_MSG_DATA,		"MD",		ABCC_MSG_DATA_FIELD_SIZE }
 };
 
-tValueName asAnbInstAttrNames[] =
+static const tValueName asAnbInstAttrNames[] =
 {
 	{ ABP_ANB_IA_MODULE_TYPE,		"Module Type",				false },
 	{ ABP_ANB_IA_FW_VERSION,		"Firmware Version",			false },
@@ -139,13 +139,13 @@ tValueName asAnbInstAttrNames[] =
 	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		false }
 };
 
-tValueName asDiObjAttrNames[] =
+static const tValueName asDiObjAttrNames[] =
 {
 	{ ABP_DI_OA_MAX_INST,		"Maximum Number of Instances",	false },
 	{ ABP_DI_OA_SUPPORT_FUNC,	"Supported Functionality",		false }
 };
 
-tValueName asDiInstAttrNames[] =
+static const tValueName asDiInstAttrNames[] =
 {
 	{ ABP_DI_IA_SEVERITY,			"Severity",						false },
 	{ ABP_DI_IA_EVENT_CODE,			"Event Code",					false },
@@ -156,7 +156,7 @@ tValueName asDiInstAttrNames[] =
 	{ ABP_DI_IA_BIT,				"Bit",							false }
 };
 
-tValueName asNwInstAttrNames[] =
+static const tValueName asNwInstAttrNames[] =
 {
 	{ ABP_NW_IA_NW_TYPE,		"Network Type",				false },
 	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		false },
@@ -167,12 +167,12 @@ tValueName asNwInstAttrNames[] =
 	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	false }
 };
 
-tValueName asSocObjAttrNames[] =
+static const tValueName asSocObjAttrNames[] =
 {
 	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	false }
 };
 
-tValueName asSocInstAttrNames[] =
+static const tValueName asSocInstAttrNames[] =
 {
 	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			false },
 	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			false },
@@ -190,14 +190,14 @@ tValueName asSocInstAttrNames[] =
 	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	false }
 };
 
-tValueName asSmtpObjAttrNames[] =
+static const tValueName asSmtpObjAttrNames[] =
 {
 	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	false },
 	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					false },
 	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		false }
 };
 
-tValueName asSmtpInstAttrNames[] =
+static const tValueName asSmtpInstAttrNames[] =
 {
 	{ ABP_SMTP_IA_FROM,		"From Address",		false },
 	{ ABP_SMTP_IA_TO,		"To Address",		false },
@@ -205,7 +205,7 @@ tValueName asSmtpInstAttrNames[] =
 	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		false }
 };
 
-tValueName asNcInstAttrNames[] =
+static const tValueName asNcInstAttrNames[] =
 {
 	{ ABP_NC_VAR_IA_NAME,			"Name",					false },
 	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			false },
@@ -215,7 +215,7 @@ tValueName asNcInstAttrNames[] =
 	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		false }
 };
 
-tValueName asNwEtnInstAttrNames[] =
+static const tValueName asNwEtnInstAttrNames[] =
 {
 	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",					false },
 	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",					false },
@@ -237,12 +237,12 @@ tValueName asNwEtnInstAttrNames[] =
 	{ ABP_ETN_IA_ETH_PHY_CONFIG,		"PHY Duplex Fallback Config",	false }
 };
 
-tValueName asCpcObjAttrNames[] =
+static const tValueName asCpcObjAttrNames[] =
 {
 	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	false }
 };
 
-tValueName asCpcInstAttrNames[] =
+static const tValueName asCpcInstAttrNames[] =
 {
 	{ ABP_CPC_IA_PORT_TYPE,			"Port Type",		false },
 	{ ABP_CPC_IA_PORT_NUMBER,		"Port Number",		false },
@@ -252,7 +252,7 @@ tValueName asCpcInstAttrNames[] =
 	{ ABP_CPC_IA_PORT_NODE_RANGE,	"Port Node Range",	false }
 };
 
-tValueName asCipIdInstAttrNames[] =
+static const tValueName asCipIdInstAttrNames[] =
 {
 	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		false },
 	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		false },
@@ -263,7 +263,7 @@ tValueName asCipIdInstAttrNames[] =
 	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		false }
 };
 
-tValueName asEplInstAttrNames[] =
+static const tValueName asEplInstAttrNames[] =
 {
 	{ ABP_EPL_IA_VENDOR_ID,		"Vendor ID",						false },
 	{ ABP_EPL_IA_PRODUCT_CODE,	"Product Code",						false },
@@ -277,7 +277,7 @@ tValueName asEplInstAttrNames[] =
 	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
 };
 
-tValueName asPnioInstAttrNames[] =
+static const tValueName asPnioInstAttrNames[] =
 {
 	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						false },
 	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	false },
@@ -305,7 +305,7 @@ tValueName asPnioInstAttrNames[] =
 	{ 0x18,									"Custom Station Name",				false } /* TODO: ABP macro does not exist yet */
 };
 
-tValueName asEipInstAttrNames[] =
+static const tValueName asEipInstAttrNames[] =
 {
 	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										false },
 	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										false },
@@ -339,7 +339,7 @@ tValueName asEipInstAttrNames[] =
 	{ 0x1F,										"Enable DLR",										false } /* TODO: ABP macro does not exist yet */
 };
 
-tValueName asEtcInstAttrNames[] =
+static const tValueName asEtcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
 	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								false },
@@ -363,14 +363,14 @@ tValueName asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							false },
 };
 
-tValueName asAppdObjAttrNames[] =
+static const tValueName asAppdObjAttrNames[] =
 {
 	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	false },
 	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false },
 	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	false }
 };
 
-tValueName asAppdInstAttrNames[] =
+static const tValueName asAppdInstAttrNames[] =
 {
 	{ ABP_APPD_IA_NAME,			"Name",						false },
 	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				false },
@@ -384,7 +384,7 @@ tValueName asAppdInstAttrNames[] =
 	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				false }
 };
 
-tValueName asAppInstAttrNames[] =
+static const tValueName asAppInstAttrNames[] =
 {
 	{ ABP_APP_IA_CONFIGURED,	"Configured",						false },
 	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				false },
@@ -394,7 +394,7 @@ tValueName asAppInstAttrNames[] =
 	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false }
 };
 
-tValueName asFsiObjAttrNames[] =
+static const tValueName asFsiObjAttrNames[] =
 {
 	{ ABP_FSI_OA_MAX_INST,						"Max Number of Instances",		false },
 	{ ABP_FSI_OA_DISABLE_VFS,					"Disable Virtual File System",	false },
@@ -405,20 +405,20 @@ tValueName asFsiObjAttrNames[] =
 	{ ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL,	"Disc Fault Tolerance Level",	false }
 };
 
-tValueName asFsiInstAttrNames[] =
+static const tValueName asFsiInstAttrNames[] =
 {
 	{ ABP_FSI_IA_TYPE,		"Instance Type",			false },
 	{ ABP_FSI_IA_FILE_SIZE,	"File Size",				false },
 	{ ABP_FSI_IA_PATH,		"Current Instance Path",	false }
 };
 
-tValueName asAsmObjAttrNames[] =
+static const tValueName asAsmObjAttrNames[] =
 {
 	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	false },
 	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	false }
 };
 
-tValueName asAsmInstAttrNames[] =
+static const tValueName asAsmInstAttrNames[] =
 {
 	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	false },
 	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			false },
@@ -434,13 +434,13 @@ tValueName asAsmInstAttrNames[] =
 	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false }
 };
 
-tValueName asMddObjAttrNames[] =
+static const tValueName asMddObjAttrNames[] =
 {
 	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			false },
 	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	false }
 };
 
-tValueName asSyncInstAttrNames[] =
+static const tValueName asSyncInstAttrNames[] =
 {
 	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",				false },
 	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",				false },
@@ -452,7 +452,7 @@ tValueName asSyncInstAttrNames[] =
 	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",		false }
 };
 
-tValueName asFusmInstAttrNames[] =
+static const tValueName asFusmInstAttrNames[] =
 {
 	{ ABP_FUSM_IA_STATE,		"State",					false },
 	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				false },
@@ -467,7 +467,7 @@ tValueName asFusmInstAttrNames[] =
 	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		false }
 };
 
-tValueName asSafeInstAttrNames[] =
+static const tValueName asSafeInstAttrNames[] =
 {
 	{ ABP_SAFE_IA_SAFETY_ENABLE,	"Safety Enabled",		false },
 	{ ABP_SAFE_IA_BAUD_RATE,		"Baud Rate",			false },
@@ -475,7 +475,7 @@ tValueName asSafeInstAttrNames[] =
 };
 
 
-tValueName asObjAttrNames[] =
+static const tValueName asObjAttrNames[] =
 {
 	{ ABP_OA_NAME,			"Name",						false },
 	{ ABP_OA_REV,			"Revision",					false },
@@ -483,7 +483,7 @@ tValueName asObjAttrNames[] =
 	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	false }
 };
 
-tValueName asObjectNames[] =
+static const tValueName asObjectNames[] =
 {
 	/*------------------------------------------------------------------------------
 	** Anybus module objects
@@ -538,7 +538,7 @@ tValueName asObjectNames[] =
 	{ ABP_OBJ_NUM_APP,		"Application Object",							false }
 };
 
-tValueName asCmdNames[] =
+static const tValueName asCmdNames[] =
 {
 	{ ABP_CMD_GET_ATTR,			"Get_Attribute",			false },
 	{ ABP_CMD_SET_ATTR,			"Set_Attribute",			false },
@@ -551,23 +551,23 @@ tValueName asCmdNames[] =
 };
 
 
-tValueName asMddCmdNames[] =
+static const tValueName asMddCmdNames[] =
 {
 	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false },
 };
 
-tValueName asAsmCmdNames[] =
+static const tValueName asAsmCmdNames[] =
 {
 	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	false },
 	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	false }
 };
 
-tValueName asFusmCmdNames[] =
+static const tValueName asFusmCmdNames[] =
 {
 	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,	"Error_Confirmation",	true }
 };
 
-tValueName asFsiCmdNames[] =
+static const tValueName asFsiCmdNames[] =
 {
 	{ ABP_FSI_CMD_FILE_OPEN,			"File_Open",		false },
 	{ ABP_FSI_CMD_FILE_CLOSE,			"File_Close",		false },
@@ -585,7 +585,7 @@ tValueName asFsiCmdNames[] =
 	{ ABP_FSI_CMD_FORMAT_DISC,			"Format_Disc",		false }
 };
 
-tValueName asEipCmdNames[] =
+static const tValueName asEipCmdNames[] =
 {
 	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		false },
 	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				false },
@@ -594,12 +594,12 @@ tValueName asEipCmdNames[] =
 	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	false }
 };
 
-tValueName asEctCmdNames[] =
+static const tValueName asEctCmdNames[] =
 {
 	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	false }
 };
 
-tValueName asPnioCmdNames[] =
+static const tValueName asPnioCmdNames[] =
 {
 	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
 	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			false },
@@ -617,14 +617,14 @@ tValueName asPnioCmdNames[] =
 	{ 0x1E,								"Indicate_Device",		false } /* TODO: ABP macro does not exist yet */
 };
 
-tValueName asAppCmdNames[] =
+static const tValueName asAppCmdNames[] =
 {
 	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			false },
 	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	false },
 	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
 };
 
-tValueName asAppDataCmdNames[] =
+static const tValueName asAppDataCmdNames[] =
 {
 	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	false },
 	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		false },
@@ -634,7 +634,7 @@ tValueName asAppDataCmdNames[] =
 	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			false }
 };
 
-tValueName asNetCmdNames[] =
+static const tValueName asNetCmdNames[] =
 {
 	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		false },
 	{ ABP_NW_CMD_MAP_ADI_READ_AREA,			"Map_ADI_Read_Area",		false },
@@ -642,21 +642,21 @@ tValueName asNetCmdNames[] =
 	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	false }
 };
 
-tValueName asAnbErrNames[] =
+static const tValueName asAnbErrNames[] =
 {
 	{ ABP_ANB_ERR_INV_PRD_CFG,		"Invalid process data config",		true },
 	{ ABP_ANB_ERR_INV_DEV_ADDR,		"Invalid device address",			true },
 	{ ABP_ANB_ERR_INV_COM_SETTINGS,	"Invalid communication settings",	true }
 };
 
-tValueName asDiErrNames[] =
+static const tValueName asDiErrNames[] =
 {
 	{ ABP_DI_ERR_NOT_REMOVED,		"Event could not be removed",		true },
 	{ ABP_DI_LATCH_NOT_SUPPORTED,	"Latching events not supported",	true },
 	{ ABP_DI_ERR_NW_SPECIFIC,		"Network specific error",			true }
 };
 
-tValueName asNwErrNames[] =
+static const tValueName asNwErrNames[] =
 {
 	{ ABP_NW_ERR_INVALID_ADI_DATA_TYPE,	"Invalid ADI data type",		true },
 	{ ABP_NW_ERR_INVALID_NUM_ELEMENTS,	"Invalid number of elements",	true },
@@ -670,14 +670,14 @@ tValueName asNwErrNames[] =
 	{ ABP_NW_ERR_NW_SPEC_RESTRICTION,	"Network specific restriction",	true }
 };
 
-tValueName asAppdErrNames[] =
+static const tValueName asAppdErrNames[] =
 {
 	{ ABP_APPD_ERR_MAPPING_ITEM_NAK,				"Mapping item NAK",				true },
 	{ ABP_APPD_ERR_INVALID_TOTAL_SIZE,				"Invalid total size",			true },
 	{ ABP_APPD_ERR_ATTR_CTRL_FROM_OTHER_CHANNEL,	"Attr ctrl from other channel",	true }
 };
 
-tValueName asSmtpErrNames[] =
+static const tValueName asSmtpErrNames[] =
 {
 	{ ABP_SMTP_NO_EMAIL_SERVER,			"No e-mail server",			true },
 	{ ABP_SMTP_SERVER_NOT_READY,		"Server not ready",			true },
@@ -688,13 +688,13 @@ tValueName asSmtpErrNames[] =
 	{ ABP_SMTP_OTHER,					"Other",					true }
 };
 
-tValueName asEipErrNames[] =
+static const tValueName asEipErrNames[] =
 {
 	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
 	{ ABP_EIP_ERR_INVALID_CONFIG,		"Invalid configuration",	true }
 };
 
-tValueName asPnioErrNames[] =
+static const tValueName asPnioErrNames[] =
 {
 	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI write not mapped",				true },
 	{ ABP_NWPNIO_ERR_ADI_READ_NOT_MAPPED,		"ADI read not mapped",				true },
@@ -720,7 +720,7 @@ tValueName asPnioErrNames[] =
 	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true }
 };
 
-tValueName asSocErrNames[] =
+static const tValueName asSocErrNames[] =
 {
 	{ SOC_ERR_ENOBUFS,			"ENOBUFS",			true },
 	{ SOC_ERR_ETIMEDOUT,		"ETIMEDOUT",		true },
@@ -750,14 +750,14 @@ tValueName asSocErrNames[] =
 
 };
 
-tValueName asFusmErrNames[] =
+static const tValueName asFusmErrNames[] =
 {
 	{ ABP_FUSM_ERR_REJECT_BY_MODULE,	"Rejected by module",			true },
 	{ ABP_FUSM_ERR_MODULE_RSP_FAULTY,	"Module response is faulty",	true }
 };
 
 
-tValueName asFsiErrNames[] =
+static const tValueName asFsiErrNames[] =
 {
 	{ ABP_FSI_ERR_FILE_OPEN_FAILED,				"File_Open Failed",			true },
 	{ ABP_FSI_ERR_FILE_CLOSE_FAILED,			"File_Close Failed",		true },
@@ -773,7 +773,7 @@ tValueName asFsiErrNames[] =
 	{ ABP_FSI_ERR_FILE_RENAME_FAILED,			"File_Rename Failed",		true }
 };
 
-tValueName asIntMaskNames[] =
+static const tValueName asIntMaskNames[] =
 {
 	{ ABP_INTMASK_RDPDIEN,		"RDPD",		false },
 	{ ABP_INTMASK_RDMSGIEN,		"RDMSG",	false },
@@ -785,7 +785,7 @@ tValueName asIntMaskNames[] =
 	{ 0x80,						"RESERVED",	true  }  /* No ABP mask exists */
 };
 
-tValueName asLedStsNames[] =
+static const tValueName asLedStsNames[] =
 {
 	{ 0x0001, "LED1A",		false },
 	{ 0x0002, "LED1B",		false },
@@ -798,7 +798,7 @@ tValueName asLedStsNames[] =
 	{ 0xFF00, "RESERVED",	true }
 };
 
-tValueName asErrorRspNames[] =
+static const tValueName asErrorRspNames[] =
 {
 	{ ABP_ERR_INV_MSG_FORMAT,					"Invalid message format",							true },
 	{ ABP_ERR_UNSUP_OBJ,						"Unsupported object",								true },
@@ -824,7 +824,7 @@ tValueName asErrorRspNames[] =
 	{ 0xFF,										"Object specific error",							true }
 };
 
-tValueName asAnybusStsNames[] =
+static const tValueName asAnybusStsNames[] =
 {
 	{ ABP_ANB_STATE_SETUP,			"SETUP",			false },
 	{ ABP_ANB_STATE_NW_INIT,		"NW_INIT",			false },
@@ -835,7 +835,7 @@ tValueName asAnybusStsNames[] =
 	{ ABP_ANB_STATE_EXCEPTION,		"EXCEPTION",		true  }
 };
 
-tValueName asApplStsNames[] =
+static const tValueName asApplStsNames[] =
 {
 	{ ABP_APPSTAT_NO_ERROR,			"No Error",									false },
 	{ ABP_APPSTAT_NOT_SYNCED,		"Not yet synchronized",						false },
@@ -847,7 +847,7 @@ tValueName asApplStsNames[] =
 	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								true  }
 };
 
-tValueName asSpiStsNames[] =
+static const tValueName asSpiStsNames[] =
 {
 	{ 0xC0,							"RESERVED",		true  }, /* No ABP mask exists */
 	{ ABP_SPI_STATUS_NEW_PD,		"NEW_PD",		false },
@@ -857,7 +857,7 @@ tValueName asSpiStsNames[] =
 	{ ABP_SPI_STATUS_WRMSG_FULL,	"WRMSG_FULL",	true  }
 };
 
-tValueName asSpiCtrlNames[] =
+static const tValueName asSpiCtrlNames[] =
 {
 	{ ABP_SPI_CTRL_T,			"TOGGLE",		false },
 	{ 0x60,						"RESERVED",		true  }, /* No ABP mask exists */
@@ -1025,7 +1025,7 @@ bool GetErrorRspString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 	return true;
 }
 
-bool GetObjSpecificErrString(U8 val, char* str, U16 maxLen, tValueName* pasErrNames, U8 bNoErrors, DisplayBase display_base)
+bool GetObjSpecificErrString(U8 val, char* str, U16 maxLen, const tValueName* pasErrNames, U8 bNoErrors, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < bNoErrors; i++)
@@ -1180,11 +1180,11 @@ bool GetLedStatusString(U16 val, char* str, U16 maxLen, DisplayBase display_base
 bool GetNamedAttrString(U16 inst, U8 val,
 	char* str, U16 maxLen,
 	DisplayBase display_base,
-	tValueName* pasObjNames, U8 NoObjNames,
-	tValueName* pasInstNames, U8 NoInstNames)
+	const tValueName* pasObjNames, U8 NoObjNames,
+	const tValueName* pasInstNames, U8 NoInstNames)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	tValueName* pasAttrNames = NULL;
+	const tValueName* pasAttrNames = NULL;
 	U8 bNoAttrs = 0;
 	bool alert = false;
 	bool found = false;
@@ -1262,7 +1262,7 @@ bool GetObjectString(U8 val, char* str, U16 maxLen, DisplayBase display_base)
 	return true;
 }
 
-bool GetObjSpecificCmdString(U8 val, char* str, U16 maxLen, tValueName* pasCmdNames, U8 bNoCmds, DisplayBase display_base)
+bool GetObjSpecificCmdString(U8 val, char* str, U16 maxLen, const tValueName* pasCmdNames, U8 bNoCmds, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < bNoCmds; i++)

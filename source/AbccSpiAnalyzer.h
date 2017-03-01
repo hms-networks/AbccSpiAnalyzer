@@ -175,9 +175,9 @@ typedef struct tNetworkTimeInfo
 	bool wrPdValid;
 }tNetworkTimeInfo;
 
-extern tAbccMosiInfo asMosiStates[];
-extern tAbccMisoInfo asMisoStates[];
-extern tAbccMsgInfo asMsgStates[];
+extern const tAbccMosiInfo asMosiStates[];
+extern const tAbccMisoInfo asMisoStates[];
+extern const tAbccMsgInfo asMsgStates[];
 
 class SpiAnalyzerSettings;
 class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
