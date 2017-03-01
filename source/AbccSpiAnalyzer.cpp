@@ -485,6 +485,24 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 	{
 		fMosiReadyForNewPacket = false;
 		fMisoReadyForNewPacket = false;
+
+		if (mEnable != NULL)
+		{
+			/* Check if any additional clocks appear on SCLK before enable goes inactive */
+			if(mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
+			{
+				Frame error_frame;
+				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
+				error_frame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
+				error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
+				mResults->AddFrame(error_frame);
+
+				mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+			}
+
+			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+		}
 	}
 }
 
