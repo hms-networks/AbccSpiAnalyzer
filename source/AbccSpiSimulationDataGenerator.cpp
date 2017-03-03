@@ -88,7 +88,7 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 		mEnable = NULL;
 
 	/* Insert 10 bit-periods of idle */
-	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(10.0)); 
+	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(10.0));
 
 	mValue = 0;
 }
@@ -100,8 +100,16 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
 	while (mClock->GetCurrentSampleNumber() < adjusted_largest_sample_requested)
 	{
 		CreateSpiTransaction();
-		/* Insert 5 bit-periods of idle */
-		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(5.0));
+		if (mEnable != NULL)
+		{
+			/* Insert 5 bit-periods of idle */
+			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(5.0));
+		}
+		else
+		{
+			/* Insert >10us bit-periods of idle */
+			mSpiSimulationChannels.AdvanceAll(mSimulationSampleRateHz * 10.0e-6f);
+		}
 	}
 
 	*simulation_channels = mSpiSimulationChannels.GetArray();

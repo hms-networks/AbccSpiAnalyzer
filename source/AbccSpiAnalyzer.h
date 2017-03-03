@@ -223,6 +223,8 @@ protected: /* functions */
 	bool RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMisoStates* peMisoMsgSubState);
 	bool RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMosiStates* peMosiMsgSubState);
 
+	bool Is3WireIdleCondition(float rIdleTimeCondition);
+
 
 #pragma warning( push )
 #pragma warning( disable : 4251 ) //warning C4251: 'SerialAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class

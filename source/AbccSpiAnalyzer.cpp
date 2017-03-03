@@ -17,6 +17,9 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
+#define MIN_IDLE_GAP_TIME		10.0e-6f
+#define MAX_CLOCK_IDLE_HI_TIME	5.0e-6f
+
 #define PROCESS_SAMPLE(x,y,z) \
 		if( x != NULL ) \
 		{ \
@@ -158,6 +161,7 @@ void SpiAnalyzer::WorkerThread()
 		case e_GET_WORD_ERROR:
 			fError = true;
 			fReset = true;
+			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
 			break;
 		}
 		/* Run the ABCC MOSI state machine */
@@ -166,13 +170,40 @@ void SpiAnalyzer::WorkerThread()
 		/* Run the ABCC MISO state machine */
 		fReady2 = RunAbccMisoStateMachine((fReset||fReady2), fError, lMisoData, lFirstSample);
 
+		if (mEnable == NULL)
+		{
+			if (!fReady1 && !fReady2)
+			{
+				if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+				{
+					eMosiState = e_ABCC_MOSI_SPI_CTRL;
+					eMisoState = e_ABCC_MISO_Reserved1;
+					eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+					eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+					mMisoChecksum.Init();
+					mMosiChecksum.Init();
+					fError = true;
+				}
+			}
+		}
+
 		if (fError == true)
 		{
 			/* Signal error, do not commit packet */
 			SignalReadyForNewPacket(false, fError);
 
-			/* Advance to the next enabled state */
-			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+			/* Advance to the next enabled (or idle) state */
+			if (mEnable != NULL)
+			{
+				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+			}
+			else
+			{
+				mClock->Advance((U32)(MAX_CLOCK_IDLE_HI_TIME * GetSampleRate() / 2.0f));
+				mCurrentSample = mClock->GetSampleNumber();
+				mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
+				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+			}
 		}
 
 		mResults->CommitResults();
@@ -184,17 +215,32 @@ void SpiAnalyzer::WorkerThread()
 
 void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 {
+	/* NOTE: 3-wire requires correct clock polarity (IDLE HI),
+	** in 4-wire mode, the polarity does not matter. */
+
 	AdvanceToActiveEnableEdge();
 
-	/* 3-wire requires IDLE HI, 4-wire does not matter */
-	if (mEnable != NULL)
+	if (mEnable == NULL)
 	{
+		/* With no enable line an idle gap of at least >=10us is required */
 		for (;;)
 		{
+			/* First find idle gap */
+			while (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
+			{
+				GetSampleRate();
+				mClock->AdvanceToNextEdge();
+			}
+
+			mCurrentSample = mClock->GetSampleNumber();
 			/* If false, this function moves to the next enable-active edge. */
 			if (IsInitialClockPolarityCorrect() == true)
 			{
 				break;
+			}
+			else
+			{
+				mClock->AdvanceToNextEdge();
 			}
 		}
 	}
@@ -260,40 +306,16 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 
 bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 {
-	if (mClock->GetBitState() == mSettings->mClockInactiveState)
+	bool fCorrect = true;
+	if (mEnable == NULL)
 	{
-		return true;
+		if (mClock->GetBitState() != mSettings->mClockInactiveState)
+		{
+			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
+			fCorrect = false;
+		}
 	}
-
-	mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
-
-	if (mEnable != NULL)
-	{
-		Frame error_frame;
-		error_frame.mStartingSampleInclusive = mCurrentSample;
-
-		mEnable->AdvanceToNextEdge();
-		mCurrentSample = mEnable->GetSampleNumber();
-
-		error_frame.mEndingSampleInclusive = mCurrentSample;
-		error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-		error_frame.mType = e_ABCC_SPI_ERROR_SETTINGS;
-		mResults->AddFrame(error_frame);
-
-		/* move to the next enable-active edge */
-		mEnable->AdvanceToNextEdge();
-		mCurrentSample = mEnable->GetSampleNumber();
-		mClock->AdvanceToAbsPosition(mCurrentSample);
-
-		return false;
-	}
-	else
-	{
-		/* No enable line; at least start with the clock in the idle state. */
-		mClock->AdvanceToNextEdge();
-		mCurrentSample = mClock->GetSampleNumber();
-		return true;
-	}
+	return fCorrect;
 }
 
 bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
@@ -314,6 +336,14 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
 	{
 		return true;
 	}
+}
+
+bool SpiAnalyzer::Is3WireIdleCondition(float rIdleTimeCondition)
+{
+	UINT64 lSampleDistance = mClock->GetSampleOfNextEdge() - mClock->GetSampleNumber();
+	U32 dwSampleRate = GetSampleRate();
+	float rIdleTime = (float)lSampleDistance / (float)dwSampleRate;
+	return (rIdleTime >= rIdleTimeCondition);
 }
 
 tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
@@ -361,6 +391,27 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
 		if (fClkIdleHigh || (i > 0))
 		{
+			if (mEnable == NULL)
+			{
+				/* In 3-wire mode idle condition is >=5us (during a transaction).
+				** On every advancement on clock, check for idle condition.
+				** If detected, a reset of the statemachines are need to re-sync */
+				if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+				{
+					if (i == 0)
+					{
+						/* Simply advance forward to next transaction */
+						AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+					}
+					else
+					{
+						/* Reset everything and return. */
+						status = e_GET_WORD_ERROR;
+						break;
+					}
+				}
+			}
+
 			/* Jump to the next clock phase */
 			mClock->AdvanceToNextEdge();
 		}
@@ -378,6 +429,19 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 			break;
 		}
 
+		if (mEnable == NULL)
+		{
+			/* In 3-wire mode idle condition is >=5us (during a transaction).
+			** On every advancement on clock, check for idle condition.
+			** If detected, a reset of the statemachines are need to re-sync */
+			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+			{
+				/* Error: reset everything and return. */
+				status = e_GET_WORD_ERROR;
+				break;
+			}
+		}
+
 		/* Jump to the next clock phase */
 		mClock->AdvanceToNextEdge();
 
@@ -393,11 +457,11 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 
 	if(status == e_GET_WORD_OK)
 	{
-	/* Add sample markers to the results */
-	U32 count = (U32)mArrowLocations.size();
-	for (U32 i = 0; i < count; i++)
-	{
-		mResults->AddMarker(mArrowLocations[i], mArrowMarker, mSettings->mClockChannel);
+		/* Add sample markers to the results */
+		U32 count = (U32)mArrowLocations.size();
+		for (U32 i = 0; i < count; i++)
+		{
+			mResults->AddMarker(mArrowLocations[i], mArrowMarker, mSettings->mClockChannel);
 		}
 	}
 
@@ -928,7 +992,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoData, S64 lFirstSample)
 {
-	tAbccMisoStates eMsgSubState;
+	tAbccMisoStates eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
 	tAbccMisoStates eMisoState_Current = e_ABCC_MISO_IDLE;
 	bool fAddFrame = false;
 
@@ -1178,7 +1242,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 
 bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiData, S64 lFirstSample)
 {
-	tAbccMosiStates eMsgSubState;
+	tAbccMosiStates eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
 	tAbccMosiStates eMosiState_Current = e_ABCC_MOSI_IDLE;
 	bool fAddFrame = false;
 
