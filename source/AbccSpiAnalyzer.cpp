@@ -248,8 +248,6 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 
 void SpiAnalyzer::Setup()
 {
-	mArrowMarker = AnalyzerResults::UpArrow;
-
 	if (mSettings->mMosiChannel != UNDEFINED_CHANNEL)
 	{
 		mMosi = GetAnalyzerChannelData(mSettings->mMosiChannel);
@@ -364,6 +362,11 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 	if (mClock->GetBitState() == BIT_HIGH)
 	{
 		fClkIdleHigh = true;
+		mArrowMarker = AnalyzerResults::UpArrow;
+	}
+	else
+	{
+		mArrowMarker = AnalyzerResults::DownArrow;
 	}
 
 	for (U32 i = 0; i < bits_per_transfer; i++)
