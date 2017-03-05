@@ -644,7 +644,7 @@ void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLas
 		frag_frame.mFlags |= SPI_MOSI_FLAG;
 	}
 
-	if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
+	if (mEnable != NULL)
 	{
 		mResults->AddMarker(lLastSample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 	}
@@ -1051,7 +1051,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
 		eMisoState = e_ABCC_MISO_IDLE;
-		if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
+		if (mEnable != NULL)
 		{
 			AddFragFrame(false, (U8)eMisoState, lFirstSample, mEnable->GetSampleOfNextEdge());
 		}
@@ -1301,7 +1301,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
 		eMosiState = e_ABCC_MOSI_IDLE;
-		if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
+		if (mEnable != NULL)
 		{
 			AddFragFrame(true, (U8)eMosiState, lFirstSample, mEnable->GetSampleOfNextEdge());
 		}
