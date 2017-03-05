@@ -190,7 +190,7 @@ void SpiAnalyzer::WorkerThread()
 		if (fError == true)
 		{
 			/* Signal error, do not commit packet */
-			SignalReadyForNewPacket(false, fError);
+			SignalReadyForNewPacket(false, e_PROTOCOL_ERROR_PACKET);
 
 			/* Advance to the next enabled (or idle) state */
 			if (mEnable != NULL)
@@ -531,19 +531,21 @@ bool SpiAnalyzer::IsEnableActive(void)
 	}
 }
 
-void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
+void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacketType)
 {
 	bool fStartNewPacket = false;
 	if (fMosiChannel)
 	{
 		fMosiReadyForNewPacket = true;
+		eMosiPacketType = ePacketType;
 	}
 	else
 	{
 		fMisoReadyForNewPacket = true;
+		eMisoPacketType = ePacketType;
 	}
 
-	if (fErrorPacket)
+	if (ePacketType == e_PROTOCOL_ERROR_PACKET)
 	{
 		fStartNewPacket = true;
 		mResults->CancelPacketAndStartNewPacket();
@@ -551,20 +553,48 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 	}
 	else if (fMisoReadyForNewPacket && fMosiReadyForNewPacket)
 	{
-		U64 packet_id;
+		U64 packet_id = mResults->CommitPacketAndStartNewPacket();
 		fStartNewPacket = true;
-		packet_id = mResults->CommitPacketAndStartNewPacket();
-		if(packet_id == INVALID_RESULT_INDEX)
+		if (packet_id == INVALID_RESULT_INDEX)
 		{
-			mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorX, mSettings->mEnableChannel);
+			mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 		}
 		else
 		{
-			if (fMisoNewMsg || fMosiNewMsg)
+			if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
 			{
-				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				AnalyzerResults::MarkerType eMarkerType = AnalyzerResults::One;
+				/* If either MISO or MOSI contain an error report it,
+				** Else if either MISO or MOSI contain an response report it,
+				** Else report any command. */
+				if ((eMosiPacketType == e_PROTOCOL_ERROR_PACKET) || (eMisoPacketType == e_PROTOCOL_ERROR_PACKET))
 				{
-					mResults->AddMarker(mCurrentSample, AnalyzerResults::Start, mSettings->mEnableChannel);
+					eMarkerType = AnalyzerResults::ErrorX;
+				}
+				else if ((eMosiPacketType == e_ERROR_RESPONSE_PACKET) || (eMisoPacketType == e_ERROR_RESPONSE_PACKET))
+				{
+					eMarkerType = AnalyzerResults::ErrorDot;
+				}
+				else if ((eMosiPacketType != e_NULL_PACKET) && (eMisoPacketType != e_NULL_PACKET))
+				{
+					eMarkerType = AnalyzerResults::Square;
+				}
+				else if ((eMosiPacketType == e_RESPONSE_PACKET) || (eMisoPacketType == e_RESPONSE_PACKET))
+				{
+					eMarkerType = AnalyzerResults::Stop;
+				}
+				else if ((eMosiPacketType == e_COMMAND_PACKET) || (eMisoPacketType == e_COMMAND_PACKET))
+				{
+					eMarkerType = AnalyzerResults::Start;
+				}
+				else if ((eMosiPacketType == e_MSG_FRAGMENT_PACKET) || (eMisoPacketType == e_MSG_FRAGMENT_PACKET))
+				{
+					eMarkerType = AnalyzerResults::Dot;
+				}
+
+				if (eMarkerType != AnalyzerResults::One)
+				{
+					mResults->AddMarker(mCurrentSample, eMarkerType, mSettings->mEnableChannel);
 				}
 			}
 		}
@@ -581,7 +611,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 		if (mEnable != NULL)
 		{
 			/* Check if any additional clocks appear on SCLK before enable goes inactive */
-			if(mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
+			if (mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
 			{
 				Frame error_frame;
 				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
@@ -592,7 +622,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket)
 
 				if (mSettings->mErrorIndexing)
 				{
-					mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorDot, mSettings->mEnableChannel);
+					mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 				}
 			}
 
@@ -776,34 +806,43 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		}
 	}
 
-	/* Handle high-level error indication (error-dots), only permit one dot per message to improve rendering chances */
-	if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	/* Commit the processed frame */
+	mResults->AddFrame(result_frame);
+	if (eState == e_ABCC_MISO_CRC32)
 	{
-		if (fMisoNewMsg) /* TODO: this marker should not be exclusive to "valid messages" such that information outside of messages can be indicated through this mechanism */
+		tPacketType ePacketType;
+		if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 		{
-			fMisoNewMsg = false;
-			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
+			ePacketType = e_PROTOCOL_ERROR_PACKET;
+		}
+		else if (fMisoNewMsg)
+		{
+			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
+				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
 			{
-				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				ePacketType = e_MSG_FRAGMENT_PACKET;
+			}
+			else
+			{
+				if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
-					mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+					ePacketType = e_COMMAND_PACKET;
+				}
+				else if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
+				{
+					ePacketType = e_ERROR_RESPONSE_PACKET;
+				}
+				else
+				{
+					ePacketType = e_RESPONSE_PACKET;
 				}
 			}
 		}
 		else
 		{
-			if (mSettings->mErrorIndexing)
-			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
-			}
+			ePacketType = e_NULL_PACKET;
 		}
-	}
-
-	/* Commit the processed frame */
-	mResults->AddFrame(result_frame);
-	if (eState == e_ABCC_MISO_CRC32)
-	{
-		SignalReadyForNewPacket(false, false);
+		SignalReadyForNewPacket(false, ePacketType);
 	}
 }
 
@@ -835,7 +874,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
-			//result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			fMosiErrorRsp = true;
 		}
 		else
@@ -959,34 +997,43 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		}
 	}
 
-	/* Handle high-level error indication (error-dots), only permit one dot per message to improve rendering chances */
-	if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	/* Commit the processed frame */
+	mResults->AddFrame(result_frame);
+	if (eState == e_ABCC_MOSI_PAD)
 	{
-		if (fMosiNewMsg) /* TODO: this marker should not be exclusive to "valid messages" such that information outside of messages can be indicated through this mechanism */
+		tPacketType ePacketType;
+		if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 		{
-			fMosiNewMsg = false;
-			if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
+			ePacketType = e_PROTOCOL_ERROR_PACKET;
+		}
+		else if (fMosiNewMsg)
+		{
+			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
+				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
 			{
-				if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+				ePacketType = e_MSG_FRAGMENT_PACKET;
+			}
+			else
+			{
+				if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
-					mResults->AddMarker(lFramesFirstSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+					ePacketType = e_COMMAND_PACKET;
+				}
+				else if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
+				{
+					ePacketType = e_ERROR_RESPONSE_PACKET;
+				}
+				else
+				{
+					ePacketType = e_RESPONSE_PACKET;
 				}
 			}
 		}
 		else
 		{
-			if (mSettings->mErrorIndexing)
-			{
-				mResults->AddMarker(lFramesFirstSample, AnalyzerResults::ErrorDot, mSettings->mMosiChannel);
-			}
+			ePacketType = e_NULL_PACKET;
 		}
-	}
-
-	/* Commit the processed frame */
-	mResults->AddFrame(result_frame);
-	if (eState == e_ABCC_MOSI_PAD)
-	{
-		SignalReadyForNewPacket(true, false);
+		SignalReadyForNewPacket(true, ePacketType);
 	}
 }
 

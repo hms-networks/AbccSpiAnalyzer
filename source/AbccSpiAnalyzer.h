@@ -54,6 +54,17 @@ typedef enum tGetWordStatus
 	e_GET_WORD_RESET	/* Reading WORD resulted in a event that requires state machine reset */
 }tGetWordStatus;
 
+typedef enum tPacketType
+{
+	e_NULL_PACKET,
+	e_COMMAND_PACKET,
+	e_RESPONSE_PACKET,
+	e_MSG_FRAGMENT_PACKET,
+	e_ERROR_RESPONSE_PACKET,
+	e_PROTOCOL_ERROR_PACKET,
+	e_MULTI_PACKET
+}tPacketType;
+
 typedef enum tAbccMosiStates
 {
 	e_ABCC_MOSI_IDLE,
@@ -212,7 +223,7 @@ protected: /* functions */
 	tGetWordStatus GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
 
 	void AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLastSample);
-	void SignalReadyForNewPacket(bool fMosiChannel, bool fErrorPacket);
+	void SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacketType);
 
 	void ProcessMosiFrame(tAbccMosiStates eMosiState, U64 lFrameData, S64 lFramesFirstSample);
 	void ProcessMisoFrame(tAbccMisoStates eMisoState, U64 lFrameData, S64 lFramesFirstSample);
@@ -277,6 +288,8 @@ protected: /* variables */
 
 	bool fMisoReadyForNewPacket;
 	bool fMosiReadyForNewPacket;
+	tPacketType eMisoPacketType;
+	tPacketType eMosiPacketType;
 
 	tMsgHeaderInfo sMisoMsgHeader;
 	U32 dwMisoPdCnt;
