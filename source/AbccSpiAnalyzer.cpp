@@ -284,7 +284,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 {
 	if (mEnable != NULL)
 	{
-		if (mEnable->GetBitState() != mSettings->mEnableActiveState)
+		if (mEnable->GetBitState() != BIT_LOW)
 		{
 			mEnable->AdvanceToNextEdge();
 		}
@@ -307,7 +307,8 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 	bool fCorrect = true;
 	if (mEnable == NULL)
 	{
-		if (mClock->GetBitState() != mSettings->mClockInactiveState)
+		/* In 3-wire clock must idle HIGH */
+		if (mClock->GetBitState() == BIT_LOW)
 		{
 			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
 			fCorrect = false;
@@ -347,14 +348,14 @@ bool SpiAnalyzer::Is3WireIdleCondition(float rIdleTimeCondition)
 tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 {
 	/* We're assuming we come into this function with the clock in the idle state */
-	U32 bits_per_transfer = mSettings->mBitsPerTransfer;
+	const U32 dwBitsPerTransfer = 8;
 	DataBuilder mosi_result;
 	DataBuilder miso_result;
 	tGetWordStatus status = e_GET_WORD_OK;
 	bool fClkIdleHigh = false;
 
-	mosi_result.Reset(plMosiData, mSettings->mShiftOrder, bits_per_transfer);
-	miso_result.Reset(plMisoData, mSettings->mShiftOrder, bits_per_transfer);
+	mosi_result.Reset(plMosiData, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
+	miso_result.Reset(plMisoData, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 	mArrowLocations.clear();
 
 	*plFirstSample = mClock->GetSampleNumber();
@@ -369,7 +370,7 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		mArrowMarker = AnalyzerResults::DownArrow;
 	}
 
-	for (U32 i = 0; i < bits_per_transfer; i++)
+	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
 		/* On every single edge, we need to check that "enable" doesn't toggle. */
 		/* Note that we can't just advance the enable line to the next edge, because there may not be another edge */
@@ -448,15 +449,11 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		/* Jump to the next clock phase */
 		mClock->AdvanceToNextEdge();
 
-		if (mSettings->mDataValidEdge == AnalyzerEnums::TrailingEdge)
-		{
 			mCurrentSample = mClock->GetSampleNumber();
 			PROCESS_SAMPLE(mMosi, mosi_result, mMosiChannel);
 			PROCESS_SAMPLE(mMiso, miso_result, mMisoChannel);
 			mArrowLocations.push_back(mCurrentSample);
 		}
-
-	}
 
 	if(status == e_GET_WORD_OK)
 	{
@@ -526,7 +523,7 @@ bool SpiAnalyzer::IsEnableActive(void)
 {
 	if (mEnable != NULL)
 	{
-		return (mEnable->GetBitState() == mSettings->mEnableActiveState);
+		return (mEnable->GetBitState() == BIT_LOW);
 	}
 	else
 	{

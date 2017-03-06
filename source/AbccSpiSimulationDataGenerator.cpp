@@ -80,10 +80,10 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 	else
 		mMosi = NULL;
 
-	mClock = mSpiSimulationChannels.Add(settings->mClockChannel, mSimulationSampleRateHz, mSettings->mClockInactiveState);
+	mClock = mSpiSimulationChannels.Add(settings->mClockChannel, mSimulationSampleRateHz, BIT_HIGH);
 
 	if (settings->mEnableChannel != UNDEFINED_CHANNEL)
-		mEnable = mSpiSimulationChannels.Add(settings->mEnableChannel, mSimulationSampleRateHz, Invert(mSettings->mEnableActiveState));
+		mEnable = mSpiSimulationChannels.Add(settings->mEnableChannel, mSimulationSampleRateHz, BIT_HIGH);
 	else
 		mEnable = NULL;
 
@@ -169,10 +169,11 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 
 void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
 {
-	BitExtractor mosi_bits(mosi_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer);
-	BitExtractor miso_bits(miso_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer);
+	const U32 dwBitsPerTransfer = 8;
+	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
+	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 
-	for (U32 i = 0; i < mSettings->mBitsPerTransfer; i++)
+	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
 		if (mMosi != NULL)
 			mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
@@ -198,10 +199,11 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
 
 void SpiSimulationDataGenerator::OutputWord_CPHA1(U64 mosi_data, U64 miso_data)
 {
-	BitExtractor mosi_bits(mosi_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer);
-	BitExtractor miso_bits(miso_data, mSettings->mShiftOrder, mSettings->mBitsPerTransfer);
+	const U32 dwBitsPerTransfer = 8;
+	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
+	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 
-	for (U32 i = 0; i < mSettings->mBitsPerTransfer; i++)
+	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
 		mClock->Transition();  /* data invalid */
 		if (mMosi != NULL)

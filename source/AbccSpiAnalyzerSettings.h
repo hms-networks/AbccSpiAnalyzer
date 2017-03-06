@@ -55,11 +55,6 @@ public:
 	Channel mMisoChannel;
 	Channel mClockChannel;
 	Channel mEnableChannel;
-	AnalyzerEnums::ShiftOrder mShiftOrder;
-	U32 mBitsPerTransfer;
-	BitState mClockInactiveState;
-	AnalyzerEnums::Edge mDataValidEdge;
-	BitState mEnableActiveState;
 	U32 mMessageIndexingVerbosityLevel;
 	U32 mMsgDataPriority;
 	bool mMessageSrcIdIndexing;
