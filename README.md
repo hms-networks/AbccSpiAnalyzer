@@ -102,13 +102,14 @@ included in this repository's documentation folder.
 * Supports CRC32 computation and indication on invalid checksum.
 * Identifies fragmented SPI telegrams (not to be confused with the ABCC SPI</br>
   protocol's message fragmentation or segmentation).
-* Supports both 3-wire and 4-wire Full Duplex configurations. 4-wire is</br>
-  recommended for improved reliability in protocol analysis.
+* Supports both 3-wire and 4-wire configurations.
 * Supports ABCC SPI fragmentation protocol
+  * Fragmentation starting at the message header is currently not supported (PLANNED)
 * Support toggle-bit monitoring for identification of retransmissions.
 * Byte counter to logic-frames that are part of process data.
 * Byte counter to logic-frames that are part of message data this will be</br>
   particularly helpful for tracking long segmented messages.
+* Markup to aid in distinguishing valid message data from invalid message data.
 * Supports bubble-text enumeration for 'most' of the following SPI telegram</br>
   fields:
   * SPI control/status
@@ -119,8 +120,9 @@ included in this repository's documentation folder.
   * Message Object Number
   * Command Byte
   * Command Extension Word (for object/instance attributes)
+  * Error Response Bytes (including some object specific codes)
 * Supports filtering options to indexed decoded protocol information. Currently</br>
-  the DLL supports indexing:
+  the plugin supports indexing:
   * Message Object and Command information (only "new" messages are indexed)
   * Message Source ID (only "new" messages are indexed)
   * Anybus status
