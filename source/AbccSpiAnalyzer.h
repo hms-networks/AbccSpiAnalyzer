@@ -242,7 +242,7 @@ protected: /* functions */
 protected: /* variables */
 	std::auto_ptr< SpiAnalyzerSettings > mSettings;
 	std::auto_ptr< SpiAnalyzerResults > mResults;
-	bool mSimulationInitilized;
+	bool mSimulationInitialized;
 	SpiSimulationDataGenerator mSimulationDataGenerator;
 
 	AnalyzerChannelData* mMosi;

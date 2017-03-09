@@ -38,7 +38,7 @@
 SpiAnalyzer::SpiAnalyzer()
 	: Analyzer2(),
 	mSettings(new SpiAnalyzerSettings()),
-	mSimulationInitilized(false),
+	mSimulationInitialized(false),
 	mMosi(NULL),
 	mMiso(NULL),
 	mClock(NULL),
@@ -134,7 +134,7 @@ void SpiAnalyzer::WorkerThread()
 
 	AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 
-	/* Reset presistent state logic between captures */
+	/* Reset persistent state logic between captures */
 	eMosiState = e_ABCC_MOSI_IDLE;
 	eMisoState = e_ABCC_MISO_IDLE;
 	bLastAnbSts = 0xFF;
@@ -484,10 +484,10 @@ bool SpiAnalyzer::NeedsRerun()
 
 U32 SpiAnalyzer::GenerateSimulationData(U64 minimum_sample_index, U32 device_sample_rate, SimulationChannelDescriptor** simulation_channels)
 {
-	if (mSimulationInitilized == false)
+	if (mSimulationInitialized == false)
 	{
 		mSimulationDataGenerator.Initialize(GetSimulationSampleRate(), mSettings.get());
-		mSimulationInitilized = true;
+		mSimulationInitialized = true;
 	}
 
 	return mSimulationDataGenerator.GenerateSimulationData(minimum_sample_index, device_sample_rate, simulation_channels);
@@ -715,7 +715,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		if (fMisoErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			/* Check if data is 0xFF, if so delay deasserssion of fMisoErrorRsp
+			/* Check if data is 0xFF, if so delay de-assertion of fMisoErrorRsp
 			** so that the object specific error response can be detected */
 			if ((((U8)lFrameData != (U8)0xFF) && (dwMisoMdCnt == 0)) ||
 				(dwMisoMdCnt > 1))
@@ -910,7 +910,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		if (fMosiErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			/* Check if data is 0xFF, if so delay deasserssion of fMosiErrorRsp
+			/* Check if data is 0xFF, if so delay de-assertion of fMosiErrorRsp
 			** so that the object specific error response can be detected */
 			if ((((U8)lFrameData != (U8)0xFF) && (dwMosiMdCnt == 0)) ||
 				(dwMosiMdCnt > 1))

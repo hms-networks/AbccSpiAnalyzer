@@ -15,7 +15,7 @@
 #include <AnalyzerResults.h>
 
 #define SPI_ERROR_FLAG ( 1 << 0 ) /* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
-#define SPI_MOSI_FLAG ( 1 << 1 )  /* Direction flag. When asserted, MOSI, when deasserted MISO */
+#define SPI_MOSI_FLAG ( 1 << 1 )  /* Direction flag. When asserted, MOSI, when de-asserted MISO */
 
 #define SPI_MSG_FIRST_FRAG_FLAG ( 1 << 2 ) /* Indicates the first message in a fragmented message transfer */
 #define SPI_MSG_FRAG_FLAG ( 1 << 3 ) /* Indicates that message fragmentation is in progress */

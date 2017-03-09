@@ -338,7 +338,7 @@ void SpiAnalyzerResults::BuildApplStatus(U8 val, DisplayBase display_base)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
+	/* Note ABCC documentation shows U16 datatype for status code, but SPI telegram is U8 */
 	bool alert = GetApplStsString((U8)val, &str[0], sizeof(str), display_base);
 	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MOSI_APP_STAT), number_str, sizeof(number_str));
 	StringBuilder(GET_MOSI_FRAME_TAG(e_ABCC_MOSI_APP_STAT), number_str, str, alert);
@@ -512,7 +512,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				default:
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, number_str, sizeof(number_str));
 					alert = true;
-					StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", alert);
+					StringBuilder("UNKOWN", number_str, "Internal Error: Unknown State", alert);
 					break;
 			}
 		}
@@ -651,7 +651,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				default:
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, number_str, sizeof(number_str));
 					alert = true;
-					StringBuilder("UNKWN", number_str, "Internal Error: Unknown State", alert);
+					StringBuilder("UNKOWN", number_str, "Internal Error: Unknown State", alert);
 					break;
 			}
 		}
@@ -1327,13 +1327,13 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	}
 }
 
-void SpiAnalyzerResults::GeneratePacketTabularText(U64 /*packet_id*/, DisplayBase /*display_base*/)  //unrefereced vars commented out to remove warnings.
+void SpiAnalyzerResults::GeneratePacketTabularText(U64 /*packet_id*/, DisplayBase /*display_base*/)  //unreferenced vars commented out to remove warnings.
 {
 	ClearResultStrings();
 	AddResultString("not supported");
 }
 
-void SpiAnalyzerResults::GenerateTransactionTabularText(U64 /*transaction_id*/, DisplayBase /*display_base*/)  //unrefereced vars commented out to remove warnings.
+void SpiAnalyzerResults::GenerateTransactionTabularText(U64 /*transaction_id*/, DisplayBase /*display_base*/)  //unreferenced vars commented out to remove warnings.
 {
 	ClearResultStrings();
 	AddResultString("not supported");

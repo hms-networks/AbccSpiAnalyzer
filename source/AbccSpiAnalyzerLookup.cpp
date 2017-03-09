@@ -130,7 +130,7 @@ static const tValueName asAnbInstAttrNames[] =
 	{ ABP_ANB_IA_LED_COLOURS,		"LED Colors",				false },
 	{ ABP_ANB_IA_LED_STATUS,		"LED Status",				false },
 	{ ABP_ANB_IA_SWITCH_STATUS,		"Switch Status",			false },
-	{ ABP_ANB_IA_AUX_BIT_FUNC,		"Auxilery Bit Function",	false },
+	{ ABP_ANB_IA_AUX_BIT_FUNC,		"Auxilary Bit Function",	false },
 	{ ABP_ANB_IA_GPIO_CONFIG,		"GPIO Configuration",		false },
 	{ ABP_ANB_IA_VIRTUAL_ATTRS,		"Virtual Attributes",		false },
 	{ ABP_ANB_IA_BLACK_WHITE_LIST,	"Black/White List",			false },
@@ -490,7 +490,7 @@ static const tValueName asObjectNames[] =
 	**------------------------------------------------------------------------------
 	*/
 	{ ABP_OBJ_NUM_ANB,		"Anybus Object",						false },
-	{ ABP_OBJ_NUM_DI,		"Diagnositic Object",					false },
+	{ ABP_OBJ_NUM_DI,		"Diagnostic Object",					false },
 	{ ABP_OBJ_NUM_NW,		"Network Object",						false },
 	{ ABP_OBJ_NUM_NC,		"Network Configuration Object",			false },
 	{ ABP_OBJ_NUM_ADD,		"PROFIBUS DP-V1 Additional Diag",		false },
@@ -681,7 +681,7 @@ static const tValueName asSmtpErrNames[] =
 {
 	{ ABP_SMTP_NO_EMAIL_SERVER,			"No e-mail server",			true },
 	{ ABP_SMTP_SERVER_NOT_READY,		"Server not ready",			true },
-	{ ABP_SMTP_AUTHENTICATION_ERROR,	"Authentiacation error",	true },
+	{ ABP_SMTP_AUTHENTICATION_ERROR,	"Authentication error",		true },
 	{ ABP_SMTP_SOCKET_ERROR,			"Socket error",				true },
 	{ ABP_SMTP_SSI_SCAN_ERROR,			"SSI scan error",			true },
 	{ ABP_SMTP_FILE_ERROR,				"File error",				true },
@@ -1352,7 +1352,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			break;
 		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
-			alert = true; //TODO: We only alert here because we have not implmented all object specific commands yet.
+			alert = true; //TODO: We only alert here because we have not implemented all object specific commands yet.
 			break;
 		}
 		SNPRINTF(str, maxLen, "%s", strBuffer);

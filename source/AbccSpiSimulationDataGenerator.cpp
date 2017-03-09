@@ -28,7 +28,7 @@ static tAbccMosiPacket sMosiData = { 0x1F,		/* SPI_CTRL */
 									 0xFE,		/* OBJ */
 									 0x0001,	/* INST */
 									 0x41,		/* CMD */
-									 0x00,		/* RESVERED */
+									 0x00,		/* RESEVERED */
 									 0x0005,	/* CMDEXT */
 									 { 0x00, 0x00, 0x00, 0x00 },	/* MSG_DATA */
 									 { 0x11, 0x22, 0x33, 0x44 },	/* PROCESS_DATA */
