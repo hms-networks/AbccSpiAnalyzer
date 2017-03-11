@@ -75,7 +75,8 @@ const tAbccMosiInfo asMosiStates[] =
 	{ e_ABCC_MOSI_WR_MSG_SUBFIELD_data,		"MD",		ABCC_MSG_DATA_FIELD_SIZE },
 	{ e_ABCC_MOSI_WR_PD_FIELD,				"PD",		1 },
 	{ e_ABCC_MOSI_CRC32,					"CRC32",	4 },
-	{ e_ABCC_MOSI_PAD,						"PAD",		2 }
+	{ e_ABCC_MOSI_PAD,						"PAD",		2 },
+	{ e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid, "--", 1 }
 };
 
 const tAbccMisoInfo asMisoStates[] =
@@ -99,6 +100,8 @@ const tAbccMisoInfo asMisoStates[] =
 	{ e_ABCC_MISO_RD_MSG_SUBFIELD_data,		"MD",		ABCC_MSG_DATA_FIELD_SIZE },
 	{ e_ABCC_MISO_RD_PD_FIELD,				"PD",		1 },
 	{ e_ABCC_MISO_CRC32,					"CRC32",	4 },
+	{ e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid, "--", 1 }
+
 };
 
 const tAbccMsgInfo asMsgStates[] =
