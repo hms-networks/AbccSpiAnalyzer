@@ -228,7 +228,7 @@ bool SpiAnalyzerResults::BuildCmdString(U8 val, U8 obj, DisplayBase display_base
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetCmdString(val, obj, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MSG_CMD), number_str, sizeof(number_str));
 	if ((val & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 	{
 		errorRspMsg = true;
@@ -285,7 +285,7 @@ void SpiAnalyzerResults::BuildSpiCtrlString(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetSpiCtrlString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MOSI_SPI_CTRL), number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(e_ABCC_MOSI_SPI_CTRL), number_str, sizeof(number_str));
 	StringBuilder(GET_MOSI_FRAME_TAG(e_ABCC_MOSI_SPI_CTRL), number_str, str, alert);
 }
 
@@ -294,7 +294,7 @@ void SpiAnalyzerResults::BuildSpiStsString(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetSpiStsString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MISO_SPI_STAT), number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MISO_SPI_STAT), number_str, sizeof(number_str));
 	StringBuilder(GET_MISO_FRAME_TAG(e_ABCC_MISO_SPI_STAT), number_str, str, alert);
 }
 
@@ -321,7 +321,7 @@ void SpiAnalyzerResults::BuildIntMask(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetIntMaskString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MOSI_INT_MASK), number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(e_ABCC_MOSI_INT_MASK), number_str, sizeof(number_str));
 	StringBuilder(GET_MOSI_FRAME_TAG(e_ABCC_MOSI_INT_MASK), number_str, str, alert);
 }
 
@@ -330,7 +330,7 @@ void SpiAnalyzerResults::BuildAbccStatus(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetAbccStatusString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MISO_ANB_STAT), number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MISO_ANB_STAT), number_str, sizeof(number_str));
 	StringBuilder(GET_MISO_FRAME_TAG(e_ABCC_MISO_ANB_STAT), number_str, str, alert);
 }
 
@@ -340,7 +340,7 @@ void SpiAnalyzerResults::BuildApplStatus(U8 val, DisplayBase display_base)
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	/* Note ABCC documentation shows U16 datatype for status code, but SPI telegram is U8 */
 	bool alert = GetApplStsString((U8)val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MOSI_APP_STAT), number_str, sizeof(number_str));
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(e_ABCC_MOSI_APP_STAT), number_str, sizeof(number_str));
 	StringBuilder(GET_MOSI_FRAME_TAG(e_ABCC_MOSI_APP_STAT), number_str, str, alert);
 }
 
