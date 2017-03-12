@@ -9,34 +9,47 @@
 *******************************************************************************
 ******************************************************************************/
 
-#include "AbccSpiAnalyzerResults.h"
-#include <AnalyzerHelpers.h>
-#include "AbccSpiAnalyzer.h"
-#include "AbccSpiAnalyzerSettings.h"
 #include <iostream>
 #include <sstream>
+#include <AnalyzerHelpers.h>
+#include "AbccSpiAnalyzer.h"
+#include "AbccSpiAnalyzerResults.h"
+#include "AbccSpiAnalyzerSettings.h"
 
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
-#include "abcc_abp/abp_fsi.h"
+
+#include "abcc_abp/abp_add.h"
 #include "abcc_abp/abp_asm.h"
-#include "abcc_abp/abp_cpc.h"
+#include "abcc_abp/abp_bac.h"
+#include "abcc_abp/abp_ccl.h"
 #include "abcc_abp/abp_cipid.h"
+#include "abcc_abp/abp_cnt.h"
+#include "abcc_abp/abp_cop.h"
+#include "abcc_abp/abp_cpc.h"
+#include "abcc_abp/abp_cpn.h"
+#include "abcc_abp/abp_dev.h"
+//#include "abcc_abp/abp_dpv0di.h" /* Currently not used */
+#include "abcc_abp/abp_dpv1.h"
+#include "abcc_abp/abp_eco.h"
+#include "abcc_abp/abp_ect.h"
+#include "abcc_abp/abp_eip.h"
+#include "abcc_abp/abp_epl.h"
+#include "abcc_abp/abp_er.h"
+#include "abcc_abp/abp_etn.h"
+#include "abcc_abp/abp_fsi.h"
 #include "abcc_abp/abp_fusm.h"
 #include "abcc_abp/abp_mdd.h"
-#include "abcc_abp/abp_sync.h"
-#include "abcc_abp/abp_soc.h"
-#include "abcc_abp/abp_smtp.h"
-#include "abcc_abp/abp_safe.h"
-
-#include "abcc_abp/abp_etn.h"
-#include "abcc_abp/abp_epl.h"
-#include "abcc_abp/abp_eip.h"
-#include "abcc_abp/abp_ect.h"
 #include "abcc_abp/abp_mod.h"
+//#include "abcc_abp/abp_nwccl.h" /* Currently not used */
+//#include "abcc_abp/abp_nwdpv1.h" /* Currently not used */
 #include "abcc_abp/abp_nwetn.h"
 #include "abcc_abp/abp_nwpnio.h"
 #include "abcc_abp/abp_pnio.h"
+#include "abcc_abp/abp_safe.h"
+#include "abcc_abp/abp_smtp.h"
+#include "abcc_abp/abp_soc.h"
+#include "abcc_abp/abp_sync.h"
 
 #define IS_CMD_STANDARD(cmd)			(cmd > 0) && (cmd < 9)
 #define IS_CMD_OBJECT_SPECIFIC(cmd) 	(((cmd >= 0x10) && (cmd <= 0x30)) || \
@@ -117,6 +130,22 @@ const tAbccMsgInfo asMsgStates[] =
 	{ e_ABCC_MSG_DATA,		"MD",		ABCC_MSG_DATA_FIELD_SIZE }
 };
 
+static const tValueName asAddObjAttrNames[] =
+{
+	{ ABP_ADD_OA_MAX_INST,			"Max Instance",			false },
+	{ ABP_ADD_OA_EXT_DIAG_OVERFLOW,	"Ext Diag Overflow",	false },
+	{ ABP_ADD_OA_STATIC_DIAG,		"Static Diag",			false }
+};
+
+static const tValueName asAddInstAttrNames[] =
+{
+	{ ABP_ADD_IA_MODULE_NUMBER,		"Module Number",	false },
+	{ ABP_ADD_IA_IO_TYPE,			"IO Type",			false },
+	{ ABP_ADD_IA_CHANNEL_NUMBER,	"Channel Number",	false },
+	{ ABP_ADD_IA_CHANNEL_TYPE,		"Channel Type",		false },
+	{ ABP_ADD_IA_ERROR_TYPE,		"Error Type",		false }
+};
+
 static const tValueName asAnbInstAttrNames[] =
 {
 	{ ABP_ANB_IA_MODULE_TYPE,		"Module Type",				false },
@@ -142,6 +171,91 @@ static const tValueName asAnbInstAttrNames[] =
 	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		false }
 };
 
+static const tValueName asBacInstAttrNames[] =
+{
+	{ ABP_BAC_IA_OBJECT_NAME,			"Object Name",				false },
+	{ ABP_BAC_IA_VENDOR_NAME,			"Vendor Name",				false },
+	{ ABP_BAC_IA_VENDOR_IDENTIFIER,		"Vendor Identifier",		false },
+	{ ABP_BAC_IA_MODEL_NAME,			"Model Name",				false },
+	{ ABP_BAC_IA_FIRMWARE_REVISION,		"Firmware Revision",		false },
+	{ ABP_BAC_IA_APP_SOFTWARE_VERSION,	"Software Revision",		false },
+	{ ABP_BAC_IA_SUPPORT_ADV_MAPPING,	"Support Advanced Mapping",	false },
+	{ ABP_BAC_IA_CURRENT_DATE_AND_TIME,	"Current Date and Time",	false },
+	{ ABP_BAC_IA_PASSWORD,				"Password",					false }
+};
+
+static const tValueName asCclInstAttrNames[] =
+{
+	{ ABP_CCL_IA_VENDOR_CODE,			"Vendor Code",			false },
+	{ ABP_CCL_IA_SOFTWARE_VERSION,		"Software Version",		false },
+	{ ABP_CCL_IA_MODEL_CODE,			"Model Code",			false },
+	{ ABP_CCL_IA_NETWORK_SETTINGS,		"Network Settings",		false },
+	{ ABP_CCL_IA_SYS_AREA_HANDLER,		"System Area Handler",	false },
+	{ ABP_CCL_IA_HOLD_CLEAR_SETTING,	"Hold Clear Setting",	false }
+};
+
+static const tValueName asCntInstAttrNames[] =
+{
+	{ ABP_CNT_IA_VENDOR_ID,					"Vendor ID",						false },
+	{ ABP_CNT_IA_DEVICE_TYPE,				"Device Type",						false },
+	{ ABP_CNT_IA_PRODUCT_CODE,				"Product Code",						false },
+	{ ABP_CNT_IA_REVISION,					"Revision",							false },
+	{ ABP_CNT_IA_SERIAL_NUMBER,				"Serial Number",					false },
+	{ ABP_CNT_IA_PRODUCT_NAME,				"Product Name",						false },
+	{ ABP_CNT_IA_PROD_INSTANCE,				"Producing Instance",				false },
+	{ ABP_CNT_IA_CONS_INSTANCE,				"Consuming Instance",				false },
+	{ ABP_CNT_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	false },
+	{ ABP_CNT_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			false },
+	{ ABP_CNT_IA_CONFIG_INSTANCE,			"Configuration Instance",			false }
+};
+
+static const tValueName asCopInstAttrNames[] =
+{
+	{ ABP_COP_IA_VENDOR_ID,			"Vendor ID",				false },
+	{ ABP_COP_IA_PRODUCT_CODE,		"Product Code",				false },
+	{ ABP_COP_IA_MAJOR_REV,			"Major Revision",			false },
+	{ ABP_COP_IA_MINOR_REV,			"Minor Revision",			false },
+	{ ABP_COP_IA_SERIAL_NUMBER,		"Serial Number",			false },
+	{ ABP_COP_IA_MANF_DEV_NAME,		"Manufacturer Device Name",	false },
+	{ ABP_COP_IA_MANF_HW_VER,		"Manufacturer HW Version",	false },
+	{ ABP_COP_IA_MANF_SW_VER,		"Manufacturer SW Version",	false }
+};
+
+static const tValueName asCpnInstAttrNames[] =
+{
+	{ ABP_CPN_IA_VENDOR_ID,					"Vendor ID",						false },
+	{ ABP_CPN_IA_DEVICE_TYPE,				"Device Type",						false },
+	{ ABP_CPN_IA_PRODUCT_CODE,				"Product Code",						false },
+	{ ABP_CPN_IA_REVISION,					"Revision",							false },
+	{ ABP_CPN_IA_SERIAL_NUMBER,				"Serial Number",					false },
+	{ ABP_CPN_IA_PRODUCT_NAME,				"Product Name",						false },
+	{ ABP_CPN_IA_PROD_INSTANCE,				"Producing Instance",				false },
+	{ ABP_CPN_IA_CONS_INSTANCE,				"Consuming Instance",				false },
+	{ ABP_CPN_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	false },
+	{ ABP_CPN_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			false },
+	{ ABP_CPN_IA_BIT_SLAVE,					"Bit Slave",						false }
+};
+
+static const tValueName asDevInstAttrNames[] =
+{
+	{ ABP_DEV_IA_VENDOR_ID,					"Vendor ID",						false },
+	{ ABP_DEV_IA_DEVICE_TYPE,				"Device Type",						false },
+	{ ABP_DEV_IA_PRODUCT_CODE,				"Product Code",						false },
+	{ ABP_DEV_IA_REVISION,					"Revision",							false },
+	{ ABP_DEV_IA_SERIAL_NUMBER,				"Serial Number",					false },
+	{ ABP_DEV_IA_PRODUCT_NAME,				"Product Name",						false },
+	{ ABP_DEV_IA_PROD_INSTANCE,				"Producing Instance",				false },
+	{ ABP_DEV_IA_CONS_INSTANCE,				"Consuming Instance",				false },
+	{ ABP_DEV_IA_ADDRESS_FROM_NET,			"Address From Network",				false },
+	{ ABP_DEV_IA_BAUD_RATE_FROM_NET,		"Baud Rate From Network",			false },
+	{ ABP_DEV_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	false },
+	{ ABP_DEV_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			false },
+	{ ABP_DEV_IA_ENABLE_QUICK_CONNECT,		"Enable QuickConnect",				false },
+	{ ABP_DEV_IA_PREPEND_PRODUCING,			"Prepend Producing",				false },
+	{ ABP_DEV_IA_PREPEND_CONSUMING,			"Prepend Consuming",				false },
+	{ ABP_DEV_IA_ABCC_ADI_OBJECT,			"ABCC ADI Object",					false }
+};
+
 static const tValueName asDiObjAttrNames[] =
 {
 	{ ABP_DI_OA_MAX_INST,		"Maximum Number of Instances",	false },
@@ -157,6 +271,61 @@ static const tValueName asDiInstAttrNames[] =
 	{ ABP_DI_IA_ADI,				"ADI",							false },
 	{ ABP_DI_IA_ELEMENT,			"Element",						false },
 	{ ABP_DI_IA_BIT,				"Bit",							false }
+};
+
+static const tValueName asDpv1InstAttrNames[] =
+{
+	{ ABP_DPV1_IA_IDENT_NUMBER,			"Identity Number",					false },
+	{ ABP_DPV1_IA_PRM_DATA,				"Parameter Data",					false },
+	{ ABP_DPV1_IA_EXPECTED_CFG_DATA,	"Expected Configuration Data",		false },
+	{ ABP_DPV1_IA_SSA_ENABLED,			"SSA Enabled",						false },
+	{ ABP_DPV1_IA_SIZEOF_ID_REL_DIAG,	"Size of ID Related Diagnostic",	false },
+	{ ABP_DPV1_IA_BUFFER_MODE,			"Buffer Mode",						false },
+	{ ABP_DPV1_IA_ALARM_SETTINGS,		"Alarm Setting",					false },
+	{ ABP_DPV1_IA_MANUFACTURER_ID,		"Manufacturer ID",					false },
+	{ ABP_DPV1_IA_ORDER_ID,				"Order ID",							false },
+	{ ABP_DPV1_IA_SERIAL_NO,			"Serial Number",					false },
+	{ ABP_DPV1_IA_HW_REV,				"Hardware Revision",				false },
+	{ ABP_DPV1_IA_SW_REV,				"Software Revision",				false },
+	{ ABP_DPV1_IA_REV_COUNTER,			"Revision Counter",					false },
+	{ ABP_DPV1_IA_PROFILE_ID,			"Profile ID",						false },
+	{ ABP_DPV1_IA_PROFILE_SPEC_TYPE,	"Profile Specific Type",			false },
+	{ ABP_DPV1_IA_IM_VERSION,			"I&M Version",						false },
+	{ ABP_DPV1_IA_IM_SUPPORTED,			"I&M Supported",					false },
+	{ ABP_DPV1_IA_IM_HEADER,			"I&M Header",						false },
+	{ ABP_DPV1_IA_CHK_CFG_BEHAVIOR,		"Check Configuration Behavior",		false },
+	{ ABP_DPV1_IA_RESERVED,				"Reserved",							false }
+};
+
+static const tValueName asEcoObjAttrNames[] =
+{
+	{ ABP_ECO_OA_CURRENT_ENERGY_SAVING_MODE,	"Current Energy Saving Mode",			false },
+	{ ABP_ECO_OA_REMAINING_TIME_TO_DEST,		"Remaining Time to Destination",		false },
+	{ ABP_ECO_OA_ENERGY_CONSUMP_TO_DEST,		"Energy Consumption to Destination",	false }
+};
+
+static const tValueName asEcoInstAttrNames[] =
+{
+	{ ABP_ECO_IA_MODE_ATTRIBUTES,			"Mode Attributes",					false },
+	{ ABP_ECO_IA_TIME_MIN_PAUSE,			"Time Min Pause",					false },
+	{ ABP_ECO_IA_TIME_TO_PAUSE,				"Time To Pause",					false },
+	{ ABP_ECO_IA_TIME_TO_OPERATE,			"Time To Operate",					false },
+	{ ABP_ECO_IA_TIME_MIN_LENGTH_OF_STAY,	"Time Min Length Of Stay",			false },
+	{ ABP_ECO_IA_TIME_MAX_LENGTH_OF_STAY,	"Time Max Length Of Stay",			false },
+	{ ABP_ECO_IA_MODE_POWER_CONSUMP,		"Mode Power Consumption",			false },
+	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_PAUSE,	"Energy Consumption To Pause",		false },
+	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_OPERATE,	"Energy Consumption To Operate",	false },
+	{ ABP_ECO_IA_AVAILABILITY,				"Availability",						false },
+	{ ABP_ECO_IA_POWER_CONSUMPTION,			"Power Consumption",				false }
+};
+
+static const tValueName asErInstAttrNames[] =
+{
+	{ ABP_ER_IA_ENERGY_READING,				"Energy Reading",				false },
+	{ ABP_ER_IA_DIRECTION,					"Direction",					false },
+	{ ABP_ER_IA_ACCURACY,					"Accuracy",						false },
+	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	false },
+	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	false },
 };
 
 static const tValueName asNwInstAttrNames[] =
@@ -553,10 +722,61 @@ static const tValueName asCmdNames[] =
 	{ ABP_CMD_SET_INDEXED_ATTR,	"Set_Indexed_Attribute",	false }
 };
 
+static const tValueName asAddCmdNames[] =
+{
+	{ ABP_ADD_CMD_ALARM_NOTIFICATION,	"Alarm_Notification",	true }
+};
+
+static const tValueName asBacCmdNames[] =
+{
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST,		"Get_Adi_By_BacNet_Obj_Inst",		false },
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST_NAME,	"Get_Adi_By_BacNet_Obj_Inst_Name",	false },
+	{ ABP_BAC_CMD_GET_ALL_BACNET_OBJ_INSTANCES,		"Get_All_BacNet_Obj_Instances",		false },
+	{ ABP_BAC_CMD_GET_BACNET_OBJ_INST_BY_ADI,		"Get_BacNet_Obj_Inst_By_Adi",		false }
+};
+
+static const tValueName asCclCmdNames[] =
+{
+	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notfication",					false },
+	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notfication",	false }
+};
+
+static const tValueName asCntCmdNames[] =
+{
+	{ ABP_CNT_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	false },
+	{ ABP_CNT_CMD_SET_CONFIG_DATA,			"Set_Config_Data",			false },
+	{ ABP_CNT_CMD_GET_CONFIG_DATA,			"Get_Config_Data",			false },
+};
+
+static const tValueName asCpnCmdNames[] =
+{
+	{ ABP_CPN_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	false }
+};
+
+static const tValueName asDevCmdNames[] =
+{
+	{ ABP_DEV_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	false }
+};
+
+static const tValueName asDpv1CmdNames[] =
+{
+	{ ABP_DPV1_CMD_GET_IM_RECORD,	"Get_IM_Record",	false },
+	{ ABP_DPV1_CMD_SET_IM_RECORD,	"Set_IM_Record",	false },
+	{ ABP_DPV1_CMD_ALARM_ACK,		"Alarm_Ack",		false },
+	{ ABP_DPV1_CMD_GET_RECORD,		"Get_Record",		false },
+	{ ABP_DPV1_CMD_SET_RECORD,		"Set_Record",		false }
+};
+
+static const tValueName asEcoCmdNames[] =
+{
+	{ ABP_ECO_CMD_START_PAUSE,			"Start_Pause",			false },
+	{ ABP_ECO_CMD_END_PAUSE,			"End_Pause",			false },
+	{ ABP_ECO_CMD_PREVIEW_PAUSE_TIME,	"Preview_Pause_Time",	false }
+};
 
 static const tValueName asMddCmdNames[] =
 {
-	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false },
+	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false }
 };
 
 static const tValueName asAsmCmdNames[] =
@@ -650,6 +870,29 @@ static const tValueName asAnbErrNames[] =
 	{ ABP_ANB_ERR_INV_PRD_CFG,		"Invalid process data config",		true },
 	{ ABP_ANB_ERR_INV_DEV_ADDR,		"Invalid device address",			true },
 	{ ABP_ANB_ERR_INV_COM_SETTINGS,	"Invalid communication settings",	true }
+};
+
+static const tValueName asBacErrNames[] =
+{
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_AV,		"Could not read object instance AV",		true },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BV,		"Could not read object instance BV",		true },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_MSV,		"Could not read object instance MSV",		true },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BY_ADI,	"Could not read object instance by ADI",	true }
+};
+
+static const tValueName asCntErrNames[] =
+{
+	{ ABP_CNT_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
+};
+
+static const tValueName asCpnErrNames[] =
+{
+	{ ABP_CPN_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
+};
+
+static const tValueName asDevErrNames[] =
+{
+	{ ABP_DEV_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
 };
 
 static const tValueName asDiErrNames[] =
@@ -1066,6 +1309,26 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase displa
 		GetObjSpecificErrString(val, str, maxLen, &asAnbErrNames[0],
 			(sizeof(asAnbErrNames) / sizeof(tValueName)), display_base);
 		break;
+	case ABP_OBJ_NUM_BAC:
+		/* BacNet Object */
+		GetObjSpecificErrString(val, str, maxLen, &asBacErrNames[0],
+			(sizeof(asBacErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_CNT:
+		/* ControlNet Object */
+		GetObjSpecificErrString(val, str, maxLen, &asCntErrNames[0],
+			(sizeof(asCntErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_CPN:
+		/* CompoNet Object */
+		GetObjSpecificErrString(val, str, maxLen, &asCpnErrNames[0],
+			(sizeof(asCpnErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_DEV:
+		/* DeviceNet Object */
+		GetObjSpecificErrString(val, str, maxLen, &asDevErrNames[0],
+			(sizeof(asDevErrNames) / sizeof(tValueName)), display_base);
+		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
 		GetObjSpecificErrString(val, str, maxLen, &asDiErrNames[0],
@@ -1302,6 +1565,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 	{
 		switch(obj)
 		{
+		case ABP_OBJ_NUM_ADD:
+			/* Additional Diagnostic Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asAddCmdNames[0], (sizeof(asAddCmdNames) / sizeof(tValueName)), display_base);
+			break;
 		case ABP_OBJ_NUM_NW:
 			/* Network Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
@@ -1322,6 +1590,41 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			/* Assembly Mapping Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asAsmCmdNames[0], (sizeof(asAsmCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_BAC:
+			/* BacNet Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asBacCmdNames[0], (sizeof(asBacCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_CCL:
+			/* CC-Link Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asCclCmdNames[0], (sizeof(asCclCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_CNT:
+			/* ControlNet Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asCntCmdNames[0], (sizeof(asCntCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_CPN:
+			/* CompoNet Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asCpnCmdNames[0], (sizeof(asCpnCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_DEV:
+			/* DeviceNet Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asDevCmdNames[0], (sizeof(asDevCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_DPV1:
+			/* DPV1 Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asDpv1CmdNames[0], (sizeof(asDpv1CmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_ECO:
+			/* Energy Control Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asEcoCmdNames[0], (sizeof(asEcoCmdNames) / sizeof(tValueName)), display_base);
 			break;
 		case ABP_OBJ_NUM_MDD:
 			/* Modular Device Object */
@@ -1381,16 +1684,68 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 	}
 	switch (obj)
 	{
+	case ABP_OBJ_NUM_ADD:
+		/* Additional Diagnostic Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			&asAddObjAttrNames[0], sizeof(asAddObjAttrNames) / sizeof(tValueName),
+			&asAddInstAttrNames[0], sizeof(asAddInstAttrNames) / sizeof(tValueName));
+		break;
 	case ABP_OBJ_NUM_ANB:
 		/* Anybus Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			NULL, 0, &asAnbInstAttrNames[0], sizeof(asAnbInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_BAC:
+		/* BacNet Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asBacInstAttrNames[0], sizeof(asBacInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_CCL:
+		/* CC-Link Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asCclInstAttrNames[0], sizeof(asCclInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_CNT:
+		/* ControlNet Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asCntInstAttrNames[0], sizeof(asCntInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_COP:
+		/* CANopen Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asCopInstAttrNames[0], sizeof(asCopInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_CPN:
+		/* CompoNet Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asCpnInstAttrNames[0], sizeof(asCpnInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_DEV:
+		/* DeviceNet Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asDevInstAttrNames[0], sizeof(asDevInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			&asDiObjAttrNames[0], sizeof(asDiObjAttrNames) / sizeof(tValueName),
 			&asDiInstAttrNames[0], sizeof(asDiInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_DPV1:
+		/* DPV1 Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asDpv1InstAttrNames[0], sizeof(asDpv1InstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_ECO:
+		/* Energy Control Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			&asEcoObjAttrNames[0], sizeof(asEcoObjAttrNames) / sizeof(tValueName),
+			&asEcoInstAttrNames[0], sizeof(asEcoInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_ER:
+		/* Energy Reporting Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asErInstAttrNames[0], sizeof(asErInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
