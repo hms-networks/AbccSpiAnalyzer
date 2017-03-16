@@ -1208,6 +1208,9 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 			{
 				/* No new message */
 				fMisoNewMsg = false;
+				eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid;
+				dwMisoMdCnt = 0;
+				wMisoMdSize = 0;
 			}
 			fAddFrame = true;
 			eMisoState = e_ABCC_MISO_NET_TIME;
@@ -1220,7 +1223,10 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 			if (dwMisoMsgLen != 0)
 			{
 				eMisoState = e_ABCC_MISO_RD_MSG_FIELD;
-				RunAbccMisoMsgSubStateMachine(true, NULL, &eMsgSubState);
+				if (fMisoNewMsg)
+				{
+					RunAbccMisoMsgSubStateMachine(true, NULL, &eMsgSubState);
+				}
 			}
 			else if (dwMisoPdLen != 0)
 			{
@@ -1448,6 +1454,9 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 			{
 				/* No new message */
 				fMosiNewMsg = false;
+				eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid;
+				dwMosiMdCnt = 0;
+				wMosiMdSize = 0;
 			}
 			fAddFrame = true;
 			eMosiState = e_ABCC_MOSI_RESERVED1;
@@ -1492,7 +1501,10 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 			if (dwMosiMsgLen != 0)
 			{
 				eMosiState = e_ABCC_MOSI_WR_MSG_FIELD;
-				RunAbccMosiMsgSubStateMachine(true, NULL, &eMsgSubState);
+				if (fMosiNewMsg)
+				{
+					RunAbccMosiMsgSubStateMachine(true, NULL, &eMsgSubState);
+				}
 			}
 			else if (dwMosiPdLen != 0)
 			{
