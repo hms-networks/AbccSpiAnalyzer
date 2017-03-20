@@ -23,6 +23,7 @@
 #include "abcc_abp/abp_asm.h"
 #include "abcc_abp/abp_bac.h"
 #include "abcc_abp/abp_ccl.h"
+#include "abcc_abp/abp_cfn.h"
 #include "abcc_abp/abp_cipid.h"
 #include "abcc_abp/abp_cnt.h"
 #include "abcc_abp/abp_cop.h"
@@ -41,8 +42,9 @@
 #include "abcc_abp/abp_fusm.h"
 #include "abcc_abp/abp_mdd.h"
 #include "abcc_abp/abp_mod.h"
-//#include "abcc_abp/abp_nwccl.h" /* Currently not used */
-//#include "abcc_abp/abp_nwdpv1.h" /* Currently not used */
+#include "abcc_abp/abp_nwccl.h"
+#include "abcc_abp/abp_nwcfn.h"
+#include "abcc_abp/abp_nwdpv1.h"
 #include "abcc_abp/abp_nwetn.h"
 #include "abcc_abp/abp_nwpnio.h"
 #include "abcc_abp/abp_pnio.h"
@@ -194,6 +196,16 @@ static const tValueName asCclInstAttrNames[] =
 	{ ABP_CCL_IA_HOLD_CLEAR_SETTING,	"Hold Clear Setting",	false }
 };
 
+static const tValueName asCfnInstAttrNames[] =
+{
+	{ ABP_CFN_IA_VENDOR_CODE,	"Vendor Code",	false },
+	{ ABP_CFN_IA_VENDOR_NAME,	"Vendor Name",	false },
+	{ ABP_CFN_IA_MODEL_TYPE,	"Model Type",	false },
+	{ ABP_CFN_IA_MODEL_NAME,	"Model Name",	false },
+	{ ABP_CFN_IA_MODEL_CODE,	"Model Code",	false },
+	{ ABP_CFN_IA_SW_VERSION,	"SW Version",	false }
+};
+
 static const tValueName asCntInstAttrNames[] =
 {
 	{ ABP_CNT_IA_VENDOR_ID,					"Vendor ID",						false },
@@ -253,7 +265,9 @@ static const tValueName asDevInstAttrNames[] =
 	{ ABP_DEV_IA_ENABLE_QUICK_CONNECT,		"Enable QuickConnect",				false },
 	{ ABP_DEV_IA_PREPEND_PRODUCING,			"Prepend Producing",				false },
 	{ ABP_DEV_IA_PREPEND_CONSUMING,			"Prepend Consuming",				false },
-	{ ABP_DEV_IA_ABCC_ADI_OBJECT,			"ABCC ADI Object",					false }
+	{ ABP_DEV_IA_ABCC_ADI_OBJECT,			"ABCC ADI Object",					false },
+	{ ABP_DEV_IA_PROD_INSTANCE_LIST,		"Producing Instance List",			false },
+	{ ABP_DEV_IA_CONS_INSTANCE_LIST,		"Consuming Instance List",			false },
 };
 
 static const tValueName asDiObjAttrNames[] =
@@ -299,9 +313,10 @@ static const tValueName asDpv1InstAttrNames[] =
 
 static const tValueName asEcoObjAttrNames[] =
 {
-	{ ABP_ECO_OA_CURRENT_ENERGY_SAVING_MODE,	"Current Energy Saving Mode",			false },
-	{ ABP_ECO_OA_REMAINING_TIME_TO_DEST,		"Remaining Time to Destination",		false },
-	{ ABP_ECO_OA_ENERGY_CONSUMP_TO_DEST,		"Energy Consumption to Destination",	false }
+	{ ABP_ECO_OA_CURRENT_ENERGY_SAVING_MODE,		"Current Energy Saving Mode",			false },
+	{ ABP_ECO_OA_REMAINING_TIME_TO_DEST,			"Remaining Time to Destination",		false },
+	{ ABP_ECO_OA_ENERGY_CONSUMP_TO_DEST,			"Energy Consumption to Destination",	false },
+	{ ABP_ECO_OA_TRANSITION_TO_POWER_OFF_SUPPORTED,	"Transition To Power Off Supported",	false },
 };
 
 static const tValueName asEcoInstAttrNames[] =
@@ -328,15 +343,67 @@ static const tValueName asErInstAttrNames[] =
 	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	false },
 };
 
+static const tValueName asModInstAttrNames[] =
+{
+	{ ABP_MOD_IA_VENDOR_NAME,			"Vendor Name",									false },
+	{ ABP_MOD_IA_PRODUCT_CODE,			"Product Code",									false },
+	{ ABP_MOD_IA_REVISION,				"Major Minor Revision",							false },
+	{ ABP_MOD_IA_VENDOR_URL,			"Vendor URL",									false },
+	{ ABP_MOD_IA_PRODUCT_NAME,			"Product Name",									false },
+	{ ABP_MOD_IA_MODEL_NAME,			"Model Name",									false },
+	{ ABP_MOD_IA_USER_APP_NAME,			"User Application Name",						false },
+	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									false },
+	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						false },
+	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				false },
+	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	false }
+};
+
 static const tValueName asNwInstAttrNames[] =
 {
 	{ ABP_NW_IA_NW_TYPE,		"Network Type",				false },
 	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		false },
-	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",		    	false },
+	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",				false },
 	{ ABP_NW_IA_PARAM_SUPPORT,	"Parameter Support",		false },
 	{ ABP_NW_IA_WRITE_PD_SIZE,	"Write Process Data Size",	false },
 	{ ABP_NW_IA_READ_PD_SIZE,	"Read Process Data Size",	false },
 	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	false }
+};
+
+static const tValueName asNwCclInstAttrNames[] =
+{
+	{ ABP_NWCCL_IA_NETWORK_SETTINGS,	"Network Settings",				false },
+	{ ABP_NWCCL_IA_SYSTEM_AREA_HANDLER,	"System Area Handler",			false },
+	{ ABP_NWCCL_IA_ERROR_CODE_POSITION,	"Error Code Position",			false },
+	{ ABP_NWCCL_IA_LAST_MAPPING_INFO,	"Last Mapping Info",			false },
+	{ ABP_NWCCL_IA_CCL_CONF_TEST_MODE,	"CCL Conformance Test Mode",	false },
+	{ ABP_NWCCL_IA_ERROR_INFO,			"Error Information",			false }
+};
+
+static const tValueName asNwCfnInstAttrNames[] =
+{
+	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",	false }
+};
+
+static const tValueName asNwEtnInstAttrNames[] =
+{
+	{ ABP_NWETN_IA_MAC_ID,			"MAC Address",			false },
+	{ ABP_NWETN_IA_PORT1_MAC_ID,	"Port 1 MAC Address",	false },
+	{ ABP_NWETN_IA_PORT2_MAC_ID,	"Port 2 MAC Address",	false }
+};
+
+static const tValueName asNwPnioInstAttrNames[] =
+{
+	{ ABP_NWPNIO_IA_ONLINE_TRANS,			"Number of on-line transitions",		false },
+	{ ABP_NWPNIO_IA_OFFLINE_TRANS,			"Number of off-line transitions",		false },
+	{ ABP_NWPNIO_IA_OFFLINE_REASON_CODE,	"Reason code of last off-line",			false },
+	{ ABP_NWPNIO_IA_ABORT_REASON_CODE,		"Last abort reason code",				false },
+	{ ABP_NWPNIO_IA_ADDED_APIS,				"Number of added APIs",					false },
+	{ ABP_NWPNIO_IA_API_LIST,				"List of the added APIs",				false },
+	{ ABP_NWPNIO_IA_EST_ARS,				"Number of established ARs",			false },
+	{ ABP_NWPNIO_IA_AR_LIST,				"List of established ARs (handles)",	false },
+	{ ABP_NWPNIO_IA_PNIO_INIT_ERR_CODE,		"Error code PROFINET IO stack init",	false },
+	{ ABP_NWPNIO_IA_PORT1_MAC_ADDRESS,		"PROFINET IO port 1 MAC address",		false },
+	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		false }
 };
 
 static const tValueName asSocObjAttrNames[] =
@@ -387,7 +454,7 @@ static const tValueName asNcInstAttrNames[] =
 	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		false }
 };
 
-static const tValueName asNwEtnInstAttrNames[] =
+static const tValueName asEtnInstAttrNames[] =
 {
 	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",					false },
 	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",					false },
@@ -474,7 +541,9 @@ static const tValueName asPnioInstAttrNames[] =
 	{ ABP_PNIO_IA_MOD_ID_ASSIGN_MODE,		"Module Id Assignment Mode",		false },
 	{ ABP_PNIO_IA_SYSTEM_CONTACT,			"System Contact",					false },
 	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		false },
-	{ 0x18,									"Custom Station Name",				false } /* TODO: ABP macro does not exist yet */
+	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				false },
+	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				false },
+	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					false }
 };
 
 static const tValueName asEipInstAttrNames[] =
@@ -508,7 +577,7 @@ static const tValueName asEipInstAttrNames[] =
 	{ ABP_EIP_IA_CONS_INSTANCE_MAP,				"Consuming Instance Mapping",						false },
 	{ ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK,		"Ignore Sequence Count Check",						false },
 	{ ABP_EIP_IA_ABCC_ADI_OBJECT,				"ABCC ADI Object Number",							false },
-	{ 0x1F,										"Enable DLR",										false } /* TODO: ABP macro does not exist yet */
+	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									false }
 };
 
 static const tValueName asEtcInstAttrNames[] =
@@ -641,9 +710,11 @@ static const tValueName asFusmInstAttrNames[] =
 
 static const tValueName asSafeInstAttrNames[] =
 {
-	{ ABP_SAFE_IA_SAFETY_ENABLE,	"Safety Enabled",		false },
-	{ ABP_SAFE_IA_BAUD_RATE,		"Baud Rate",			false },
-	{ 0x03,							"I/O Configuration",	false } /* TODO: ABP macro does not exist yet */
+	{ ABP_SAFE_IA_SAFETY_ENABLED,			"Safety Enabled",			false },
+	{ ABP_SAFE_IA_BAUD_RATE,				"Baud Rate",				false },
+	{ ABP_SAFE_IA_IO_CONFIG,				"I/O Configuration",		false },
+	{ ABP_SAFE_IA_CYCLE_TIME,				"Cycle Time",				false },
+	{ ABP_SAFE_IA_FW_UPGRADE_IN_PROGRESS,	"FW Upgrade In Progress",	false }
 };
 
 
@@ -661,53 +732,56 @@ static const tValueName asObjectNames[] =
 	** Anybus module objects
 	**------------------------------------------------------------------------------
 	*/
-	{ ABP_OBJ_NUM_ANB,		"Anybus Object",						false },
-	{ ABP_OBJ_NUM_DI,		"Diagnostic Object",					false },
-	{ ABP_OBJ_NUM_NW,		"Network Object",						false },
-	{ ABP_OBJ_NUM_NC,		"Network Configuration Object",			false },
-	{ ABP_OBJ_NUM_ADD,		"PROFIBUS DP-V1 Additional Diag",		false },
-	{ ABP_OBJ_NUM_RSV1,		"Reserved",								true  },
-	{ ABP_OBJ_NUM_SOC,		"Socket Interface Object",				false },
-	{ ABP_OBJ_NUM_NWCCL,	"Network CC-Link Object",				false },
-	{ ABP_OBJ_NUM_SMTP,		"SMTP Client Object",					false },
-	{ ABP_OBJ_NUM_FSI,		"Anybus File System Interface Object",	false },
-	{ ABP_OBJ_NUM_NWDPV1,	"Network PROFIBUS DP-V1 Object",		false },
-	{ ABP_OBJ_NUM_NWETN,	"Network Ethernet Object",				false },
-	{ ABP_OBJ_NUM_CPC,		"CIP Port Configuration Object",		false },
-	{ ABP_OBJ_NUM_NWPNIO,	"Network PROFINET IO Object",			false },
-	{ ABP_OBJ_NUM_PNIOADD,	"PROFINET IO Additional Diag Object",	false },
-	{ ABP_OBJ_NUM_DPV0DI,	"PROFIBUS DP-V0 Diagnostic Object",		false },
-	{ ABP_OBJ_NUM_FUSM,		"Functional Safety Module Object",		false },
-	{ ABP_OBJ_NUM_NWCFN,	"Network CC-Link IE Field Network",		false },
+	{ ABP_OBJ_NUM_ANB,		"Anybus",							false },
+	{ ABP_OBJ_NUM_DI,		"Diagnostic",						false },
+	{ ABP_OBJ_NUM_NW,		"Network",							false },
+	{ ABP_OBJ_NUM_NC,		"Network Configuration",			false },
+	{ ABP_OBJ_NUM_ADD,		"PROFIBUS DP-V1 Additional Diag",	false },
+	{ ABP_OBJ_NUM_RSV1,		"Reserved",							true  },
+	{ ABP_OBJ_NUM_SOC,		"Socket Interface",					false },
+	{ ABP_OBJ_NUM_NWCCL,	"Network CC-Link",					false },
+	{ ABP_OBJ_NUM_SMTP,		"SMTP Client",						false },
+	{ ABP_OBJ_NUM_FSI,		"Anybus File System Interface",		false },
+	{ ABP_OBJ_NUM_NWDPV1,	"Network PROFIBUS DP-V1",			false },
+	{ ABP_OBJ_NUM_NWETN,	"Network Ethernet",					false },
+	{ ABP_OBJ_NUM_CPC,		"CIP Port Configuration",			false },
+	{ ABP_OBJ_NUM_NWPNIO,	"Network PROFINET IO",				false },
+	{ ABP_OBJ_NUM_PNIOADD,	"PROFINET IO Additional Diag",		false },
+	{ ABP_OBJ_NUM_DPV0DI,	"PROFIBUS DP-V0 Diagnostic",		false },
+	{ ABP_OBJ_NUM_FUSM,		"Functional Safety Module",			false },
+	{ ABP_OBJ_NUM_NWCFN,	"Network CC-Link IE Field Network",	false },
 	/*------------------------------------------------------------------------------
 	** Host application objects
 	**------------------------------------------------------------------------------
 	*/
-	{ ABP_OBJ_NUM_ER,		"Energy Reporting Object",						false },
-	{ ABP_OBJ_NUM_SAFE,		"Functional Safety Object",						false },
-	{ ABP_OBJ_NUM_EPL,		"POWERLINK Object",								false },
-	{ ABP_OBJ_NUM_AFSI,		"Application File System Interface Object",		false },
-	{ ABP_OBJ_NUM_ASM,		"Assembly Object",								false },
-	{ ABP_OBJ_NUM_MDD,		"Modular Device Object",						false },
-	{ ABP_OBJ_NUM_CIPID,	"CIP Identity Host Object",						false },
-	{ ABP_OBJ_NUM_SYNC,		"Sync Object",									false },
-	{ ABP_OBJ_NUM_BAC,		"BACnet Object",								false },
-	{ ABP_OBJ_NUM_ECO,		"Energy Control Object",						false },
-	{ ABP_OBJ_NUM_SRC3,		"SERCOS III Object",							false },
-	{ ABP_OBJ_NUM_PRD,		"PROFIdrive Object",							false },
-	{ ABP_OBJ_NUM_CNT,		"ControlNet Object",							false },
-	{ ABP_OBJ_NUM_CPN,		"CompoNet Object",								false },
-	{ ABP_OBJ_NUM_ECT,		"EtherCAT Object",								false },
-	{ ABP_OBJ_NUM_PNIO,		"PROFINET IO Object",							false },
-	{ ABP_OBJ_NUM_CCL,		"CC-Link Host Object",							false },
-	{ ABP_OBJ_NUM_EIP,		"EtherNet/IP Host Object",						false },
-	{ ABP_OBJ_NUM_ETN,		"Ethernet Host Object",							false },
-	{ ABP_OBJ_NUM_MOD,		"Modbus Host Object",							false },
-	{ ABP_OBJ_NUM_COP,		"CANopen Object",								false },
-	{ ABP_OBJ_NUM_DEV,		"DeviceNet Host Object",						false },
-	{ ABP_OBJ_NUM_DPV1,		"PROFIBUS DP-V1 Object",						false },
-	{ ABP_OBJ_NUM_APPD,		"Application Data Object",						false },
-	{ ABP_OBJ_NUM_APP,		"Application Object",							false }
+	{ ABP_OBJ_NUM_EME,		"Energy Measurement",					false },
+	{ ABP_OBJ_NUM_PNAM,		"PROFINET Asset Management",			false },
+	{ ABP_OBJ_NUM_CFN,		"CC-Link IE Field Network",				false },
+	{ ABP_OBJ_NUM_ER,		"Energy Reporting",						false },
+	{ ABP_OBJ_NUM_SAFE,		"Functional Safety",					false },
+	{ ABP_OBJ_NUM_EPL,		"POWERLINK",							false },
+	{ ABP_OBJ_NUM_AFSI,		"Application File System Interface",	false },
+	{ ABP_OBJ_NUM_ASM,		"Assembly Mapping",						false },
+	{ ABP_OBJ_NUM_MDD,		"Modular Device",						false },
+	{ ABP_OBJ_NUM_CIPID,	"CIP Identity",							false },
+	{ ABP_OBJ_NUM_SYNC,		"Sync",									false },
+	{ ABP_OBJ_NUM_BAC,		"BACnet",								false },
+	{ ABP_OBJ_NUM_ECO,		"Energy Control",						false },
+	{ ABP_OBJ_NUM_SRC3,		"SERCOS III",							false },
+	{ ABP_OBJ_NUM_PRD,		"PROFIdrive",							false },
+	{ ABP_OBJ_NUM_CNT,		"ControlNet",							false },
+	{ ABP_OBJ_NUM_CPN,		"CompoNet",								false },
+	{ ABP_OBJ_NUM_ECT,		"EtherCAT",								false },
+	{ ABP_OBJ_NUM_PNIO,		"PROFINET IO",							false },
+	{ ABP_OBJ_NUM_CCL,		"CC-Link",								false },
+	{ ABP_OBJ_NUM_EIP,		"EtherNet/IP",							false },
+	{ ABP_OBJ_NUM_ETN,		"Ethernet",								false },
+	{ ABP_OBJ_NUM_MOD,		"Modbus",								false },
+	{ ABP_OBJ_NUM_COP,		"CANopen",								false },
+	{ ABP_OBJ_NUM_DEV,		"DeviceNet",							false },
+	{ ABP_OBJ_NUM_DPV1,		"PROFIBUS DP-V1",						false },
+	{ ABP_OBJ_NUM_APPD,		"Application Data",						false },
+	{ ABP_OBJ_NUM_APP,		"Application",							false }
 };
 
 static const tValueName asCmdNames[] =
@@ -729,16 +803,21 @@ static const tValueName asAddCmdNames[] =
 
 static const tValueName asBacCmdNames[] =
 {
-	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST,		"Get_Adi_By_BacNet_Obj_Inst",		false },
-	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST_NAME,	"Get_Adi_By_BacNet_Obj_Inst_Name",	false },
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST,		"Get_ADI_By_BacNet_Obj_Inst",		false },
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST_NAME,	"Get_ADI_By_BacNet_Obj_Inst_Name",	false },
 	{ ABP_BAC_CMD_GET_ALL_BACNET_OBJ_INSTANCES,		"Get_All_BacNet_Obj_Instances",		false },
-	{ ABP_BAC_CMD_GET_BACNET_OBJ_INST_BY_ADI,		"Get_BacNet_Obj_Inst_By_Adi",		false }
+	{ ABP_BAC_CMD_GET_BACNET_OBJ_INST_BY_ADI,		"Get_BacNet_Obj_Inst_By_ADI",		false }
 };
 
 static const tValueName asCclCmdNames[] =
 {
 	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notfication",					false },
 	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notfication",	false }
+};
+
+static const tValueName asCfnCmdNames[] =
+{
+	{ ABP_CFN_CMD_BUF_SIZE_NOTIF,	"Buf_Size_Notif",	false }
 };
 
 static const tValueName asCntCmdNames[] =
@@ -787,7 +866,8 @@ static const tValueName asAsmCmdNames[] =
 
 static const tValueName asFusmCmdNames[] =
 {
-	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,	"Error_Confirmation",	true }
+	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,	"Error_Confirmation",	true  },
+	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,	"Set_IO_Cfg_String",	false },
 };
 
 static const tValueName asFsiCmdNames[] =
@@ -822,6 +902,11 @@ static const tValueName asEctCmdNames[] =
 	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	false }
 };
 
+static const tValueName asModCmdNames[] =
+{
+	{ ABP_MOD_CMD_PROCESS_MODBUS_MESSAGE,	"Process_Modbus_Message",	false }
+};
+
 static const tValueName asPnioCmdNames[] =
 {
 	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
@@ -834,10 +919,10 @@ static const tValueName asPnioCmdNames[] =
 	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		false },
 	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			true  }, //TODO check if alert is appropriate here
 	{ ABP_PNIO_CMD_PLUG_SUB_FAILED,		"Plug_Sub_Failed",		true  }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	true  }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	false },
 	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		false },
 	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	false },
-	{ 0x1E,								"Indicate_Device",		false } /* TODO: ABP macro does not exist yet */
+	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		false }
 };
 
 static const tValueName asAppCmdNames[] =
@@ -857,7 +942,7 @@ static const tValueName asAppDataCmdNames[] =
 	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			false }
 };
 
-static const tValueName asNetCmdNames[] =
+static const tValueName asNwCmdNames[] =
 {
 	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		false },
 	{ ABP_NW_CMD_MAP_ADI_READ_AREA,			"Map_ADI_Read_Area",		false },
@@ -865,34 +950,44 @@ static const tValueName asNetCmdNames[] =
 	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	false }
 };
 
+static const tValueName asNwCclCmdNames[] =
+{
+	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_WRITE_AREA,	"Map_ADI_Spec_Write_Area",	false },
+	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_READ_AREA,		"Map_ADI_Spec_Read_Area",	false },
+	{ ABP_NWCCL_CMD_CCL_CONF_TEST_MODE,			"CCL_Conf_Test_Mode",		false }
+};
+
+static const tValueName asNwCfnCmdNames[] =
+{
+	{ ABP_NWCFN_CMD_EXT_LOOPBACK,	"Ext_Loopback",	false }
+};
+
+static const tValueName asNwDpv1CmdNames[] =
+{
+	{ ABP_NWDPV1_CMD_MAP_ADI_WRITE_AREA,	"Map_ADI_Write_Area",	false },
+	{ ABP_NWDPV1_CMD_MAP_ADI_READ_AREA,		"Map_ADI_Read_Area",	false }
+};
+
+static const tValueName asNwPnioCmdNames[] =
+{
+	{ ABP_NWPNIO_CMD_PLUG_MODULE,			"Plug_Module",			false },
+	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE,		"Plug_Submodule",		false },
+	{ ABP_NWPNIO_CMD_PULL_MODULE,			"Pull_Module",			false },
+	{ ABP_NWPNIO_CMD_PULL_SUB_MODULE,		"Pull_Submodule",		false },
+	{ ABP_NWPNIO_CMD_API_ADD,				"API_Add",				false },
+	{ ABP_NWPNIO_CMD_APPL_STATE_READY,		"Appl_State_Ready",		false },
+	{ ABP_NWPNIO_CMD_AR_ABORT,				"AR_Abort",				true },
+	{ ABP_NWPNIO_CMD_ADD_SAFETY_MODULE,		"Add_Safety_Module",	false },
+	{ ABP_NWPNIO_CMD_IM_OPTIONS,			"IM_Options",			false },
+	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE_EXT,	"Plug_Submodule_Ext",	false },
+	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	false }
+};
+
 static const tValueName asAnbErrNames[] =
 {
 	{ ABP_ANB_ERR_INV_PRD_CFG,		"Invalid process data config",		true },
 	{ ABP_ANB_ERR_INV_DEV_ADDR,		"Invalid device address",			true },
 	{ ABP_ANB_ERR_INV_COM_SETTINGS,	"Invalid communication settings",	true }
-};
-
-static const tValueName asBacErrNames[] =
-{
-	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_AV,		"Could not read object instance AV",		true },
-	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BV,		"Could not read object instance BV",		true },
-	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_MSV,		"Could not read object instance MSV",		true },
-	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BY_ADI,	"Could not read object instance by ADI",	true }
-};
-
-static const tValueName asCntErrNames[] =
-{
-	{ ABP_CNT_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
-};
-
-static const tValueName asCpnErrNames[] =
-{
-	{ ABP_CPN_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
-};
-
-static const tValueName asDevErrNames[] =
-{
-	{ ABP_DEV_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY Instance",	true }
 };
 
 static const tValueName asDiErrNames[] =
@@ -914,6 +1009,55 @@ static const tValueName asNwErrNames[] =
 	{ ABP_NW_ERR_BAD_ALIGNMENT,			"Invalid data alignment",		true },
 	{ ABP_NW_ERR_INVALID_ADI_0,			"Invalid use of ADI 0",			true },
 	{ ABP_NW_ERR_NW_SPEC_RESTRICTION,	"Network specific restriction",	true }
+};
+
+static const tValueName asNwCclErrNames[] =
+{
+	{ ABP_NWCCL_ERR_INVALID_ADI_DATA_TYPE,	"Invalid ADI data type",		true },
+	{ ABP_NWCCL_ERR_INVALID_NUM_ELEMENTS,	"Invalid number of elements",	true },
+	{ ABP_NWCCL_ERR_INVALID_TOTAL_SIZE,		"Invalid total size",			true },
+	{ ABP_NWCCL_ERR_INVALID_ORDER_NUM,		"Invalid ADI order number",		true },
+	{ ABP_NWCCL_ERR_INVALID_MAP_CMD_SEQ,	"Invalid map cmd sequence",		true },
+	{ ABP_NWCCL_ERR_INVALID_CCL_AREA,		"Invalid CCL area",				true },
+	{ ABP_NWCCL_ERR_INVALID_OFFSET,			"Invalid offset",				true },
+	{ ABP_NWCCL_ERR_DATA_OVERLAPPING,		"Data overlapping",				true }
+};
+
+static const tValueName asNwDpv1ErrNames[] =
+{
+	{ ABP_NWDPV1_ERR_INVALID_ADI_DATA_TYPE,		"Invalid ADI data type",		true },
+	{ ABP_NWDPV1_ERR_INVALID_NUM_ELEMENTS,		"Invalid number of elements",	true },
+	{ ABP_NWDPV1_ERR_INVALID_TOTAL_SIZE,		"Invalid total size",			true },
+	{ ABP_NWDPV1_ERR_INVALID_ORDER_NUM,			"Invalid ADI order number",		true },
+	{ ABP_NWDPV1_ERR_INVALID_MAP_CMD_SEQ,		"Invalid map cmd sequence",		true },
+	{ ABP_NWDPV1_ERR_INVALID_CFG_DATA,			"Invalid configuration data",	true },
+	{ ABP_NWDPV1_ERR_TOO_MUCH_TOTAL_CFG_DATA,	"Too much total config data",	true }
+};
+
+static const tValueName asNwPnioErrNames[] =
+{
+	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI write not mapped",				true },
+	{ ABP_NWPNIO_ERR_ADI_READ_NOT_MAPPED,		"ADI read not mapped",				true },
+	{ ABP_NWPNIO_ERR_ADI_ELEM_NOT_PRESENT,		"ADI element not present",			true },
+	{ ABP_NWPNIO_ERR_ADI_ALREADY_MAPPED,		"ADI already mapped",				true },
+	{ ABP_NWPNIO_ERR_API_0_NOT_ADDED,			"API 0 not added",					true },
+	{ ABP_NWPNIO_ERR_API_NOT_PRESENT,			"API not present",					true },
+	{ ABP_NWPNIO_ERR_API_ALREADY_PRESENT,		"API already present",				true },
+	{ ABP_NWPNIO_ERR_API_CANNOT_BE_ADDED,		"API cannot be added",				true },
+	{ ABP_NWPNIO_ERR_NO_IO_IN_SLOT_0,			"No I/O in slot 0",					true },
+	{ ABP_NWPNIO_ERR_SLOT_0_NOT_PROP_PLUGGED,	"Slot 0 not properly plugged",		true },
+	{ ABP_NWPNIO_ERR_SLOT_OCCUPIED,				"Slot occupied",					true },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OCCUPIED,			"Subslot occupied",					true },
+	{ ABP_NWPNIO_ERR_NO_MODULE_SPECIFIED_SLOT,	"No module specified in slot",		true },
+	{ ABP_NWPNIO_ERR_NO_SUBMOD_SPECIFIED_SLOT,	"No submodule specified in slot",	true },
+	{ ABP_NWPNIO_ERR_SLOT_OUT_OF_RANGE,			"Slot out of range",				true },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OUT_OF_RANGE,		"Subslot out of range",				true },
+	{ ABP_NWPNIO_ERR_AR_NOT_VALID,				"AR not valid",						true },
+	{ ABP_NWPNIO_ERR_NO_PEND_APPL_READY,		"No pending application ready",		true },
+	{ ABP_NWPNIO_ERR_UNKNOWN_STACK_ERROR,		"Unknown stack error",				true },
+	{ ABP_NWPNIO_ERR_MAX_NBR_OF_PLUGGED_SUBMOD,	"Max number of plugged submodules",	true },
+	{ ABP_NWPNIO_ERR_SAFETY_NOT_ENABLED,		"Safety not enabled",				true },
+	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true }
 };
 
 static const tValueName asAppdErrNames[] =
@@ -938,6 +1082,11 @@ static const tValueName asEipErrNames[] =
 {
 	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
 	{ ABP_EIP_ERR_INVALID_CONFIG,		"Invalid configuration",	true }
+};
+
+static const tValueName asModErrNames[] =
+{
+	{ ABP_MOD_NW_EXCPT_MISSING_MAC_ADDRESS,	"Missing MAC Address",	true }
 };
 
 static const tValueName asPnioErrNames[] =
@@ -1309,35 +1458,35 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase displa
 		GetObjSpecificErrString(val, str, maxLen, &asAnbErrNames[0],
 			(sizeof(asAnbErrNames) / sizeof(tValueName)), display_base);
 		break;
-	case ABP_OBJ_NUM_BAC:
-		/* BacNet Object */
-		GetObjSpecificErrString(val, str, maxLen, &asBacErrNames[0],
-			(sizeof(asBacErrNames) / sizeof(tValueName)), display_base);
-		break;
-	case ABP_OBJ_NUM_CNT:
-		/* ControlNet Object */
-		GetObjSpecificErrString(val, str, maxLen, &asCntErrNames[0],
-			(sizeof(asCntErrNames) / sizeof(tValueName)), display_base);
-		break;
-	case ABP_OBJ_NUM_CPN:
-		/* CompoNet Object */
-		GetObjSpecificErrString(val, str, maxLen, &asCpnErrNames[0],
-			(sizeof(asCpnErrNames) / sizeof(tValueName)), display_base);
-		break;
-	case ABP_OBJ_NUM_DEV:
-		/* DeviceNet Object */
-		GetObjSpecificErrString(val, str, maxLen, &asDevErrNames[0],
-			(sizeof(asDevErrNames) / sizeof(tValueName)), display_base);
-		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
 		GetObjSpecificErrString(val, str, maxLen, &asDiErrNames[0],
 			(sizeof(asDiErrNames) / sizeof(tValueName)), display_base);
 		break;
+	case ABP_OBJ_NUM_MOD:
+		/* Modbus Object */
+		GetObjSpecificErrString(val, str, maxLen, &asModErrNames[0],
+			(sizeof(asModErrNames) / sizeof(tValueName)), display_base);
+		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
 		GetObjSpecificErrString(val, str, maxLen, &asNwErrNames[0],
 			(sizeof(asNwErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_NWCCL:
+		/* Network CCL Object */
+		GetObjSpecificErrString(val, str, maxLen, &asNwCclErrNames[0],
+			(sizeof(asNwCclErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_NWDPV1:
+		/* Network DPV1 Object */
+		GetObjSpecificErrString(val, str, maxLen, &asNwDpv1ErrNames[0],
+			(sizeof(asNwDpv1ErrNames) / sizeof(tValueName)), display_base);
+		break;
+	case ABP_OBJ_NUM_NWPNIO:
+		/* Network PNIO Object */
+		GetObjSpecificErrString(val, str, maxLen, &asNwPnioErrNames[0],
+			(sizeof(asNwPnioErrNames) / sizeof(tValueName)), display_base);
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
@@ -1368,6 +1517,14 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 maxLen, DisplayBase displa
 		/* CC-Link Object */
 	case ABP_OBJ_NUM_DPV1:
 		/* DPV1 Object */
+	case ABP_OBJ_NUM_BAC:
+		/* BacNet Object */
+	case ABP_OBJ_NUM_CNT:
+		/* ControlNet Object */
+	case ABP_OBJ_NUM_CPN:
+		/* CompoNet Object */
+	case ABP_OBJ_NUM_DEV:
+		/* DeviceNet Object */
 	default:
 		AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, maxLen);
 		SNPRINTF(str, maxLen, "Unknown: 0x%02X, %s", obj, number_str);
@@ -1573,7 +1730,12 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 		case ABP_OBJ_NUM_NW:
 			/* Network Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNetCmdNames[0], (sizeof(asNetCmdNames) / sizeof(tValueName)), display_base);
+				&asNwCmdNames[0], (sizeof(asNwCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_NWCCL:
+			/* Network CCL Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asNwCclCmdNames[0], (sizeof(asNwCclCmdNames) / sizeof(tValueName)), display_base);
 			break;
 		case ABP_OBJ_NUM_FUSM:
 			/* Functional Safety Module Object */
@@ -1601,6 +1763,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asCclCmdNames[0], (sizeof(asCclCmdNames) / sizeof(tValueName)), display_base);
 			break;
+		case ABP_OBJ_NUM_CFN:
+			/* CFN Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asCfnCmdNames[0], (sizeof(asCfnCmdNames) / sizeof(tValueName)), display_base);
+			break;
 		case ABP_OBJ_NUM_CNT:
 			/* ControlNet Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
@@ -1625,6 +1792,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			/* Energy Control Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asEcoCmdNames[0], (sizeof(asEcoCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_MOD:
+			/* Modbus Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asModCmdNames[0], (sizeof(asModCmdNames) / sizeof(tValueName)), display_base);
 			break;
 		case ABP_OBJ_NUM_MDD:
 			/* Modular Device Object */
@@ -1655,6 +1827,21 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			/* Application Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asAppCmdNames[0], (sizeof(asAppCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_NWCFN:
+			/* Network CFN Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asNwCfnCmdNames[0], (sizeof(asNwCfnCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_NWPNIO:
+			/* Network PNIO Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asNwPnioCmdNames[0], (sizeof(asNwPnioCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_NWDPV1:
+			/* Network DPV1 Object */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asNwDpv1CmdNames[0], (sizeof(asNwDpv1CmdNames) / sizeof(tValueName)), display_base);
 			break;
 		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
@@ -1705,6 +1892,11 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			NULL, 0, &asCclInstAttrNames[0], sizeof(asCclInstAttrNames) / sizeof(tValueName));
 		break;
+	case ABP_OBJ_NUM_CFN:
+		/* CFN Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asCfnInstAttrNames[0], sizeof(asCfnInstAttrNames) / sizeof(tValueName));
+		break;
 	case ABP_OBJ_NUM_CNT:
 		/* ControlNet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
@@ -1747,6 +1939,11 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			NULL, 0, &asErInstAttrNames[0], sizeof(asErInstAttrNames) / sizeof(tValueName));
 		break;
+	case ABP_OBJ_NUM_MOD:
+		/* Modbus Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asModInstAttrNames[0], sizeof(asModInstAttrNames) / sizeof(tValueName));
+		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
@@ -1782,10 +1979,34 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 			NULL, 0, &asFusmInstAttrNames[0], sizeof(asFusmInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_NWETN:
-	case ABP_OBJ_NUM_ETN:
-		/* Network Ethernet Object / Ethernet Host Object */
+		/* Network Ethernet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_NWCCL:
+		/* Network CCL Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asNwCclInstAttrNames[0], sizeof(asNwCclInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_NWCFN:
+		/* Network CFN Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asNwCfnInstAttrNames[0], sizeof(asNwCfnInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_NWPNIO:
+		/* Network PNIO Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asNwPnioInstAttrNames[0], sizeof(asNwPnioInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_NWDPV1:
+		/* Network DPV1 Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_ETN:
+		/* Ethernet Host Object */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asEtnInstAttrNames[0], sizeof(asEtnInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_CPC:
 		/* CIP Port Configuration Object */
