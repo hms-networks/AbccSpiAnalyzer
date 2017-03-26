@@ -1099,14 +1099,18 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
 		eMisoState = e_ABCC_MISO_IDLE;
+		if (dwMisoByteCnt == 0)
+		{
+			lMisoFramesFirstSample = lFirstSample;
+		}
 		if (mEnable != NULL)
 		{
-			AddFragFrame(false, lFirstSample, mEnable->GetSampleOfNextEdge());
+			AddFragFrame(false, lMisoFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
 		else
 		{
 			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
-			AddFragFrame(false, lFirstSample, mClock->GetSampleOfNextEdge());
+			AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleOfNextEdge());
 		}
 		mResults->CommitResults();
 		return true;
@@ -1308,11 +1312,11 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 			/* We have a fragmented message */
 			if (mEnable != NULL)
 			{
-				AddFragFrame(false, lFirstSample, mEnable->GetSampleOfNextEdge());
+				AddFragFrame(false, lMisoFramesFirstSample, mEnable->GetSampleOfNextEdge());
 			}
 			else
 			{
-				AddFragFrame(false, lFirstSample, mClock->GetSampleNumber());
+				AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleNumber());
 			}
 			eMisoState = e_ABCC_MISO_IDLE;
 			lMisoFrameData = 0;

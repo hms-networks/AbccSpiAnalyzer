@@ -370,7 +370,11 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 		switch (frame.mType)
 		{
 			case e_ABCC_SPI_ERROR_FRAGMENTATION:
-				StringBuilder("FRAGMENT", NULL, "Fragmented ABCC SPI Packet.", alert);
+				if ((IS_MISO_FRAME(frame) && (channel == mSettings->mMisoChannel)) ||
+					(IS_MOSI_FRAME(frame) && (channel == mSettings->mMosiChannel)))
+				{
+					StringBuilder("FRAGMENT", NULL, "Fragmented ABCC SPI Packet.", alert);
+				}
 				break;
 			case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
 				StringBuilder("CLOCKING", NULL, "ABCC SPI Clocking. The ABCC SPI protocol expects one transaction per 'Active Enable' phase.", alert);
