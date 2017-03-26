@@ -23,16 +23,16 @@ static tAbccMosiPacket sMosiData = { 0x1F,		/* SPI_CTRL */
 									 0x0002,	/* PD_LEN */
 									 0x00,		/* APP_STAT */
 									 0x10,		/* INT_MSK */
-									 0x0000,	/* MD_SIZE */
+									 0x0004,	/* MD_SIZE */
 									 0x0000,	/* RESERVED */
 									 0x01,		/* SRC_ID */
 									 0xFE,		/* OBJ */
 									 0x0001,	/* INST */
-									 0x41,		/* CMD */
+									 0x01,		/* CMD */
 									 0x00,		/* RESEVERED */
 									 0x0005,	/* CMDEXT */
-									 { 0x00, 0x00, 0x00, 0x00 },	/* MSG_DATA */
-									 { 0x11, 0x22, 0x33, 0x44 },	/* PROCESS_DATA */
+									 { 0x11, 0x22, 0x33, 0x44 },	/* MSG_DATA */
+									 { 0x1A, 0x2B, 0x3C, 0x4D },	/* PROCESS_DATA */
 									 0x0000,	/* CRC32 LOW */
 									 0x0000,	/* CRC32 HIGH */
 									 0x0000 };	/* PAD */
@@ -43,15 +43,15 @@ static tAbccMisoPacket sMisoData = { 0x0000,	/* RESERVED */
 									 0x3E,		/* SPI_STAT */
 									 0x0000,	/* NET_TIME LOW */
 									 0x0000,	/* NET_TIME HIGH */
-									 0x0004,	/* MD_SIZE */
+									 0x0000,	/* MD_SIZE */
 									 0x0000,	/* RESERVED */
 									 0x00,		/* SRC_ID */
 									 0xFE,		/* OBJ */
 									 0x0001,	/* INST */
-									 0x01,		/* CMD */
+									 0x41,		/* CMD */
 									 0x00,		/* RESERVED */
 									 0x0005,	/* CMDEXT */
-									 { 0x11, 0x22, 0x33, 0x44 },	/* MSG_DATA */
+									 { 0x00, 0x00, 0x00, 0x00 },	/* MSG_DATA */
 									 { 0xAA, 0xBB, 0xCC, 0xDD },	/* PROCESS_DATA */
 									 0x0000,	/* CRC32 LOW */
 									 0x0000 };	/* CRC32 HIGH */
