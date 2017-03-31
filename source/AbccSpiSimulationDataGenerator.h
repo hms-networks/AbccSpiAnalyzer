@@ -86,8 +86,8 @@ protected: /* SPI specific */
 	ClockGenerator mClockGenerator;
 
 	void CreateSpiTransaction();
-	void OutputWord_CPHA0(U64 mosi_data, U64 miso_data);
-	void OutputWord_CPHA1(U64 mosi_data, U64 miso_data);
+	void OutputWord_CPOL0_CPHA0(U64 mosi_data, U64 miso_data);
+	void OutputWord_CPOL1_CPHA1(U64 mosi_data, U64 miso_data);
 
 
 	SimulationChannelDescriptorGroup mSpiSimulationChannels;

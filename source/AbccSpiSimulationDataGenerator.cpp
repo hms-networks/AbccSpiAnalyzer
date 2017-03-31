@@ -163,11 +163,11 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	{
 		if (fClockIdleHigh == true)
 		{
-			OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
 		}
 		else
 		{
-			OutputWord_CPHA0(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			OutputWord_CPOL0_CPHA0(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
 		}
 	}
 
@@ -179,7 +179,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			/* Create an additional transaction before enable goes high (cause clocking errors) */
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket); i++)
 			{
-				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
 			}
 		}
 		else if (distr(eng) < 20)
@@ -191,7 +191,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
 			{
-				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
 			}
 		}
 
@@ -199,7 +199,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		** ignore data as long as the enable-line is high */
 		mEnable->Transition();
 		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-		OutputWord_CPHA1(mValue, mValue + 1);
+		OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
 		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		mValue++;
 
@@ -220,7 +220,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			/* Add extra clocking */
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
-			OutputWord_CPHA1(mValue, mValue + 1);
+			OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mValue++;
 		}
@@ -228,7 +228,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			/* Create a fragment (1 byte) */
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-			OutputWord_CPHA1(mValue, mValue + 1);
+			OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mValue++;
 		}
@@ -238,14 +238,14 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
 			{
-				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
 			}
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		}
 	}
 }
 
-void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
+void SpiSimulationDataGenerator::OutputWord_CPOL0_CPHA0(U64 mosi_data, U64 miso_data)
 {
 	const U32 dwBitsPerTransfer = 8;
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
@@ -276,7 +276,7 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 }
 
-void SpiSimulationDataGenerator::OutputWord_CPHA1(U64 mosi_data, U64 miso_data)
+void SpiSimulationDataGenerator::OutputWord_CPOL1_CPHA1(U64 mosi_data, U64 miso_data)
 {
 	const U32 dwBitsPerTransfer = 8;
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
