@@ -9,6 +9,7 @@
 *******************************************************************************
 ******************************************************************************/
 
+#include <random>
 #include "AbccSpiSimulationDataGenerator.h"
 #include "AbccSpiAnalyzerSettings.h"
 #include "AbccSpiAnalyzer.h"
@@ -87,8 +88,8 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 	else
 		mEnable = NULL;
 
-	/* Insert 10 bit-periods of idle */
-	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(10.0));
+	/* Insert >10us idle */
+	mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 
 	mValue = 0;
 }
@@ -100,16 +101,8 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
 	while (mClock->GetCurrentSampleNumber() < adjusted_largest_sample_requested)
 	{
 		CreateSpiTransaction();
-		if (mEnable != NULL)
-		{
-			/* Insert 5 bit-periods of idle */
-			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(5.0));
-		}
-		else
-		{
-			/* Insert >10us bit-periods of idle */
-			mSpiSimulationChannels.AdvanceAll(mSimulationSampleRateHz * 10.0e-6f);
-		}
+		/* Insert >10us idle */
+		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 	}
 
 	*simulation_channels = mSpiSimulationChannels.GetArray();
@@ -118,9 +111,15 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
 
 void SpiSimulationDataGenerator::CreateSpiTransaction()
 {
+	bool fClockIdleHigh;
+	std::random_device rd;
+	std::mt19937 eng(rd());
+	std::uniform_int_distribution<> distr(0, 100);
 	static U32 netTime = 0x00000001;
 	AbccCrc mosiChecksum = AbccCrc();
 	AbccCrc misoChecksum = AbccCrc();
+
+	fClockIdleHigh = (mClock->GetCurrentBitState() == BIT_HIGH);
 
 	if (mEnable != NULL)
 		mEnable->Transition();
@@ -149,21 +148,100 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	sMisoData.crc32_lo = misoChecksum.Crc32() & 0xFFFF;
 	sMisoData.crc32_hi = (misoChecksum.Crc32() >> 16) & 0xFFFF;
 
-	/* Produce the transaction */
+	/* Create occasional CRC errors */
+	if (distr(eng) < 10)
+	{
+		sMosiData.crc32_lo++;
+	}
+	else if (distr(eng) < 10)
+	{
+		sMisoData.crc32_lo++;
+	}
+
+	/* Produce the transaction (10% using CPHA0; 90% using CPHA1) */
 	for (U16 i = 0; i < sizeof(tAbccMosiPacket); i++)
 	{
-		OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+		if (fClockIdleHigh == true)
+		{
+			OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+		}
+		else
+		{
+			OutputWord_CPHA0(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+		}
 	}
 
 	if (mEnable != NULL)
 	{
+		/* Occassionally create additional distubances after the packet (~20% chance) */
+		if (distr(eng) < 10)
+		{
+			/* Create an additional transaction before enable goes high (cause clocking errors) */
+			for (U16 i = 0; i < sizeof(tAbccMosiPacket); i++)
+			{
+				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			}
+		}
+		else if (distr(eng) < 20)
+		{
+			/* Create a fragment (short 1 byte) */
+			mEnable->Transition();
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			mEnable->Transition();
+			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
+			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
+			{
+				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			}
+		}
+
 		/* Create an out-of-band SPI transaction to illustrate that the analyzer will
 		** ignore data as long as the enable-line is high */
 		mEnable->Transition();
-		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(100.0));
+		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		OutputWord_CPHA1(mValue, mValue + 1);
-		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(100.0));
+		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		mValue++;
+
+		/* Switch Clock IDLE LOW/HIGH (10/90%) */
+		if (distr(eng) < 10)
+		{
+			mClock->TransitionIfNeeded(BIT_LOW);
+		}
+		else
+		{
+			mClock->TransitionIfNeeded(BIT_HIGH);
+		}
+	}
+	else
+	{
+		/* Occassionally create additional distubances after the packet (~20% chance) */
+		if (distr(eng) < 10)
+		{
+			/* Add extra clocking */
+			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
+			OutputWord_CPHA1(mValue, mValue + 1);
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			mValue++;
+		}
+		else if (distr(eng) < 15)
+		{
+			/* Create a fragment (1 byte) */
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			OutputWord_CPHA1(mValue, mValue + 1);
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			mValue++;
+		}
+		else if (distr(eng) < 20)
+		{
+			/* Create a fragment (short 1 byte) */
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
+			{
+				OutputWord_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			}
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+		}
 	}
 }
 
@@ -173,13 +251,17 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 
+	/* First ensure clock is low */
+	if (mClock->GetCurrentBitState() == BIT_HIGH)
+	{
+		/* Wrong beginning polarity, don't bother sending anything */
+		return;
+	}
+
 	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
-		if (mMosi != NULL)
-			mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
-
-		if (mMiso != NULL)
-			mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
+		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
+		mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
 
 		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 		mClock->Transition();  /* data invalid */
@@ -188,11 +270,8 @@ void SpiSimulationDataGenerator::OutputWord_CPHA0(U64 mosi_data, U64 miso_data)
 		mClock->Transition();  /* data invalid */
 	}
 
-	if (mMosi != NULL)
-		mMosi->TransitionIfNeeded(BIT_LOW);
-
-	if (mMiso != NULL)
-		mMiso->TransitionIfNeeded(BIT_LOW);
+	mMosi->TransitionIfNeeded(BIT_LOW);
+	mMiso->TransitionIfNeeded(BIT_LOW);
 
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 }
@@ -203,13 +282,18 @@ void SpiSimulationDataGenerator::OutputWord_CPHA1(U64 mosi_data, U64 miso_data)
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
 
+	/* First ensure clock is high */
+	if (mClock->GetCurrentBitState() == BIT_LOW)
+	{
+		/* Wrong beginning polarity, don't bother sending anything */
+		return;
+	}
+
 	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
 		mClock->Transition();  /* data invalid */
-		if (mMosi != NULL)
-			mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
-		if (mMiso != NULL)
-			mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
+		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
+		mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
 
 		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 		mClock->Transition();  /* data invalid */
@@ -217,10 +301,8 @@ void SpiSimulationDataGenerator::OutputWord_CPHA1(U64 mosi_data, U64 miso_data)
 		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 	}
 
-	if (mMosi != NULL)
-		mMosi->TransitionIfNeeded(BIT_LOW);
-	if (mMiso != NULL)
-		mMiso->TransitionIfNeeded(BIT_LOW);
+	mMosi->TransitionIfNeeded(BIT_LOW);
+	mMiso->TransitionIfNeeded(BIT_LOW);
 
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 }
