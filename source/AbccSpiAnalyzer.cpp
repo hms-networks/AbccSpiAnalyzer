@@ -371,11 +371,6 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 
 	*plFirstSample = mClock->GetSampleNumber();
 
-	if (mClock->GetBitState() == BIT_HIGH)
-	{
-		fClkIdleHigh = true;
-	}
-
 	for (U32 i = 0; i < dwBitsPerTransfer; i++)
 	{
 		/* On every single edge, we need to check that "enable" doesn't toggle. */
@@ -393,6 +388,14 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 				/* Reset everything and return. */
 				status = e_GET_WORD_RESET;
 				break;
+			}
+		}
+
+		if (i == 0)
+		{
+			if (mClock->GetBitState() == BIT_HIGH)
+			{
+				fClkIdleHigh = true;
 			}
 		}
 
