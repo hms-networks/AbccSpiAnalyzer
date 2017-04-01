@@ -99,10 +99,15 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 	AddInterface(mMsgDataPriorityInterface.get());
 
-	//AddExportOption( 0, "Export as text/csv file", "text (*.txt);;csv (*.csv)" );
-	AddExportOption(0, "Export as text/csv file");
-	AddExportExtension(0, "text", "txt");
-	AddExportExtension(0, "csv", "csv");
+	AddExportOption(0, "Export All Frame Data");
+	AddExportExtension(0, "All Frame Data", "csv");
+	AddExportOption(1, "Export Message Data");
+	AddExportExtension(1, "Message Data", "csv");
+	AddExportOption(2, "Export Process Data");
+	AddExportExtension(2, "Process Data", "csv");
+
+	//AddExportOption(3, "Export as XML file");
+	//AddExportExtension(3, "XML-File", "xml");
 
 	ClearChannels();
 	AddChannel(mMosiChannel, "MOSI", false);

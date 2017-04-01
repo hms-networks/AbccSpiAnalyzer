@@ -69,6 +69,10 @@ protected: /* functions */
 
 	virtual void BuildAttrString(U8 obj, U16 inst, U16 val, bool indexed, DisplayBase display_base);
 
+	virtual void ExportAllFramesToFile(const char* file, DisplayBase display_base);
+	virtual void ExportMessageDataToFile(const char* file, DisplayBase display_base);
+	virtual void ExportProcessDataToFile(const char* file, DisplayBase display_base);
+
 protected:  /* variables */
 	SpiAnalyzerSettings* mSettings;
 	SpiAnalyzer* mAnalyzer;
