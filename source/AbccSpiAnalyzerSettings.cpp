@@ -15,13 +15,16 @@
 #include <sstream>
 #include <cstring>
 
+/* Anytime behavior or definition of settings change, increment this counter. */
+#define SETTINGS_REVISION 0x00000001
+
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
 	mMisoChannel(UNDEFINED_CHANNEL),
 	mClockChannel(UNDEFINED_CHANNEL),
 	mEnableChannel(UNDEFINED_CHANNEL),
 	mMessageIndexingVerbosityLevel(e_VERBOSITY_LEVEL_DETAILED),
-	mMsgDataPriority(e_MSG_DATA_PRIORITIZE_DATA),
+	mMsgDataPriority(e_MSG_DATA_PRIORITIZE_TAG),
 	mMessageSrcIdIndexing(true),
 	mErrorIndexing(true),
 	mTimestampIndexing(e_TIMESTAMP_DISABLED),
@@ -131,9 +134,9 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 		return false;
 	}
 
-	if ((mosi == UNDEFINED_CHANNEL) && (miso == UNDEFINED_CHANNEL))
+	if ((mosi == UNDEFINED_CHANNEL) || (miso == UNDEFINED_CHANNEL) || (clock == UNDEFINED_CHANNEL))
 	{
-		SetErrorText("Please select at least one input for either MISO or MOSI.");
+		SetErrorText("Please select a channel for MOSI, MISO, SCLK.");
 		return false;
 	}
 
@@ -163,10 +166,11 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 {
 	SimpleArchive text_archive;
 	const char* name_string;
+	U32 dwSettingsRevision;
 
 	text_archive.SetString(settings);
 
-	/* the first thing in the archive is the name of the protocol analyzer that the data belongs to. */
+	/* The first thing in the archive is the name of the protocol analyzer that the data belongs to. */
 	text_archive >> &name_string;
 	if (strcmp(name_string, "AbccSpiAnalyzer") != 0)
 	{
@@ -178,13 +182,18 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	text_archive >> mClockChannel;
 	text_archive >> mEnableChannel;
 
-	text_archive >> mMessageIndexingVerbosityLevel;
-	text_archive >> mMsgDataPriority;
-	text_archive >> mMessageSrcIdIndexing;
-	text_archive >> mErrorIndexing;
-	text_archive >> mTimestampIndexing;
-	text_archive >> mAnybusStatusIndexing;
-	text_archive >> mApplStatusIndexing;
+	/* Compare version in archive to what the plugin's "settings" version is */
+	text_archive >> dwSettingsRevision;
+	if (SETTINGS_REVISION == dwSettingsRevision)
+	{
+		text_archive >> mMessageIndexingVerbosityLevel;
+		text_archive >> mMsgDataPriority;
+		text_archive >> mMessageSrcIdIndexing;
+		text_archive >> mErrorIndexing;
+		text_archive >> mTimestampIndexing;
+		text_archive >> mAnybusStatusIndexing;
+		text_archive >> mApplStatusIndexing;
+	}
 
 	//bool success = text_archive >> mUsePackets;  //new paramater added -- do this for backwards compatibility
 	//if( success == false )
@@ -209,6 +218,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mClockChannel;
 	text_archive << mEnableChannel;
 
+	text_archive << (U32)SETTINGS_REVISION;
 	text_archive << mMessageIndexingVerbosityLevel;
 	text_archive << mMsgDataPriority;
 	text_archive << mMessageSrcIdIndexing;
