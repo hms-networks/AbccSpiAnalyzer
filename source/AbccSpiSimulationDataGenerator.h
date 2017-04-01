@@ -79,6 +79,8 @@ public:
 
 protected:
 	SpiAnalyzerSettings* mSettings;
+	tAbccMosiPacket mMosiData;
+	tAbccMisoPacket mMisoData;
 	U32 mSimulationSampleRateHz;
 	U64 mValue;
 	U32 mNetTime;

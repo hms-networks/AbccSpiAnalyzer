@@ -17,48 +17,58 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-static tAbccMosiPacket sMosiData = { 0x1F,		/* SPI_CTRL */
-									 0x00,		/* RESERVED */
-									 0x0008,	/* MSG_LEN */
-									 0x0002,	/* PD_LEN */
-									 0x00,		/* APP_STAT */
-									 0x10,		/* INT_MSK */
-									 0x0004,	/* MD_SIZE */
-									 0x0000,	/* RESERVED */
-									 0x01,		/* SRC_ID */
-									 0xFE,		/* OBJ */
-									 0x0001,	/* INST */
-									 0x01,		/* CMD */
-									 0x00,		/* RESEVERED */
-									 0x0005,	/* CMDEXT */
-									 { 0x11, 0x22, 0x33, 0x44 },	/* MSG_DATA */
-									 { 0x1A, 0x2B, 0x3C, 0x4D },	/* PROCESS_DATA */
-									 0x0000,	/* CRC32 LOW */
-									 0x0000,	/* CRC32 HIGH */
-									 0x0000 };	/* PAD */
+/* Initial MOSI frame state */
+static const tAbccMosiPacket sMosiData =
+{
+	0x1F,						/* SPI_CTRL */
+	0x00,						/* RESERVED */
+	0x0008,						/* MSG_LEN */
+	0x0002,						/* PD_LEN */
+	0x00,						/* APP_STAT */
+	0x10,						/* INT_MSK */
+	0x0004,						/* MD_SIZE */
+	0x0000,						/* RESERVED */
+	0x01,						/* SRC_ID */
+	0xFE,						/* OBJ */
+	0x0001,						/* INST */
+	0x01,						/* CMD */
+	0x00,						/* RESEVERED */
+	0x0005,						/* CMDEXT */
+	{ 0x11, 0x22, 0x33, 0x44 },	/* MSG_DATA */
+	{ 0x1A, 0x2B, 0x3C, 0x4D },	/* PROCESS_DATA */
+	0x0000,						/* CRC32 LOW */
+	0x0000,						/* CRC32 HIGH */
+	0x0000						/* PAD */
+};
 
-static tAbccMisoPacket sMisoData = { 0x0000,	/* RESERVED */
-									 0x0000,	/* LED_STAT */
-									 0x0C,		/* ANB_STAT */
-									 0x3E,		/* SPI_STAT */
-									 0x0000,	/* NET_TIME LOW */
-									 0x0000,	/* NET_TIME HIGH */
-									 0x0000,	/* MD_SIZE */
-									 0x0000,	/* RESERVED */
-									 0x00,		/* SRC_ID */
-									 0xFE,		/* OBJ */
-									 0x0001,	/* INST */
-									 0x41,		/* CMD */
-									 0x00,		/* RESERVED */
-									 0x0005,	/* CMDEXT */
-									 { 0x00, 0x00, 0x00, 0x00 },	/* MSG_DATA */
-									 { 0xAA, 0xBB, 0xCC, 0xDD },	/* PROCESS_DATA */
-									 0x0000,	/* CRC32 LOW */
-									 0x0000 };	/* CRC32 HIGH */
+/* Initial MISO frame state */
+static const tAbccMisoPacket sMisoData =
+{
+	0x0000,						/* RESERVED */
+	0x0000,						/* LED_STAT */
+	0x0C,						/* ANB_STAT */
+	0x3E,						/* SPI_STAT */
+	0x0000,						/* NET_TIME LOW */
+	0x0000,						/* NET_TIME HIGH */
+	0x0000,						/* MD_SIZE */
+	0x0000,						/* RESERVED */
+	0x00,						/* SRC_ID */
+	0xFE,						/* OBJ */
+	0x0001,						/* INST */
+	0x41,						/* CMD */
+	0x00,						/* RESERVED */
+	0x0005,						/* CMDEXT */
+	{ 0x00, 0x00, 0x00, 0x00 },	/* MSG_DATA */
+	{ 0xAA, 0xBB, 0xCC, 0xDD },	/* PROCESS_DATA */
+	0x0000,						/* CRC32 LOW */
+	0x0000						/* CRC32 HIGH */
+};
 
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
 	mNetTime = 0x00000001;
+	memcpy(&mMosiData, &sMosiData, sizeof(tAbccMosiPacket));
+	memcpy(&mMisoData, &sMisoData, sizeof(tAbccMosiPacket));
 }
 
 SpiSimulationDataGenerator::~SpiSimulationDataGenerator()
@@ -127,35 +137,35 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
 
 	/* Update toggle bit */
-	sMosiData.spiCtrl ^= ABP_SPI_CTRL_T;
+	mMosiData.spiCtrl ^= ABP_SPI_CTRL_T;
 
 	/* Update Network Time */
-	sMisoData.netTime_lo = mNetTime & 0xFFFF;
-	sMisoData.netTime_hi = (mNetTime >> 16) & 0xFFFF;
+	mMisoData.netTime_lo = mNetTime & 0xFFFF;
+	mMisoData.netTime_hi = (mNetTime >> 16) & 0xFFFF;
 	mNetTime += 0x1234;
 
 	/* Update source ID */
-	sMisoData.srcId = sMosiData.srcId;
-	sMosiData.srcId++;
+	mMisoData.srcId = mMosiData.srcId;
+	mMosiData.srcId++;
 
 	/* Update the CRC32 */
 	mosiChecksum.Init();
 	misoChecksum.Init();
-	mosiChecksum.Update(&((U8*)&sMosiData)[0], sizeof(tAbccMosiPacket) - 6);
-	misoChecksum.Update(&((U8*)&sMisoData)[0], sizeof(tAbccMisoPacket) - 4);
-	sMosiData.crc32_lo = mosiChecksum.Crc32() & 0xFFFF;
-	sMosiData.crc32_hi = (mosiChecksum.Crc32() >> 16) & 0xFFFF;
-	sMisoData.crc32_lo = misoChecksum.Crc32() & 0xFFFF;
-	sMisoData.crc32_hi = (misoChecksum.Crc32() >> 16) & 0xFFFF;
+	mosiChecksum.Update(&((U8*)&mMosiData)[0], sizeof(tAbccMosiPacket) - 6);
+	misoChecksum.Update(&((U8*)&mMisoData)[0], sizeof(tAbccMisoPacket) - 4);
+	mMosiData.crc32_lo = mosiChecksum.Crc32() & 0xFFFF;
+	mMosiData.crc32_hi = (mosiChecksum.Crc32() >> 16) & 0xFFFF;
+	mMisoData.crc32_lo = misoChecksum.Crc32() & 0xFFFF;
+	mMisoData.crc32_hi = (misoChecksum.Crc32() >> 16) & 0xFFFF;
 
 	/* Create occasional CRC errors */
 	if (distr(eng) < 10)
 	{
-		sMosiData.crc32_lo++;
+		mMosiData.crc32_lo++;
 	}
 	else if (distr(eng) < 10)
 	{
-		sMisoData.crc32_lo++;
+		mMisoData.crc32_lo++;
 	}
 
 	/* Produce the transaction (10% using CPHA0; 90% using CPHA1) */
@@ -163,11 +173,11 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	{
 		if (fClockIdleHigh == true)
 		{
-			OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			OutputWord_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 		}
 		else
 		{
-			OutputWord_CPOL0_CPHA0(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+			OutputWord_CPOL0_CPHA0(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 		}
 	}
 
@@ -179,7 +189,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			/* Create an additional transaction before enable goes high (cause clocking errors) */
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket); i++)
 			{
-				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 			}
 		}
 		else if (distr(eng) < 20)
@@ -191,7 +201,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
 			{
-				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 			}
 		}
 
@@ -238,7 +248,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			for (U16 i = 0; i < sizeof(tAbccMosiPacket) - 1; i++)
 			{
-				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&sMosiData)->raw[i], ((uAbccPacket*)&sMisoData)->raw[i]);
+				OutputWord_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 			}
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		}
