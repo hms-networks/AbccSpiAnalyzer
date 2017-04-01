@@ -369,15 +369,13 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 		alert = true;
 		switch (frame.mType)
 		{
-			case e_ABCC_SPI_ERROR_SETTINGS:
-				StringBuilder("SETTINGS", NULL, "ABCC SPI Settings Mismatch. The ABCC SPI protocol expects the clock to idle HI.", alert);
-				break;
 			case e_ABCC_SPI_ERROR_FRAGMENTATION:
-				StringBuilder("FRAGMENT", NULL, "Fragmented ABCC SPI Packet", alert);
+				StringBuilder("FRAGMENT", NULL, "Fragmented ABCC SPI Packet.", alert);
 				break;
 			case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
 				StringBuilder("CLOCKING", NULL, "ABCC SPI Clocking. The ABCC SPI protocol expects one transaction per 'Active Enable' phase.", alert);
 				break;
+			case e_ABCC_SPI_ERROR_GENERIC:
 			default:
 				StringBuilder("ERROR", NULL, "ABCC SPI Error.", alert);
 				break;
@@ -1134,37 +1132,38 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 	if (mSettings->mErrorIndexing == true)
 	{
-		if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
-			if (frame.mType == e_ABCC_MISO_CRC32)
+			/* These types of errors effect the bus as a whole and are not
+			** specific to a MISO/MOSI channel. For compatibility, only
+			** show one for tabular text */
+			if (IS_MISO_FRAME(frame))
 			{
-				TableBuilder(IS_MOSI_FRAME(frame), "CRC32", true);
-			}
-			return;
-		}
-		else if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
-		{
-			switch (frame.mType)
-			{
-				case e_ABCC_SPI_ERROR_SETTINGS:
-					AddTabularText("!ABCC SPI Settings Mismatch");
-					break;
-				case e_ABCC_SPI_ERROR_FRAGMENTATION:
-					AddTabularText("!Fragmented ABCC SPI Packet");
-					break;
-				case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
-					AddTabularText("!ABCC SPI Clocking");
-					break;
-				default:
-					AddTabularText("!ABCC SPI Error");
-					break;
+				switch (frame.mType)
+				{
+					case e_ABCC_SPI_ERROR_FRAGMENTATION:
+						AddTabularText("!FRAGMENT: ABCC SPI Packet is Fragmented");
+						break;
+					case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
+						AddTabularText("!CLOCKING: Unexpected ABCC SPI Clocking Behavior");
+						break;
+					case e_ABCC_SPI_ERROR_GENERIC:
+					default:
+						AddTabularText("!ERROR: General Error in ABCC SPI Communication");
+						break;
+				}
 			}
 			return;
 		}
 
 		if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 		{
-			if ((frame.mType == e_ABCC_MOSI_APP_STAT) && IS_MOSI_FRAME(frame))
+			if (frame.mType == e_ABCC_MISO_CRC32)
+			{
+				TableBuilder(IS_MOSI_FRAME(frame), "CRC32", true);
+				return;
+			}
+			else if ((frame.mType == e_ABCC_MOSI_APP_STAT) && IS_MOSI_FRAME(frame))
 			{
 				char str[FORMATTED_STRING_BUFFER_SIZE];
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */

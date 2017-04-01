@@ -17,9 +17,6 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define MIN_IDLE_GAP_TIME		10.0e-6f
-#define MAX_CLOCK_IDLE_HI_TIME	5.0e-6f
-
 #define PROCESS_SAMPLE(x,y,z) \
 		if( x != NULL ) \
 		{ \
@@ -165,7 +162,6 @@ void SpiAnalyzer::WorkerThread()
 			case e_GET_WORD_ERROR:
 				fError = true;
 				fReset = true;
-				mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
 				break;
 			}
 
@@ -187,6 +183,10 @@ void SpiAnalyzer::WorkerThread()
 						eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
 						mMisoChecksum.Init();
 						mMosiChecksum.Init();
+						lMisoFrameData = 0;
+						lMosiFrameData = 0;
+						dwMisoByteCnt = 0;
+						dwMosiByteCnt = 0;
 						fError = true;
 					}
 				}
@@ -204,14 +204,8 @@ void SpiAnalyzer::WorkerThread()
 				}
 				else
 				{
-					Frame error_frame;
-					U64 markerSample = mCurrentSample + (mClock->GetSampleOfNextEdge() - mCurrentSample) / 2;
-					mResults->AddMarker(markerSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
-					error_frame.mStartingSampleInclusive = mCurrentSample;
-					error_frame.mEndingSampleInclusive = markerSample;
-					error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-					error_frame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
-					mResults->AddFrame(error_frame);
+					AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleOfNextEdge());
+					AddFragFrame(true,  lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				}
 			}
@@ -387,8 +381,6 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		/* On every single edge, we need to check that "enable" doesn't toggle. */
 		/* Note that we can't just advance the enable line to the next edge, because there may not be another edge */
 
-		/* Clock IDLES HI. Since we must sample on rising edge,
-		** there is an additional phase jump */
 		if (WouldAdvancingTheClockToggleEnable() == true)
 		{
 			if (i == 0)
@@ -405,32 +397,29 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		}
 
 		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
-		//if (fClkIdleHigh || (i > 0))
+		if (mEnable == NULL)
 		{
-			if (mEnable == NULL)
+			/* In 3-wire mode, idle condition is >=5us (during a transaction).
+			** On every advancement on clock, check for idle condition.
+			** If detected, a reset of the statemachines are need to re-sync */
+			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
-				/* In 3-wire mode idle condition is >=5us (during a transaction).
-				** On every advancement on clock, check for idle condition.
-				** If detected, a reset of the statemachines are need to re-sync */
-				if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+				if (i == 0)
 				{
-					if (i == 0)
-					{
-						/* Simply advance forward to next transaction */
-						AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-					}
-					else
-					{
-						/* Reset everything and return. */
-						status = e_GET_WORD_ERROR;
-						break;
-					}
+					/* Simply advance forward to next transaction */
+					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+				}
+				else
+				{
+					/* Reset everything and return. */
+					status = e_GET_WORD_ERROR;
+					break;
 				}
 			}
-
-			/* Jump to the next clock phase */
-			mClock->AdvanceToNextEdge();
 		}
+
+		/* Jump to the next clock phase */
+		mClock->AdvanceToNextEdge();
 
 		if(!fClkIdleHigh)
 		{
@@ -587,7 +576,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 		{
 			if (mEnable != NULL)
 			{
-				mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
+				mResults->AddMarker(mCurrentSample, AnalyzerResults::Zero, mSettings->mEnableChannel);
 			}
 		}
 		else
@@ -640,55 +629,76 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 		fMisoReadyForNewPacket = false;
 
 		/* Check if any additional clocks appear on SCLK before enable goes inactive */
-		if (mEnable != NULL)
-		{
-			if (mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
-			{
-				Frame error_frame;
-				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
-				error_frame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
-				error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
-				mResults->AddFrame(error_frame);
-				mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
-			}
-
-			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-		}
-		else
-		{
-			if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
-			{
-				Frame error_frame;
-				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
-				AdvanceToActiveEnableEdgeWithCorrectClockPolarity(); //TODO joca: is this ok?????????
-				error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
-				error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
-				mResults->AddFrame(error_frame);
-			}
-		}
+		CheckForIdleAfterPacket();
 	}
 }
 
-void SpiAnalyzer::AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLastSample)
+void SpiAnalyzer::CheckForIdleAfterPacket(void)
 {
-	Frame frag_frame;
-	frag_frame.mStartingSampleInclusive = lFirstSample;
-	frag_frame.mEndingSampleInclusive = lLastSample;
-	frag_frame.mData1 = 0;
-	frag_frame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
-	frag_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-	if (fMosi)
-	{
-		frag_frame.mFlags |= SPI_MOSI_FLAG;
-	}
+	Frame error_frame;
+	U64 markerSample = 0;
+	Channel mChannel;
+	bool fAddError = false;
 
 	if (mEnable != NULL)
 	{
-		mResults->AddMarker(lLastSample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
+		if (mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
+		{
+			mChannel = mSettings->mEnableChannel;
+			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
+			error_frame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
+			markerSample = error_frame.mEndingSampleInclusive;
+			fAddError = true;
+		}
+		AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 	}
-	mResults->AddFrame(frag_frame);
+	else
+	{
+		if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
+		{
+			mChannel = mSettings->mClockChannel;
+			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
+			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+			error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
+			markerSample = error_frame.mStartingSampleInclusive + (error_frame.mEndingSampleInclusive - error_frame.mStartingSampleInclusive) / 2;
+			fAddError = true;
+		}
+	}
+
+	if (fAddError)
+	{
+		error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+		error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
+		mResults->AddFrame(error_frame);
+		mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, mChannel);
+	}
+}
+
+void SpiAnalyzer::AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample)
+{
+	Frame error_frame;
+	error_frame.mStartingSampleInclusive = lFirstSample;
+	error_frame.mEndingSampleInclusive = lLastSample;
+	error_frame.mData1 = 0;
+	error_frame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
+	error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+	if (fMosi)
+	{
+		error_frame.mFlags |= SPI_MOSI_FLAG;
+
+		/* Only apply marker from MOSI, this prevents multiple markers at the same spot
+		** in such instances draw distance is reduced significantly. */
+		if (mEnable != NULL)
+		{
+			mResults->AddMarker(lLastSample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
+		}
+		else
+		{
+			U64 markerSample = lFirstSample + (lLastSample - lFirstSample) / 2;
+			mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
+		}
+	}
+	mResults->AddFrame(error_frame);
 }
 
 void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 lFramesFirstSample)
@@ -934,7 +944,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			wMosiMdSize = 0;
-			//TODO joca: the last state (where a valid packet was received) should be restored
 			fMosiFirstFrag = false;
 			fMosiLastFrag = false;
 			fMosiFragmentation = false;
@@ -999,7 +1008,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			//TODO joca: the last state (where a valid packet was received) should be restored
 			fMosiFirstFrag = false;
 			fMosiLastFrag = false;
 			fMosiFragmentation = false;
@@ -1093,8 +1101,14 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 		eMisoState = e_ABCC_MISO_IDLE;
 		if (mEnable != NULL)
 		{
-			AddFragFrame(false, (U8)eMisoState, lFirstSample, mEnable->GetSampleOfNextEdge());
+			AddFragFrame(false, lFirstSample, mEnable->GetSampleOfNextEdge());
 		}
+		else
+		{
+			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
+			AddFragFrame(false, lFirstSample, mClock->GetSampleOfNextEdge());
+		}
+		mResults->CommitResults();
 		return true;
 	}
 
@@ -1286,7 +1300,14 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 		if (eMisoState != e_ABCC_MISO_IDLE)
 		{
 			/* We have a fragmented message */
-			AddFragFrame(false, (U8)eMisoState_Current, lFirstSample, mClock->GetSampleNumber());
+			if (mEnable != NULL)
+			{
+				AddFragFrame(false, lFirstSample, mEnable->GetSampleOfNextEdge());
+			}
+			else
+			{
+				AddFragFrame(false, lFirstSample, mClock->GetSampleNumber());
+			}
 			eMisoState = e_ABCC_MISO_IDLE;
 			lMisoFrameData = 0;
 			dwMisoByteCnt = 0;
@@ -1340,11 +1361,21 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	** This would essentially indicate the begining of a new transaction. */
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
+		if (dwMosiByteCnt == 0)
+		{
+			lMosiFramesFirstSample = lFirstSample;
+		}
 		eMosiState = e_ABCC_MOSI_IDLE;
 		if (mEnable != NULL)
 		{
-			AddFragFrame(true, (U8)eMosiState, lFirstSample, mEnable->GetSampleOfNextEdge());
+			AddFragFrame(true, lMosiFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
+		else
+		{
+			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
+			AddFragFrame(true, lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
+		}
+		mResults->CommitResults();
 		return true;
 	}
 
@@ -1547,7 +1578,14 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 		if (eMosiState != e_ABCC_MOSI_IDLE)
 		{
 			/* We have a fragmented message */
-			AddFragFrame(true, (U8)eMosiState_Current, lFirstSample, mClock->GetSampleNumber());
+			if (mEnable != NULL)
+			{
+				AddFragFrame(true, lMosiFramesFirstSample, mEnable->GetSampleOfNextEdge());
+			}
+			else
+			{
+				AddFragFrame(true, lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
+			}
 			eMosiState = e_ABCC_MOSI_IDLE;
 			lMosiFrameData = 0;
 			dwMosiByteCnt = 0;

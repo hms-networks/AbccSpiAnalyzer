@@ -27,6 +27,9 @@
 #define FORMATTED_STRING_BUFFER_SIZE		256
 #define DISPLAY_NUMERIC_STRING_BUFFER_SIZE	128
 
+#define MIN_IDLE_GAP_TIME					10.0e-6f
+#define MAX_CLOCK_IDLE_HI_TIME				5.0e-6f
+
 #define ABCC_STATUS_RESERVED_MASK			0xF0
 #define ABCC_STATUS_SUP_MASK				0x08
 #define ABCC_STATUS_CODE_MASK				0x07
@@ -116,10 +119,9 @@ typedef enum tAbccMisoStates
 
 typedef enum tAbccSpiError
 {
-	e_ABCC_SPI_ERROR_GENERIC,
-	e_ABCC_SPI_ERROR_SETTINGS,
-	e_ABCC_SPI_ERROR_FRAGMENTATION,
-	e_ABCC_SPI_ERROR_END_OF_TRANSFER,
+	e_ABCC_SPI_ERROR_GENERIC			= 0x80,
+	e_ABCC_SPI_ERROR_FRAGMENTATION		= 0x81,
+	e_ABCC_SPI_ERROR_END_OF_TRANSFER	= 0x82
 }tAbccSpiError;
 
 typedef union uAbccSpiStates
@@ -222,7 +224,8 @@ protected: /* functions */
 
 	tGetWordStatus GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
 
-	void AddFragFrame(bool fMosi, U8 bState, U64 lFirstSample, U64 lLastSample);
+	void CheckForIdleAfterPacket(void);
+	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);
 	void SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacketType);
 
 	void ProcessMosiFrame(tAbccMosiStates eMosiState, U64 lFrameData, S64 lFramesFirstSample);
