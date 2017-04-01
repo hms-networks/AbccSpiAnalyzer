@@ -58,6 +58,7 @@ static tAbccMisoPacket sMisoData = { 0x0000,	/* RESERVED */
 
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
+	mNetTime = 0x00000001;
 }
 
 SpiSimulationDataGenerator::~SpiSimulationDataGenerator()
@@ -115,7 +116,6 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	std::random_device rd;
 	std::mt19937 eng(rd());
 	std::uniform_int_distribution<> distr(0, 100);
-	static U32 netTime = 0x00000001;
 	AbccCrc mosiChecksum = AbccCrc();
 	AbccCrc misoChecksum = AbccCrc();
 
@@ -130,9 +130,9 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	sMosiData.spiCtrl ^= ABP_SPI_CTRL_T;
 
 	/* Update Network Time */
-	sMisoData.netTime_lo = netTime & 0xFFFF;
-	sMisoData.netTime_hi = (netTime >> 16) & 0xFFFF;
-	netTime += 0x1234;
+	sMisoData.netTime_lo = mNetTime & 0xFFFF;
+	sMisoData.netTime_hi = (mNetTime >> 16) & 0xFFFF;
+	mNetTime += 0x1234;
 
 	/* Update source ID */
 	sMisoData.srcId = sMosiData.srcId;

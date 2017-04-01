@@ -81,6 +81,7 @@ protected:
 	SpiAnalyzerSettings* mSettings;
 	U32 mSimulationSampleRateHz;
 	U64 mValue;
+	U32 mNetTime;
 
 protected: /* SPI specific */
 	ClockGenerator mClockGenerator;
