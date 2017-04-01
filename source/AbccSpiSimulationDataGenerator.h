@@ -89,6 +89,7 @@ protected: /* SPI specific */
 	ClockGenerator mClockGenerator;
 
 	void CreateSpiTransaction();
+	void SendPacketData(bool fClockIdleHigh, U32 dwLength);
 	void OutputWord_CPOL0_CPHA0(U64 mosi_data, U64 miso_data);
 	void OutputWord_CPOL1_CPHA1(U64 mosi_data, U64 miso_data);
 
