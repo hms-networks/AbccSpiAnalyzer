@@ -129,88 +129,98 @@ void SpiAnalyzer::WorkerThread()
 	bool fReady1 = true;
 	bool fReady2 = true;
 	Setup();
-	mMisoChecksum = AbccCrc();
-	mMosiChecksum = AbccCrc();
 
-	AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-
-	/* Reset persistent state logic between captures */
-	eMosiState = e_ABCC_MOSI_IDLE;
-	eMisoState = e_ABCC_MISO_IDLE;
-	bLastAnbSts = 0xFF;
-	bLastApplSts = 0xFF;
-
-	RunAbccMosiMsgSubStateMachine(true, NULL, NULL);
-	RunAbccMisoMsgSubStateMachine(true, NULL, NULL);
-
-	for (;;)
+	/* Check that all required channels are valid */
+	if ( (mMiso != NULL) && (mMosi != NULL) && (mClock != NULL) )
 	{
-		/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
-		eWordStatus = GetWord(&lMosiData, &lMisoData, &lFirstSample);
-		switch(eWordStatus)
+		mMisoChecksum = AbccCrc();
+		mMosiChecksum = AbccCrc();
+
+		AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+
+		/* Reset persistent state logic between captures */
+		eMosiState = e_ABCC_MOSI_IDLE;
+		eMisoState = e_ABCC_MISO_IDLE;
+		bLastAnbSts = 0xFF;
+		bLastApplSts = 0xFF;
+
+		RunAbccMosiMsgSubStateMachine(true, NULL, NULL);
+		RunAbccMisoMsgSubStateMachine(true, NULL, NULL);
+
+		for (;;)
 		{
-		case e_GET_WORD_OK:
-			fError = false;
-			fReset = false;
-			break;
-		case e_GET_WORD_RESET:
-			fError = false;
-			fReset = true;
-			break;
-		default:
-		case e_GET_WORD_ERROR:
-			fError = true;
-			fReset = true;
-			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
-			break;
-		}
-
-		/* Run the ABCC MOSI state machine */
-		fReady1 = RunAbccMosiStateMachine((fReset||fReady1), fError, lMosiData, lFirstSample);
-
-		/* Run the ABCC MISO state machine */
-		fReady2 = RunAbccMisoStateMachine((fReset||fReady2), fError, lMisoData, lFirstSample);
-
-		if (mEnable == NULL)
-		{
-			if (!fReady1 && !fReady2)
+			/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
+			eWordStatus = GetWord(&lMosiData, &lMisoData, &lFirstSample);
+			switch (eWordStatus)
 			{
-				if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+			case e_GET_WORD_OK:
+				fError = false;
+				fReset = false;
+				break;
+			case e_GET_WORD_RESET:
+				fError = false;
+				fReset = true;
+				break;
+			default:
+			case e_GET_WORD_ERROR:
+				fError = true;
+				fReset = true;
+				mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
+				break;
+			}
+
+			/* Run the ABCC MOSI state machine */
+			fReady1 = RunAbccMosiStateMachine((fReset||fReady1), fError, lMosiData, lFirstSample);
+
+			/* Run the ABCC MISO state machine */
+			fReady2 = RunAbccMisoStateMachine((fReset||fReady2), fError, lMisoData, lFirstSample);
+
+			if (mEnable == NULL)
+			{
+				if (!fReady1 && !fReady2)
 				{
-					eMosiState = e_ABCC_MOSI_SPI_CTRL;
-					eMisoState = e_ABCC_MISO_Reserved1;
-					eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
-					eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
-					mMisoChecksum.Init();
-					mMosiChecksum.Init();
-					fError = true;
+					if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
+					{
+						eMosiState = e_ABCC_MOSI_SPI_CTRL;
+						eMisoState = e_ABCC_MISO_Reserved1;
+						eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+						eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+						mMisoChecksum.Init();
+						mMosiChecksum.Init();
+						fError = true;
+					}
 				}
 			}
-		}
 
-		if (fError == true)
-		{
-			/* Signal error, do not commit packet */
-			SignalReadyForNewPacket(false, e_PROTOCOL_ERROR_PACKET);
-
-			/* Advance to the next enabled (or idle) state */
-			if (mEnable != NULL)
+			if (fError == true)
 			{
-				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+				/* Signal error, do not commit packet */
+				SignalReadyForNewPacket(false, e_PROTOCOL_ERROR_PACKET);
+
+				/* Advance to the next enabled (or idle) state */
+				if (mEnable != NULL)
+				{
+					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+				}
+				else
+				{
+					Frame error_frame;
+					U64 markerSample = mCurrentSample + (mClock->GetSampleOfNextEdge() - mCurrentSample) / 2;
+					mResults->AddMarker(markerSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
+					error_frame.mStartingSampleInclusive = mCurrentSample;
+					error_frame.mEndingSampleInclusive = markerSample;
+					error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+					error_frame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
+					mResults->AddFrame(error_frame);
+					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+				}
 			}
-			else
-			{
-				mClock->Advance((U32)(MAX_CLOCK_IDLE_HI_TIME * GetSampleRate() / 2.0f));
-				mCurrentSample = mClock->GetSampleNumber();
-				mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mClockChannel);
-				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-			}
+
+			mResults->CommitResults();
+			ReportProgress(mClock->GetSampleNumber());
+
+			CheckIfThreadShouldExit();
 		}
-
-		mResults->CommitResults();
-		ReportProgress(mClock->GetSampleNumber());
-
-		CheckIfThreadShouldExit();
 	}
 }
 
@@ -229,7 +239,6 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 			/* First find idle gap */
 			while (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
 			{
-				GetSampleRate();
 				mClock->AdvanceToNextEdge();
 			}
 
@@ -267,8 +276,14 @@ void SpiAnalyzer::Setup()
 		mMiso = NULL;
 	}
 
-
-	mClock = GetAnalyzerChannelData(mSettings->mClockChannel);
+	if (mSettings->mMisoChannel != UNDEFINED_CHANNEL)
+	{
+		mClock = GetAnalyzerChannelData(mSettings->mClockChannel);
+	}
+	else
+	{
+		mClock = NULL;
+	}
 
 	if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
 	{
@@ -350,6 +365,7 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 {
 	/* We're assuming we come into this function with the clock in the idle state */
 	const U32 dwBitsPerTransfer = 8;
+	const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
 	DataBuilder mosi_result;
 	DataBuilder miso_result;
 	tGetWordStatus status = e_GET_WORD_OK;
@@ -364,11 +380,6 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 	if (mClock->GetBitState() == BIT_HIGH)
 	{
 		fClkIdleHigh = true;
-		mArrowMarker = AnalyzerResults::UpArrow;
-	}
-	else
-	{
-		mArrowMarker = AnalyzerResults::DownArrow;
 	}
 
 	for (U32 i = 0; i < dwBitsPerTransfer; i++)
@@ -394,7 +405,7 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		}
 
 		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
-		if (fClkIdleHigh || (i > 0))
+		//if (fClkIdleHigh || (i > 0))
 		{
 			if (mEnable == NULL)
 			{
@@ -419,6 +430,14 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 
 			/* Jump to the next clock phase */
 			mClock->AdvanceToNextEdge();
+		}
+
+		if(!fClkIdleHigh)
+		{
+			/* Sample on leading edge */
+			mCurrentSample = mClock->GetSampleNumber();
+			PROCESS_SAMPLE(mMosi, mosi_result, mMosiChannel);
+			PROCESS_SAMPLE(mMiso, miso_result, mMisoChannel);
 		}
 
 		if (i == 0)
@@ -450,11 +469,16 @@ tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFir
 		/* Jump to the next clock phase */
 		mClock->AdvanceToNextEdge();
 
+		if(fClkIdleHigh)
+		{
+			/* Sample on tailing edge */
 			mCurrentSample = mClock->GetSampleNumber();
 			PROCESS_SAMPLE(mMosi, mosi_result, mMosiChannel);
 			PROCESS_SAMPLE(mMiso, miso_result, mMisoChannel);
-			mArrowLocations.push_back(mCurrentSample);
 		}
+
+		mArrowLocations.push_back(mCurrentSample);
+	}
 
 	if(status == e_GET_WORD_OK)
 	{
@@ -550,7 +574,10 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 	{
 		fStartNewPacket = true;
 		mResults->CancelPacketAndStartNewPacket();
-		mResults->AddMarker(mCurrentSample, AnalyzerResults::Stop, mSettings->mEnableChannel);
+		if (mEnable != NULL)
+		{
+			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mEnableChannel);
+		}
 	}
 	else if (fMisoReadyForNewPacket && fMosiReadyForNewPacket)
 	{
@@ -558,11 +585,14 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 		fStartNewPacket = true;
 		if (packet_id == INVALID_RESULT_INDEX)
 		{
-			mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
+			if (mEnable != NULL)
+			{
+				mResults->AddMarker(mCurrentSample,AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
+			}
 		}
 		else
 		{
-			if (mSettings->mMessageIndexingVerbosityLevel != e_VERBOSITY_LEVEL_DISABLED)
+			if (mEnable != NULL)
 			{
 				AnalyzerResults::MarkerType eMarkerType = AnalyzerResults::One;
 				/* If either MISO or MOSI contain an error report it,
@@ -609,9 +639,9 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 		fMosiReadyForNewPacket = false;
 		fMisoReadyForNewPacket = false;
 
+		/* Check if any additional clocks appear on SCLK before enable goes inactive */
 		if (mEnable != NULL)
 		{
-			/* Check if any additional clocks appear on SCLK before enable goes inactive */
 			if (mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
 			{
 				Frame error_frame;
@@ -620,14 +650,23 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 				error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
 				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
 				mResults->AddFrame(error_frame);
-
-				if (mSettings->mErrorIndexing)
-				{
-					mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
-				}
+				mResults->AddMarker(error_frame.mEndingSampleInclusive, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 			}
 
 			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+		}
+		else
+		{
+			if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
+			{
+				Frame error_frame;
+				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
+				AdvanceToActiveEnableEdgeWithCorrectClockPolarity(); //TODO joca: is this ok?????????
+				error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
+				error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+				error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
+				mResults->AddFrame(error_frame);
+			}
 		}
 	}
 }
@@ -1076,7 +1115,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 		lMisoFramesFirstSample = lFirstSample;
 	}
 
-	lMisoFrameData |= lMisoData << (8 * dwMisoByteCnt);
+	lMisoFrameData |= (lMisoData << (8 * dwMisoByteCnt));
 	dwMisoByteCnt++;
 
 	if (eMisoState != e_ABCC_MISO_CRC32)
@@ -1326,7 +1365,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 		lMosiFramesFirstSample = lFirstSample;
 	}
 
-	lMosiFrameData |= lMosiData << (8 * dwMosiByteCnt);
+	lMosiFrameData |= (lMosiData << (8 * dwMosiByteCnt));
 	dwMosiByteCnt++;
 
 	if (eMosiState != e_ABCC_MOSI_CRC32)
@@ -1561,6 +1600,11 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		return true;
 	}
 
+	if ((pfAddFrame == NULL) || (peMisoMsgSubState == NULL))
+	{
+		return false;
+	}
+
 	*peMisoMsgSubState = eMisoMsgSubState;
 	bMisoByteCnt2++;
 
@@ -1662,6 +1706,11 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
 		bMosiByteCnt2 = 0;
 		return true;
+	}
+
+	if ((pfAddFrame == NULL) || (peMosiMsgSubState == NULL))
+	{
+		return false;
 	}
 
 	*peMosiMsgSubState = eMosiMsgSubState;
