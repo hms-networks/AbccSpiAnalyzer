@@ -251,7 +251,6 @@ protected: /* variables */
 	AnalyzerChannelData* mEnable;
 
 	U64 mCurrentSample;
-	AnalyzerResults::MarkerType mArrowMarker;
 	std::vector<U64> mArrowLocations;
 
 	tAbccMosiStates eMosiState;
