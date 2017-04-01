@@ -18,21 +18,28 @@
 #define FORMATTED_STRING_BUFFER_SIZE		256
 #endif
 
-#define SPI_ERROR_FLAG ( 1 << 0 ) /* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
-#define SPI_MOSI_FLAG ( 1 << 1 )  /* Direction flag. When asserted, MOSI, when de-asserted MISO */
+/* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
+#define SPI_ERROR_FLAG						( 1 << 0 )
 
-#define SPI_MSG_FIRST_FRAG_FLAG ( 1 << 2 ) /* Indicates the first message in a fragmented message transfer */
-#define SPI_MSG_FRAG_FLAG ( 1 << 3 ) /* Indicates that message fragmentation is in progress */
+/* Direction flag. When asserted, MOSI, when de-asserted MISO */
+#define SPI_MOSI_FLAG						( 1 << 1 )
 
-#define SPI_PROTO_EVENT_FLAG ( 1 << 5 ) /* Event flag to indicate any critical events that are part of the ABCC SPI protocol
-										** This flag is field-specific.
-										** This flag is relevant for the following fields (not all supported yet):
-										**   - SPI_CTL: signals a toggle error (retransmission event)
-										**   - ANB_STS: signals a Anybus status changed event
-										**   - SPI_STS: signals a toggle error (retransmission event)
-										**   - APP_STS: signals an application status changed event
-										**   - MSG_CMD: signals an error response message
-										**   - CRC32: signals a checksum error */
+/* Indicates the first message in a fragmented message transfer */
+#define SPI_MSG_FIRST_FRAG_FLAG				( 1 << 2 )
+
+/* Indicates that message fragmentation is in progress */
+#define SPI_MSG_FRAG_FLAG					( 1 << 3 )
+
+/* Event flag to indicate any critical events that are part of the ABCC SPI protocol
+** This flag is field-specific.
+** This flag is relevant for the following fields (not all supported yet):
+**   - SPI_CTL: signals a toggle error (retransmission event)
+**   - ANB_STS: signals a Anybus status changed event
+**   - SPI_STS: signals a toggle error (retransmission event)
+**   - APP_STS: signals an application status changed event
+**   - MSG_CMD: signals an error response message
+**   - CRC32: signals a checksum error */
+#define SPI_PROTO_EVENT_FLAG				( 1 << 5 )
 
 class SpiAnalyzer;
 class SpiAnalyzerSettings;
