@@ -245,7 +245,7 @@ protected: /* functions */
 protected: /* variables */
 	std::auto_ptr< SpiAnalyzerSettings > mSettings;
 	std::auto_ptr< SpiAnalyzerResults > mResults;
-	bool mSimulationInitialized;
+
 	SpiSimulationDataGenerator mSimulationDataGenerator;
 
 	AnalyzerChannelData* mMosi;
@@ -254,73 +254,82 @@ protected: /* variables */
 	AnalyzerChannelData* mEnable;
 
 	U64 mCurrentSample;
+
+	S64 lMosiFramesFirstSample;
+	S64 lMisoFramesFirstSample;
+
+	U64 lMosiFrameData;
+	U64 lMisoFrameData;
+
 	std::vector<U64> mArrowLocations;
+
+	tMsgHeaderInfo sMosiMsgHeader;
+	tMsgHeaderInfo sMisoMsgHeader;
+
+	AbccCrc mMosiChecksum;
+	AbccCrc mMisoChecksum;
+
+	U32 dwLastMisoTimestamp;
+
+	U32 dwMosiPdLen;
+	U32 dwMisoPdLen;
+
+	U32 dwMosiPdCnt;
+	U32 dwMisoPdCnt;
+
+	U32 dwMosiMsgLen;
+	U32 dwMisoMsgLen;
+
+	U32 dwMosiByteCnt;
+	U32 dwMisoByteCnt;
+
+	U8 bMosiByteCnt2;
+	U8 bMisoByteCnt2;
+
+	U32 dwMosiMdCnt;
+	U32 dwMisoMdCnt;
+
+	U16 wMosiMdSize;
+	U16 wMisoMdSize;
 
 	tAbccMosiStates eMosiState;
 	tAbccMisoStates eMisoState;
 
-	AbccCrc mMisoChecksum;
-	AbccCrc mMosiChecksum;
+	tAbccMosiStates eMosiMsgSubState;
+	tAbccMisoStates eMisoMsgSubState;
 
-	U32 dwMisoPdLen;
-	U32 dwMosiPdLen;
-
-	U32 dwMisoMsgLen;
-	U32 dwMosiMsgLen;
-
-	bool fMisoNewMsg;
-	bool fMosiNewMsg;
-
-	bool fMisoErrorRsp;
-	bool fMosiErrorRsp;
-
-	bool fMisoFragmentation;
-	bool fMosiFragmentation;
-
-	bool fMisoFirstFrag;
-	bool fMosiFirstFrag;
-
-	bool fMisoLastFrag;
-	bool fMosiLastFrag;
-
-	bool fMisoNewRdPd;
-	bool fMosiWrPdValid;
-
-	U8 bSettingsChangeID;
-
-	bool fMisoReadyForNewPacket;
-	bool fMosiReadyForNewPacket;
-	tPacketType eMisoPacketType;
 	tPacketType eMosiPacketType;
-
-	tMsgHeaderInfo sMisoMsgHeader;
-	U32 dwMisoPdCnt;
-	U32 dwMisoMdCnt;
-	U16 wMisoMdSize;
-
-	tMsgHeaderInfo sMosiMsgHeader;
-	U32 dwMosiPdCnt;
-	U32 dwMosiMdCnt;
-	U16 wMosiMdSize;
+	tPacketType eMisoPacketType;
 
 	U8 bLastAnbSts;
 	U8 bLastApplSts;
+
 	U8 bMosiLastToggleState;
 
-	U32 dwLastMisoTimestamp;
+	U8 bSettingsChangeID;
 
-	tAbccMisoStates eMisoMsgSubState;
-	U32 dwMisoByteCnt;
-	U64 lMisoFrameData;
-	S64 lMisoFramesFirstSample;
+	bool fMosiNewMsg;
+	bool fMisoNewMsg;
 
-	tAbccMosiStates eMosiMsgSubState;
-	U32 dwMosiByteCnt;
-	U64 lMosiFrameData;
-	S64 lMosiFramesFirstSample;
+	bool fMosiErrorRsp;
+	bool fMisoErrorRsp;
 
-	U8 bMisoByteCnt2;
-	U8 bMosiByteCnt2;
+	bool fMosiFragmentation;
+	bool fMisoFragmentation;
+
+	bool fMosiFirstFrag;
+	bool fMisoFirstFrag;
+
+	bool fMosiLastFrag;
+	bool fMisoLastFrag;
+
+	bool fMosiWrPdValid;
+	bool fMisoNewRdPd;
+
+	bool fMosiReadyForNewPacket;
+	bool fMisoReadyForNewPacket;
+
+	bool mSimulationInitialized;
 
 #pragma warning( pop )
 };
