@@ -222,7 +222,7 @@ protected: /* functions */
 
 	bool WouldAdvancingTheClockToggleEnable();
 
-	tGetWordStatus GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
+	tGetWordStatus GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
 
 	void CheckForIdleAfterPacket(void);
 	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);

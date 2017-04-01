@@ -147,7 +147,7 @@ void SpiAnalyzer::WorkerThread()
 		for (;;)
 		{
 			/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
-			eWordStatus = GetWord(&lMosiData, &lMisoData, &lFirstSample);
+			eWordStatus = GetByte(&lMosiData, &lMisoData, &lFirstSample);
 			switch (eWordStatus)
 			{
 			case e_GET_WORD_OK:
@@ -355,7 +355,7 @@ bool SpiAnalyzer::Is3WireIdleCondition(float rIdleTimeCondition)
 	return (rIdleTime >= rIdleTimeCondition);
 }
 
-tGetWordStatus SpiAnalyzer::GetWord(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
+tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 {
 	/* We're assuming we come into this function with the clock in the idle state */
 	const U32 dwBitsPerTransfer = 8;
