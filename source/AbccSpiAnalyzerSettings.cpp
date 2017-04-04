@@ -33,19 +33,19 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mChangeID(0)
 {
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMosiChannelInterface->SetTitleAndTooltip("SPI MOSI Channel :", "Master Out, Slave In (Host to Module)");
+	mMosiChannelInterface->SetTitleAndTooltip("SPI Channel - MOSI :", "Master Out, Slave In (Host to Module)");
 	mMosiChannelInterface->SetChannel(mMosiChannel);
 
 	mMisoChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMisoChannelInterface->SetTitleAndTooltip("SPI MISO Channel :", "Master In, Slave Out (Module to Host)");
+	mMisoChannelInterface->SetTitleAndTooltip("SPI Channel - MISO :", "Master In, Slave Out (Module to Host)");
 	mMisoChannelInterface->SetChannel(mMisoChannel);
 
 	mClockChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mClockChannelInterface->SetTitleAndTooltip("SPI Clock Channel :", "Clock (CLK)");
+	mClockChannelInterface->SetTitleAndTooltip("SPI Channel - Clock :", "Clock (CLK)");
 	mClockChannelInterface->SetChannel(mClockChannel);
 
 	mEnableChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mEnableChannelInterface->SetTitleAndTooltip("SPI Enable Channel :", "Enable (SS, Slave Select)");
+	mEnableChannelInterface->SetTitleAndTooltip("SPI Channel - Enable :", "Enable (SS, Slave Select)");
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
 
