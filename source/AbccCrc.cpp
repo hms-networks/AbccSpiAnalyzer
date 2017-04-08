@@ -1,5 +1,5 @@
 /******************************************************************************
-**  Copyright (C) 1996-2016 HMS Industrial Networks Inc, all rights reserved
+**  Copyright (C) 2015-2017 HMS Industrial Networks Inc, all rights reserved
 *******************************************************************************
 **
 **       File: AbccCrc.cpp
