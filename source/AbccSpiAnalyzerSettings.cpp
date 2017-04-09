@@ -16,7 +16,7 @@
 #include <cstring>
 
 /* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION 0x00000001
+#define SETTINGS_REVISION_STRING "REVISION_00000001"
 
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
@@ -170,14 +170,14 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 void SpiAnalyzerSettings::LoadSettings(const char* settings)
 {
 	SimpleArchive text_archive;
-	const char* name_string;
-	U32 dwSettingsRevision;
+	const char* pcPluginName;
+	const char* pcSettingsVersionString;
 
 	text_archive.SetString(settings);
 
 	/* The first thing in the archive is the name of the protocol analyzer that the data belongs to. */
-	text_archive >> &name_string;
-	if (strcmp(name_string, "AbccSpiAnalyzer") != 0)
+	text_archive >> &pcPluginName;
+	if (strcmp(pcPluginName, "AbccSpiAnalyzer") != 0)
 	{
 		AnalyzerHelpers::Assert("AbccSpiAnalyzer: Provided with a settings string that doesn't belong to us.");
 	}
@@ -188,8 +188,8 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	text_archive >> mEnableChannel;
 
 	/* Compare version in archive to what the plugin's "settings" version is */
-	text_archive >> dwSettingsRevision;
-	if (SETTINGS_REVISION == dwSettingsRevision)
+	text_archive >> &pcSettingsVersionString;
+	if (strcmp(pcSettingsVersionString, SETTINGS_REVISION_STRING) == 0)
 	{
 		text_archive >> mMessageIndexingVerbosityLevel;
 		text_archive >> mMsgDataPriority;
@@ -223,7 +223,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mClockChannel;
 	text_archive << mEnableChannel;
 
-	text_archive << (U32)SETTINGS_REVISION;
+	text_archive << SETTINGS_REVISION_STRING;
 	text_archive << mMessageIndexingVerbosityLevel;
 	text_archive << mMsgDataPriority;
 	text_archive << mMessageSrcIdIndexing;
