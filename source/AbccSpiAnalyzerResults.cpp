@@ -1490,7 +1490,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (!found)
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 16, str, sizeof(str));
+								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), str, sizeof(str));
 							}
 							if (alert)
 							{
@@ -1697,7 +1697,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (!found)
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 16, str, sizeof(str));
+								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), str, sizeof(str));
 							}
 							if (alert)
 							{
