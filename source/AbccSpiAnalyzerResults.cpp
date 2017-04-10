@@ -1169,6 +1169,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	ClearTabularText();
 	U64 packet_id = GetPacketContainingFrame(frame_index);
 	Frame frame = GetFrame(frame_index);
+	char str[FORMATTED_STRING_BUFFER_SIZE];
 
 	if (mSettings->mErrorIndexing == true)
 	{
@@ -1205,7 +1206,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			}
 			else if ((frame.mType == e_ABCC_MOSI_APP_STAT) && IS_MOSI_FRAME(frame))
 			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
@@ -1223,7 +1223,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			}
 			else if ((frame.mType == e_ABCC_MISO_ANB_STAT) && IS_MISO_FRAME(frame))
 			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				char tab_text[FORMATTED_STRING_BUFFER_SIZE];
 				bool alert = false;
 				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
@@ -1253,7 +1252,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 	if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
 	{
-		char str[FORMATTED_STRING_BUFFER_SIZE];
 		switch(mSettings->mTimestampIndexing)
 		{
 		case e_TIMESTAMP_ALL_PACKETS:
@@ -1293,7 +1291,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		{
 			if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
@@ -1314,7 +1311,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		{
 			if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 			{
-				char str[FORMATTED_STRING_BUFFER_SIZE];
 				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
 				{
 					AddTabularText("!Anybus Status : (", str, ")");
@@ -1387,7 +1383,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						char str[FORMATTED_STRING_BUFFER_SIZE];
 						bool alert = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
 						if (alert)
 						{
@@ -1424,7 +1419,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						char str[FORMATTED_STRING_BUFFER_SIZE];
 						bool alert = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[0], sizeof(str), display_base);
 						if ((fMsgErrorRsp[ABCC_MISO_CHANNEL] == true) || (alert == true))
 						{
@@ -1474,7 +1468,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 						{
-							char str[FORMATTED_STRING_BUFFER_SIZE];
 							bool alert = false;
 							bool found = false;
 							bool attrCmd = (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
@@ -1594,7 +1587,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						char str[FORMATTED_STRING_BUFFER_SIZE];
 						bool alert = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
 						if (alert)
 						{
@@ -1631,7 +1623,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						char str[FORMATTED_STRING_BUFFER_SIZE];
 						bool alert = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[ABCC_MOSI_CHANNEL], sizeof(str), display_base);
 						if ((fMsgErrorRsp[ABCC_MOSI_CHANNEL] == true) || (alert == true))
 						{
@@ -1681,7 +1672,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 						{
-							char str[FORMATTED_STRING_BUFFER_SIZE];
 							bool alert = false;
 							bool found = false;
 							bool attrCmd = (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
