@@ -1,7 +1,7 @@
 /*******************************************************************************
 ********************************************************************************
 **                                                                            **
-** ABP version 7.16.01 (2015-10-14)                                           **
+** ABP version 7.31.01 (2016-09-16)                                           **
 **                                                                            */
 /*******************************************************************************
 ********************************************************************************
@@ -86,6 +86,9 @@
 #define ABP_PNIO_IA_MOD_ID_ASSIGN_MODE          21
 #define ABP_PNIO_IA_SYSTEM_CONTACT              22
 #define ABP_PNIO_IA_PROFIENERGY_FUNC            23
+#define ABP_PNIO_IA_CUSTOM_STATION_NAME         24
+#define ABP_PNIO_IA_IM_MODULE_ORDER_ID          25
+#define ABP_PNIO_IA_IM_ANNOTATION               26
 
 /*------------------------------------------------------------------------------
 **
@@ -116,6 +119,9 @@
 #define ABP_PNIO_IA_MOD_ID_ASSIGN_MODE_DS          ( ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_SYSTEM_CONTACT_DS              ( 255 * ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_PROFIENERGY_FUNC_DS            ( ABP_UINT8_SIZEOF )
+#define ABP_PNIO_IA_CUSTOM_STATION_NAME_DS         ( 58 * ABP_UINT8_SIZEOF )
+#define ABP_PNIO_IA_IM_MODULE_ORDER_ID_DS          ( 64 * ABP_UINT8_SIZEOF )
+#define ABP_PNIO_IA_IM_ANNOTATION_ID_DS            ( 64 * ABP_UINT8_SIZEOF )
 
 /*------------------------------------------------------------------------------
 **
@@ -137,6 +143,7 @@
 #define ABP_PNIO_CMD_EXPECTED_IDENT_IND            0x1B
 #define ABP_PNIO_CMD_SAVE_IP_SUITE                 0x1C
 #define ABP_PNIO_CMD_SAVE_STATION_NAME             0x1D
+#define ABP_PNIO_CMD_INDICATE_DEVICE               0x1E
 
 /*------------------------------------------------------------------------------
 **
@@ -156,6 +163,7 @@
 #define ABP_PNIO_CMD_AR_ABORT_IND_DS               2
 #define ABP_PNIO_CMD_PLUG_SUB_FAILED_DS            8
 #define ABP_PNIO_CMD_EXPECTED_IDENT_IND_DS         255
+#define ABP_PNIO_CMD_INDICATE_DEVICE_DS            0
 
 /*------------------------------------------------------------------------------
 **
@@ -179,6 +187,9 @@
 #define ABP_PNIO_NW_EXCPT_ILLEGAL_RSP           3
 #define ABP_PNIO_NW_EXCPT_MISSING_MAC_ADDRESS   4
 #define ABP_PNIO_NW_EXCPT_CMD_TIMEOUT           5
+#define ABP_PNIO_NW_EXCPT_MDD_ERR               6
+#define ABP_PNIO_NW_EXCPT_PE_WRONG_VERSION      7
+#define ABP_PNIO_NW_EXCPT_PE_INST_OUT_OF_RANGE  8
 
 #endif  /* inclusion lock */
 

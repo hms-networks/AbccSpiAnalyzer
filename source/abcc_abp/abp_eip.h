@@ -1,7 +1,7 @@
 /*******************************************************************************
 ********************************************************************************
 **                                                                            **
-** ABP version 7.16.01 (2015-10-14)                                           **
+** ABP version 7.31.01 (2016-09-16)                                           **
 **                                                                            */
 /*******************************************************************************
 ********************************************************************************
@@ -91,6 +91,7 @@
 #define ABP_EIP_IA_CONS_INSTANCE_MAP          28
 #define ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK     29
 #define ABP_EIP_IA_ABCC_ADI_OBJECT            30
+#define ABP_EIP_IA_ABCC_ENABLE_DLR            31
 
 
 /*------------------------------------------------------------------------------
@@ -130,6 +131,7 @@
 #define ABP_EIP_IA_CONS_INSTANCE_MAP_DS            ( 6 * 2 * ABP_UINT16_SIZEOF )
 #define ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK_DS       ABP_BOOL_SIZEOF
 #define ABP_EIP_IA_ABCC_ADI_OBJECT_DS              ABP_UINT16_SIZEOF
+#define ABP_EIP_IA_ABCC_ENABLE_DLR_DS              ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------

@@ -1,5 +1,10 @@
 /*******************************************************************************
 ********************************************************************************
+**                                                                            **
+** ABP version 7.31.01 (2016-09-16)                                           **
+**                                                                            */
+/*******************************************************************************
+********************************************************************************
 **
 ** File Name
 ** ---------
@@ -546,7 +551,7 @@ ABP_AppStatusType;
 
 #define ABP_SINT64_MIN              ( - ABP_SINT64_MAX - 1 )
 #define ABP_UINT64_MIN              0
-#define ABP_FLOAT_MIN               1.17549435E-38F
+#define ABP_FLOAT_MIN               -3.402823466E+38F
 
 #define ABP_BOOL1_MIN               0 /* ABCC40 */
 #define ABP_BITS1_MIN               0 /* ABCC40 */
@@ -622,6 +627,7 @@ ABP_LangType;
 **------------------------------------------------------------------------------
 */
 
+#define ABP_OBJ_NUM_EME             228   /* Energy Measurement               */
 #define ABP_OBJ_NUM_PNAM            229   /* PROFINET Asset Management        */
 #define ABP_OBJ_NUM_CFN             230   /* CC-Link IE Field Network         */
 #define ABP_OBJ_NUM_ER              231   /* Energy Reporting                 */
