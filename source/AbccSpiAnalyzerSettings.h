@@ -36,6 +36,12 @@ typedef enum tMsgDataPriority
 	e_MSG_DATA_PRIORITIZE_TAG
 }tMsgDataPriority;
 
+typedef enum tProcessDataPriority
+{
+	e_PROCESS_DATA_PRIORITIZE_DATA,
+	e_PROCESS_DATA_PRIORITIZE_TAG
+}tProcessDataPriority;
+
 class SpiAnalyzerSettings : public AnalyzerSettings
 {
 public:
@@ -57,6 +63,7 @@ public:
 	Channel mEnableChannel;
 	U32 mMessageIndexingVerbosityLevel;
 	U32 mMsgDataPriority;
+	U32 mProcessDataPriority;
 	bool mMessageSrcIdIndexing;
 	bool mErrorIndexing;
 	U32 mTimestampIndexing;
@@ -71,6 +78,7 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMsgDataPriorityInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mProcessDataPriorityInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mIndexTimestampsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexMessageSrcIdInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;

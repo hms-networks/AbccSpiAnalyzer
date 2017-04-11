@@ -18,18 +18,29 @@
 /* Anytime behavior or definition of settings change, increment this counter. */
 #define SETTINGS_REVISION_STRING "REVISION_00000001"
 
+/* Default setting states */
+static const U32  d_MessageIndexingVerbosityLevel = e_VERBOSITY_LEVEL_DETAILED;
+static const U32  d_MsgDataPriority               = e_MSG_DATA_PRIORITIZE_TAG;
+static const U32  d_ProcessDataPriority           = e_PROCESS_DATA_PRIORITIZE_TAG;
+static const U32  d_TimestampIndexing             = e_TIMESTAMP_DISABLED;
+static const bool d_MessageSrcIdIndexing          = true;
+static const bool d_ErrorIndexing                 = true;
+static const bool d_AnybusStatusIndexing          = true;
+static const bool d_ApplStatusIndexing            = true;
+
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
 	mMisoChannel(UNDEFINED_CHANNEL),
 	mClockChannel(UNDEFINED_CHANNEL),
 	mEnableChannel(UNDEFINED_CHANNEL),
-	mMessageIndexingVerbosityLevel(e_VERBOSITY_LEVEL_DETAILED),
-	mMsgDataPriority(e_MSG_DATA_PRIORITIZE_TAG),
-	mMessageSrcIdIndexing(true),
-	mErrorIndexing(true),
-	mTimestampIndexing(e_TIMESTAMP_DISABLED),
-	mAnybusStatusIndexing(true),
-	mApplStatusIndexing(true),
+	mMessageIndexingVerbosityLevel(d_MessageIndexingVerbosityLevel),
+	mMsgDataPriority(d_MsgDataPriority),
+	mProcessDataPriority(d_ProcessDataPriority),
+	mMessageSrcIdIndexing(d_MessageSrcIdIndexing),
+	mErrorIndexing(d_ErrorIndexing),
+	mTimestampIndexing(d_TimestampIndexing),
+	mAnybusStatusIndexing(d_AnybusStatusIndexing),
+	mApplStatusIndexing(d_ApplStatusIndexing),
 	mChangeID(0)
 {
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
@@ -86,6 +97,12 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
 	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
 
+	mProcessDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mProcessDataPriorityInterface->SetTitleAndTooltip("Process Data Priority :", "Specifies if the Process Data or Tag information is given priority in the display of multi-layered bubble-text.");
+	mProcessDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_DATA, "Prioritize Data", "Process Data will be displayed as first layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
+
 	AddInterface(mMosiChannelInterface.get());
 	AddInterface(mMisoChannelInterface.get());
 	AddInterface(mClockChannelInterface.get());
@@ -98,6 +115,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mIndexMessageSrcIdInterface.get());
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 	AddInterface(mMsgDataPriorityInterface.get());
+	AddInterface(mProcessDataPriorityInterface.get());
 
 	AddExportOption(0, "Export All Frame Data");
 	AddExportExtension(0, "All Frame Data", "csv");
@@ -152,6 +170,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 
 	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
 	mMsgDataPriority               = U32(mMsgDataPriorityInterface->GetNumber());
+	mProcessDataPriority           = U32(mProcessDataPriorityInterface->GetNumber());
 	mMessageSrcIdIndexing          = bool(mIndexMessageSrcIdInterface->GetValue());
 	mErrorIndexing                 = bool(mIndexErrorsInterface->GetValue());
 	mTimestampIndexing             = U32(mIndexTimestampsInterface->GetNumber());
@@ -193,6 +212,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	{
 		text_archive >> mMessageIndexingVerbosityLevel;
 		text_archive >> mMsgDataPriority;
+		text_archive >> mProcessDataPriority;
 		text_archive >> mMessageSrcIdIndexing;
 		text_archive >> mErrorIndexing;
 		text_archive >> mTimestampIndexing;
@@ -222,6 +242,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << SETTINGS_REVISION_STRING;
 	text_archive << mMessageIndexingVerbosityLevel;
 	text_archive << mMsgDataPriority;
+	text_archive << mProcessDataPriority;
 	text_archive << mMessageSrcIdIndexing;
 	text_archive << mErrorIndexing;
 	text_archive << mTimestampIndexing;
@@ -242,6 +263,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 
 	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
 	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
+	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);

@@ -435,7 +435,16 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					{
 						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 						SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", number_str, (U32)frame.mData2);
-						StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
+						if( (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA) )
+						{
+							/* Conditionally trim the leading 0x specifier */
+							U8 bOffset = ( display_base == DisplayBase::Hexadecimal ) ? 2 : 0;
+							StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), &number_str[bOffset], str, alert, true);
+						}
+						else
+						{
+							StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+						}
 					}
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid:
@@ -501,7 +510,16 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				case e_ABCC_MOSI_WR_PD_FIELD:
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+					if( (mSettings->mProcessDataPriority == e_PROCESS_DATA_PRIORITIZE_DATA) )
+					{
+						/* Conditionally trim the leading 0x specifier */
+						U8 bOffset = ( display_base == DisplayBase::Hexadecimal ) ? 2 : 0;
+						StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), &number_str[bOffset], str, alert, true);
+					}
+					else
+					{
+						StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, str, alert);
+					}
 					break;
 				case e_ABCC_MOSI_CRC32:
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
@@ -577,7 +595,16 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					{
 						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 						SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", number_str, (U32)frame.mData2);
-						StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert, (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA));
+						if( (mSettings->mMsgDataPriority == e_MSG_DATA_PRIORITIZE_DATA) )
+						{
+							/* Conditionally trim the leading 0x specifier */
+							U8 bOffset = ( display_base == DisplayBase::Hexadecimal ) ? 2 : 0;
+							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &number_str[bOffset], str, alert, true);
+						}
+						else
+						{
+							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
+						}
 					}
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid:
@@ -643,7 +670,16 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				case e_ABCC_MISO_RD_PD_FIELD:
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", number_str, frame.mData2);
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
+					if( (mSettings->mProcessDataPriority == e_PROCESS_DATA_PRIORITIZE_DATA) )
+					{
+						/* Conditionally trim the leading 0x specifier */
+						U8 bOffset = ( display_base == DisplayBase::Hexadecimal ) ? 2 : 0;
+						StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &number_str[bOffset], str, alert, true);
+					}
+					else
+					{
+						StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, str, alert);
+					}
 					break;
 				case e_ABCC_MISO_CRC32:
 				{
