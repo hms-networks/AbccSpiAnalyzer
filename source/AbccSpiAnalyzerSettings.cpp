@@ -122,9 +122,9 @@ SpiAnalyzerSettings::~SpiAnalyzerSettings()
 
 bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 {
-	Channel mosi = mMosiChannelInterface->GetChannel();
-	Channel miso = mMisoChannelInterface->GetChannel();
-	Channel clock = mClockChannelInterface->GetChannel();
+	Channel mosi   = mMosiChannelInterface->GetChannel();
+	Channel miso   = mMisoChannelInterface->GetChannel();
+	Channel clock  = mClockChannelInterface->GetChannel();
 	Channel enable = mEnableChannelInterface->GetChannel();
 
 	std::vector<Channel> channels;
@@ -145,23 +145,23 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 		return false;
 	}
 
-	mMosiChannel = mMosiChannelInterface->GetChannel();
-	mMisoChannel = mMisoChannelInterface->GetChannel();
-	mClockChannel = mClockChannelInterface->GetChannel();
+	mMosiChannel   = mMosiChannelInterface->GetChannel();
+	mMisoChannel   = mMisoChannelInterface->GetChannel();
+	mClockChannel  = mClockChannelInterface->GetChannel();
 	mEnableChannel = mEnableChannelInterface->GetChannel();
 
 	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
-	mMsgDataPriority = U32(mMsgDataPriorityInterface->GetNumber());
-	mMessageSrcIdIndexing = bool(mIndexMessageSrcIdInterface->GetValue());
-	mErrorIndexing = bool(mIndexErrorsInterface->GetValue());
-	mTimestampIndexing = U32(mIndexTimestampsInterface->GetNumber());
-	mAnybusStatusIndexing = bool(mIndexAnybusStatusInterface->GetValue());
-	mApplStatusIndexing = bool(mIndexApplStatusInterface->GetValue());
+	mMsgDataPriority               = U32(mMsgDataPriorityInterface->GetNumber());
+	mMessageSrcIdIndexing          = bool(mIndexMessageSrcIdInterface->GetValue());
+	mErrorIndexing                 = bool(mIndexErrorsInterface->GetValue());
+	mTimestampIndexing             = U32(mIndexTimestampsInterface->GetNumber());
+	mAnybusStatusIndexing          = bool(mIndexAnybusStatusInterface->GetValue());
+	mApplStatusIndexing            = bool(mIndexApplStatusInterface->GetValue());
 
 	ClearChannels();
-	AddChannel(mMosiChannel, "MOSI", mMosiChannel != UNDEFINED_CHANNEL);
-	AddChannel(mMisoChannel, "MISO", mMisoChannel != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel, "CLOCK", mClockChannel != UNDEFINED_CHANNEL);
+	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
 
 	return true;
@@ -200,14 +200,10 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		text_archive >> mApplStatusIndexing;
 	}
 
-	//bool success = text_archive >> mUsePackets;  //new paramater added -- do this for backwards compatibility
-	//if( success == false )
-	//	mUsePackets = false; //if the archive fails, set the default value
-
 	ClearChannels();
-	AddChannel(mMosiChannel, "MOSI", mMosiChannel != UNDEFINED_CHANNEL);
-	AddChannel(mMisoChannel, "MISO", mMisoChannel != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel, "CLOCK", mClockChannel != UNDEFINED_CHANNEL);
+	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
 
 	UpdateInterfacesFromSettings();
