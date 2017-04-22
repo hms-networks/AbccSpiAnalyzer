@@ -65,7 +65,10 @@ typedef enum tPacketType
 	e_MSG_FRAGMENT_PACKET,
 	e_ERROR_RESPONSE_PACKET,
 	e_PROTOCOL_ERROR_PACKET,
-	e_MULTI_PACKET
+	e_CHECKSUM_ERROR_PACKET,
+	e_MULTI_PACKET,
+	e_MULTI_ERROR_PACKET,
+	e_CANCEL_PACKET
 }tPacketType;
 
 typedef enum tAbccMosiStates
@@ -226,7 +229,11 @@ protected: /* functions */
 
 	void CheckForIdleAfterPacket(void);
 	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);
-	void SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacketType);
+	void SignalReadyForNewPacket(bool fMosiChannel);
+
+	void SetMosiPacketType(tPacketType ePacketType);
+	void SetMisoPacketType(tPacketType ePacketType);
+	AnalyzerResults::MarkerType GetPacketMarkerType(void);
 
 	void ProcessMosiFrame(tAbccMosiStates eMosiState, U64 lFrameData, S64 lFramesFirstSample);
 	void ProcessMisoFrame(tAbccMisoStates eMisoState, U64 lFrameData, S64 lFramesFirstSample);

@@ -195,7 +195,8 @@ void SpiAnalyzer::WorkerThread()
 			if (fError == true)
 			{
 				/* Signal error, do not commit packet */
-				SignalReadyForNewPacket(false, e_PROTOCOL_ERROR_PACKET);
+				SetMosiPacketType(e_CANCEL_PACKET);
+				SignalReadyForNewPacket(true);
 
 				/* Advance to the next enabled (or idle) state */
 				if (mEnable != NULL)
@@ -548,21 +549,104 @@ bool SpiAnalyzer::IsEnableActive(void)
 	}
 }
 
-void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacketType)
+static bool IsErrorPacketType(tPacketType ePacketType)
+{
+	switch (ePacketType)
+	{
+	case e_PROTOCOL_ERROR_PACKET:
+	case e_CHECKSUM_ERROR_PACKET:
+	case e_ERROR_RESPONSE_PACKET:
+		return true;
+	}
+	return false;
+}
+
+AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
+{
+	AnalyzerResults::MarkerType eMarkerType;
+
+	/* Determine marker type based on packet types:
+	** Dot - Message Fragment
+	** Start - Message Command
+	** Stop - Message Response
+	** Square - Multiple Events (no errors)
+	** ErrorDot - Error Response
+	** ErrorX - Checksum Error
+	** ErrorSquare - Protocol Error or Multiple Events with at least one error
+	*/
+	if ((eMosiPacketType != e_NULL_PACKET) && (eMisoPacketType != e_NULL_PACKET))
+	{
+		/* Multiple events (at least one on each channel) */
+		if (IsErrorPacketType(eMosiPacketType) || IsErrorPacketType(eMisoPacketType))
+		{
+			eMarkerType = AnalyzerResults::ErrorSquare;
+		}
+		else
+		{
+			eMarkerType = AnalyzerResults::Square;
+		}
+	}
+	else
+	{
+		/* Only one event */
+		if ((eMosiPacketType == e_MULTI_ERROR_PACKET) || (eMisoPacketType == e_MULTI_ERROR_PACKET))
+		{
+			eMarkerType = AnalyzerResults::ErrorSquare;
+		}
+		else if ((eMosiPacketType == e_PROTOCOL_ERROR_PACKET) || (eMisoPacketType == e_PROTOCOL_ERROR_PACKET))
+		{
+			eMarkerType = AnalyzerResults::ErrorSquare;
+		}
+		else if ((eMosiPacketType == e_CHECKSUM_ERROR_PACKET) || (eMisoPacketType == e_CHECKSUM_ERROR_PACKET))
+		{
+			eMarkerType = AnalyzerResults::ErrorX;
+		}
+		else if ((eMosiPacketType == e_ERROR_RESPONSE_PACKET) || (eMisoPacketType == e_ERROR_RESPONSE_PACKET))
+		{
+			eMarkerType = AnalyzerResults::ErrorDot;
+		}
+		else if ((eMosiPacketType == e_MULTI_PACKET) || (eMisoPacketType == e_MULTI_PACKET))
+		{
+			eMarkerType = AnalyzerResults::Square;
+		}
+		else if ((eMosiPacketType == e_RESPONSE_PACKET) || (eMisoPacketType == e_RESPONSE_PACKET))
+		{
+			eMarkerType = AnalyzerResults::Stop;
+		}
+		else if ((eMosiPacketType == e_COMMAND_PACKET) || (eMisoPacketType == e_COMMAND_PACKET))
+		{
+			eMarkerType = AnalyzerResults::Start;
+		}
+		else if ((eMosiPacketType == e_MSG_FRAGMENT_PACKET) || (eMisoPacketType == e_MSG_FRAGMENT_PACKET))
+		{
+			eMarkerType = AnalyzerResults::Dot;
+		}
+		else if ((eMosiPacketType == e_NULL_PACKET) || (eMisoPacketType == e_NULL_PACKET))
+		{
+			eMarkerType = AnalyzerResults::One;
+		}
+		else
+		{
+			eMarkerType = AnalyzerResults::UpArrow;
+		}
+	}
+
+	return eMarkerType;
+}
+
+void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel)
 {
 	bool fStartNewPacket = false;
 	if (fMosiChannel)
 	{
 		fMosiReadyForNewPacket = true;
-		eMosiPacketType = ePacketType;
 	}
 	else
 	{
 		fMisoReadyForNewPacket = true;
-		eMisoPacketType = ePacketType;
 	}
 
-	if (ePacketType == e_PROTOCOL_ERROR_PACKET)
+	if (eMosiPacketType == e_CANCEL_PACKET)
 	{
 		fStartNewPacket = true;
 		mResults->CancelPacketAndStartNewPacket();
@@ -586,34 +670,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 		{
 			if (mEnable != NULL)
 			{
-				AnalyzerResults::MarkerType eMarkerType = AnalyzerResults::One;
-				/* If either MISO or MOSI contain an error report it,
-				** Else if either MISO or MOSI contain an response report it,
-				** Else report any command. */
-				if ((eMosiPacketType == e_PROTOCOL_ERROR_PACKET) || (eMisoPacketType == e_PROTOCOL_ERROR_PACKET))
-				{
-					eMarkerType = AnalyzerResults::ErrorX;
-				}
-				else if ((eMosiPacketType == e_ERROR_RESPONSE_PACKET) || (eMisoPacketType == e_ERROR_RESPONSE_PACKET))
-				{
-					eMarkerType = AnalyzerResults::ErrorDot;
-				}
-				else if ((eMosiPacketType != e_NULL_PACKET) && (eMisoPacketType != e_NULL_PACKET))
-				{
-					eMarkerType = AnalyzerResults::Square;
-				}
-				else if ((eMosiPacketType == e_RESPONSE_PACKET) || (eMisoPacketType == e_RESPONSE_PACKET))
-				{
-					eMarkerType = AnalyzerResults::Stop;
-				}
-				else if ((eMosiPacketType == e_COMMAND_PACKET) || (eMisoPacketType == e_COMMAND_PACKET))
-				{
-					eMarkerType = AnalyzerResults::Start;
-				}
-				else if ((eMosiPacketType == e_MSG_FRAGMENT_PACKET) || (eMisoPacketType == e_MSG_FRAGMENT_PACKET))
-				{
-					eMarkerType = AnalyzerResults::Dot;
-				}
+				AnalyzerResults::MarkerType eMarkerType = GetPacketMarkerType();
 
 				if (eMarkerType != AnalyzerResults::One)
 				{
@@ -630,6 +687,8 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel, tPacketType ePacket
 	{
 		fMosiReadyForNewPacket = false;
 		fMisoReadyForNewPacket = false;
+		eMosiPacketType = e_NULL_PACKET;
+		eMisoPacketType = e_NULL_PACKET;
 
 		/* Check if any additional clocks appear on SCLK before enable goes inactive */
 		CheckForIdleAfterPacket();
@@ -868,41 +927,46 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 	/* Commit the processed frame */
 	mResults->AddFrame(result_frame);
+
 	if (eState == e_ABCC_MISO_CRC32)
 	{
-		tPacketType ePacketType;
+		tPacketType ePacketType = e_NULL_PACKET;
 		if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 		{
-			ePacketType = e_PROTOCOL_ERROR_PACKET;
+			if (eState == e_ABCC_MISO_CRC32)
+			{
+				SetMisoPacketType(e_CHECKSUM_ERROR_PACKET);
+			}
+			else
+			{
+				SetMisoPacketType(e_PROTOCOL_ERROR_PACKET);
+			}
 		}
-		else if (fMisoNewMsg)
+
+		if (fMisoNewMsg)
 		{
 			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
 				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
 			{
-				ePacketType = e_MSG_FRAGMENT_PACKET;
+				SetMisoPacketType(e_MSG_FRAGMENT_PACKET);
 			}
 			else
 			{
 				if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
-					ePacketType = e_COMMAND_PACKET;
+					SetMisoPacketType(e_COMMAND_PACKET);
 				}
 				else if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
 				{
-					ePacketType = e_ERROR_RESPONSE_PACKET;
+					SetMisoPacketType(e_ERROR_RESPONSE_PACKET);
 				}
 				else
 				{
-					ePacketType = e_RESPONSE_PACKET;
+					SetMisoPacketType(e_RESPONSE_PACKET);
 				}
 			}
 		}
-		else
-		{
-			ePacketType = e_NULL_PACKET;
-		}
-		SignalReadyForNewPacket(false, ePacketType);
+		SignalReadyForNewPacket(false);
 	}
 }
 
@@ -1057,41 +1121,129 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 	/* Commit the processed frame */
 	mResults->AddFrame(result_frame);
+
+	if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	{
+		if (eState == e_ABCC_MOSI_CRC32)
+		{
+			SetMosiPacketType(e_CHECKSUM_ERROR_PACKET);
+		}
+		/*else
+		{
+			SetMosiPacketType(e_PROTOCOL_ERROR_PACKET);
+		}*/
+	}
+
 	if (eState == e_ABCC_MOSI_PAD)
 	{
-		tPacketType ePacketType;
-		if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
-		{
-			ePacketType = e_PROTOCOL_ERROR_PACKET;
-		}
-		else if (fMosiNewMsg)
+		if (fMosiNewMsg)
 		{
 			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
 				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
 			{
-				ePacketType = e_MSG_FRAGMENT_PACKET;
+				SetMosiPacketType(e_MSG_FRAGMENT_PACKET);
 			}
 			else
 			{
 				if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
-					ePacketType = e_COMMAND_PACKET;
+					SetMosiPacketType(e_COMMAND_PACKET);
 				}
 				else if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
 				{
-					ePacketType = e_ERROR_RESPONSE_PACKET;
+					SetMosiPacketType(e_ERROR_RESPONSE_PACKET);
 				}
 				else
 				{
-					ePacketType = e_RESPONSE_PACKET;
+					SetMosiPacketType(e_RESPONSE_PACKET);
 				}
 			}
 		}
-		else
+		SignalReadyForNewPacket(true);
+	}
+}
+
+void SpiAnalyzer::SetMosiPacketType(tPacketType ePacketType)
+{
+	switch (ePacketType)
+	{
+	case e_NULL_PACKET:
+		eMosiPacketType = ePacketType;
+		break;
+	case e_PROTOCOL_ERROR_PACKET:
+	case e_CHECKSUM_ERROR_PACKET:
+	case e_ERROR_RESPONSE_PACKET:
+		if (eMosiPacketType == e_NULL_PACKET)
 		{
-			ePacketType = e_NULL_PACKET;
+			eMosiPacketType = ePacketType;
 		}
-		SignalReadyForNewPacket(true, ePacketType);
+		else if (eMosiPacketType != ePacketType)
+		{
+			eMosiPacketType = e_MULTI_ERROR_PACKET;
+		}
+		break;
+	case e_RESPONSE_PACKET:
+	case e_COMMAND_PACKET:
+	case e_MSG_FRAGMENT_PACKET:
+		if (eMosiPacketType == e_NULL_PACKET)
+		{
+			eMosiPacketType = ePacketType;
+		}
+		else if (IsErrorPacketType(eMosiPacketType))
+		{
+			eMosiPacketType = e_MULTI_ERROR_PACKET;
+		}
+		else if (eMosiPacketType != ePacketType)
+		{
+			eMosiPacketType = e_MULTI_PACKET;
+		}
+		break;
+	default:
+	case e_MULTI_PACKET:
+	case e_MULTI_ERROR_PACKET:
+		break;
+	}
+}
+
+void SpiAnalyzer::SetMisoPacketType(tPacketType ePacketType)
+{
+	switch (ePacketType)
+	{
+	case e_NULL_PACKET:
+		eMisoPacketType = ePacketType;
+		break;
+	case e_PROTOCOL_ERROR_PACKET:
+	case e_CHECKSUM_ERROR_PACKET:
+	case e_ERROR_RESPONSE_PACKET:
+		if (eMisoPacketType == e_NULL_PACKET)
+		{
+			eMisoPacketType = ePacketType;
+		}
+		else if (eMisoPacketType != ePacketType)
+		{
+			eMisoPacketType = e_MULTI_ERROR_PACKET;
+		}
+		break;
+	case e_RESPONSE_PACKET:
+	case e_COMMAND_PACKET:
+	case e_MSG_FRAGMENT_PACKET:
+		if (eMisoPacketType == e_NULL_PACKET)
+		{
+			eMisoPacketType = ePacketType;
+		}
+		else if (IsErrorPacketType(eMisoPacketType))
+		{
+			eMisoPacketType = e_MULTI_ERROR_PACKET;
+		}
+		else if (eMisoPacketType != ePacketType)
+		{
+			eMisoPacketType = e_MULTI_PACKET;
+		}
+		break;
+	default:
+	case e_MULTI_PACKET:
+	case e_MULTI_ERROR_PACKET:
+		break;
 	}
 }
 
