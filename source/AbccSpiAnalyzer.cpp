@@ -645,7 +645,14 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 
 	if (mEnable != NULL)
 	{
-		if (mClock->WouldAdvancingToAbsPositionCauseTransition(mEnable->GetSampleOfNextEdge()))
+		U64 lNextSample = mEnable->GetSampleOfNextEdge();
+		if (lNextSample <= mClock->GetSampleNumber())
+		{
+			mEnable->AdvanceToAbsPosition(mClock->GetSampleNumber());
+			lNextSample = mEnable->GetSampleOfNextEdge();
+		}
+
+		if (mClock->WouldAdvancingToAbsPositionCauseTransition(lNextSample))
 		{
 			mChannel = mSettings->mEnableChannel;
 			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
