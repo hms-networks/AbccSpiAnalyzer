@@ -1,6 +1,6 @@
 /*******************************************************************************
 ********************************************************************************
-** COPYRIGHT NOTIFICATION (c) 2014 HMS Industrial Networks AB                 **
+** COPYRIGHT NOTIFICATION (c) 2017 HMS Industrial Networks AB                 **
 **                                                                            **
 ** This code is the property of HMS Industrial Networks AB.                   **
 ** The source code may not be reproduced, distributed, or used without        **
@@ -15,42 +15,40 @@
 
 ********************************************************************************
 ********************************************************************************
-** This file contains Sync Object specific definitions used by
-** ABCC modules as well as applications designed to use the Sync Object..
+** This file contains OPC UA specific definitions.
 ********************************************************************************
 ********************************************************************************
 */
 
-#ifndef ABP_SYNC_H_
-#define ABP_SYNC_H_
-
-#include "abp.h"
+#ifndef ABP_OPCUA_H_
+#define ABP_OPCUA_H_
 
 /*------------------------------------------------------------------------------
-** The Sync Object specific instance attributes.
+** OPC UA instance attributes
 **------------------------------------------------------------------------------
 */
-#define ABP_SYNC_IA_CYCLE_TIME               1    /* Cycle time */
-#define ABP_SYNC_IA_OUTPUT_VALID             2    /* Output valid */
-#define ABP_SYNC_IA_INPUT_CAPTURE            3    /* Input capture */
-#define ABP_SYNC_IA_OUTPUT_PROCESSING        4    /* Output processing */
-#define ABP_SYNC_IA_INPUT_PROCESSING         5    /* Input processing */
-#define ABP_SYNC_IA_MIN_CYCLE_TIME           6    /* Min cycle time */
-#define ABP_SYNC_IA_SYNC_MODE                7    /* Sync mode */
-#define ABP_SYNC_IA_SUPPORTED_SYNC_MODES     8    /* Supported sync modes */
+#define ABP_OPCUA_IA_MODEL                   1
+#define ABP_OPCUA_IA_APPLICATION_URI         2
+#define ABP_OPCUA_IA_VENDOR_NAMESPACE_URI    3
+#define ABP_OPCUA_IA_DEVICE_TYPE_NAME        4
+#define ABP_OPCUA_IA_DEVICE_INST_NAME        5
+#define ABP_OPCUA_IA_PRODUCT_URI             6
 
 /*------------------------------------------------------------------------------
-** The data size of the sync object specific instance attributes
-** (in bytes).
+** The data size of the OPC UA instance attributes
 **------------------------------------------------------------------------------
 */
-#define ABP_SYNC_IA_CYCLE_TIME_DS            ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_OUTPUT_VALID_DS          ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_INPUT_CAPTURE_DS         ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_OUTPUT_PROCESSING_DS     ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_INPUT_PROCESSING_DS      ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_MIN_CYCLE_TIME_DS        ABP_UINT32_SIZEOF
-#define ABP_SYNC_IA_SYNC_MODE_DS             ABP_UINT16_SIZEOF
-#define ABP_SYNC_IA_SUPPORTED_SYNC_MODES_DS  ABP_UINT16_SIZEOF
+#define ABP_OPCUA_IA_MODEL_DS                ( ABP_UINT8_SIZEOF )
+
+/*------------------------------------------------------------------------------
+** Values of Model attribute
+**------------------------------------------------------------------------------
+*/
+typedef enum ABP_OpcuaModel
+{
+   ABP_OPCUA_MODEL_DISABLED            = 0,
+   ABP_OPCUA_MODEL_CC40                = 1
+}
+ABP_OpcuaModelType;
 
 #endif  /* inclusion lock */

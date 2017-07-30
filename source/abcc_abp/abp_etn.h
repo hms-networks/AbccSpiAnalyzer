@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -80,6 +75,12 @@
 #define ABP_ETN_IA_IP_CONFIGURATION            16
 #define ABP_ETN_IA_IP_ADDRESS_BYTE_0_2         17
 #define ABP_ETN_IA_ETH_PHY_CONFIG              18
+#define ABP_ETN_IA_SNMP_READ_ONLY              20
+#define ABP_ETN_IA_SNMP_READ_WRITE             21
+#define ABP_ETN_IA_DHCP_OPTION_61_SOURCE       22
+#define ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR  23
+#define ABP_ETN_IA_ENABLE_DHCP_CLIENT          24
+
 
 /*------------------------------------------------------------------------------
 **
@@ -89,23 +90,28 @@
 **------------------------------------------------------------------------------
 */
 
-#define ABP_ETN_IA_MAC_ADDRESS_DS               ( 6 * ABP_UINT8_SIZEOF )
-#define ABP_ETN_IA_ENABLE_HICP_DS               ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_WEB_DS                ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_MOD_TCP_DS            ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS_DS     ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_FTP_DS                ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_ADMIN_MODE_DS         ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_NETWORK_STATUS_DS            ABP_UINT16_SIZEOF
-#define ABP_ETN_IA_PORT1_MAC_ADDRESS_DS         ( 6 * ABP_UINT8_SIZEOF )
-#define ABP_ETN_IA_PORT2_MAC_ADDRESS_DS         ( 6 * ABP_UINT8_SIZEOF )
-#define ABP_ETN_IA_ENABLE_ACD_DS                ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_PORT1_STATE_DS               ABP_ENUM_SIZEOF
-#define ABP_ETN_IA_PORT2_STATE_DS               ABP_ENUM_SIZEOF
-#define ABP_ETN_IA_ENABLE_WEB_UPDATE_DS         ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_ENABLE_HICP_RESET_DS         ABP_BOOL_SIZEOF
-#define ABP_ETN_IA_IP_CONFIGURATION_DS          ( 3 * ABP_UINT32_SIZEOF )
-#define ABP_ETN_IA_IP_ADDRESS_BYTE_0_2_DS       ( 3 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_MAC_ADDRESS_DS                  ( 6 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_ENABLE_HICP_DS                  ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_WEB_DS                   ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_MOD_TCP_DS               ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS_DS        ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_FTP_DS                   ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_ADMIN_MODE_DS            ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_NETWORK_STATUS_DS               ABP_UINT16_SIZEOF
+#define ABP_ETN_IA_PORT1_MAC_ADDRESS_DS            ( 6 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_PORT2_MAC_ADDRESS_DS            ( 6 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_ENABLE_ACD_DS                   ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_PORT1_STATE_DS                  ABP_ENUM_SIZEOF
+#define ABP_ETN_IA_PORT2_STATE_DS                  ABP_ENUM_SIZEOF
+#define ABP_ETN_IA_ENABLE_WEB_UPDATE_DS            ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_HICP_RESET_DS            ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_IP_CONFIGURATION_DS             ( 3 * ABP_UINT32_SIZEOF )
+#define ABP_ETN_IA_IP_ADDRESS_BYTE_0_2_DS          ( 3 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_SNMP_READ_ONLY_DS               ( 32 * ABP_CHAR_SIZEOF )
+#define ABP_ETN_IA_SNMP_READ_WRITE_DS              ( 32 * ABP_CHAR_SIZEOF )
+#define ABP_ETN_IA_DHCP_OPTION_61_SOURCE_DS        ABP_ENUM_SIZEOF
+#define ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR_DS   ( 64 * ABP_UINT8_SIZEOF )
+#define ABP_ETN_IA_ENABLE_DHCP_CLIENT_DS           ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------
@@ -138,6 +144,25 @@ typedef enum ABP_EtnPortStateType
    ABP_ETN_IA_PORT_STATE_NUM_VALUES         /* Number of port states          */
 }
 ABP_EtnPortStateType;
+
+
+/*------------------------------------------------------------------------------
+**
+** DHCP option 61 source attribute values
+**
+**------------------------------------------------------------------------------
+*/
+
+typedef enum ABP_DHCPOption61SourceType
+{
+   ABP_ETN_IA_DHCP_OPTION_61_SOURCE_DISABLE     = 0x00,
+   ABP_ETN_IA_DHCP_OPTION_61_SOURCE_MACID       = 0x01,
+   ABP_ETN_IA_DHCP_OPTION_61_SOURCE_HOST_NAME   = 0x02,
+   ABP_ETN_IA_DHCP_OPTION_61_SOURCE_GENERIC_STR = 0x03,
+
+   ABP_ETN_IA_DHCP_OPTION_61_SOURCE_NUM_VALUES
+}
+ABP_DHCPOption61SourceType;
 
 
 /*------------------------------------------------------------------------------

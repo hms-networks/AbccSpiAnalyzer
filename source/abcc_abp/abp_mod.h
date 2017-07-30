@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -73,6 +68,7 @@
 #define ABP_MOD_IA_ADI_INDEXING_BITS        9
 #define ABP_MOD_IA_MESSAGE_FORWARDING       10
 #define ABP_MOD_IA_RW_OFFSET                11
+#define ABP_MOD_IA_DISABLE_DEVICE_ID_FC     12
 
 
 /*------------------------------------------------------------------------------
@@ -86,6 +82,7 @@
 #define ABP_MOD_IA_ADI_INDEXING_BITS_DS            ABP_UINT8_SIZEOF
 #define ABP_MOD_IA_MESSAGE_FORWARDING_DS           ABP_BOOL_SIZEOF
 #define ABP_MOD_IA_RW_OFFSET_DS                    ( 2 * ABP_SINT16_SIZEOF )
+#define ABP_MOD_IA_DISABLE_DEVICE_ID_FC_DS         ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------

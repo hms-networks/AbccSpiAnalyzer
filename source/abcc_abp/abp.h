@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -403,6 +398,9 @@ ABP_AppStatusType;
 #define ABP_NW_TYPE_EPL                   0x009F  /* POWERLINK */
 #define ABP_NW_TYPE_CFN                   0x009E  /* CC-Link IE Field Network */
 #define ABP_NW_TYPE_CET                   0x00A3  /* Common Ethernet */
+#define ABP_NW_TYPE_EIP_2P_BB_IIOT        0x00AB  /* EtherNet/IP IIoT */
+#define ABP_NW_TYPE_PIR_IIOT              0x00AD  /* PROFINET IRT IIoT */
+#define ABP_NW_TYPE_PIR_FO_IIOT           0x00AE  /* PROFINET IRT FO IIoT */
 
 
 
@@ -627,6 +625,7 @@ ABP_LangType;
 **------------------------------------------------------------------------------
 */
 
+#define ABP_OBJ_NUM_OPCUA           227   /* OPC Unified Architecture         */
 #define ABP_OBJ_NUM_EME             228   /* Energy Measurement               */
 #define ABP_OBJ_NUM_PNAM            229   /* PROFINET Asset Management        */
 #define ABP_OBJ_NUM_CFN             230   /* CC-Link IE Field Network         */
@@ -1115,6 +1114,22 @@ ABP_DiEventCodeType;
 #define ABP_NW_EXCPT_INFO_NONE            0x00  /* No information             */
 
 
+/*------------------------------------------------------------------------------
+**
+** The Network data format values.
+**
+**------------------------------------------------------------------------------
+*/
+
+typedef enum ABP_NwDataFormatType
+{
+   ABP_NW_DATA_FORMAT_LSB_FIRST = 0,                /* 'Little endian'        */
+   ABP_NW_DATA_FORMAT_MSB_FIRST = 1,                /* 'Big endian'           */
+   ABP_NW_DATA_FORMAT_NUM_FORMATS                   /* Number of data formats */
+}
+ABP_NwDataFormatType;
+
+
 /*******************************************************************************
 **
 ** Network configuration object constants.
@@ -1323,6 +1338,11 @@ ABP_DiEventCodeType;
 #define ABP_APP_IA_PAR_CRTL_SUM           4   /* ABCC40 */
 #define ABP_APP_IA_FW_AVAILABLE           5   /* ABCC40 */
 #define ABP_APP_IA_HW_CONF_ADDR           6   /* ABCC40 */
+#define ABP_APP_IA_MODE                   7   /* ABCC40 */
+#define ABP_APP_IA_VENDOR_NAME            8   /* ABCC40 */
+#define ABP_APP_IA_PRODUCT_NAME           9   /* ABCC40 */
+#define ABP_APP_IA_FW_VERSION             10  /* ABCC40 */
+#define ABP_APP_IA_HW_VERSION             11  /* ABCC40 */
 
 
 /*------------------------------------------------------------------------------
@@ -1337,6 +1357,11 @@ ABP_DiEventCodeType;
 #define ABP_APP_IA_PAR_CRTL_SUM_DS        ( 16 * ABP_UINT8_SIZEOF ) /* ABCC40 */
 #define ABP_APP_IA_FW_AVAILABLE_DS        ABP_BOOL_SIZEOF           /* ABCC40 */
 #define ABP_APP_IA_HW_CONF_ADDR_DS        ABP_BOOL_SIZEOF           /* ABCC40 */
+#define ABP_APP_IA_MODE_DS                ABP_BITS32_SIZEOF         /* ABCC40 */
+#define ABP_APP_IA_VENDOR_NAME_MAX_DS     ( 64 * ABP_CHAR_SIZEOF )  /* ABCC40 */
+#define ABP_APP_IA_PRODUCT_NAME_MAX_DS    ( 64 * ABP_CHAR_SIZEOF )  /* ABCC40 */
+#define ABP_APP_IA_FW_VERSION_DS          ( 3 * ABP_UINT8_SIZEOF )  /* ABCC40 */
+#define ABP_APP_IA_HW_VERSION_DS          ABP_UINT16_SIZEOF         /* ABCC40 */
 
 
 /*------------------------------------------------------------------------------
@@ -1349,6 +1374,16 @@ ABP_DiEventCodeType;
 #define ABP_APP_CMD_RESET_REQUEST         0x10
 #define ABP_APP_CMD_CHANGE_LANG_REQUEST   0x11
 #define ABP_APP_CMD_RESET_DIAGNOSTIC      0x12	 /* ABCC40 */
+
+/*------------------------------------------------------------------------------
+**
+** Definition for different modes for attribute ABP_APP_IA_MODE.
+**
+**------------------------------------------------------------------------------
+*/
+
+#define ABP_APP_MODE_NORMAL_LED          0x00000000
+#define ABP_APP_MODE_AIDA_LED            0x00000001
 
 /*******************************************************************************
 **

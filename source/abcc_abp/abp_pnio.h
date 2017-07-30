@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -89,6 +84,7 @@
 #define ABP_PNIO_IA_CUSTOM_STATION_NAME         24
 #define ABP_PNIO_IA_IM_MODULE_ORDER_ID          25
 #define ABP_PNIO_IA_IM_ANNOTATION               26
+#define ABP_PNIO_IA_IM5_ENABLED                 27
 
 /*------------------------------------------------------------------------------
 **
@@ -122,6 +118,7 @@
 #define ABP_PNIO_IA_CUSTOM_STATION_NAME_DS         ( 58 * ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_IM_MODULE_ORDER_ID_DS          ( 64 * ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_IM_ANNOTATION_ID_DS            ( 64 * ABP_UINT8_SIZEOF )
+#define ABP_PNIO_IA_IM5_ENABLE_DS                  ABP_BOOL_SIZEOF
 
 /*------------------------------------------------------------------------------
 **

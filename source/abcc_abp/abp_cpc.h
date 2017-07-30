@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -83,12 +78,13 @@
 **------------------------------------------------------------------------------
 */
 
-#define ABP_CPC_IA_PORT_TYPE              1     /* Port type                  */
-#define ABP_CPC_IA_PORT_NUMBER            2     /* Port number                */
-#define ABP_CPC_IA_LINK_PATH              3     /* Link path                  */
-#define ABP_CPC_IA_PORT_NAME              4     /* Port name                  */
-#define ABP_CPC_IA_NODE_ADDRESS           7     /* Node address               */
-#define ABP_CPC_IA_PORT_NODE_RANGE        8     /* Port node range            */
+#define ABP_CPC_IA_PORT_TYPE                 1   /* Port type                 */
+#define ABP_CPC_IA_PORT_NUMBER               2   /* Port number               */
+#define ABP_CPC_IA_LINK_PATH                 3   /* Link path                 */
+#define ABP_CPC_IA_PORT_NAME                 4   /* Port name                 */
+#define ABP_CPC_IA_NODE_ADDRESS              7   /* Node address              */
+#define ABP_CPC_IA_PORT_NODE_RANGE           8   /* Port node range           */
+#define ABP_CPC_IA_PORT_ROUTING_CAPABILITIES 10  /* Port routing capabilities */
 
 
 /*------------------------------------------------------------------------------
@@ -99,12 +95,13 @@
 **------------------------------------------------------------------------------
 */
 
-#define ABP_CPC_IA_PORT_TYPE_DS           ABP_UINT16_SIZEOF
-#define ABP_CPC_IA_PORT_NUMBER_DS         ABP_UINT16_SIZEOF
-#define ABP_CPC_IA_LINK_PATH_MAX_DS       12
-#define ABP_CPC_IA_PORT_NAME_MAX_DS       64
-#define ABP_CPC_IA_NODE_ADDRESS_MAX_DS    64
-#define ABP_CPC_IA_PORT_NODE_RANGE_DS     ( 2 * ABP_UINT16_SIZEOF )
+#define ABP_CPC_IA_PORT_TYPE_DS                    ABP_UINT16_SIZEOF
+#define ABP_CPC_IA_PORT_NUMBER_DS                  ABP_UINT16_SIZEOF
+#define ABP_CPC_IA_LINK_PATH_MAX_DS                12
+#define ABP_CPC_IA_PORT_NAME_MAX_DS                64
+#define ABP_CPC_IA_NODE_ADDRESS_MAX_DS             64
+#define ABP_CPC_IA_PORT_NODE_RANGE_DS              ( 2 * ABP_UINT16_SIZEOF )
+#define ABP_CPC_IA_PORT_ROUTING_CAPABILITIES_DS    ABP_UINT32_SIZEOF
 
 
 #endif  /* inclusion lock */

@@ -1,10 +1,5 @@
 /*******************************************************************************
 ********************************************************************************
-**                                                                            **
-** ABP version 7.31.01 (2016-09-16)                                           **
-**                                                                            */
-/*******************************************************************************
-********************************************************************************
 **
 ** File Name
 ** ---------
@@ -65,6 +60,9 @@
 #define ABP_NWETN_IA_MAC_ID                1
 #define ABP_NWETN_IA_PORT1_MAC_ID          2
 #define ABP_NWETN_IA_PORT2_MAC_ID          3
+#define ABP_NWETN_IA_MAC_ADDRESS           4
+#define ABP_NWETN_IA_INTERFACE_COUNTERS    5
+#define ABP_NWETN_IA_MEDIA_COUNTERS        6
 
 
 /*------------------------------------------------------------------------------
@@ -78,6 +76,9 @@
 #define ABP_NWETN_IA_MAC_ID_DS               ( 6 * ABP_UINT8_SIZEOF )
 #define ABP_NWETN_IA_PORT1_MAC_ID_DS         ( 6 * ABP_UINT8_SIZEOF )
 #define ABP_NWETN_IA_PORT2_MAC_ID_DS         ( 6 * ABP_UINT8_SIZEOF )
+#define ABP_NWETN_IA_MAC_ADDRESS_DS          ( 6 * ABP_UINT8_SIZEOF )
+#define ABP_NWETN_IA_INTERFACE_COUNTERS_DS   ( 11 * ABP_UINT32_SIZEOF )
+#define ABP_NWETN_IA_MEDIA_COUNTERS_DS       ( 12 * ABP_UINT32_SIZEOF )
 
 #endif  /* inclusion lock */
 

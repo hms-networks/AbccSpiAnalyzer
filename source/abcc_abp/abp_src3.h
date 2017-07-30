@@ -4,7 +4,7 @@
 ** File Name
 ** ---------
 **
-** abp_smtp.h
+** abp_src3.h
 **
 ********************************************************************************
 ********************************************************************************
@@ -12,10 +12,10 @@
 ** Description
 ** -----------
 **
-** ABP - Anybus-CC SMTP Client Interface Object Protocol Definitions.
+** abp_src3 - Anybus-CC Protocol - SERCOS III Definitions.
 **
-** This software component contains SMTP definitions used by Anybus-CC
-** modules as well as applications designed to use such modules.
+** This software component contains protocol definitions used by the SERCOS III
+** Anybus-CC module as well as applications designed to use such modules.
 **
 ********************************************************************************
 ********************************************************************************
@@ -37,13 +37,13 @@
 ********************************************************************************
 */
 
-#ifndef ABP_SMTP_H
-#define ABP_SMTP_H
+#ifndef ABP_SRC3_H
+#define ABP_SRC3_H
 
 
 /*******************************************************************************
 **
-** SMTP Client Interface object constants.
+** Anybus-CC SERCOS III object constants.
 **
 ** Object revision: 1.
 **
@@ -52,88 +52,122 @@
 
 /*------------------------------------------------------------------------------
 **
-** The SMTP Client Interface object specific object attributes.
+** SERCOS III object instance number
 **
 **------------------------------------------------------------------------------
 */
 
-#define ABP_SMTP_OA_MAX_INST              11    /* Max number of instances    */
-#define ABP_SMTP_OA_EMAILS_SENT           12    /* Emails sent                */
-#define ABP_SMTP_OA_EMAIL_FAILED          13    /* Emails failed to send      */
+#define ABP_SRC3_OI_ID                     1
 
 
 /*------------------------------------------------------------------------------
 **
-** The data size of the Anybus-CC SMTP Client Interface object specific
-** attributes (in bytes).
+** SERCOS III object instance attributes.
 **
 **------------------------------------------------------------------------------
 */
 
-#define ABP_SMTP_OA_MAX_INST_DS            ABP_UINT16_SIZEOF
-#define ABP_SMTP_OA_EMAILS_SENT_DS         ABP_UINT16_SIZEOF
-#define ABP_SMTP_OA_EMAIL_FAILED_DS        ABP_UINT16_SIZEOF
+#define ABP_SRC3_IA_COMPONENT_NAME         1
+#define ABP_SRC3_IA_VENDOR_CODE            2
+#define ABP_SRC3_IA_DEVICE_NAME            3
+#define ABP_SRC3_IA_VENDOR_DEVICE_ID       4
+#define ABP_SRC3_IA_SOFTWARE_REVISION      5
+#define ABP_SRC3_IA_SERIAL_NUMBER          6
+#define ABP_SRC3_IA_MAJOR_EVT_LATCHING     7
+
+/*------------------------------------------------------------------------------
+**
+** The data size of the SERCOS III object instance attributes (in bytes).
+**
+**------------------------------------------------------------------------------
+*/
+
+#define ABP_SRC3_CFG_STR_LEN               32
+
+#define ABP_SRC3_IA_COMPONENT_NAME_DS      ( ABP_CHAR_SIZEOF * ABP_SRC3_CFG_STR_LEN )
+#define ABP_SRC3_IA_VENDOR_CODE_DS         ABP_UINT16_SIZEOF
+#define ABP_SRC3_IA_DEVICE_NAME_DS         ( ABP_CHAR_SIZEOF * ABP_SRC3_CFG_STR_LEN )
+#define ABP_SRC3_IA_VENDOR_DEVICE_ID_DS    ( ABP_CHAR_SIZEOF * ABP_SRC3_CFG_STR_LEN )
+#define ABP_SRC3_IA_SOFTWARE_REVISION_DS   ( ABP_CHAR_SIZEOF * ABP_SRC3_CFG_STR_LEN )
+#define ABP_SRC3_IA_SERIAL_NUMBER_DS       ( ABP_CHAR_SIZEOF * ABP_SRC3_CFG_STR_LEN )
+#define ABP_SRC3_IA_MAJOR_EVT_LATCHING_DS  ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------
 **
-** The SMTP Client Interface instance attributes.
+** The SERCOS III Object specific message commands.
 **
 **------------------------------------------------------------------------------
 */
 
-#define ABP_SMTP_IA_FROM                   1    /* From address               */
-#define ABP_SMTP_IA_TO                     2    /* To address                 */
-#define ABP_SMTP_IA_SUBJECT                3    /* Message subject            */
-#define ABP_SMTP_IA_MESSAGE                4    /* Message body               */
+#define ABP_SRC3_CMD_RESET_DIAGNOSTIC     0x10
 
+
+/*******************************************************************************
+**
+** Network object constants.
+**
+********************************************************************************
+*/
 
 /*------------------------------------------------------------------------------
 **
-** The data size of the Anybus-CC SMTP Client Interface object instance
-** attributes (in bytes).
+** Network object instance attribute # 7 information
+** SERCOS III specific exception constants
 **
 **------------------------------------------------------------------------------
 */
 
-#define ABP_SMTP_IA_FROM_DS               ( 255 * ABP_UINT8_SIZEOF )
-#define ABP_SMTP_IA_TO_DS                 ( 255 * ABP_UINT8_SIZEOF )
-#define ABP_SMTP_IA_SUBJECT_DS            ( 255 * ABP_UINT8_SIZEOF )
-#define ABP_SMTP_IA_MESSAGE_DS            ( 255 * ABP_UINT8_SIZEOF )
+#define ABP_SRC3_NW_EXCPT_ILLEGAL_DATA_TYPE           1
+#define ABP_SRC3_NW_EXCPT_INSTANCE_BY_ORDER_ERROR     2
+#define ABP_SRC3_NW_EXCPT_HIGHEST_INSTANCE_ERROR      3
+#define ABP_SRC3_NW_EXCPT_NUMBER_OF_INSTANCES_ERROR   4
+#define ABP_SRC3_NW_EXCPT_INSTANCE_LOWER_THAN_ORDER_NUMBER  5
 
+
+/*******************************************************************************
+**
+** Network configuration object constants.
+**
+********************************************************************************
+*/
 
 /*------------------------------------------------------------------------------
 **
-** The SMTP Client Interface object specific message commands.
+** The Network configuration instances common to most Anybus-CC modules.
+**
+** Note:
+**       In case the values of these instances originate from input devices
+**       controlled by the end user (DIP switches or similar), the application
+**       shall keep these instances updated at all times because some networks
+**       require that a changed switch is indicated by the LED’s.
 **
 **------------------------------------------------------------------------------
 */
 
-#define ABP_SMTP_CMD_SEND_EMAIL                 0x10
-#define ABP_SMTP_CMD_SEND_EMAIL_FROM_FILE       0x11
+#define ABP_NC_INST_NUM_SERCOS_ADR       0x03
 
+/*******************************************************************************
+**
+** Diagnostic object constants.
+**
+********************************************************************************
+*/
 
 /*------------------------------------------------------------------------------
 **
-** SMTP Client Interface object specific error codes.
+** Device specific emergency (EMCY) error codes.
+** These should be used in combination with the ABP_DI_EVENT_NW_SPECIFIC
+** diagnostic code.
 **
 **------------------------------------------------------------------------------
 */
-
-#define ABP_SMTP_NO_EMAIL_SERVER                1
-#define ABP_SMTP_SERVER_NOT_READY               2
-#define ABP_SMTP_AUTHENTICATION_ERROR           3
-#define ABP_SMTP_SOCKET_ERROR                   4
-#define ABP_SMTP_SSI_SCAN_ERROR                 5
-#define ABP_SMTP_FILE_ERROR                     6
-#define ABP_SMTP_OTHER                        255
-
 
 #endif  /* inclusion lock */
 
 /*******************************************************************************
 **
-** End of abp_smtp.h
+** End of abp_src3.h
 **
 ********************************************************************************
 */
