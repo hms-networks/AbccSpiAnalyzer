@@ -35,6 +35,7 @@
 #include "abcc_abp/abp_eco.h"
 #include "abcc_abp/abp_ect.h"
 #include "abcc_abp/abp_eip.h"
+#include "abcc_abp/abp_eme.h"
 #include "abcc_abp/abp_epl.h"
 #include "abcc_abp/abp_er.h"
 #include "abcc_abp/abp_etn.h"
@@ -47,10 +48,13 @@
 #include "abcc_abp/abp_nwdpv1.h"
 #include "abcc_abp/abp_nwetn.h"
 #include "abcc_abp/abp_nwpnio.h"
+#include "abcc_abp/abp_opcua.h"
+#include "abcc_abp/abp_pnam.h"
 #include "abcc_abp/abp_pnio.h"
 #include "abcc_abp/abp_safe.h"
 #include "abcc_abp/abp_smtp.h"
 #include "abcc_abp/abp_soc.h"
+#include "abcc_abp/abp_src3.h"
 #include "abcc_abp/abp_sync.h"
 
 #define IS_CMD_STANDARD(cmd)			(cmd > 0) && (cmd < 9)
@@ -198,12 +202,14 @@ static const tValueName asCclInstAttrNames[] =
 
 static const tValueName asCfnInstAttrNames[] =
 {
-	{ ABP_CFN_IA_VENDOR_CODE,	"Vendor Code",	false },
-	{ ABP_CFN_IA_VENDOR_NAME,	"Vendor Name",	false },
-	{ ABP_CFN_IA_MODEL_TYPE,	"Model Type",	false },
-	{ ABP_CFN_IA_MODEL_NAME,	"Model Name",	false },
-	{ ABP_CFN_IA_MODEL_CODE,	"Model Code",	false },
-	{ ABP_CFN_IA_SW_VERSION,	"SW Version",	false }
+	{ ABP_CFN_IA_VENDOR_CODE,		"Vendor Code",			false },
+	{ ABP_CFN_IA_VENDOR_NAME,		"Vendor Name",			false },
+	{ ABP_CFN_IA_MODEL_TYPE,		"Model Type",			false },
+	{ ABP_CFN_IA_MODEL_NAME,		"Model Name",			false },
+	{ ABP_CFN_IA_MODEL_CODE,		"Model Code",			false },
+	{ ABP_CFN_IA_SW_VERSION,		"SW Version",			false },
+	{ ABP_CFN_IA_ENABLE_SLMP,		"Enable SLMP",			false },
+	{ ABP_CFN_IA_ENA_SLMP_FORWARD,	"Enable SLMP Forward",	false }
 };
 
 static const tValueName asCntInstAttrNames[] =
@@ -355,7 +361,8 @@ static const tValueName asModInstAttrNames[] =
 	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									false },
 	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						false },
 	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				false },
-	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	false }
+	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	false },
+	{ ABP_MOD_IA_DISABLE_DEVICE_ID_FC,	"Disable Device ID Function Code",				false }
 };
 
 static const tValueName asNwInstAttrNames[] =
@@ -381,14 +388,19 @@ static const tValueName asNwCclInstAttrNames[] =
 
 static const tValueName asNwCfnInstAttrNames[] =
 {
-	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",	false }
+	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",			false },
+	{ ABP_NWCFN_IA_APP_OP_STATUS,	"Application OP Status",	false },
+	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		false }
 };
 
 static const tValueName asNwEtnInstAttrNames[] =
 {
-	{ ABP_NWETN_IA_MAC_ID,			"MAC Address",			false },
-	{ ABP_NWETN_IA_PORT1_MAC_ID,	"Port 1 MAC Address",	false },
-	{ ABP_NWETN_IA_PORT2_MAC_ID,	"Port 2 MAC Address",	false }
+	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			false },
+	{ ABP_NWETN_IA_PORT1_MAC_ID,		"Port 1 MAC Address",	false },
+	{ ABP_NWETN_IA_PORT2_MAC_ID,		"Port 2 MAC Address",	false },
+	{ ABP_NWETN_IA_MAC_ADDRESS,			"MAC Address",			false },
+	{ ABP_NWETN_IA_INTERFACE_COUNTERS,	"Interface Counters",	false },
+	{ ABP_NWETN_IA_MEDIA_COUNTERS,		"Media Counters",		false }
 };
 
 static const tValueName asNwPnioInstAttrNames[] =
@@ -456,24 +468,29 @@ static const tValueName asNcInstAttrNames[] =
 
 static const tValueName asEtnInstAttrNames[] =
 {
-	{ ABP_ETN_IA_MAC_ADDRESS,			"MAC Address",					false },
-	{ ABP_ETN_IA_ENABLE_HICP,			"Enable HICP",					false },
-	{ ABP_ETN_IA_ENABLE_WEB,			"Enable Web Server",			false },
-	{ ABP_ETN_IA_ENABLE_MOD_TCP ,		"Enable Modbus TCP",			false },
-	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,	"Enable Web ADI Access",		false },
-	{ ABP_ETN_IA_ENABLE_FTP,			"Enable FTP Server",			false },
-	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,		"Enable Admin Mode",			false },
-	{ ABP_ETN_IA_NETWORK_STATUS,		"Network Status",				false },
-	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",			false },
-	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",			false },
-	{ ABP_ETN_IA_ENABLE_ACD,			"Enable ACD",					false },
-	{ ABP_ETN_IA_PORT1_STATE,			"Port 1 State",					false },
-	{ ABP_ETN_IA_PORT2_STATE,			"Port 2 State",					false },
-	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,		"Enable Web Update",			false },
-	{ ABP_ETN_IA_ENABLE_HICP_RESET,		"Enable Reset From HICP",		false },
-	{ ABP_ETN_IA_IP_CONFIGURATION,		"IP Configuration",				false },
-	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,	"IP Address Byte 0-2",			false },
-	{ ABP_ETN_IA_ETH_PHY_CONFIG,		"PHY Duplex Fallback Config",	false }
+	{ ABP_ETN_IA_MAC_ADDRESS,					"MAC Address",						false },
+	{ ABP_ETN_IA_ENABLE_HICP,					"Enable HICP",						false },
+	{ ABP_ETN_IA_ENABLE_WEB,					"Enable Web Server",				false },
+	{ ABP_ETN_IA_ENABLE_MOD_TCP ,				"Enable Modbus TCP",				false },
+	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,			"Enable Web ADI Access",			false },
+	{ ABP_ETN_IA_ENABLE_FTP,					"Enable FTP Server",				false },
+	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,				"Enable Admin Mode",				false },
+	{ ABP_ETN_IA_NETWORK_STATUS,				"Network Status",					false },
+	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,				"Port 1 MAC Address",				false },
+	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,				"Port 2 MAC Address",				false },
+	{ ABP_ETN_IA_ENABLE_ACD,					"Enable ACD",						false },
+	{ ABP_ETN_IA_PORT1_STATE,					"Port 1 State",						false },
+	{ ABP_ETN_IA_PORT2_STATE,					"Port 2 State",						false },
+	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,				"Enable Web Update",				false },
+	{ ABP_ETN_IA_ENABLE_HICP_RESET,				"Enable Reset From HICP",			false },
+	{ ABP_ETN_IA_IP_CONFIGURATION,				"IP Configuration",					false },
+	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,			"IP Address Byte 0-2",				false },
+	{ ABP_ETN_IA_ETH_PHY_CONFIG,				"PHY Duplex Fallback Config",		false },
+	{ ABP_ETN_IA_SNMP_READ_ONLY,				"SNMP Read-Only",					false },
+	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					false },
+	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			false },
+	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	false },
+	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				false }
 };
 
 static const tValueName asCpcObjAttrNames[] =
@@ -483,12 +500,13 @@ static const tValueName asCpcObjAttrNames[] =
 
 static const tValueName asCpcInstAttrNames[] =
 {
-	{ ABP_CPC_IA_PORT_TYPE,			"Port Type",		false },
-	{ ABP_CPC_IA_PORT_NUMBER,		"Port Number",		false },
-	{ ABP_CPC_IA_LINK_PATH,			"Link Path",		false },
-	{ ABP_CPC_IA_PORT_NAME,			"Port Name",		false },
-	{ ABP_CPC_IA_NODE_ADDRESS,		"Node Address",		false },
-	{ ABP_CPC_IA_PORT_NODE_RANGE,	"Port Node Range",	false }
+	{ ABP_CPC_IA_PORT_TYPE,					"Port Type",					false },
+	{ ABP_CPC_IA_PORT_NUMBER,				"Port Number",					false },
+	{ ABP_CPC_IA_LINK_PATH,					"Link Path",					false },
+	{ ABP_CPC_IA_PORT_NAME,					"Port Name",					false },
+	{ ABP_CPC_IA_NODE_ADDRESS,				"Node Address",					false },
+	{ ABP_CPC_IA_PORT_NODE_RANGE,			"Port Node Range",				false },
+	{ ABP_CPC_IA_PORT_ROUTING_CAPABILITIES,	"Port Routing Capabilities",	false }
 };
 
 static const tValueName asCipIdInstAttrNames[] =
@@ -514,6 +532,24 @@ static const tValueName asEplInstAttrNames[] =
 	{ ABP_EPL_IA_MANF_SW_VER,	"Manufacturer Software Version",	false },
 	{ ABP_EPL_IA_DEVICE_TYPE,	"Device Type",						false },
 	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
+};
+
+static const tValueName asPnamInstAttrNames[] =
+{
+	{ ABP_PNAM_IA_INFO_TYPE,		"Info Type",							false },
+	{ ABP_PNAM_IA_UNIQUE_ID,		"Unique ID",							false },
+	{ ABP_PNAM_IA_LOCATION_TYPE,	"Location Type",						false },
+	{ ABP_PNAM_IA_LOCATION_LT,		"Location Level Tree",					false },
+	{ ABP_PNAM_IA_LOCATION_SS,		"Location Slot Subslot",				false },
+	{ ABP_PNAM_IA_ANNOTATION,		"Annotation",							false },
+	{ ABP_PNAM_IA_ORDER_ID,			"Order ID",								false },
+	{ ABP_PNAM_IA_SERIAL,			"Serial",								false },
+	{ ABP_PNAM_IA_DEVICE_ID,		"Device ID",							false },
+	{ ABP_PNAM_IA_TYPE_ID,			"Type ID",								false },
+	{ ABP_PNAM_IA_AM_SW_REV,		"Asset Management Software Revision",	false },
+	{ ABP_PNAM_IA_IM_SW_REV,		"I&M Software Revision",				false },
+	{ ABP_PNAM_IA_AM_HW_REV,		"Asset Management Hardware Revision",	false },
+	{ ABP_PNAM_IA_IM_HW_REV,		"I&M Hardware Revision",				false }
 };
 
 static const tValueName asPnioInstAttrNames[] =
@@ -543,7 +579,8 @@ static const tValueName asPnioInstAttrNames[] =
 	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		false },
 	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				false },
 	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				false },
-	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					false }
+	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					false },
+	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						false }
 };
 
 static const tValueName asEipInstAttrNames[] =
@@ -580,6 +617,41 @@ static const tValueName asEipInstAttrNames[] =
 	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									false }
 };
 
+static const tValueName asEmeInstAttrNames[] =
+{
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL,			"Voltage Phase Neutral",		false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MIN,		"Voltage Phase Neutral Min",	false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MAX,		"Voltage Phase Neutral Max",	false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE,			"Voltage Phase Phase",			false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MIN,		"Voltage Phase Phase Min",		false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MAX,		"Voltage Phase Phase Max",		false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND,			"Voltage Phase Ground",			false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MIN,		"Voltage Phase Ground Min",		false },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MAX,		"Voltage Phase Ground Max",		false },
+	{ ABP_EME_IA_CURRENT,						"Current",						false },
+	{ ABP_EME_IA_CURRENT_MIN,					"Current Min",					false },
+	{ ABP_EME_IA_CURRENT_MAX,					"Current Max",					false },
+	{ ABP_EME_IA_APPARENT_POWER,				"Apparent Power",				false },
+	{ ABP_EME_IA_APPARENT_POWER_MIN,			"Apparent Power Min",			false },
+	{ ABP_EME_IA_APPARENT_POWER_MAX,			"Apparent Power Max",			false },
+	{ ABP_EME_IA_ACTIVE_POWER,					"Active Power",					false },
+	{ ABP_EME_IA_ACTIVE_POWER_MIN,				"Active Power Min",				false },
+	{ ABP_EME_IA_ACTIVE_POWER_MAX,				"Active Power Max",				false },
+	{ ABP_EME_IA_REACTIVE_POWER,				"Reactive Power",				false },
+	{ ABP_EME_IA_REACTIVE_POWER_MIN,			"Reactive Power Min",			false },
+	{ ABP_EME_IA_REACTIVE_POWER_MAX,			"Reactive Power Max",			false },
+	{ ABP_EME_IA_POWER_FACTOR,					"Power Factor",					false },
+	{ ABP_EME_IA_POWER_FACTOR_MIN,				"Power Factor Min",				false },
+	{ ABP_EME_IA_POWER_FACTOR_MAX,				"Power Factor Max",				false },
+	{ ABP_EME_IA_FREQUENCY,						"Frequency",					false },
+	{ ABP_EME_IA_FREQUENCY_MIN,					"Frequency Min",				false },
+	{ ABP_EME_IA_FREQUENCY_MAX,					"Frequency Max",				false },
+	{ ABP_EME_IA_FIELD_ROTATION,				"Field Rotation",				false },
+	{ ABP_EME_IA_TOTAL_ACTIVE_ENERGY,			"Total Active Energy",			false },
+	{ ABP_EME_IA_TOTAL_REACTIVE_ENERGY,			"Total Reactive Engery",		false },
+	{ ABP_EME_IA_TOTAL_APPARENT_ENERGY,			"Total Apparent Energy",		false }
+};
+
 static const tValueName asEtcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
@@ -602,6 +674,9 @@ static const tValueName asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",false },
 	{ ABP_ECT_IA_ETHERCAT_STATE,		"EtherCAT State",							false },
 	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							false },
+	{ ABP_ECT_IA_COMP_IDENT_LISTS,		"Compare Identity Lists",					false },
+	{ ABP_ECT_IA_FSOE_STATUS_IND,		"FSoE Status Indication",					false },
+	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					false }
 };
 
 static const tValueName asAppdObjAttrNames[] =
@@ -632,7 +707,12 @@ static const tValueName asAppInstAttrNames[] =
 	{ ABP_APP_IA_SER_NUM,		"Serial Number",					false },
 	{ ABP_APP_IA_PAR_CRTL_SUM,	"Parameter Control Sum",			false },
 	{ ABP_APP_IA_FW_AVAILABLE,	"Candidate Firmware Available",		false },
-	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false }
+	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false },
+	{ ABP_APP_IA_MODE,			"Mode",								false },
+	{ ABP_APP_IA_VENDOR_NAME,	"Vendor Name",						false },
+	{ ABP_APP_IA_PRODUCT_NAME,	"Product Name",						false },
+	{ ABP_APP_IA_FW_VERSION,	"FW Version",						false },
+	{ ABP_APP_IA_HW_VERSION,	"HW Version",						false },
 };
 
 static const tValueName asFsiObjAttrNames[] =
@@ -679,6 +759,27 @@ static const tValueName asMddObjAttrNames[] =
 {
 	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			false },
 	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	false }
+};
+
+static const tValueName asOpcuaInstAttrNames[] =
+{
+	{ ABP_OPCUA_IA_MODEL,					"Model",				false },
+	{ ABP_OPCUA_IA_APPLICATION_URI,			"Application URI",		false },
+	{ ABP_OPCUA_IA_VENDOR_NAMESPACE_URI,	"Vendor Namespace URI",	false },
+	{ ABP_OPCUA_IA_DEVICE_TYPE_NAME,		"Device Type Name",		false },
+	{ ABP_OPCUA_IA_DEVICE_INST_NAME,		"Device Instance Name",	false },
+	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			false }
+};
+
+static const tValueName asSrc3InstAttrNames[] =
+{
+	{ ABP_SRC3_IA_COMPONENT_NAME,		"Component Name",					false },
+	{ ABP_SRC3_IA_VENDOR_CODE,			"Vendor Code",						false },
+	{ ABP_SRC3_IA_DEVICE_NAME,			"Device Name",						false },
+	{ ABP_SRC3_IA_VENDOR_DEVICE_ID,		"Vendor Device ID",					false },
+	{ ABP_SRC3_IA_SOFTWARE_REVISION,	"Software Revision",				false },
+	{ ABP_SRC3_IA_SERIAL_NUMBER,		"Serial Number",					false },
+	{ ABP_SRC3_IA_MAJOR_EVT_LATCHING,	"Major Diagnostic Event Latching",	false }
 };
 
 static const tValueName asSyncInstAttrNames[] =
@@ -754,6 +855,8 @@ static const tValueName asObjectNames[] =
 	** Host application objects
 	**------------------------------------------------------------------------------
 	*/
+	{ 0x80,					"Host Application Specific",			false }, /* No abp define exists yet */
+	{ ABP_OBJ_NUM_OPCUA,	"OPC Unified Architecture",				false },
 	{ ABP_OBJ_NUM_EME,		"Energy Measurement",					false },
 	{ ABP_OBJ_NUM_PNAM,		"PROFINET Asset Management",			false },
 	{ ABP_OBJ_NUM_CFN,		"CC-Link IE Field Network",				false },
@@ -817,7 +920,8 @@ static const tValueName asCclCmdNames[] =
 
 static const tValueName asCfnCmdNames[] =
 {
-	{ ABP_CFN_CMD_BUF_SIZE_NOTIF,	"Buf_Size_Notif",	false }
+	{ ABP_CFN_CMD_BUF_SIZE_NOTIF,	"Buf_Size_Notif",	false },
+	{ ABP_CFN_CMD_SLMP_SERVER_REQ,	"SLMP_Server_Req",	false }
 };
 
 static const tValueName asCntCmdNames[] =
@@ -853,6 +957,11 @@ static const tValueName asEcoCmdNames[] =
 	{ ABP_ECO_CMD_PREVIEW_PAUSE_TIME,	"Preview_Pause_Time",	false }
 };
 
+static const tValueName asEmeCmdNames[] =
+{
+	{ ABP_EME_CMD_GET_ATTRIBUTE_MEASUREMENT_LIST,	"Get_Attribute_Measurement_List",	false }
+};
+
 static const tValueName asMddCmdNames[] =
 {
 	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false }
@@ -866,8 +975,10 @@ static const tValueName asAsmCmdNames[] =
 
 static const tValueName asFusmCmdNames[] =
 {
-	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,	"Error_Confirmation",	true  },
-	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,	"Set_IO_Cfg_String",	false },
+	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,		"Error_Confirmation",		true  },
+	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,		"Set_IO_Cfg_String",		false },
+	{ ABP_FUSM_CMD_GET_SAFETY_OUTPUT_PDU,	"Get_Safety_Output_PDU",	false },
+	{ ABP_FUSM_CMD_GET_SAFETY_INPUT_PDU,	"Get_Safety_Input_PDU",		false }
 };
 
 static const tValueName asFsiCmdNames[] =
@@ -981,6 +1092,11 @@ static const tValueName asNwPnioCmdNames[] =
 	{ ABP_NWPNIO_CMD_IM_OPTIONS,			"IM_Options",			false },
 	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE_EXT,	"Plug_Submodule_Ext",	false },
 	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	false }
+};
+
+static const tValueName asSrc3CmdNames[] =
+{
+	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnositic",	false }
 };
 
 static const tValueName asAnbErrNames[] =
@@ -1112,7 +1228,8 @@ static const tValueName asPnioErrNames[] =
 	{ ABP_NWPNIO_ERR_UNKNOWN_STACK_ERROR,		"Unknown stack error",				true },
 	{ ABP_NWPNIO_ERR_MAX_NBR_OF_PLUGGED_SUBMOD,	"Max number of plugged submodules",	true },
 	{ ABP_NWPNIO_ERR_SAFETY_NOT_ENABLED,		"Safety not enabled",				true },
-	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true }
+	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true },
+	{ ABP_NWPNIO_ERR_ASM_ALREADY_PLUGGED,		"ASM Already Plugged",				true },
 };
 
 static const tValueName asSocErrNames[] =
@@ -1843,6 +1960,16 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asNwDpv1CmdNames[0], (sizeof(asNwDpv1CmdNames) / sizeof(tValueName)), display_base);
 			break;
+		case ABP_OBJ_NUM_EME:
+			/* Energy Measurement */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asEmeCmdNames[0], (sizeof(asEmeCmdNames) / sizeof(tValueName)), display_base);
+			break;
+		case ABP_OBJ_NUM_SRC3:
+			/* SERCOS III */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asSrc3CmdNames[0], (sizeof(asSrc3CmdNames) / sizeof(tValueName)), display_base);
+			break;
 		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
 			alert = true; //TODO: We only alert here because we have not implemented all object specific commands yet.
@@ -2071,6 +2198,26 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 		/* Application Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
 			NULL, 0, &asAppInstAttrNames[0], sizeof(asAppInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_PNAM:
+		/* PROFINET Asset Management */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asPnamInstAttrNames[0], sizeof(asPnamInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_EME:
+		/* Energy Measurement */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asEmeInstAttrNames[0], sizeof(asEmeInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_OPCUA:
+		/* OPC Unified Architecture */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asOpcuaInstAttrNames[0], sizeof(asOpcuaInstAttrNames) / sizeof(tValueName));
+		break;
+	case ABP_OBJ_NUM_SRC3:
+		/* SERCOS III */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
+			NULL, 0, &asSrc3InstAttrNames[0], sizeof(asSrc3InstAttrNames) / sizeof(tValueName));
 		break;
 	default:
 		objFound = false;
