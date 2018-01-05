@@ -11,10 +11,10 @@
   format settings.
 * Opening multiple saved captures will often lead to the currently opened Logic
   windows to crash.
-* Assigning severly misbehaving logic signals to the analyzer plugin may result
+* Assigning severely misbehaving logic signals to the analyzer plugin may result
   in an application crash.
 * A capture that starts in the middle of message fragmentation may result in a
-  series of packets being incorrectly interpeted and possibly marked as invalid.
+  series of packets being incorrectly interpreted and possibly marked as invalid.
   To workaround this, the user can place a marker past this fragmentation and
   instruct the plugin to start analysis after this point.
 
@@ -32,6 +32,10 @@
   * Export process data
     * On MOSI, only packets that indicate PD_VALID will be exported
     * On MISO, only packets that indicate NEW_PD will be exported
+  * Export XML
+    * All data is exported in XML format
+    * Uses a human readable hierarchical structure to present ABCC SPI packet
+      information
 
 ## Revision 1.0.0.0 (Beta)
 
@@ -45,7 +49,7 @@
 * Supports both 3-wire and 4-wire configurations.
 * Supports ABCC SPI fragmentation protocol
   * `NOTE` Fragmentation starting at the message header is currently not
-    supported (PLANNED)
+  supported (PLANNED)
 * Support toggle-bit monitoring for identification of retransmissions.
 * Byte counter to logic-frames that are part of process data.
 * Byte counter to logic-frames that are part of message data this will be
