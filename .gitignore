@@ -8,7 +8,8 @@ debug/Logic/
 .vscode
 
 # Ignore Build Artifacts
-plugins/
+plugins/*/*.lib
+plugins/*/Debug/
 project/*/Debug/
 project/*/x64/Debug/
 *.aps
