@@ -714,7 +714,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 {
 	Frame error_frame;
 	U64 markerSample = 0;
-	Channel mChannel;
+	Channel chn;
 	bool fAddError = false;
 
 	if (IS_PURE_4WIRE_MODE())
@@ -722,13 +722,13 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 		U64 lNextSample = mEnable->GetSampleOfNextEdge();
 		if (lNextSample <= mClock->GetSampleNumber())
 		{
-			mEnable->AdvanceToAbsPosition(mClock->GetSampleNumber());
+			mEnable->AdvanceToAbsPosition(mClock->GetSampleNumber()); //TODO joca: this fixes the crashing...other changes dont do much
 			lNextSample = mEnable->GetSampleOfNextEdge();
 		}
 
 		if (mClock->WouldAdvancingToAbsPositionCauseTransition(lNextSample))
 		{
-			mChannel = mSettings->mEnableChannel;
+			chn = mSettings->mEnableChannel;
 			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
 			error_frame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
 			markerSample = error_frame.mEndingSampleInclusive;
@@ -740,7 +740,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 	{
 		if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
 		{
-			mChannel = mSettings->mClockChannel;
+			chn = mSettings->mClockChannel;
 			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
 			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 			error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
@@ -754,7 +754,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 		error_frame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
 		error_frame.mType = e_ABCC_SPI_ERROR_END_OF_TRANSFER;
 		mResults->AddFrame(error_frame);
-		mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, mChannel);
+		mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, chn);
 	}
 }
 
