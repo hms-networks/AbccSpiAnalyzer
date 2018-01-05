@@ -192,31 +192,36 @@ bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
 				/* Iterate over each available setting */
 				for (rapidxml::xml_node<> * settings_node = root_node->first_node("Setting"); settings_node; settings_node = settings_node->next_sibling())
 				{
-					/* Get the type of setting */
-					type = settings_node->first_attribute("type")->value();
+					rapidxml::xml_attribute<char>* ptr = settings_node->first_attribute("type");
 
-					if (type.compare("3-wire-on-4-channels") == 0)
+					/* Get the type of setting */
+					if (ptr != nullptr)
 					{
-						value = settings_node->value();
-						if (value.compare("1") == 0)
+						type = ptr->value();
+
+						if (type.compare("3-wire-on-4-channels") == 0)
 						{
-							m3WireOn4Channels = true;
+							value = settings_node->value();
+							if (value.compare("1") == 0)
+							{
+								m3WireOn4Channels = true;
+							}
+							else
+							{
+								m3WireOn4Channels = false;
+							}
 						}
-						else
+						else if (type.compare("4-wire-on-3-channels") == 0)
 						{
-							m3WireOn4Channels = false;
-						}
-					}
-					else if (type.compare("4-wire-on-3-channels") == 0)
-					{
-						value = settings_node->value();
-						if (value.compare("1") == 0)
-						{
-							m4WireOn3Channels = true;
-						}
-						else
-						{
-							m4WireOn3Channels = false;
+							value = settings_node->value();
+							if (value.compare("1") == 0)
+							{
+								m4WireOn3Channels = true;
+							}
+							else
+							{
+								m4WireOn3Channels = false;
+							}
 						}
 					}
 				}
