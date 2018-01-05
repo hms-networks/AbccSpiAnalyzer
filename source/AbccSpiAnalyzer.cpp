@@ -32,6 +32,9 @@
 			} \
 		}
 
+#define IS_3WIRE_MODE() (((mEnable == NULL) && (mSettings->m4WireOn3Channels == false)) || (mSettings->m3WireOn4Channels == true))
+#define IS_PURE_4WIRE_MODE() ((mEnable != NULL) && (mSettings->m3WireOn4Channels == false))
+
 SpiAnalyzer::SpiAnalyzer()
 	: Analyzer2(),
 	mSettings(new SpiAnalyzerSettings()),
@@ -171,7 +174,7 @@ void SpiAnalyzer::WorkerThread()
 			/* Run the ABCC MISO state machine */
 			fReady2 = RunAbccMisoStateMachine((fReset||fReady2), fError, lMisoData, lFirstSample);
 
-			if (mEnable == NULL)
+			if (IS_3WIRE_MODE())
 			{
 				if (!fReady1 && !fReady2)
 				{
@@ -226,7 +229,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 
 	AdvanceToActiveEnableEdge();
 
-	if (mEnable == NULL)
+	if (IS_3WIRE_MODE())
 	{
 		/* With no enable line an idle gap of at least >=10us is required */
 		for (;;)
@@ -293,7 +296,7 @@ void SpiAnalyzer::Setup()
 
 void SpiAnalyzer::AdvanceToActiveEnableEdge()
 {
-	if (mEnable != NULL)
+	if (IS_PURE_4WIRE_MODE())
 	{
 		if (mEnable->GetBitState() != BIT_LOW)
 		{
@@ -316,7 +319,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 {
 	bool fCorrect = true;
-	if (mEnable == NULL)
+	if (IS_3WIRE_MODE())
 	{
 		/* In 3-wire clock must idle HIGH */
 		if (mClock->GetBitState() == BIT_LOW)
@@ -330,26 +333,38 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 
 bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
 {
-	if (mEnable == NULL)
+	if (IS_3WIRE_MODE())
 	{
 		return false;
 	}
 
-	U64 next_edge = mClock->GetSampleOfNextEdge();
-	bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition(next_edge);
-
-	if (enable_will_toggle == false)
+	if (mEnable != NULL)
 	{
-		return false;
+		U64 next_edge = mClock->GetSampleOfNextEdge();
+		bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition(next_edge);
+
+		if (enable_will_toggle == false)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else
 	{
-		return true;
+		return false;
 	}
 }
 
 bool SpiAnalyzer::Is3WireIdleCondition(float rIdleTimeCondition)
 {
+	if ( mSettings->m4WireOn3Channels )
+	{
+		return false;
+	}
+
 	UINT64 lSampleDistance = mClock->GetSampleOfNextEdge() - mClock->GetSampleNumber();
 	U32 dwSampleRate = GetSampleRate();
 	float rIdleTime = (float)lSampleDistance / (float)dwSampleRate;
@@ -401,7 +416,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 		}
 
 		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
-		if (mEnable == NULL)
+		if (IS_3WIRE_MODE())
 		{
 			/* In 3-wire mode, idle condition is >=5us (during a transaction).
 			** On every advancement on clock, check for idle condition.
@@ -446,7 +461,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			break;
 		}
 
-		if (mEnable == NULL)
+		if (IS_3WIRE_MODE())
 		{
 			/* In 3-wire mode idle condition is >=5us (during a transaction).
 			** On every advancement on clock, check for idle condition.
@@ -539,7 +554,7 @@ void DestroyAnalyzer(Analyzer* analyzer)
 
 bool SpiAnalyzer::IsEnableActive(void)
 {
-	if (mEnable != NULL)
+	if (IS_PURE_4WIRE_MODE())
 	{
 		return (mEnable->GetBitState() == BIT_LOW);
 	}
@@ -702,7 +717,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 	Channel mChannel;
 	bool fAddError = false;
 
-	if (mEnable != NULL)
+	if (IS_PURE_4WIRE_MODE())
 	{
 		U64 lNextSample = mEnable->GetSampleOfNextEdge();
 		if (lNextSample <= mClock->GetSampleNumber())

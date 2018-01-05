@@ -15,6 +15,8 @@
 #include <AnalyzerSettings.h>
 #include <AnalyzerTypes.h>
 
+#define ENABLE_ADVANCED_SETTINGS 1
+
 typedef enum tDecodeVerbosityLevel
 {
 	e_VERBOSITY_LEVEL_DISABLED,
@@ -69,6 +71,11 @@ public:
 	U32 mTimestampIndexing;
 	bool mAnybusStatusIndexing;
 	bool mApplStatusIndexing;
+#if ENABLE_ADVANCED_SETTINGS
+	const char* mAdvSettingsPath;
+	bool m3WireOn4Channels;
+	bool m4WireOn3Channels;
+#endif
 
 
 protected:
@@ -84,6 +91,10 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexAnybusStatusInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexApplStatusInterface;
+#if ENABLE_ADVANCED_SETTINGS
+	std::auto_ptr< AnalyzerSettingInterfaceText > 		mAdvancedSettingsInterface;
+	bool ParseAdavancedSettingsFile( void );
+#endif
 };
 
 #endif /* ABCC_SPI_ANALYZER_SETTINGS_H */

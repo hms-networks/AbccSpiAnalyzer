@@ -15,8 +15,13 @@
 #include <sstream>
 #include <cstring>
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include "rapidxml-1.13/rapidxml.hpp"
+
 /* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION_STRING "REVISION_00000001"
+#define SETTINGS_REVISION_STRING "REVISION_00000002"
 
 /* Default setting states */
 static const U32  d_MessageIndexingVerbosityLevel = e_VERBOSITY_LEVEL_DETAILED;
@@ -27,6 +32,7 @@ static const bool d_MessageSrcIdIndexing          = true;
 static const bool d_ErrorIndexing                 = true;
 static const bool d_AnybusStatusIndexing          = true;
 static const bool d_ApplStatusIndexing            = true;
+static const char* d_AdvSettingsPath              = "";
 
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
@@ -41,6 +47,11 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mTimestampIndexing(d_TimestampIndexing),
 	mAnybusStatusIndexing(d_AnybusStatusIndexing),
 	mApplStatusIndexing(d_ApplStatusIndexing),
+#if ENABLE_ADVANCED_SETTINGS
+	mAdvSettingsPath(d_AdvSettingsPath),
+	m3WireOn4Channels(false),
+	m4WireOn3Channels(false),
+#endif
 	mChangeID(0)
 {
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
@@ -103,6 +114,13 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mProcessDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
 	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
 
+#if ENABLE_ADVANCED_SETTINGS
+	mAdvancedSettingsInterface.reset(new AnalyzerSettingInterfaceText());
+	mAdvancedSettingsInterface->SetTextType(AnalyzerSettingInterfaceText::FilePath);
+	mAdvancedSettingsInterface->SetTitleAndTooltip("Advanced Settings :", "Specifies external settings file to control special (advanced) settings of the plugin.\nPlease refer to plugin documentation for more details.\nIf left empty plugin defaults will be used which are suitable for most situations.");
+	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
+#endif
+
 	AddInterface(mMosiChannelInterface.get());
 	AddInterface(mMisoChannelInterface.get());
 	AddInterface(mClockChannelInterface.get());
@@ -116,6 +134,9 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 	AddInterface(mMsgDataPriorityInterface.get());
 	AddInterface(mProcessDataPriorityInterface.get());
+#if ENABLE_ADVANCED_SETTINGS
+	AddInterface(mAdvancedSettingsInterface.get());
+#endif
 
 	AddExportOption(0, "Export All Frame Data");
 	AddExportExtension(0, "All Frame Data", "csv");
@@ -136,6 +157,94 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 
 SpiAnalyzerSettings::~SpiAnalyzerSettings()
 {
+}
+
+bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
+{
+	rapidxml::xml_document<> doc;
+	rapidxml::xml_node<> * root_node;
+	std::string type;
+	std::string value;
+
+	/* Read the xml file into a vector */
+	if( strlen(mAdvSettingsPath) > 0 )
+	{
+		std::ifstream filestream(mAdvSettingsPath);
+
+		if(!filestream)
+		{
+			SetErrorText("Advanced settings: File not found or could not be opened.");
+			return false;
+		}
+		else
+		{
+			std::vector<char> buffer((std::istreambuf_iterator<char>(filestream)), std::istreambuf_iterator<char>());
+			buffer.push_back('\0');
+
+			/* Parse the buffer using the xml file parsing library into doc */
+			doc.parse<0>(&buffer[0]);
+
+			/* Jump to root node */
+			root_node = doc.first_node("AdvancedSettings");
+
+			if (root_node)
+			{
+				/* Iterate over each available setting */
+				for (rapidxml::xml_node<> * settings_node = root_node->first_node("Setting"); settings_node; settings_node = settings_node->next_sibling())
+				{
+					/* Get the type of setting */
+					type = settings_node->first_attribute("type")->value();
+
+					if (type.compare("3-wire-on-4-channels") == 0)
+					{
+						value = settings_node->value();
+						if (value.compare("1") == 0)
+						{
+							m3WireOn4Channels = true;
+						}
+						else
+						{
+							m3WireOn4Channels = false;
+						}
+					}
+					else if (type.compare("4-wire-on-3-channels") == 0)
+					{
+						value = settings_node->value();
+						if (value.compare("1") == 0)
+						{
+							m4WireOn3Channels = true;
+						}
+						else
+						{
+							m4WireOn3Channels = false;
+						}
+					}
+				}
+
+				if (m4WireOn3Channels && m3WireOn4Channels)
+				{
+					m4WireOn3Channels = false;
+					m3WireOn4Channels = false;
+					SetErrorText("Advanced settings: 4-wire-on-3-channels and 3-wire-on-4-channels are mutually exclusive features, both cannot be enabled simultaneously.\r\nPlease fix the configuration.");
+
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				SetErrorText("Advanced settings: File could not be properly parsed.");
+				return false;
+			}
+		}
+	}
+	else
+	{
+		return true;
+	}
 }
 
 bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
@@ -176,13 +285,22 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mTimestampIndexing             = U32(mIndexTimestampsInterface->GetNumber());
 	mAnybusStatusIndexing          = bool(mIndexAnybusStatusInterface->GetValue());
 	mApplStatusIndexing            = bool(mIndexApplStatusInterface->GetValue());
+	#if ENABLE_ADVANCED_SETTINGS
+	mAdvSettingsPath               = mAdvancedSettingsInterface->GetText();
+	#endif
 
 	ClearChannels();
 	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
-
+#if ENABLE_ADVANCED_SETTINGS
+	mAdvSettingsPath = mAdvancedSettingsInterface->GetText();
+	if (!ParseAdavancedSettingsFile())
+	{
+		return false;
+	}
+#endif
 	return true;
 }
 
@@ -218,6 +336,9 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		text_archive >> mTimestampIndexing;
 		text_archive >> mAnybusStatusIndexing;
 		text_archive >> mApplStatusIndexing;
+		#if ENABLE_ADVANCED_SETTINGS
+		text_archive >> &mAdvSettingsPath;
+		#endif
 	}
 
 	ClearChannels();
@@ -248,6 +369,9 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mTimestampIndexing;
 	text_archive << mAnybusStatusIndexing;
 	text_archive << mApplStatusIndexing;
+	#if ENABLE_ADVANCED_SETTINGS
+	text_archive << mAdvSettingsPath;
+	#endif
 
 	SaveSettingChangeID();
 
@@ -269,6 +393,9 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
+	#if ENABLE_ADVANCED_SETTINGS
+	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
+	#endif
 }
 
 U8 SpiAnalyzerSettings::SaveSettingChangeID( void )
