@@ -741,14 +741,19 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 	}
 	else
 	{
-		if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
+		/* Skip idle check when m4WireOn3Channels is being used, since it is
+		** impossible to infer if the enable line had toggled or not */
+		if( mSettings->m4WireOn3Channels == false )
 		{
-			chn = mSettings->mClockChannel;
-			error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
-			AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-			error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
-			markerSample = error_frame.mStartingSampleInclusive + (error_frame.mEndingSampleInclusive - error_frame.mStartingSampleInclusive) / 2;
-			fAddError = true;
+			if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
+			{
+				chn = mSettings->mClockChannel;
+				error_frame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
+				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+				error_frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge();
+				markerSample = error_frame.mStartingSampleInclusive + (error_frame.mEndingSampleInclusive - error_frame.mStartingSampleInclusive) / 2;
+				fAddError = true;
+			}
 		}
 	}
 
