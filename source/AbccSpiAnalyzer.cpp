@@ -572,6 +572,8 @@ static bool IsErrorPacketType(tPacketType ePacketType)
 	case e_PROTOCOL_ERROR_PACKET:
 	case e_CHECKSUM_ERROR_PACKET:
 	case e_ERROR_RESPONSE_PACKET:
+	case e_MULTI_ERROR_PACKET:
+	case e_CANCEL_PACKET:
 		return true;
 	}
 	return false;
