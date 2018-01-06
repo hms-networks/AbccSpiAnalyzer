@@ -340,16 +340,27 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
 
 	if (mEnable != NULL)
 	{
-		U64 next_edge = mClock->GetSampleOfNextEdge();
-		bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition(next_edge);
-
-		if (enable_will_toggle == false)
+		if( mClock->DoMoreTransitionsExistInCurrentData() )
 		{
-			return false;
+			U64 next_edge = mClock->GetSampleOfNextEdge();
+			bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition(next_edge);
+
+			if (enable_will_toggle == false)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else if( mEnable->DoMoreTransitionsExistInCurrentData() )
+		{
+			return true;
 		}
 		else
 		{
-			return true;
+			return false;
 		}
 	}
 	else
@@ -498,6 +509,8 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			mResults->AddMarker(mArrowLocations[i], mArrowMarker, mSettings->mClockChannel);
 		}
 	}
+
+	mResults->CommitResults();
 
 	return status;
 }
@@ -950,6 +963,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 	/* Commit the processed frame */
 	mResults->AddFrame(result_frame);
+	mResults->CommitResults();
 
 	if (eState == e_ABCC_MISO_CRC32)
 	{
@@ -1144,6 +1158,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 	/* Commit the processed frame */
 	mResults->AddFrame(result_frame);
+	mResults->CommitResults();
 
 	if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 	{
