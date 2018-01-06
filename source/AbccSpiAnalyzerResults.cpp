@@ -377,7 +377,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				}
 				break;
 			case e_ABCC_SPI_ERROR_END_OF_TRANSFER:
-				StringBuilder("CLOCKING", NULL, "ABCC SPI Clocking. The ABCC SPI protocol expects one transaction per 'Active Enable' phase.", alert);
+				StringBuilder("CLOCKING", NULL, "ABCC SPI Clocking. The analyzer expects one transaction per 'Active Enable' phase.", alert);
 				break;
 			case e_ABCC_SPI_ERROR_GENERIC:
 			default:
