@@ -1206,6 +1206,7 @@ void SpiAnalyzer::SetMosiPacketType(tPacketType ePacketType)
 	switch (ePacketType)
 	{
 	case e_NULL_PACKET:
+	case e_CANCEL_PACKET:
 		eMosiPacketType = ePacketType;
 		break;
 	case e_PROTOCOL_ERROR_PACKET:
@@ -1248,6 +1249,7 @@ void SpiAnalyzer::SetMisoPacketType(tPacketType ePacketType)
 	switch (ePacketType)
 	{
 	case e_NULL_PACKET:
+	case e_CANCEL_PACKET:
 		eMisoPacketType = ePacketType;
 		break;
 	case e_PROTOCOL_ERROR_PACKET:
