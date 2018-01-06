@@ -401,7 +401,8 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			}
 			else
 			{
-				/* Reset everything and return. */
+				/* The enable state changed in the middle of aquiring a byte.
+				** Suggests we are not byte-synchronized. */
 				status = e_GET_WORD_RESET;
 				break;
 			}
@@ -591,7 +592,7 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	*/
 	if ((eMosiPacketType != e_NULL_PACKET) && (eMisoPacketType != e_NULL_PACKET))
 	{
-		/* Multiple events (at least one on each channel) */
+		/* Multiple events (at least one on each channel, or multiple events on one channel) */
 		if (IsErrorPacketType(eMosiPacketType) || IsErrorPacketType(eMisoPacketType))
 		{
 			eMarkerType = AnalyzerResults::ErrorSquare;
