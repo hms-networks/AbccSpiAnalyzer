@@ -1378,7 +1378,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
-					SNPRINTF(acMsgSrcStr[ABCC_MISO_CHANNEL], sizeof(acMsgSrcStr[ABCC_MISO_CHANNEL]), "Source ID: 0x%02X", (U8)frame.mData1);
+					SNPRINTF(acMsgSrcStr[ABCC_MISO_CHANNEL], sizeof(acMsgSrcStr[ABCC_MISO_CHANNEL]), "Source ID: %d (0x%02X)", (U8)frame.mData1, (U8)frame.mData1);
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
@@ -1401,7 +1401,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(acMsgInstStr[ABCC_MISO_CHANNEL], sizeof(acMsgInstStr[ABCC_MISO_CHANNEL]), "Instance: 0x%04X", (U16)frame.mData1);
+						SNPRINTF(acMsgInstStr[ABCC_MISO_CHANNEL], sizeof(acMsgInstStr[ABCC_MISO_CHANNEL]), "Instance: %d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{
@@ -1483,7 +1483,8 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (!found)
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), str, sizeof(str));
+								/* For consistency with Source ID and Instance, only use hex format */
+								SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
 							}
 							if (alert)
 							{
@@ -1582,7 +1583,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
-					SNPRINTF(acMsgSrcStr[ABCC_MOSI_CHANNEL], sizeof(acMsgSrcStr[ABCC_MOSI_CHANNEL]), "Source ID: 0x%02X", (U8)frame.mData1);
+					SNPRINTF(acMsgSrcStr[ABCC_MOSI_CHANNEL], sizeof(acMsgSrcStr[ABCC_MOSI_CHANNEL]), "Source ID: %d (0x%02X)", (U8)frame.mData1, (U8)frame.mData1);
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_obj:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
@@ -1605,7 +1606,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(acMsgInstStr[ABCC_MOSI_CHANNEL], sizeof(acMsgInstStr[ABCC_MOSI_CHANNEL]), "Instance: 0x%04X", (U16)frame.mData1);
+						SNPRINTF(acMsgInstStr[ABCC_MOSI_CHANNEL], sizeof(acMsgInstStr[ABCC_MOSI_CHANNEL]), "Instance: %d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{
@@ -1687,7 +1688,8 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							if (!found)
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), str, sizeof(str));
+								/* For consistency with Source ID and Instance, only use hex format */
+								SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
 							}
 							if (alert)
 							{
