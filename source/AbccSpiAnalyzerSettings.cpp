@@ -258,8 +258,10 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 	rapidxml::xml_document<> doc;
 	rapidxml::xml_node<> * rootNode;
 	std::string trimmedPath(mAdvSettingsPath);
-	std::string type;
-	std::string value;
+	std::string nodeName;
+	std::string nodeValue;
+	const std::string settingName = "Advanced settings";
+	bool settingsValid = true;
 
 	/*
 	** Trim the file path so that an entry with nothing
@@ -268,11 +270,11 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 	TrimString(trimmedPath);
 
 	/* Read the xml file into a vector */
-	if( trimmedPath.length() > 0 )
+	if (trimmedPath.length() > 0)
 	{
 		std::ifstream filestream(trimmedPath);
 
-		if(!filestream)
+		if (!filestream)
 		{
 			SetErrorText("Advanced settings: File not found or could not be opened.");
 			return false;
@@ -293,17 +295,17 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 				/* Iterate over each available setting */
 				for (rapidxml::xml_node<> * settings_node = rootNode->first_node("Setting"); settings_node; settings_node = settings_node->next_sibling())
 				{
-					rapidxml::xml_attribute<char>* ptr = settings_node->first_attribute("type");
+					rapidxml::xml_attribute<char>* ptr = settings_node->first_attribute("name");
 
 					/* Get the type of setting */
 					if (ptr != nullptr)
 					{
-						type = ptr->value();
+						nodeName = ptr->value();
 
-						if (type.compare("3-wire-on-4-channels") == 0)
+						if (nodeName.compare("3-wire-on-4-channels") == 0)
 						{
-							value = settings_node->value();
-							if (value.compare("1") == 0)
+							nodeValue = settings_node->value();
+							if (nodeValue.compare("1") == 0)
 							{
 								m3WireOn4Channels = true;
 							}
@@ -312,10 +314,10 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 								m3WireOn4Channels = false;
 							}
 						}
-						else if (type.compare("4-wire-on-3-channels") == 0)
+						else if (nodeName.compare("4-wire-on-3-channels") == 0)
 						{
-							value = settings_node->value();
-							if (value.compare("1") == 0)
+							nodeValue = settings_node->value();
+							if (nodeValue.compare("1") == 0)
 							{
 								m4WireOn3Channels = true;
 							}
@@ -340,32 +342,41 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 							}
 						}
 					}
+					else
+					{
+						SetSettingError(settingName, "XML node must contain a valid \"name\" attribute.");
+						settingsValid = false;
+						break;
+					}
 				}
 
 				if (m4WireOn3Channels && m3WireOn4Channels)
 				{
+					settingsValid = false;
 					m4WireOn3Channels = false;
 					m3WireOn4Channels = false;
-					SetErrorText("Advanced settings: 4-wire-on-3-channels and 3-wire-on-4-channels are mutually exclusive features, both cannot be enabled simultaneously.\r\nPlease fix the configuration.");
-
-					return false;
-				}
-				else
-				{
-					return true;
+					SetSettingError(settingName, "4-wire-on-3-channels and 3-wire-on-4-channels are mutually exclusive features, both cannot be enabled simultaneously.\r\nPlease fix the configuration.");
 				}
 			}
 			else
 			{
-				SetErrorText("Advanced settings: File could not be properly parsed.");
-				return false;
+				SetSettingError(settingName, "File could not be properly parsed.");
 			}
 		}
 	}
-	else
-	{
-		return true;
-	}
+
+
+	return settingsValid;
+}
+
+void SpiAnalyzerSettings::SetSettingError( const std::string &setting_name,
+                                           const std::string &error_text )
+{
+   std::string s = "";
+
+   s += setting_name + " : " + error_text;
+
+   SetErrorText( s.c_str() );
 }
 
 bool SpiAnalyzerSettings::SetSettingsFromInterfaces()

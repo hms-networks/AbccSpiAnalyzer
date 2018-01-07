@@ -5,18 +5,18 @@
 	interface with the ABCC but only MOSI, MISO, and SCLK are connected to the Logic
 	analyzer. This mode will ignore timing and CPOL/CPHA requirements that the ABCC's
 	3-wire mode enforces. -->
-	<Setting type="4-wire-on-3-channels">0</Setting>
+	<Setting name="4-wire-on-3-channels">0</Setting>
 
 	<!-- "3-wire-on-4-channels" is useful when a 3-wire SPI configuration is used to
 	interface with the ABCC but the user has a spare Logic channel that can be used
 	as a dummy place holder for placing the markers that the plugin normally applied
 	to the SPI Enable channel. -->
-	<Setting type="3-wire-on-4-channels">0</Setting>
+	<Setting name="3-wire-on-4-channels">0</Setting>
 
 	<!-- "export-delimiter" allows the user to define a delimiter to use when
 	using one of the plugin's supported export options. Any single (visible)
 	character is accepted as a delimiter. A tab-delimiter can be specified
 	by using "\t" without the quotes. -->
-	<Setting type="export-delimiter">\t</Setting>
+	<Setting name="export-delimiter">\t</Setting>
 
 </AdvancedSettings>

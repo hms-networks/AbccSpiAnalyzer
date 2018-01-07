@@ -147,6 +147,7 @@ protected: /* Methods */
 	bool ParseAdvancedSettingsFile(void);
 #endif
 
+	void SetSettingError( const std::string& setting_name, const std::string& error_text );
 	U8 SaveSettingChangeID();
 };
 
