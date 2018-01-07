@@ -19,6 +19,7 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
     * [OS X](#os-x)
 4. [Documentation](#documentation)
 5. [Changelog](#changelog)
+6. [Licenses](#licenses)
 
 ---
 
@@ -101,5 +102,9 @@ For complete details regarding this plugin's functionality please consult the
 
 ## [Changelog](#table-of-contents)
 
-Please see [CHANGELOG.md](CHANGELOG.md) provided within this repository for details on the
-changelog history.
+Please see [CHANGELOG.md](CHANGELOG.md) provided within this repository for details on the changelog history.
+
+## [Licenses](#table-of-contents)
+
+Please see [LICENSE.md](LICENSE.md) provided within this repository for details on the software licensing.
+
