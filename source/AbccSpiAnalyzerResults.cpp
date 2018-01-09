@@ -260,6 +260,27 @@ bool SpiAnalyzerResults::BuildCmdString(U8 val, U8 obj, DisplayBase display_base
 	return errorRspMsg;
 }
 
+void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base)
+{
+	char verbose_str[FORMATTED_STRING_BUFFER_SIZE];
+	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	bool alert = false;
+	bool objFound = true;
+
+	objFound = GetInstString(nw_type_idx, obj, val, verbose_str, sizeof(verbose_str), &alert, display_base);
+
+	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MSG_CMD_EXT), number_str, sizeof(number_str));
+
+	if (objFound)
+	{
+		StringBuilder(GET_MSG_FRAME_TAG(e_ABCC_MSG_INST), number_str, verbose_str, alert);
+	}
+	else
+	{
+		StringBuilder(GET_MSG_FRAME_TAG(e_ABCC_MSG_INST), number_str, NULL, false);
+	}
+}
+
 void SpiAnalyzerResults::BuildAttrString(U8 obj, U16 inst, U16 val, bool indexed, DisplayBase display_base)
 {
 	char verbose_str[FORMATTED_STRING_BUFFER_SIZE];
@@ -477,8 +498,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					BuildObjectString((U8)frame.mData1, display_base);
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), number_str, sizeof(number_str));
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), number_str, NULL, alert);
+					BuildInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, display_base);
 					break;
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd:
 					BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
@@ -637,8 +657,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					BuildObjectString((U8)frame.mData1, display_base);
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), number_str, sizeof(number_str));
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), number_str, NULL, alert);
+					BuildInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, display_base);
 					break;
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
 					BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
@@ -1401,7 +1420,21 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(acMsgInstStr[ABCC_MISO_CHANNEL], sizeof(acMsgInstStr[ABCC_MISO_CHANNEL]), "Instance: %d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
+						bool found = false;
+						bool alert = false;
+						found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, str, sizeof(str), &alert, display_base);
+						if (!found)
+						{
+							SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
+						}
+						if (alert)
+						{
+							SNPRINTF(acMsgInstStr[ABCC_MISO_CHANNEL], sizeof(acMsgInstStr[ABCC_MISO_CHANNEL]), "!Instance: %s", str);
+						}
+						else
+						{
+							SNPRINTF(acMsgInstStr[ABCC_MISO_CHANNEL], sizeof(acMsgInstStr[ABCC_MISO_CHANNEL]), "Instance: %s", str);
+						}
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{
@@ -1606,7 +1639,21 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						SNPRINTF(acMsgInstStr[ABCC_MOSI_CHANNEL], sizeof(acMsgInstStr[ABCC_MOSI_CHANNEL]), "Instance: %d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
+						bool found = false;
+						bool alert = false;
+						found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, str, sizeof(str), &alert, display_base);
+						if (!found)
+						{
+							SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
+						}
+						if (alert)
+						{
+							SNPRINTF(acMsgInstStr[ABCC_MOSI_CHANNEL], sizeof(acMsgInstStr[ABCC_MOSI_CHANNEL]), "!Instance: %s", str);
+						}
+						else
+						{
+							SNPRINTF(acMsgInstStr[ABCC_MOSI_CHANNEL], sizeof(acMsgInstStr[ABCC_MOSI_CHANNEL]), "Instance: %s", str);
+						}
 					}
 					else if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_COMPACT)
 					{

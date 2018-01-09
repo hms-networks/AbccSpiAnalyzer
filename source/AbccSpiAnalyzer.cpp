@@ -824,6 +824,9 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_inst)
 	{
 		sMisoMsgHeader.inst = (U16)lFrameData;
+
+		/* Store the object code in frame data to handle object specific data */
+		result_frame.mData2 = sMisoMsgHeader.obj;
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_cmd)
 	{
@@ -1025,6 +1028,9 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_inst)
 	{
 		sMosiMsgHeader.inst = (U16)lFrameData;
+
+		/* Store the object code in frame data to handle object specific data */
+		result_frame.mData2 = sMosiMsgHeader.obj;
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd)
 	{

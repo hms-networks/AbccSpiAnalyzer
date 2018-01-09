@@ -74,6 +74,7 @@ protected: /* functions */
 	virtual void BuildIntMask(U8 val, DisplayBase display_base);
 	virtual void BuildObjectString(U8 val, DisplayBase display_base);
 
+	virtual void BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base);
 	virtual void BuildAttrString(U8 obj, U16 inst, U16 val, bool indexed, DisplayBase display_base);
 
 	virtual void ExportAllFramesToFile(const char* file, DisplayBase display_base);

@@ -17,12 +17,42 @@
 
 #define ENABLE_ADVANCED_SETTINGS 1
 
-typedef enum tDecodeVerbosityLevel
-{
+typedef enum tNetworkType {
+	e_NW_TYPE_UNSPECIFIED,
+	e_NW_TYPE_PDPV0,		  /* PROFIBUS DP-V0 */
+	e_NW_TYPE_PDPV1,		  /* PROFIBUS DP-V1 */
+	e_NW_TYPE_COP,			  /* CANopen */
+	e_NW_TYPE_DEV,			  /* DeviceNet */
+	e_NW_TYPE_RTU,			  /* Modbus-RTU */
+	e_NW_TYPE_CNT,			  /* ControlNet */
+	e_NW_TYPE_ETN_1P,		  /* Modbus-TCP */
+	e_NW_TYPE_PRT,			  /* PROFINET RT */
+	e_NW_TYPE_EIP_1P,		  /* EtherNet/IP */
+	e_NW_TYPE_ECT,			  /* EtherCAT */
+	e_NW_TYPE_PIR,			  /* PROFINET IRT */
+	e_NW_TYPE_CCL,			  /* CC-Link */
+	e_NW_TYPE_ETN_2P,		  /* Modbus-TCP 2-Port */
+	e_NW_TYPE_CPN,			  /* CompoNet */
+	e_NW_TYPE_PRT_2P,		  /* PROFINET RT 2-port */
+	e_NW_TYPE_SRC3,			  /* SERCOS III */
+	e_NW_TYPE_BMP,			  /* BACnet MS/TP */
+	e_NW_TYPE_BIP,			  /* BACnet/IP */
+	e_NW_TYPE_EIP_2P_BB,	  /* EtherNet/IP 2-Port BB DLR */
+	e_NW_TYPE_EIP_2P,		  /* EtherNet/IP 2-Port */
+	e_NW_TYPE_PIR_FO,		  /* PROFINET IRT FO */
+	e_NW_TYPE_EPL,			  /* POWERLINK */
+	e_NW_TYPE_CFN,			  /* CC-Link IE Field Network */
+	e_NW_TYPE_CET,			  /* Common Ethernet */
+	e_NW_TYPE_EIP_2P_BB_IIOT, /* EtherNet/IP IIoT */
+	e_NW_TYPE_PIR_IIOT,		  /* PROFINET IRT IIoT */
+	e_NW_TYPE_PIR_FO_IIOT	  /* PROFINET IRT FO IIoT */
+} tNetworkType;
+
+typedef enum tDecodeVerbosityLevel {
 	e_VERBOSITY_LEVEL_DISABLED,
 	e_VERBOSITY_LEVEL_COMPACT,
 	e_VERBOSITY_LEVEL_DETAILED
-}tDecodeVerbosityLevel;
+} tDecodeVerbosityLevel;
 
 typedef enum tDecodeTimestampMode
 {
@@ -63,6 +93,7 @@ public:
 	Channel mMisoChannel;
 	Channel mClockChannel;
 	Channel mEnableChannel;
+	U32 mNetworkType;
 	U32 mMessageIndexingVerbosityLevel;
 	U32 mMsgDataPriority;
 	U32 mProcessDataPriority;
@@ -83,6 +114,7 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mMisoChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mClockChannelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList >	mNetworkTypeInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMsgDataPriorityInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mProcessDataPriorityInterface;

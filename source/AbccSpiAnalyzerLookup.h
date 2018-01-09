@@ -39,6 +39,8 @@ bool GetObjSpecificCmdString(U8 val, char* str, U16 maxLen, tValueName* pasCmdNa
 
 bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_base);
 
+bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 maxlen, bool* pAlert, DisplayBase display_base);
+
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexed, bool* pAlert, DisplayBase display_base);
 
 #endif /* ABCC_SPI_ANALYZER_LOOKUP_H_ */

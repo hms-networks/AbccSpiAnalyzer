@@ -73,6 +73,39 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
+/* Specified in same order as ABP.h */
+const U8 abNetworkTypeValue[] =
+{
+    0x00, /* Unspecified */
+    0x01, /* PROFIBUS DP-V0 */
+    0x05, /* PROFIBUS DP-V1 */
+    0x20, /* CANopen */
+    0x25, /* DeviceNet */
+    0x45, /* Modbus-RTU */
+    0x65, /* ControlNet */
+    0x80, /* Modbus-TCP */
+    0x84, /* PROFINET RT */
+    0x85, /* EtherNet/IP */
+    0x87, /* EtherCAT */
+    0x89, /* PROFINET IRT */
+    0x90, /* CC-Link */
+    0x93, /* Modbus-TCP 2-Port */
+    0x95, /* CompoNet */
+    0x96, /* PROFINET RT 2-port */
+    0x98, /* SERCOS III */
+    0x99, /* BACnet MS/TP */
+    0x9A, /* BACnet/IP */
+    0x9B, /* EtherNet/IP 2-Port BB DLR */
+    0x9C, /* EtherNet/IP 2-Port */
+    0x9D, /* PROFINET IRT FO */
+    0x9F, /* POWERLINK */
+    0x9E, /* CC-Link IE Field Network */
+    0xA3, /* Common Ethernet */
+    0xAB, /* EtherNet/IP IIoT */
+    0xAD, /* PROFINET IRT IIoT */
+    0xAE  /* PROFINET IRT FO IIoT */
+};
+
 const tAbccMosiInfo asMosiStates[] =
 {
 	{ e_ABCC_MOSI_IDLE,						"",			0 },
@@ -134,6 +167,161 @@ const tAbccMsgInfo asMsgStates[] =
 	{ e_ABCC_MSG_RESERVED2,	"RES",		ABCC_MSG_RES2_FIELD_SIZE },
 	{ e_ABCC_MSG_CMD_EXT,	"EXT",		ABCC_MSG_CMDEXT_FIELD_SIZE },
 	{ e_ABCC_MSG_DATA,		"MD",		ABCC_MSG_DATA_FIELD_SIZE }
+};
+
+static const tValueName asBipNcInstNames[] =
+{
+	{ 3,	"IP Address",											false },
+	{ 4,	"Subnet Mask",											false },
+	{ 5,	"Gateway Address",										false },
+	{ 6,	"DHCP Enable",											false },
+	{ 7,	"Ethernet Communication Settings 1",					false },
+	{ 8,	"Ethernet Communication Settings 2",					false },
+	{ 9,	"DNS 1",												false },
+	{ 10,	"DNS 2",												false },
+	{ 11,	"Host Name",											false },
+	{ 12,	"Domain Name",											false },
+	{ 13,	"SMTP Server",											false },
+	{ 14,	"SMTP User",											false },
+	{ 15,	"SMTP Password",										false },
+	{ 16,	"MDI 1 Settings",										false },
+	{ 17,	"MDI 2 Settings",										false },
+	{ 18,	"Reserved",												false },
+	{ 19,	"Reserved",												false },
+	{ 20,	"Device Instance",										false },
+	{ 21,	"UDP Port",												false },
+	{ 22,	"Process Active Timeout",								false },
+	{ 23,	"Foreign Device Registration IPAddress",				false },
+	{ 24,	"Foreign Device Registration UDP Port",					false },
+	{ 25,	"Foreign Device Registration Time to Live Value",		false },
+};
+
+static const tValueName asCclNcInstNames[] =
+{
+	{ 1,	"Station Number",						false },
+	{ 3,	"Network Number",						false }
+};
+
+static const tValueName asCetNcInstNames[] =
+{
+	{ 3,	"IP Address",							false },
+	{ 4,	"Subnet Mask",							false },
+	{ 5,	"Gateway Address",						false },
+	{ 6,	"DHCP Enable",							false },
+	{ 7,	"Ethernet Communication Settings 1",	false },
+	{ 8,	"Ethernet Communication Settings 2",	false },
+	{ 9,	"DNS 1",								false },
+	{ 10,	"DNS 2",								false },
+	{ 11,	"Host Name",							false },
+	{ 12,	"Domain Name",							false },
+	{ 13,	"SMTP Server",							false },
+	{ 14,	"SMTP User",							false },
+	{ 15,	"SMTP Password",						false },
+	{ 16,	"MDI 1 Settings",						false },
+	{ 17,	"MDI 2 Settings",						false },
+	{ 18,	"Reserved",								false },
+	{ 19,	"Reserved",								false },
+};
+
+static const tValueName asCopNcInstNames[] =
+{
+	{ 1,	"Device Address",	false },
+	{ 2,	"Baud Rate",		false },
+};
+
+static const tValueName asDevNcInstNames[] =
+{
+	{ 1,	"Node Address",						false },
+	{ 2,	"Baud Rate",						false },
+	{ 3,	"QuickConnect",						false }
+};
+
+static const tValueName asEctNcInstNames[] =
+{
+	{ 1,	"Device ID",							false },
+	{ 3,	"IP Address",							false },
+	{ 4,	"Subnet Mask",							false },
+	{ 5,	"Gateway Address",						false },
+	{ 6,	"DHCP Enable",							false },
+	{ 9,	"DNS 1",								false },
+	{ 10,	"DNS 2",								false },
+	{ 11,	"Host Name",							false },
+	{ 12,	"Domain Name",							false },
+	{ 13,	"SMTP Server",							false },
+	{ 14,	"SMTP User",							false },
+	{ 15,	"SMTP Password",						false }
+};
+
+static const tValueName asEipNcInstNames[] =
+{
+	{ 3,	"IP Address",							false },
+	{ 4,	"Subnet Mask",							false },
+	{ 5,	"Gateway Address",						false },
+	{ 6,	"DHCP Enable",							false },
+	{ 7,	"Ethernet Communication Settings 1",	false },
+	{ 8,	"Ethernet Communication Settings 2",	false },
+	{ 9,	"DNS 1",								false },
+	{ 10,	"DNS 2",								false },
+	{ 11,	"Host Name",							false },
+	{ 12,	"Domain Name",							false },
+	{ 13,	"SMTP Server",							false },
+	{ 14,	"SMTP User",							false },
+	{ 15,	"SMTP Password",						false },
+	{ 16,	"MDI 1 Settings",						false },
+	{ 17,	"MDI 2 Settings",						false },
+	{ 18,	"Reserved",								false },
+	{ 19,	"Reserved",								false },
+	{ 20,	"QuickConnect",							false }
+};
+
+static const tValueName asEplNcInstNames[] =
+{
+	{ 1,	"Node ID",	false }
+};
+
+static const tValueName asEtnNcInstNames[] =
+{
+	{ 3,	"IP Address",							false },
+	{ 4,	"Subnet Mask",							false },
+	{ 5,	"Gateway Address",						false },
+	{ 6,	"DHCP Enable",							false },
+	{ 7,	"Ethernet Communication Settings 1",	false },
+	{ 8,	"Ethernet Communication Settings 2",	false },
+	{ 9,	"DNS 1",								false },
+	{ 10,	"DNS 2",								false },
+	{ 11,	"Host Name",							false },
+	{ 12,	"Domain Name",							false },
+	{ 13,	"SMTP Server",							false },
+	{ 14,	"SMTP User",							false },
+	{ 15,	"SMTP Password",						false },
+	{ 16,	"MDI 1 Settings",						false },
+	{ 17,	"MDI 2 Settings",						false },
+	{ 18,	"Reserved",								false },
+	{ 19,	"Reserved",								false },
+	{ 20,	"Modbus Connection Timeout",			false },
+	{ 21,	"Process Active Timeout",				false },
+	{ 22,	"Word Order",							false }
+};
+
+static const tValueName asPirNcInstNames[] =
+{
+	{ 3,	"IP Address",							false },
+	{ 4,	"Subnet Mask",							false },
+	{ 5,	"Gateway Address",						false },
+	{ 6,	"DHCP Enable",							false },
+	{ 9,	"DNS 1",								false },
+	{ 10,	"DNS 2",								false },
+	{ 11,	"Host Name",							false },
+	{ 12,	"Domain Name",							false },
+	{ 13,	"SMTP Server",							false },
+	{ 14,	"SMTP User",							false },
+	{ 15,	"SMTP Password",						false },
+	{ 16,	"Reserved",								false },
+	{ 17,	"Reserved",								false },
+	{ 18,	"Reserved",								false },
+	{ 19,	"Reserved",								false },
+	{ 20,	"Station Name",							false },
+	{ 21,	"F-Address",							false }
 };
 
 static const tValueName asAddObjAttrNames[] =
@@ -583,7 +771,7 @@ static const tValueName asPnioInstAttrNames[] =
 	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						false }
 };
 
-static const tValueName asEipInstAttrNames[] =
+static const tValueName asEipNcInstAttrNames[] =
 {
 	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										false },
 	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										false },
@@ -652,7 +840,7 @@ static const tValueName asEmeInstAttrNames[] =
 	{ ABP_EME_IA_TOTAL_APPARENT_ENERGY,			"Total Apparent Energy",		false }
 };
 
-static const tValueName asEtcInstAttrNames[] =
+static const tValueName asEtcNcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
 	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								false },
@@ -1716,6 +1904,34 @@ bool GetLedStatusString(U16 val, char* str, U16 maxLen, DisplayBase display_base
 	return alert;
 }
 
+bool GetNamedInstString(U16 val,
+	char* str, U16 maxLen,
+	DisplayBase display_base,
+	const tValueName* pasInstNames, U8 NoInstNames)
+{
+	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	U8 bNoAttrs = 0;
+	bool alert = false;
+	bool found = false;
+
+	for (U8 i = 0; i < NoInstNames; i++)
+	{
+		if (pasInstNames[i].value == val)
+		{
+			SNPRINTF(str, maxLen, pasInstNames[i].name);
+			alert = pasInstNames[i].alert;
+			found = true;
+		}
+	}
+
+	if (!found)
+	{
+		SNPRINTF(str, maxLen, "Unknown: %d (0x%04X)", val, val);
+		alert = true;
+	}
+	return alert;
+}
+
 bool GetNamedAttrString(U16 inst, U8 val,
 	char* str, U16 maxLen,
 	DisplayBase display_base,
@@ -1987,6 +2203,82 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 maxLen, DisplayBase display_bas
 	return alert;
 }
 
+bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 maxlen, bool* pAlert, DisplayBase display_base)
+{
+	bool objFound = true;
+	if (obj == ABP_OBJ_NUM_NC)
+	{
+		switch (abNetworkTypeValue[nw_type_idx])
+		{
+		case ABP_NW_TYPE_BIP:
+			/* BACnet IP */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asBipNcInstNames[0], sizeof(asBipNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_CCL:
+			/* CC-Link IE */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asCclNcInstNames[0], sizeof(asCclNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_CET:
+			/* Common Ethernet */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asCetNcInstNames[0], sizeof(asCetNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_COP:
+			/* CANopen */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asCopNcInstNames[0], sizeof(asCopNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_DEV:
+			/* DeviceNet */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asDevNcInstNames[0], sizeof(asDevNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_ECT:
+			/* EtherCAT */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asEctNcInstNames[0], sizeof(asEctNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_EIP_1P:
+		case ABP_NW_TYPE_EIP_2P_BB:
+		case ABP_NW_TYPE_EIP_2P:
+		case ABP_NW_TYPE_EIP_2P_BB_IIOT:
+			/* EtherNet/IP */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asEipNcInstNames[0], sizeof(asEipNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_EPL:
+			/* Powerlink */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asEplNcInstNames[0], sizeof(asEplNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_ETN_1P:
+		case ABP_NW_TYPE_ETN_2P:
+			/* Modbus/TCP */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asEtnNcInstNames[0], sizeof(asEtnNcInstNames) / sizeof(tValueName));
+			break;
+		case ABP_NW_TYPE_PIR:
+		case ABP_NW_TYPE_PIR_FO:
+		case ABP_NW_TYPE_PIR_FO_IIOT:
+		case ABP_NW_TYPE_PIR_IIOT:
+			/* Profinet */
+			*pAlert = GetNamedInstString((U8)val, &str[0], maxlen, display_base,
+				&asPirNcInstNames[0], sizeof(asPirNcInstNames) / sizeof(tValueName));
+			break;
+		default:
+			objFound = false;
+			break;
+		}
+	}
+	else
+	{
+		objFound = false;
+	}
+	return objFound;
+}
+
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexed, bool* pAlert, DisplayBase display_base)
 {
 	bool objFound = true;
@@ -2176,7 +2468,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 	case ABP_OBJ_NUM_ECT:
 		/* EtherCAT Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asEtcInstAttrNames[0], sizeof(asEtcInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEtcNcInstAttrNames[0], sizeof(asEtcNcInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
@@ -2186,7 +2478,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 maxlen, bool indexe
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], maxlen, display_base,
-			NULL, 0, &asEipInstAttrNames[0], sizeof(asEipInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEipNcInstAttrNames[0], sizeof(asEipNcInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */

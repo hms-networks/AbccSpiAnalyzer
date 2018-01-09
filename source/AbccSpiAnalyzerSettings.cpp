@@ -21,7 +21,7 @@
 #include "rapidxml-1.13/rapidxml.hpp"
 
 /* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION_STRING "REVISION_00000002"
+#define SETTINGS_REVISION_STRING "REVISION_00000003"
 
 /* Default setting states */
 static const U32  d_MessageIndexingVerbosityLevel = e_VERBOSITY_LEVEL_DETAILED;
@@ -39,6 +39,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMisoChannel(UNDEFINED_CHANNEL),
 	mClockChannel(UNDEFINED_CHANNEL),
 	mEnableChannel(UNDEFINED_CHANNEL),
+	mNetworkType(e_NW_TYPE_UNSPECIFIED),
 	mMessageIndexingVerbosityLevel(d_MessageIndexingVerbosityLevel),
 	mMsgDataPriority(d_MsgDataPriority),
 	mProcessDataPriority(d_ProcessDataPriority),
@@ -70,6 +71,39 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mEnableChannelInterface->SetTitleAndTooltip("SPI Channel - Enable :", "Enable (SS, Slave Select)");
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
+
+
+	mNetworkTypeInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mNetworkTypeInterface->SetTitleAndTooltip("Network Type :", "Used to process network specific details such as the network configuration object's instance names.\nCan be set to \"Unspecified\", if unsure or if such details are not important.");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,  "Unspecified","");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,  "PROFIBUS DP-V0", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,  "PROFIBUS DP-V1", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_COP,  "CANopen", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_DEV,  "DeviceNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,  "Modbus-RTU", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,  "ControlNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,  "Modbus-TCP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,  "PROFINET RT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,  "EtherNet/IP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ECT,  "EtherCAT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR,  "PROFINET IRT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CCL,  "CC-Link", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_2P,  "Modbus-TCP 2-Port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,  "CompoNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,  "PROFINET RT 2-port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,  "SERCOS III", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,  "BACnet MS/TP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BIP,  "BACnet/IP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB,  "EtherNet/IP 2-Port BB DLR", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,  "EtherNet/IP 2-Port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO,  "PROFINET IRT FO", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EPL,  "POWERLINK", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CFN,  "CC-Link IE Field Network", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET,  "Common Ethernet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB_IIOT,  "EtherNet/IP IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_IIOT,  "PROFINET IRT IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO_IIOT,  "PROFINET IRT FO IIoT", "");
+	mNetworkTypeInterface->SetNumber(mNetworkType);
 
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());
 	mIndexErrorsInterface->SetTitleAndTooltip("Index - Errors :", "Enable indexed searching of errors.");
@@ -126,6 +160,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mClockChannelInterface.get());
 	AddInterface(mEnableChannelInterface.get());
 
+	AddInterface(mNetworkTypeInterface.get());
 	AddInterface(mIndexErrorsInterface.get());
 	AddInterface(mIndexTimestampsInterface.get());
 	AddInterface(mIndexAnybusStatusInterface.get());
@@ -282,6 +317,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mClockChannel  = mClockChannelInterface->GetChannel();
 	mEnableChannel = mEnableChannelInterface->GetChannel();
 
+	mNetworkType                   = U32(mNetworkTypeInterface->GetNumber());
 	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
 	mMsgDataPriority               = U32(mMsgDataPriorityInterface->GetNumber());
 	mProcessDataPriority           = U32(mProcessDataPriorityInterface->GetNumber());
@@ -333,6 +369,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	text_archive >> &pcSettingsVersionString;
 	if (strcmp(pcSettingsVersionString, SETTINGS_REVISION_STRING) == 0)
 	{
+		text_archive >> mNetworkType;
 		text_archive >> mMessageIndexingVerbosityLevel;
 		text_archive >> mMsgDataPriority;
 		text_archive >> mProcessDataPriority;
@@ -366,6 +403,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive << mEnableChannel;
 
 	text_archive << SETTINGS_REVISION_STRING;
+	text_archive << mNetworkType;
 	text_archive << mMessageIndexingVerbosityLevel;
 	text_archive << mMsgDataPriority;
 	text_archive << mProcessDataPriority;
@@ -390,6 +428,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mClockChannelInterface->SetChannel(mClockChannel);
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 
+	mNetworkTypeInterface->SetNumber(mNetworkType);
 	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
 	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
 	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
