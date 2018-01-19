@@ -61,6 +61,8 @@
 #define IS_CMD_OBJECT_SPECIFIC(cmd) 	(((cmd >= 0x10) && (cmd <= 0x30)) || \
 										(cmd == 0x3F))
 
+#define NUM_ENTRIES(val_name_lut)		( sizeof(val_name_lut) / sizeof(tValueName) )
+
 #define ABCC_MSG_SIZE_FIELD_SIZE		2
 #define ABCC_MSG_RES1_FIELD_SIZE		2
 #define ABCC_MSG_SRC_ID_FIELD_SIZE		1
@@ -1632,7 +1634,7 @@ bool GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_ba
 	const char separatorStr[] = " | ";
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asSpiCtrlNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asSpiCtrlNames); i++)
 	{
 		if (((asSpiCtrlNames[i].value & val) != 0) || (asSpiCtrlNames[i].value == ABP_SPI_CTRL_CMDCNT))
 		{
@@ -1671,7 +1673,7 @@ bool GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_bas
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asSpiStsNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asSpiStsNames); i++)
 	{
 		if (((asSpiStsNames[i].value & val) != 0) || (asSpiStsNames[i].value == ABP_SPI_STATUS_CMDCNT))
 		{
@@ -1708,7 +1710,7 @@ bool GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_ba
 	bool alert = false;
 	bool found = false;
 
-	for (U8 i = 0; i < (sizeof(asApplStsNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asApplStsNames); i++)
 	{
 		if (asApplStsNames[i].value == val)
 		{
@@ -1736,7 +1738,7 @@ bool GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display
 	bool found = false;
 	char tmpstr[FORMATTED_STRING_BUFFER_SIZE];
 
-	for (U8 i = 0; i < (sizeof(asAnybusStsNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asAnybusStsNames); i++)
 	{
 		if (asAnybusStsNames[i].value == (val & (ABCC_STATUS_CODE_MASK | ABCC_STATUS_RESERVED_MASK)))
 		{
@@ -1769,7 +1771,7 @@ bool GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display
 bool GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	for (U8 i = 0; i < (sizeof(asErrorRspNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asErrorRspNames); i++)
 	{
 		if (asErrorRspNames[i].value == val)
 		{
@@ -1810,72 +1812,72 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase d
 	case ABP_OBJ_NUM_AFSI:
 		/* (Application/Anybus) File System Interface Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asFsiErrNames[0],
-			(sizeof(asFsiErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asFsiErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_FUSM:
 		/* Functional Safety Module Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asFusmErrNames[0],
-			(sizeof(asFusmErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asFusmErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_ANB:
 		/* Anybus Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asAnbErrNames[0],
-			(sizeof(asAnbErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asAnbErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asDiErrNames[0],
-			(sizeof(asDiErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asDiErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_MOD:
 		/* Modbus Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asModErrNames[0],
-			(sizeof(asModErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asModErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asNwErrNames[0],
-			(sizeof(asNwErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asNwErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_NWCCL:
 		/* Network CCL Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asNwCclErrNames[0],
-			(sizeof(asNwCclErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asNwCclErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_NWDPV1:
 		/* Network DPV1 Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asNwDpv1ErrNames[0],
-			(sizeof(asNwDpv1ErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asNwDpv1ErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_NWPNIO:
 		/* Network PNIO Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asNwPnioErrNames[0],
-			(sizeof(asNwPnioErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asNwPnioErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asAppdErrNames[0],
-			(sizeof(asAppdErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asAppdErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_SMTP:
 		/* SMTP Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asSmtpErrNames[0],
-			(sizeof(asSmtpErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asSmtpErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_SOC:
 		/* Socket Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asSocErrNames[0],
-			(sizeof(asSocErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asSocErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asEipErrNames[0],
-			(sizeof(asEipErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asEipErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
 		GetObjSpecificErrString(val, str, max_str_len, &asPnioErrNames[0],
-			(sizeof(asPnioErrNames) / sizeof(tValueName)), display_base);
+			NUM_ENTRIES(asPnioErrNames), display_base);
 		break;
 	case ABP_OBJ_NUM_CCL:
 		/* CC-Link Object */
@@ -1905,7 +1907,7 @@ bool GetIntMaskString(U8 val, char* str, U16 max_str_len, DisplayBase display_ba
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asIntMaskNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asIntMaskNames); i++)
 	{
 		if ((asIntMaskNames[i].value & val) != 0)
 		{
@@ -1938,7 +1940,7 @@ bool GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase display
 
 	display_base = display_base; /* Resolve compiler warning */
 
-	for (U8 i = 0; i < (sizeof(asLedStsNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asLedStsNames); i++)
 	{
 		if ((asLedStsNames[i].value & val) != 0)
 		{
@@ -2005,10 +2007,10 @@ bool GetNamedAttrString(U16 inst, U8 val,
 
 	if (inst == ABP_INST_OBJ)
 	{
-		if (val <= asObjAttrNames[(sizeof(asObjAttrNames) / sizeof(tValueName)) - 1].value)
+		if (val <= asObjAttrNames[NUM_ENTRIES(asObjAttrNames) - 1].value)
 		{
 			pasAttrNames = &asObjAttrNames[0];
-			bNoAttrs = (sizeof(asObjAttrNames) / sizeof(tValueName));
+			bNoAttrs = NUM_ENTRIES(asObjAttrNames);
 		}
 		else
 		{
@@ -2062,7 +2064,7 @@ bool GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase display_bas
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
-	for (U8 i = 0; i < (sizeof(asObjectNames) / sizeof(tValueName)); i++)
+	for (U8 i = 0; i < NUM_ENTRIES(asObjectNames); i++)
 	{
 		if (asObjectNames[i].value == val)
 		{
@@ -2101,7 +2103,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase displa
 
 	if (IS_CMD_STANDARD(cmd))
 	{
-		for (U8 i = 0; i < (sizeof(asCmdNames) / sizeof(tValueName)); i++)
+		for (U8 i = 0; i < NUM_ENTRIES(asCmdNames); i++)
 		{
 			if (asCmdNames[i].value == cmd)
 			{
@@ -2117,133 +2119,133 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase displa
 		case ABP_OBJ_NUM_ADD:
 			/* Additional Diagnostic Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAddCmdNames[0], (sizeof(asAddCmdNames) / sizeof(tValueName)), display_base);
+				&asAddCmdNames[0], NUM_ENTRIES(asAddCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_NW:
 			/* Network Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNwCmdNames[0], (sizeof(asNwCmdNames) / sizeof(tValueName)), display_base);
+				&asNwCmdNames[0], NUM_ENTRIES(asNwCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_NWCCL:
 			/* Network CCL Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNwCclCmdNames[0], (sizeof(asNwCclCmdNames) / sizeof(tValueName)), display_base);
+				&asNwCclCmdNames[0], NUM_ENTRIES(asNwCclCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_FUSM:
 			/* Functional Safety Module Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asFusmCmdNames[0], (sizeof(asFusmCmdNames) / sizeof(tValueName)), display_base);
+				&asFusmCmdNames[0], NUM_ENTRIES(asFusmCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_FSI:
 		case ABP_OBJ_NUM_AFSI:
 			/* (Application/Anybus) File System Interface Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asFsiCmdNames[0], (sizeof(asFsiCmdNames) / sizeof(tValueName)), display_base);
+				&asFsiCmdNames[0], NUM_ENTRIES(asFsiCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_ASM:
 			/* Assembly Mapping Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAsmCmdNames[0], (sizeof(asAsmCmdNames) / sizeof(tValueName)), display_base);
+				&asAsmCmdNames[0], NUM_ENTRIES(asAsmCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_BAC:
 			/* BacNet Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asBacCmdNames[0], (sizeof(asBacCmdNames) / sizeof(tValueName)), display_base);
+				&asBacCmdNames[0], NUM_ENTRIES(asBacCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_CCL:
 			/* CC-Link Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asCclCmdNames[0], (sizeof(asCclCmdNames) / sizeof(tValueName)), display_base);
+				&asCclCmdNames[0], NUM_ENTRIES(asCclCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_CFN:
 			/* CFN Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asCfnCmdNames[0], (sizeof(asCfnCmdNames) / sizeof(tValueName)), display_base);
+				&asCfnCmdNames[0], NUM_ENTRIES(asCfnCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_CNT:
 			/* ControlNet Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asCntCmdNames[0], (sizeof(asCntCmdNames) / sizeof(tValueName)), display_base);
+				&asCntCmdNames[0], NUM_ENTRIES(asCntCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_CPN:
 			/* CompoNet Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asCpnCmdNames[0], (sizeof(asCpnCmdNames) / sizeof(tValueName)), display_base);
+				&asCpnCmdNames[0], NUM_ENTRIES(asCpnCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_DEV:
 			/* DeviceNet Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asDevCmdNames[0], (sizeof(asDevCmdNames) / sizeof(tValueName)), display_base);
+				&asDevCmdNames[0], NUM_ENTRIES(asDevCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_DPV1:
 			/* DPV1 Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asDpv1CmdNames[0], (sizeof(asDpv1CmdNames) / sizeof(tValueName)), display_base);
+				&asDpv1CmdNames[0], NUM_ENTRIES(asDpv1CmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_ECO:
 			/* Energy Control Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asEcoCmdNames[0], (sizeof(asEcoCmdNames) / sizeof(tValueName)), display_base);
+				&asEcoCmdNames[0], NUM_ENTRIES(asEcoCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_MOD:
 			/* Modbus Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asModCmdNames[0], (sizeof(asModCmdNames) / sizeof(tValueName)), display_base);
+				&asModCmdNames[0], NUM_ENTRIES(asModCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_MDD:
 			/* Modular Device Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asMddCmdNames[0], (sizeof(asMddCmdNames) / sizeof(tValueName)), display_base);
+				&asMddCmdNames[0], NUM_ENTRIES(asMddCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_PNIO:
 			/* PROFINET IO Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asPnioCmdNames[0], (sizeof(asPnioCmdNames) / sizeof(tValueName)), display_base);
+				&asPnioCmdNames[0], NUM_ENTRIES(asPnioCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_EIP:
 			/* EtherNet/IP Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asEipCmdNames[0], (sizeof(asEipCmdNames) / sizeof(tValueName)), display_base);
+				&asEipCmdNames[0], NUM_ENTRIES(asEipCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_ECT:
 			/* EtherNet/IP Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asEctCmdNames[0], (sizeof(asEctCmdNames) / sizeof(tValueName)), display_base);
+				&asEctCmdNames[0], NUM_ENTRIES(asEctCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_APPD:
 			/* Application Data Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAppdCmdNames[0], (sizeof(asAppdCmdNames) / sizeof(tValueName)), display_base);
+				&asAppdCmdNames[0], NUM_ENTRIES(asAppdCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_APP:
 			/* Application Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAppCmdNames[0], (sizeof(asAppCmdNames) / sizeof(tValueName)), display_base);
+				&asAppCmdNames[0], NUM_ENTRIES(asAppCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_NWCFN:
 			/* Network CFN Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNwCfnCmdNames[0], (sizeof(asNwCfnCmdNames) / sizeof(tValueName)), display_base);
+				&asNwCfnCmdNames[0], NUM_ENTRIES(asNwCfnCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_NWPNIO:
 			/* Network PNIO Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNwPnioCmdNames[0], (sizeof(asNwPnioCmdNames) / sizeof(tValueName)), display_base);
+				&asNwPnioCmdNames[0], NUM_ENTRIES(asNwPnioCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_NWDPV1:
 			/* Network DPV1 Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asNwDpv1CmdNames[0], (sizeof(asNwDpv1CmdNames) / sizeof(tValueName)), display_base);
+				&asNwDpv1CmdNames[0], NUM_ENTRIES(asNwDpv1CmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_EME:
 			/* Energy Measurement */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asEmeCmdNames[0], (sizeof(asEmeCmdNames) / sizeof(tValueName)), display_base);
+				&asEmeCmdNames[0], NUM_ENTRIES(asEmeCmdNames), display_base);
 			break;
 		case ABP_OBJ_NUM_SRC3:
 			/* SERCOS III */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asSrc3CmdNames[0], (sizeof(asSrc3CmdNames) / sizeof(tValueName)), display_base);
+				&asSrc3CmdNames[0], NUM_ENTRIES(asSrc3CmdNames), display_base);
 			break;
 		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
@@ -2272,32 +2274,32 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 		case ABP_NW_TYPE_BIP:
 			/* BACnet IP */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asBipNcInstNames[0], sizeof(asBipNcInstNames) / sizeof(tValueName));
+				&asBipNcInstNames[0], NUM_ENTRIES(asBipNcInstNames));
 			break;
 		case ABP_NW_TYPE_CCL:
 			/* CC-Link IE */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asCclNcInstNames[0], sizeof(asCclNcInstNames) / sizeof(tValueName));
+				&asCclNcInstNames[0], NUM_ENTRIES(asCclNcInstNames));
 			break;
 		case ABP_NW_TYPE_CET:
 			/* Common Ethernet */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asCetNcInstNames[0], sizeof(asCetNcInstNames) / sizeof(tValueName));
+				&asCetNcInstNames[0], NUM_ENTRIES(asCetNcInstNames));
 			break;
 		case ABP_NW_TYPE_COP:
 			/* CANopen */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asCopNcInstNames[0], sizeof(asCopNcInstNames) / sizeof(tValueName));
+				&asCopNcInstNames[0], NUM_ENTRIES(asCopNcInstNames));
 			break;
 		case ABP_NW_TYPE_DEV:
 			/* DeviceNet */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asDevNcInstNames[0], sizeof(asDevNcInstNames) / sizeof(tValueName));
+				&asDevNcInstNames[0], NUM_ENTRIES(asDevNcInstNames));
 			break;
 		case ABP_NW_TYPE_ECT:
 			/* EtherCAT */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asEctNcInstNames[0], sizeof(asEctNcInstNames) / sizeof(tValueName));
+				&asEctNcInstNames[0], NUM_ENTRIES(asEctNcInstNames));
 			break;
 		case ABP_NW_TYPE_EIP_1P:
 		case ABP_NW_TYPE_EIP_2P_BB:
@@ -2305,18 +2307,18 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 		case ABP_NW_TYPE_EIP_2P_BB_IIOT:
 			/* EtherNet/IP */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asEipNcInstNames[0], sizeof(asEipNcInstNames) / sizeof(tValueName));
+				&asEipNcInstNames[0], NUM_ENTRIES(asEipNcInstNames));
 			break;
 		case ABP_NW_TYPE_EPL:
 			/* Powerlink */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asEplNcInstNames[0], sizeof(asEplNcInstNames) / sizeof(tValueName));
+				&asEplNcInstNames[0], NUM_ENTRIES(asEplNcInstNames));
 			break;
 		case ABP_NW_TYPE_ETN_1P:
 		case ABP_NW_TYPE_ETN_2P:
 			/* Modbus/TCP */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asEtnNcInstNames[0], sizeof(asEtnNcInstNames) / sizeof(tValueName));
+				&asEtnNcInstNames[0], NUM_ENTRIES(asEtnNcInstNames));
 			break;
 		case ABP_NW_TYPE_PIR:
 		case ABP_NW_TYPE_PIR_FO:
@@ -2324,7 +2326,7 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 		case ABP_NW_TYPE_PIR_IIOT:
 			/* Profinet */
 			*pAlert = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-				&asPirNcInstNames[0], sizeof(asPirNcInstNames) / sizeof(tValueName));
+				&asPirNcInstNames[0], NUM_ENTRIES(asPirNcInstNames));
 			break;
 		default:
 			objFound = false;
@@ -2352,223 +2354,223 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, bool i
 	case ABP_OBJ_NUM_ADD:
 		/* Additional Diagnostic Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asAddObjAttrNames[0], sizeof(asAddObjAttrNames) / sizeof(tValueName),
-			&asAddInstAttrNames[0], sizeof(asAddInstAttrNames) / sizeof(tValueName));
+			&asAddObjAttrNames[0], NUM_ENTRIES(asAddObjAttrNames),
+			&asAddInstAttrNames[0], NUM_ENTRIES(asAddInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ANB:
 		/* Anybus Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asAnbInstAttrNames[0], sizeof(asAnbInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asAnbInstAttrNames[0], NUM_ENTRIES(asAnbInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_BAC:
 		/* BacNet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asBacInstAttrNames[0], sizeof(asBacInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asBacInstAttrNames[0], NUM_ENTRIES(asBacInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CCL:
 		/* CC-Link Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCclInstAttrNames[0], sizeof(asCclInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCclInstAttrNames[0], NUM_ENTRIES(asCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CFN:
 		/* CFN Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCfnInstAttrNames[0], sizeof(asCfnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCfnInstAttrNames[0], NUM_ENTRIES(asCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CNT:
 		/* ControlNet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCntInstAttrNames[0], sizeof(asCntInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCntInstAttrNames[0], NUM_ENTRIES(asCntInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_COP:
 		/* CANopen Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCopInstAttrNames[0], sizeof(asCopInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCopInstAttrNames[0], NUM_ENTRIES(asCopInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPN:
 		/* CompoNet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCpnInstAttrNames[0], sizeof(asCpnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCpnInstAttrNames[0], NUM_ENTRIES(asCpnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DEV:
 		/* DeviceNet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asDevInstAttrNames[0], sizeof(asDevInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asDevInstAttrNames[0], NUM_ENTRIES(asDevInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asDiObjAttrNames[0], sizeof(asDiObjAttrNames) / sizeof(tValueName),
-			&asDiInstAttrNames[0], sizeof(asDiInstAttrNames) / sizeof(tValueName));
+			&asDiObjAttrNames[0], NUM_ENTRIES(asDiObjAttrNames),
+			&asDiInstAttrNames[0], NUM_ENTRIES(asDiInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DPV1:
 		/* DPV1 Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asDpv1InstAttrNames[0], sizeof(asDpv1InstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asDpv1InstAttrNames[0], NUM_ENTRIES(asDpv1InstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECO:
 		/* Energy Control Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asEcoObjAttrNames[0], sizeof(asEcoObjAttrNames) / sizeof(tValueName),
-			&asEcoInstAttrNames[0], sizeof(asEcoInstAttrNames) / sizeof(tValueName));
+			&asEcoObjAttrNames[0], NUM_ENTRIES(asEcoObjAttrNames),
+			&asEcoInstAttrNames[0], NUM_ENTRIES(asEcoInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ER:
 		/* Energy Reporting Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asErInstAttrNames[0], sizeof(asErInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asErInstAttrNames[0], NUM_ENTRIES(asErInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MOD:
 		/* Modbus Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asModInstAttrNames[0], sizeof(asModInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asModInstAttrNames[0], NUM_ENTRIES(asModInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwInstAttrNames[0], sizeof(asNwInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwInstAttrNames[0], NUM_ENTRIES(asNwInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NC:
 		/* Network Configuration Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNcInstAttrNames[0], sizeof(asNcInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNcInstAttrNames[0], NUM_ENTRIES(asNcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SOC:
 		/* Socket Interface Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asSocObjAttrNames[0], sizeof(asSocObjAttrNames) / sizeof(tValueName),
-			&asSocInstAttrNames[0], sizeof(asSocInstAttrNames) / sizeof(tValueName));
+			&asSocObjAttrNames[0], NUM_ENTRIES(asSocObjAttrNames),
+			&asSocInstAttrNames[0], NUM_ENTRIES(asSocInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SMTP:
 		/* SMTP Client Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asSmtpObjAttrNames[0], sizeof(asSmtpObjAttrNames) / sizeof(tValueName),
-			&asSmtpInstAttrNames[0], sizeof(asSmtpInstAttrNames) / sizeof(tValueName));
+			&asSmtpObjAttrNames[0], NUM_ENTRIES(asSmtpObjAttrNames),
+			&asSmtpInstAttrNames[0], NUM_ENTRIES(asSmtpInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_FSI:
 	case ABP_OBJ_NUM_AFSI:
 		/* File system objects */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asFsiObjAttrNames[0], sizeof(asFsiObjAttrNames) / sizeof(tValueName),
-			&asFsiInstAttrNames[0], sizeof(asFsiInstAttrNames) / sizeof(tValueName));
+			&asFsiObjAttrNames[0], NUM_ENTRIES(asFsiObjAttrNames),
+			&asFsiInstAttrNames[0], NUM_ENTRIES(asFsiInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_FUSM:
 		/* Functional Safety Module Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asFusmInstAttrNames[0], sizeof(asFusmInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asFusmInstAttrNames[0], NUM_ENTRIES(asFusmInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWETN:
 		/* Network Ethernet Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCCL:
 		/* Network CCL Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwCclInstAttrNames[0], sizeof(asNwCclInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwCclInstAttrNames[0], NUM_ENTRIES(asNwCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCFN:
 		/* Network CFN Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwCfnInstAttrNames[0], sizeof(asNwCfnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwCfnInstAttrNames[0], NUM_ENTRIES(asNwCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWPNIO:
 		/* Network PNIO Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwPnioInstAttrNames[0], sizeof(asNwPnioInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwPnioInstAttrNames[0], NUM_ENTRIES(asNwPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWDPV1:
 		/* Network DPV1 Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asNwEtnInstAttrNames[0], sizeof(asNwEtnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ETN:
 		/* Ethernet Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEtnInstAttrNames[0], sizeof(asEtnInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEtnInstAttrNames[0], NUM_ENTRIES(asEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPC:
 		/* CIP Port Configuration Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asCpcObjAttrNames[0], sizeof(asCpcObjAttrNames) / sizeof(tValueName),
-			&asCpcInstAttrNames[0], sizeof(asCpcInstAttrNames) / sizeof(tValueName));
+			&asCpcObjAttrNames[0], NUM_ENTRIES(asCpcObjAttrNames),
+			&asCpcInstAttrNames[0], NUM_ENTRIES(asCpcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SAFE:
 		/* Functional Safety Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asSafeInstAttrNames[0], sizeof(asSafeInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asSafeInstAttrNames[0], NUM_ENTRIES(asSafeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EPL:
 		/* Ethernet POWERLINK Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEplInstAttrNames[0], sizeof(asEplInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEplInstAttrNames[0], NUM_ENTRIES(asEplInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ASM:
 		/* Assembly Mapping Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asAsmObjAttrNames[0], sizeof(asAsmObjAttrNames) / sizeof(tValueName),
-			&asAsmInstAttrNames[0], sizeof(asAsmInstAttrNames) / sizeof(tValueName));
+			&asAsmObjAttrNames[0], NUM_ENTRIES(asAsmObjAttrNames),
+			&asAsmInstAttrNames[0], NUM_ENTRIES(asAsmInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MDD:
 		/* Modular Device Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asMddObjAttrNames[0], sizeof(asMddObjAttrNames) / sizeof(tValueName),
+			&asMddObjAttrNames[0], NUM_ENTRIES(asMddObjAttrNames),
 			NULL, 0);
 		break;
 	case ABP_OBJ_NUM_CIPID:
 		/* CIP Identity Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asCipIdInstAttrNames[0], sizeof(asCipIdInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asCipIdInstAttrNames[0], NUM_ENTRIES(asCipIdInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SYNC:
 		/* Sync Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asSyncInstAttrNames[0], sizeof(asSyncInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asSyncInstAttrNames[0], NUM_ENTRIES(asSyncInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECT:
 		/* EtherCAT Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEtcInstAttrNames[0], sizeof(asEtcInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEtcInstAttrNames[0], NUM_ENTRIES(asEtcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asPnioInstAttrNames[0], sizeof(asPnioInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asPnioInstAttrNames[0], NUM_ENTRIES(asPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEipInstAttrNames[0], sizeof(asEipInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEipInstAttrNames[0], NUM_ENTRIES(asEipInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			&asAppdObjAttrNames[0], sizeof(asAppdObjAttrNames) / sizeof(tValueName),
-			&asAppdInstAttrNames[0], sizeof(asAppdInstAttrNames) / sizeof(tValueName));
+			&asAppdObjAttrNames[0], NUM_ENTRIES(asAppdObjAttrNames),
+			&asAppdInstAttrNames[0], NUM_ENTRIES(asAppdInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_APP:
 		/* Application Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asAppInstAttrNames[0], sizeof(asAppInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asAppInstAttrNames[0], NUM_ENTRIES(asAppInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNAM:
 		/* PROFINET Asset Management */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asPnamInstAttrNames[0], sizeof(asPnamInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asPnamInstAttrNames[0], NUM_ENTRIES(asPnamInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EME:
 		/* Energy Measurement */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEmeInstAttrNames[0], sizeof(asEmeInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEmeInstAttrNames[0], NUM_ENTRIES(asEmeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_OPCUA:
 		/* OPC Unified Architecture */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asOpcuaInstAttrNames[0], sizeof(asOpcuaInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SRC3:
 		/* SERCOS III */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asSrc3InstAttrNames[0], sizeof(asSrc3InstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asSrc3InstAttrNames[0], NUM_ENTRIES(asSrc3InstAttrNames));
 		break;
 	default:
 		objFound = false;
