@@ -65,21 +65,21 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	U16 len2, len3;
 	char pad[32] = "";
-	const char alert_str[] = "!ALERT - ";
-	bool apply_pad = false;
+	const char alertStr[] = "!ALERT - ";
+	bool applyPad = false;
 
 	if (verbose && value)
 	{
 		len2 = (U16)strlen(value);
 		if(alert)
 		{
-			len2 += sizeof(alert_str);
+			len2 += sizeof(alertStr);
 		}
 		len3 = (U16)strlen(verbose);
 		if (len3 <= len2)
 		{
 			/* We must pad the level3 (bit states) text to maintain display priority */
-			apply_pad = true;
+			applyPad = true;
 			memset(pad, ' ', ((len2 - len3) >> 1) + 1);
 		}
 	}
@@ -107,7 +107,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			{
 				if (alert)
 				{
-					AddResultString(alert_str, value);
+					AddResultString(alertStr, value);
 				}
 				else
 				{
@@ -126,7 +126,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 
 			if (alert)
 			{
-				AddResultString(alert_str, str);
+				AddResultString(alertStr, str);
 			}
 			else
 			{
@@ -137,7 +137,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 		{
 			if (alert)
 			{
-				AddResultString(alert_str, tag);
+				AddResultString(alertStr, tag);
 			}
 			else
 			{
@@ -156,7 +156,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 				}
 				if (alert)
 				{
-					AddResultString(alert_str, str);
+					AddResultString(alertStr, str);
 				}
 				else
 				{
@@ -172,7 +172,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			SNPRINTF(str, sizeof(str), "%s", value);
 			if (alert)
 			{
-				AddResultString(alert_str, str);
+				AddResultString(alertStr, str);
 			}
 			else
 			{
@@ -185,7 +185,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 	{
 		if (tag)
 		{
-			if (apply_pad)
+			if (applyPad)
 			{
 				SNPRINTF(str, sizeof(str), "%s%s: (%s)%s", pad, tag, verbose, pad);
 			}
@@ -196,7 +196,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 		}
 		else
 		{
-			if (apply_pad)
+			if (applyPad)
 			{
 				SNPRINTF(str, sizeof(str), "%s(%s)%s", pad, verbose, pad);
 			}
@@ -213,15 +213,16 @@ void SpiAnalyzerResults::TableBuilder(bool fMosiChannel, char* text, bool alert)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char* prefix;
-	char mosi_prefix[] = MOSI_TAG_STR;
-	char miso_prefix[] = MISO_TAG_STR;
+	char mosiPrefix[] = MOSI_TAG_STR;
+	char misoPrefix[] = MISO_TAG_STR;
+
 	if(fMosiChannel)
 	{
-		prefix = &mosi_prefix[0];
+		prefix = &mosiPrefix[0];
 	}
 	else
 	{
-		prefix = &miso_prefix[0];
+		prefix = &misoPrefix[0];
 	}
 	if(alert)
 	{
@@ -732,20 +733,20 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 	std::stringstream ss;
 	void* f = AnalyzerHelpers::StartFile(file);
 
-	U64 trigger_sample = mAnalyzer->GetTriggerSample();
-	U32 sample_rate = mAnalyzer->GetSampleRate();
-	U64 num_frames = GetNumFrames();
+	U64 triggerSample = mAnalyzer->GetTriggerSample();
+	U32 sampleRate = mAnalyzer->GetSampleRate();
+	U64 numFrames = GetNumFrames();
 
 	ss << "Channel" CSV_DELIMITER "Time [s]" CSV_DELIMITER "Packet ID" CSV_DELIMITER "Frame Type" CSV_DELIMITER "Frame Data" << std::endl;
 
-	for (U32 i = 0; i < num_frames; i++)
+	for (U32 i = 0; i < numFrames; i++)
 	{
 		Frame frame = GetFrame(i);
-		U64 packet_id = GetPacketContainingFrameSequential(i);
+		U64 packetId = GetPacketContainingFrameSequential(i);
 		char timestampStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 		char frameDataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
 
-		AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, timestampStr, sizeof(timestampStr));
+		AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timestampStr, sizeof(timestampStr));
 
 		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
@@ -766,9 +767,9 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 
 		ss << CSV_DELIMITER << timestampStr;
 
-		if (packet_id != INVALID_RESULT_INDEX)
+		if (packetId != INVALID_RESULT_INDEX)
 		{
-			ss << CSV_DELIMITER << packet_id << CSV_DELIMITER;
+			ss << CSV_DELIMITER << packetId << CSV_DELIMITER;
 		}
 		else
 		{
@@ -808,14 +809,14 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 		AnalyzerHelpers::AppendToFile((U8*)ss.str().c_str(), (U32)ss.str().length(), f);
 		ss.str(std::string());
 
-		if (UpdateExportProgressAndCheckForCancel(i, num_frames) == true)
+		if (UpdateExportProgressAndCheckForCancel(i, numFrames) == true)
 		{
 			AnalyzerHelpers::EndFile(f);
 			return;
 		}
 	}
 
-	UpdateExportProgressAndCheckForCancel(num_frames, num_frames);
+	UpdateExportProgressAndCheckForCancel(numFrames, numFrames);
 	AnalyzerHelpers::EndFile(f);
 }
 
@@ -823,17 +824,17 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 {
 	std::stringstream ssMosi;
 	std::stringstream ssMiso;
-	char time_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	char data_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool fAddMosiEntry;
 	bool fAddMisoEntry;
 	bool fAddLastMosiMsgHeader;
 	bool fAddLastMisoMsgHeader;
 	void* f = AnalyzerHelpers::StartFile(file);
 
-	U64 trigger_sample = mAnalyzer->GetTriggerSample();
-	U32 sample_rate = mAnalyzer->GetSampleRate();
-	U64 num_frames = GetNumFrames();
+	U64 triggerSample = mAnalyzer->GetTriggerSample();
+	U32 sampleRate = mAnalyzer->GetSampleRate();
+	U64 numFrames = GetNumFrames();
 	U64 i = 0;
 
 	/* Add header fields */
@@ -841,25 +842,25 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 	AnalyzerHelpers::AppendToFile((U8*)ssMosi.str().c_str(), (U32)ssMosi.str().length(), f);
 	ssMosi.str(std::string());
 
-	while (i < num_frames)
+	while (i < numFrames)
 	{
-		U64 packet_id = GetPacketContainingFrameSequential(i);
-		if (packet_id != INVALID_RESULT_INDEX)
+		U64 packetId = GetPacketContainingFrameSequential(i);
+		if (packetId != INVALID_RESULT_INDEX)
 		{
-			U64 first_frame_id;
-			U64 last_frame_id;
+			U64 firstFrameId;
+			U64 lastFrameId;
 			fAddMosiEntry = false;
 			fAddMisoEntry = false;
 			fAddLastMosiMsgHeader = true;
 			fAddLastMisoMsgHeader = true;
 
-			GetFramesContainedInPacket(packet_id, &first_frame_id, &last_frame_id);
+			GetFramesContainedInPacket(packetId, &firstFrameId, &lastFrameId);
 
 			/* Iterate through packet and extract message header and data
 			** stream is written only on receipt of "last fragment". */
-			for (U64 frame_id = first_frame_id; frame_id <= last_frame_id; frame_id++)
+			for (U64 frameId = firstFrameId; frameId <= lastFrameId; frameId++)
 			{
-				Frame frame = GetFrame(frame_id);
+				Frame frame = GetFrame(frameId);
 				if (IS_MOSI_FRAME(frame))
 				{
 					switch (frame.mType)
@@ -869,8 +870,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 						if (frame.mData1 & ABP_SPI_CTRL_M)
 						{
 							/* Add in the timestamp, packet ID */
-							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosi << "MOSI" CSV_DELIMITER << time_str << CSV_DELIMITER << packet_id << CSV_DELIMITER;
+							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+							ssMosi << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId << CSV_DELIMITER;
 							fAddMosiEntry = true;
 						}
 						if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
@@ -886,8 +887,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd:
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-						ssMosi << CSV_DELIMITER << data_str;
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMosi << CSV_DELIMITER << dataStr;
 						fAddLastMosiMsgHeader = false;
 						break;
 					}
@@ -899,8 +900,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 							ssMosi << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
 							fAddLastMosiMsgHeader = false;
 						}
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-						ssMosi << CSV_DELIMITER << data_str;
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMosi << CSV_DELIMITER << dataStr;
 						break;
 					}
 					default:
@@ -916,8 +917,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 							if (frame.mData1 & ABP_SPI_STATUS_M)
 							{
 								/* Add in the timestamp, packet ID */
-								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMiso << "MISO" CSV_DELIMITER << time_str << CSV_DELIMITER << packet_id << CSV_DELIMITER;
+								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+								ssMiso << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId << CSV_DELIMITER;
 								fAddMisoEntry = true;
 							}
 							if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
@@ -933,8 +934,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 						case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
 						case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-							ssMiso << CSV_DELIMITER << data_str;
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							ssMiso << CSV_DELIMITER << dataStr;
 							fAddLastMisoMsgHeader = false;
 							break;
 						}
@@ -946,8 +947,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 								fAddLastMisoMsgHeader = false;
 								ssMiso << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
 							}
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-							ssMiso << CSV_DELIMITER << data_str;
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							ssMiso << CSV_DELIMITER << dataStr;
 							break;
 						}
 						default:
@@ -972,7 +973,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 			ssMosi.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
-			i = last_frame_id + 1;
+			i = lastFrameId + 1;
 		}
 		else
 		{
@@ -980,14 +981,14 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 			i++;
 		}
 
-		if (UpdateExportProgressAndCheckForCancel(i, num_frames) == true)
+		if (UpdateExportProgressAndCheckForCancel(i, numFrames) == true)
 		{
 			AnalyzerHelpers::EndFile(f);
 			return;
 		}
 	}
 
-	UpdateExportProgressAndCheckForCancel(num_frames, num_frames);
+	UpdateExportProgressAndCheckForCancel(numFrames, numFrames);
 	AnalyzerHelpers::EndFile(f);
 }
 
@@ -998,30 +999,30 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 	void* f = AnalyzerHelpers::StartFile(file);
 	bool fAddCsvHeader = true;
 
-	U64 trigger_sample = mAnalyzer->GetTriggerSample();
-	U32 sample_rate = mAnalyzer->GetSampleRate();
-	U64 num_frames = GetNumFrames();
+	U64 triggerSample = mAnalyzer->GetTriggerSample();
+	U32 sampleRate = mAnalyzer->GetSampleRate();
+	U64 numFrames = GetNumFrames();
 	U64 i = 0;
 
-	while (i < num_frames)
+	while (i < numFrames)
 	{
-		U64 packet_id = GetPacketContainingFrameSequential(i);
-		char time_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-		char data_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
+		U64 packetId = GetPacketContainingFrameSequential(i);
+		char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+		char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
 		bool fAddMosiEntry = false;		bool fAddMisoEntry = false;
 
-		if (packet_id != INVALID_RESULT_INDEX)
+		if (packetId != INVALID_RESULT_INDEX)
 		{
-			U64 first_frame_id;
-			U64 last_frame_id;
+			U64 firstFrameId;
+			U64 lastFrameId;
 
-			GetFramesContainedInPacket(packet_id, &first_frame_id, &last_frame_id);
+			GetFramesContainedInPacket(packetId, &firstFrameId, &lastFrameId);
 
 			/* Iterate through packet and extract message header and data
 			** stream is written only on receipt of "last fragment". */
-			for (U64 frame_id = first_frame_id; frame_id <= last_frame_id; frame_id++)
+			for (U64 frameId = firstFrameId; frameId <= lastFrameId; frameId++)
 			{
-				Frame frame = GetFrame(frame_id);
+				Frame frame = GetFrame(frameId);
 				if (IS_MOSI_FRAME(frame))
 				{
 					switch (frame.mType)
@@ -1049,16 +1050,16 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 						if (frame.mData1 & ABP_SPI_CTRL_WRPD_VALID)
 						{
 							/* Add in the timestamp, packet ID */
-							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosi << "MOSI" CSV_DELIMITER << time_str << CSV_DELIMITER << packet_id;
+							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+							ssMosi << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 							fAddMosiEntry = true;
 						}
 						break;
 					}
 					case e_ABCC_MOSI_WR_PD_FIELD:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-						ssMosi << CSV_DELIMITER << data_str;
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMosi << CSV_DELIMITER << dataStr;
 						break;
 					}
 					default:
@@ -1074,8 +1075,8 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 							if (frame.mData1 & ABP_SPI_STATUS_NEW_PD)
 							{
 								/* Add in the timestamp, packet ID */
-								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMiso << "MISO" CSV_DELIMITER << time_str << CSV_DELIMITER << packet_id;
+								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+								ssMiso << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 								fAddMisoEntry = true;
 							}
 							break;
@@ -1083,15 +1084,15 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 						case e_ABCC_MISO_NET_TIME:
 						{
 							/* Append network time stamp to both string streams */
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-							ssMiso << CSV_DELIMITER << data_str;
-							ssMosi << CSV_DELIMITER << data_str;
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							ssMiso << CSV_DELIMITER << dataStr;
+							ssMosi << CSV_DELIMITER << dataStr;
 							break;
 						}
 						case e_ABCC_MISO_RD_PD_FIELD:
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), data_str, sizeof(data_str));
-							ssMiso << CSV_DELIMITER << data_str;
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							ssMiso << CSV_DELIMITER << dataStr;
 							break;
 						}
 						default:
@@ -1099,7 +1100,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					}
 				}
 
-				if (UpdateExportProgressAndCheckForCancel(i, num_frames) == true)
+				if (UpdateExportProgressAndCheckForCancel(i, numFrames) == true)
 				{
 					AnalyzerHelpers::EndFile(f);
 					return;
@@ -1122,14 +1123,14 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 			ssMosi.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
-			i = last_frame_id + 1;
+			i = lastFrameId + 1;
 		}
 		else
 		{
 			/* Jump to next frame */
 			i++;
 
-			if (UpdateExportProgressAndCheckForCancel(i, num_frames) == true)
+			if (UpdateExportProgressAndCheckForCancel(i, numFrames) == true)
 			{
 				AnalyzerHelpers::EndFile(f);
 				return;
@@ -1137,7 +1138,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 		}
 	}
 
-	UpdateExportProgressAndCheckForCancel(num_frames, num_frames);
+	UpdateExportProgressAndCheckForCancel(numFrames, numFrames);
 	AnalyzerHelpers::EndFile(f);
 }
 
@@ -1162,18 +1163,18 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 
 U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type)
 {
-	U64 frame_index = INVALID_RESULT_INDEX;
-	U64 first_frame_index;
-	U64 last_frame_index;
+	U64 frameIndex = INVALID_RESULT_INDEX;
+	U64 firstFrameIndex;
+	U64 lastFrameIndex;
 
 	if(packet_index != INVALID_RESULT_INDEX)
 	{
-		GetFramesContainedInPacket(packet_index, &first_frame_index, &last_frame_index);
-		if((first_frame_index != INVALID_RESULT_INDEX) && (last_frame_index != INVALID_RESULT_INDEX))
+		GetFramesContainedInPacket(packet_index, &firstFrameIndex, &lastFrameIndex);
+		if((firstFrameIndex != INVALID_RESULT_INDEX) && (lastFrameIndex != INVALID_RESULT_INDEX))
 		{
-			for(frame_index = first_frame_index; frame_index <= last_frame_index; frame_index++)
+			for(frameIndex = firstFrameIndex; frameIndex <= lastFrameIndex; frameIndex++)
 			{
-				Frame frame = GetFrame(frame_index);
+				Frame frame = GetFrame(frameIndex);
 				if( ((fMosiChannel) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
 					((!fMosiChannel) && IS_MISO_FRAME(frame) && (frame.mType == type)) )
 				{
@@ -1182,13 +1183,13 @@ U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index,
 			}
 		}
 	}
-	return frame_index;
+	return frameIndex;
 }
 
 void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase display_base)
 {
 	ClearTabularText();
-	U64 packet_id = GetPacketContainingFrame(frame_index);
+	U64 packetId = GetPacketContainingFrame(frame_index);
 	Frame frame = GetFrame(frame_index);
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 
@@ -1244,7 +1245,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			}
 			else if ((frame.mType == e_ABCC_MISO_ANB_STAT) && IS_MISO_FRAME(frame))
 			{
-				char tab_text[FORMATTED_STRING_BUFFER_SIZE];
+				char tabText[FORMATTED_STRING_BUFFER_SIZE];
 				bool alert = false;
 				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
 				{
@@ -1253,8 +1254,8 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				if (alert || (mSettings->mAnybusStatusIndexing == true))
 				{
-					SNPRINTF(tab_text, sizeof(tab_text), "Anybus Status : (%s)", str);
-					TableBuilder(true, tab_text, alert);
+					SNPRINTF(tabText, sizeof(tabText), "Anybus Status : (%s)", str);
+					TableBuilder(true, tabText, alert);
 				}
 				return;
 			}
@@ -1278,7 +1279,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		case e_TIMESTAMP_ALL_PACKETS:
 			SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
 			AddTabularText("Time : ", str);
-			SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+			SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
 			AddTabularText(str);
 			break;
 		case e_TIMESTAMP_WRITE_PROCESS_DATA_VALID:
@@ -1286,7 +1287,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			{
 				SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
 				AddTabularText("Time : ", str);
-				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
 				AddTabularText(str);
 			}
 			break;
@@ -1295,7 +1296,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			{
 				SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
 				AddTabularText("Time : ", str);
-				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packet_id);
+				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
 				AddTabularText(str);
 			}
 			break;

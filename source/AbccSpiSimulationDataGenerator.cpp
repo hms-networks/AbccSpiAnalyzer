@@ -107,9 +107,9 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 
 U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channels)
 {
-	U64 adjusted_largest_sample_requested = AnalyzerHelpers::AdjustSimulationTargetSample(largest_sample_requested, sample_rate, mSimulationSampleRateHz);
+	U64 adjustedLargestSampleRequested = AnalyzerHelpers::AdjustSimulationTargetSample(largest_sample_requested, sample_rate, mSimulationSampleRateHz);
 
-	while (mClock->GetCurrentSampleNumber() < adjusted_largest_sample_requested)
+	while (mClock->GetCurrentSampleNumber() < adjustedLargestSampleRequested)
 	{
 		CreateSpiTransaction();
 		/* Insert >10us idle */
