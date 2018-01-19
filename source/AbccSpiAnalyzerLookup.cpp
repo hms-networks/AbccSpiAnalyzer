@@ -73,38 +73,11 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
-/* Specified in same order as ABP.h */
-const U8 abNetworkTypeValue[] =
-{
-    0x00, /* Unspecified */
-    0x01, /* PROFIBUS DP-V0 */
-    0x05, /* PROFIBUS DP-V1 */
-    0x20, /* CANopen */
-    0x25, /* DeviceNet */
-    0x45, /* Modbus-RTU */
-    0x65, /* ControlNet */
-    0x80, /* Modbus-TCP */
-    0x84, /* PROFINET RT */
-    0x85, /* EtherNet/IP */
-    0x87, /* EtherCAT */
-    0x89, /* PROFINET IRT */
-    0x90, /* CC-Link */
-    0x93, /* Modbus-TCP 2-Port */
-    0x95, /* CompoNet */
-    0x96, /* PROFINET RT 2-port */
-    0x98, /* SERCOS III */
-    0x99, /* BACnet MS/TP */
-    0x9A, /* BACnet/IP */
-    0x9B, /* EtherNet/IP 2-Port BB DLR */
-    0x9C, /* EtherNet/IP 2-Port */
-    0x9D, /* PROFINET IRT FO */
-    0x9F, /* POWERLINK */
-    0x9E, /* CC-Link IE Field Network */
-    0xA3, /* Common Ethernet */
-    0xAB, /* EtherNet/IP IIoT */
-    0xAD, /* PROFINET IRT IIoT */
-    0xAE  /* PROFINET IRT FO IIoT */
-};
+/*******************************************************************************
+**
+** Protocol state lookup tables
+**
+*******************************************************************************/
 
 const tAbccMosiInfo asMosiStates[] =
 {
@@ -168,6 +141,185 @@ const tAbccMsgInfo asMsgStates[] =
 	{ e_ABCC_MSG_CMD_EXT,	"EXT",		ABCC_MSG_CMDEXT_FIELD_SIZE },
 	{ e_ABCC_MSG_DATA,		"MD",		ABCC_MSG_DATA_FIELD_SIZE }
 };
+
+/*******************************************************************************
+**
+** Basic SPI field enumeration lookup tables
+**
+*******************************************************************************/
+
+static const tValueName asAnybusStsNames[] =
+{
+	{ ABP_ANB_STATE_SETUP,			"SETUP",			false },
+	{ ABP_ANB_STATE_NW_INIT,		"NW_INIT",			false },
+	{ ABP_ANB_STATE_WAIT_PROCESS,	"WAIT_PROCESS",		false },
+	{ ABP_ANB_STATE_IDLE,			"IDLE",				false },
+	{ ABP_ANB_STATE_PROCESS_ACTIVE, "PROCESS_ACTIVE",	false },
+	{ ABP_ANB_STATE_ERROR,			"ERROR",			true  },
+	{ ABP_ANB_STATE_EXCEPTION,		"EXCEPTION",		true  }
+};
+
+static const tValueName asApplStsNames[] =
+{
+	{ ABP_APPSTAT_NO_ERROR,			"No Error",									false },
+	{ ABP_APPSTAT_NOT_SYNCED,		"Not yet synchronized",						false },
+	{ ABP_APPSTAT_SYNC_CFG_ERR,		"Sync configuration error",					true  },
+	{ ABP_APPSTAT_READ_PD_CFG_ERR,	"Read process data configuration error",	true  },
+	{ ABP_APPSTAT_WRITE_PD_CFG_ERR,	"Write process data configuration error",	true  },
+	{ ABP_APPSTAT_SYNC_LOSS,		"Synchronization loss",						true  },
+	{ ABP_APPSTAT_PD_DATA_LOSS,		"Excessive data loss",						true  },
+	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								true  }
+};
+
+static const tValueName asSpiStsNames[] =
+{
+	{ 0xC0,							"RESERVED",		true  }, /* No ABP mask exists */
+	{ ABP_SPI_STATUS_NEW_PD,		"NEW_PD",		false },
+	{ ABP_SPI_STATUS_LAST_FRAG,		"LAST_FRAG",	false },
+	{ ABP_SPI_STATUS_M,				"M",			false },
+	{ ABP_SPI_STATUS_CMDCNT,		"CMDCNT",		false },
+	{ ABP_SPI_STATUS_WRMSG_FULL,	"WRMSG_FULL",	true  }
+};
+
+static const tValueName asSpiCtrlNames[] =
+{
+	{ ABP_SPI_CTRL_T,			"TOGGLE",		false },
+	{ 0x60,						"RESERVED",		true  }, /* No ABP mask exists */
+	{ ABP_SPI_CTRL_LAST_FRAG,	"LAST_FRAG",	false },
+	{ ABP_SPI_CTRL_M,			"M",			false },
+	{ ABP_SPI_CTRL_CMDCNT,		"CMDCNT",		false },
+	{ ABP_SPI_CTRL_WRPD_VALID,	"WRPD_VALID",	false }
+};
+
+static const tValueName asIntMaskNames[] =
+{
+	{ ABP_INTMASK_RDPDIEN,		"RDPD",		false },
+	{ ABP_INTMASK_RDMSGIEN,		"RDMSG",	false },
+	{ ABP_INTMASK_WRMSGIEN,		"WRMSG",	false },
+	{ ABP_INTMASK_ANBRIEN,		"ANBR",		false },
+	{ ABP_INTMASK_STATUSIEN,	"STATUS",	false },
+	{ 0x20,						"RESERVED",	true  }, /* No ABP mask exists */
+	{ ABP_INTMASK_SYNCIEN,		"SYNC",		false },
+	{ 0x80,						"RESERVED",	true  }  /* No ABP mask exists */
+};
+
+static const tValueName asLedStsNames[] =
+{
+	{ 0x0001, "LED1A",		false },
+	{ 0x0002, "LED1B",		false },
+	{ 0x0004, "LED2A",		false },
+	{ 0x0008, "LED2B",		false },
+	{ 0x0010, "LED3A",		false },
+	{ 0x0020, "LED3B",		false },
+	{ 0x0040, "LED4A",		false },
+	{ 0x0080, "LED4B",		false },
+	{ 0xFF00, "RESERVED",	true }
+};
+
+/*******************************************************************************
+**
+** Object name lookup table
+**
+*******************************************************************************/
+
+static const tValueName asObjectNames[] =
+{
+	/*--------------------------------------------------------------------------
+	** Anybus module objects
+	**--------------------------------------------------------------------------
+	*/
+	{ ABP_OBJ_NUM_ANB,		"Anybus",							false },
+	{ ABP_OBJ_NUM_DI,		"Diagnostic",						false },
+	{ ABP_OBJ_NUM_NW,		"Network",							false },
+	{ ABP_OBJ_NUM_NC,		"Network Configuration",			false },
+	{ ABP_OBJ_NUM_ADD,		"PROFIBUS DP-V1 Additional Diag",	false },
+	{ ABP_OBJ_NUM_RSV1,		"Reserved",							true  },
+	{ ABP_OBJ_NUM_SOC,		"Socket Interface",					false },
+	{ ABP_OBJ_NUM_NWCCL,	"Network CC-Link",					false },
+	{ ABP_OBJ_NUM_SMTP,		"SMTP Client",						false },
+	{ ABP_OBJ_NUM_FSI,		"Anybus File System Interface",		false },
+	{ ABP_OBJ_NUM_NWDPV1,	"Network PROFIBUS DP-V1",			false },
+	{ ABP_OBJ_NUM_NWETN,	"Network Ethernet",					false },
+	{ ABP_OBJ_NUM_CPC,		"CIP Port Configuration",			false },
+	{ ABP_OBJ_NUM_NWPNIO,	"Network PROFINET IO",				false },
+	{ ABP_OBJ_NUM_PNIOADD,	"PROFINET IO Additional Diag",		false },
+	{ ABP_OBJ_NUM_DPV0DI,	"PROFIBUS DP-V0 Diagnostic",		false },
+	{ ABP_OBJ_NUM_FUSM,		"Functional Safety Module",			false },
+	{ ABP_OBJ_NUM_NWCFN,	"Network CC-Link IE Field Network",	false },
+	/*--------------------------------------------------------------------------
+	** Host application objects
+	**--------------------------------------------------------------------------
+	*/
+	{ 0x80,					"Host Application Specific",			false }, /* No abp define exists yet */
+	{ ABP_OBJ_NUM_OPCUA,	"OPC Unified Architecture",				false },
+	{ ABP_OBJ_NUM_EME,		"Energy Measurement",					false },
+	{ ABP_OBJ_NUM_PNAM,		"PROFINET Asset Management",			false },
+	{ ABP_OBJ_NUM_CFN,		"CC-Link IE Field Network",				false },
+	{ ABP_OBJ_NUM_ER,		"Energy Reporting",						false },
+	{ ABP_OBJ_NUM_SAFE,		"Functional Safety",					false },
+	{ ABP_OBJ_NUM_EPL,		"POWERLINK",							false },
+	{ ABP_OBJ_NUM_AFSI,		"Application File System Interface",	false },
+	{ ABP_OBJ_NUM_ASM,		"Assembly Mapping",						false },
+	{ ABP_OBJ_NUM_MDD,		"Modular Device",						false },
+	{ ABP_OBJ_NUM_CIPID,	"CIP Identity",							false },
+	{ ABP_OBJ_NUM_SYNC,		"Sync",									false },
+	{ ABP_OBJ_NUM_BAC,		"BACnet",								false },
+	{ ABP_OBJ_NUM_ECO,		"Energy Control",						false },
+	{ ABP_OBJ_NUM_SRC3,		"SERCOS III",							false },
+	{ ABP_OBJ_NUM_PRD,		"PROFIdrive",							false },
+	{ ABP_OBJ_NUM_CNT,		"ControlNet",							false },
+	{ ABP_OBJ_NUM_CPN,		"CompoNet",								false },
+	{ ABP_OBJ_NUM_ECT,		"EtherCAT",								false },
+	{ ABP_OBJ_NUM_PNIO,		"PROFINET IO",							false },
+	{ ABP_OBJ_NUM_CCL,		"CC-Link",								false },
+	{ ABP_OBJ_NUM_EIP,		"EtherNet/IP",							false },
+	{ ABP_OBJ_NUM_ETN,		"Ethernet",								false },
+	{ ABP_OBJ_NUM_MOD,		"Modbus",								false },
+	{ ABP_OBJ_NUM_COP,		"CANopen",								false },
+	{ ABP_OBJ_NUM_DEV,		"DeviceNet",							false },
+	{ ABP_OBJ_NUM_DPV1,		"PROFIBUS DP-V1",						false },
+	{ ABP_OBJ_NUM_APPD,		"Application Data",						false },
+	{ ABP_OBJ_NUM_APP,		"Application",							false }
+};
+
+/* Specified in same order as ABP.h */
+const U8 abNetworkTypeValue[] =
+{
+    0x00, /* Unspecified */
+    0x01, /* PROFIBUS DP-V0 */
+    0x05, /* PROFIBUS DP-V1 */
+    0x20, /* CANopen */
+    0x25, /* DeviceNet */
+    0x45, /* Modbus-RTU */
+    0x65, /* ControlNet */
+    0x80, /* Modbus-TCP */
+    0x84, /* PROFINET RT */
+    0x85, /* EtherNet/IP */
+    0x87, /* EtherCAT */
+    0x89, /* PROFINET IRT */
+    0x90, /* CC-Link */
+    0x93, /* Modbus-TCP 2-Port */
+    0x95, /* CompoNet */
+    0x96, /* PROFINET RT 2-port */
+    0x98, /* SERCOS III */
+    0x99, /* BACnet MS/TP */
+    0x9A, /* BACnet/IP */
+    0x9B, /* EtherNet/IP 2-Port BB DLR */
+    0x9C, /* EtherNet/IP 2-Port */
+    0x9D, /* PROFINET IRT FO */
+    0x9F, /* POWERLINK */
+    0x9E, /* CC-Link IE Field Network */
+    0xA3, /* Common Ethernet */
+    0xAB, /* EtherNet/IP IIoT */
+    0xAD, /* PROFINET IRT IIoT */
+    0xAE  /* PROFINET IRT FO IIoT */
+};
+
+/*******************************************************************************
+**
+** Network configuration object instance lookup tables
+**
+*******************************************************************************/
 
 static const tValueName asBipNcInstNames[] =
 {
@@ -324,6 +476,26 @@ static const tValueName asPirNcInstNames[] =
 	{ 21,	"F-Address",							false }
 };
 
+/*******************************************************************************
+**
+** Common object attribute lookup table
+**
+*******************************************************************************/
+
+static const tValueName asObjAttrNames[] =
+{
+	{ ABP_OA_NAME,			"Name",						false },
+	{ ABP_OA_REV,			"Revision",					false },
+	{ ABP_OA_NUM_INST,		"Number of Instances",		false },
+	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	false }
+};
+
+/*******************************************************************************
+**
+** Object-specific object/instance attribute lookup table
+**
+*******************************************************************************/
+
 static const tValueName asAddObjAttrNames[] =
 {
 	{ ABP_ADD_OA_MAX_INST,			"Max Instance",			false },
@@ -365,6 +537,64 @@ static const tValueName asAnbInstAttrNames[] =
 	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		false }
 };
 
+static const tValueName asAppInstAttrNames[] =
+{
+	{ ABP_APP_IA_CONFIGURED,	"Configured",						false },
+	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				false },
+	{ ABP_APP_IA_SER_NUM,		"Serial Number",					false },
+	{ ABP_APP_IA_PAR_CRTL_SUM,	"Parameter Control Sum",			false },
+	{ ABP_APP_IA_FW_AVAILABLE,	"Candidate Firmware Available",		false },
+	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false },
+	{ ABP_APP_IA_MODE,			"Mode",								false },
+	{ ABP_APP_IA_VENDOR_NAME,	"Vendor Name",						false },
+	{ ABP_APP_IA_PRODUCT_NAME,	"Product Name",						false },
+	{ ABP_APP_IA_FW_VERSION,	"FW Version",						false },
+	{ ABP_APP_IA_HW_VERSION,	"HW Version",						false },
+};
+
+static const tValueName asAppdObjAttrNames[] =
+{
+	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	false },
+	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false },
+	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	false }
+};
+
+static const tValueName asAppdInstAttrNames[] =
+{
+	{ ABP_APPD_IA_NAME,			"Name",						false },
+	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				false },
+	{ ABP_APPD_IA_NUM_ELEM,		"Number of Elements",		false },
+	{ ABP_APPD_IA_DESCRIPTOR,	"Descriptor",				false },
+	{ ABP_APPD_IA_VALUE,		"Value(s)",					false },
+	{ ABP_APPD_IA_MAX_VALUE,	"Max Value",				false },
+	{ ABP_APPD_IA_MIN_VALUE,	"Min Value",				false },
+	{ ABP_APPD_IA_DFLT_VALUE,	"Default Value",			false },
+	{ ABP_APPD_IA_NUM_SUB_ELEM,	"Number of SubElements",	false },
+	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				false }
+};
+
+static const tValueName asAsmObjAttrNames[] =
+{
+	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	false },
+	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	false }
+};
+
+static const tValueName asAsmInstAttrNames[] =
+{
+	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			false },
+	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false }
+};
+
 static const tValueName asBacInstAttrNames[] =
 {
 	{ ABP_BAC_IA_OBJECT_NAME,			"Object Name",				false },
@@ -400,6 +630,17 @@ static const tValueName asCfnInstAttrNames[] =
 	{ ABP_CFN_IA_ENA_SLMP_FORWARD,	"Enable SLMP Forward",	false }
 };
 
+static const tValueName asCipIdInstAttrNames[] =
+{
+	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		false },
+	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		false },
+	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		false },
+	{ ABP_CIPID_IA_REVISION,		"Revision",			false },
+	{ ABP_CIPID_IA_STATUS,			"Status",			false },
+	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	false },
+	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		false }
+};
+
 static const tValueName asCntInstAttrNames[] =
 {
 	{ ABP_CNT_IA_VENDOR_ID,					"Vendor ID",						false },
@@ -425,6 +666,22 @@ static const tValueName asCopInstAttrNames[] =
 	{ ABP_COP_IA_MANF_DEV_NAME,		"Manufacturer Device Name",	false },
 	{ ABP_COP_IA_MANF_HW_VER,		"Manufacturer HW Version",	false },
 	{ ABP_COP_IA_MANF_SW_VER,		"Manufacturer SW Version",	false }
+};
+
+static const tValueName asCpcObjAttrNames[] =
+{
+	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	false }
+};
+
+static const tValueName asCpcInstAttrNames[] =
+{
+	{ ABP_CPC_IA_PORT_TYPE,					"Port Type",					false },
+	{ ABP_CPC_IA_PORT_NUMBER,				"Port Number",					false },
+	{ ABP_CPC_IA_LINK_PATH,					"Link Path",					false },
+	{ ABP_CPC_IA_PORT_NAME,					"Port Name",					false },
+	{ ABP_CPC_IA_NODE_ADDRESS,				"Node Address",					false },
+	{ ABP_CPC_IA_PORT_NODE_RANGE,			"Port Node Range",				false },
+	{ ABP_CPC_IA_PORT_ROUTING_CAPABILITIES,	"Port Routing Capabilities",	false }
 };
 
 static const tValueName asCpnInstAttrNames[] =
@@ -528,249 +785,6 @@ static const tValueName asEcoInstAttrNames[] =
 	{ ABP_ECO_IA_POWER_CONSUMPTION,			"Power Consumption",				false }
 };
 
-static const tValueName asErInstAttrNames[] =
-{
-	{ ABP_ER_IA_ENERGY_READING,				"Energy Reading",				false },
-	{ ABP_ER_IA_DIRECTION,					"Direction",					false },
-	{ ABP_ER_IA_ACCURACY,					"Accuracy",						false },
-	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	false },
-	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	false },
-};
-
-static const tValueName asModInstAttrNames[] =
-{
-	{ ABP_MOD_IA_VENDOR_NAME,			"Vendor Name",									false },
-	{ ABP_MOD_IA_PRODUCT_CODE,			"Product Code",									false },
-	{ ABP_MOD_IA_REVISION,				"Major Minor Revision",							false },
-	{ ABP_MOD_IA_VENDOR_URL,			"Vendor URL",									false },
-	{ ABP_MOD_IA_PRODUCT_NAME,			"Product Name",									false },
-	{ ABP_MOD_IA_MODEL_NAME,			"Model Name",									false },
-	{ ABP_MOD_IA_USER_APP_NAME,			"User Application Name",						false },
-	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									false },
-	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						false },
-	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				false },
-	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	false },
-	{ ABP_MOD_IA_DISABLE_DEVICE_ID_FC,	"Disable Device ID Function Code",				false }
-};
-
-static const tValueName asNwInstAttrNames[] =
-{
-	{ ABP_NW_IA_NW_TYPE,		"Network Type",				false },
-	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		false },
-	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",				false },
-	{ ABP_NW_IA_PARAM_SUPPORT,	"Parameter Support",		false },
-	{ ABP_NW_IA_WRITE_PD_SIZE,	"Write Process Data Size",	false },
-	{ ABP_NW_IA_READ_PD_SIZE,	"Read Process Data Size",	false },
-	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	false }
-};
-
-static const tValueName asNwCclInstAttrNames[] =
-{
-	{ ABP_NWCCL_IA_NETWORK_SETTINGS,	"Network Settings",				false },
-	{ ABP_NWCCL_IA_SYSTEM_AREA_HANDLER,	"System Area Handler",			false },
-	{ ABP_NWCCL_IA_ERROR_CODE_POSITION,	"Error Code Position",			false },
-	{ ABP_NWCCL_IA_LAST_MAPPING_INFO,	"Last Mapping Info",			false },
-	{ ABP_NWCCL_IA_CCL_CONF_TEST_MODE,	"CCL Conformance Test Mode",	false },
-	{ ABP_NWCCL_IA_ERROR_INFO,			"Error Information",			false }
-};
-
-static const tValueName asNwCfnInstAttrNames[] =
-{
-	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",			false },
-	{ ABP_NWCFN_IA_APP_OP_STATUS,	"Application OP Status",	false },
-	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		false }
-};
-
-static const tValueName asNwEtnInstAttrNames[] =
-{
-	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			false },
-	{ ABP_NWETN_IA_PORT1_MAC_ID,		"Port 1 MAC Address",	false },
-	{ ABP_NWETN_IA_PORT2_MAC_ID,		"Port 2 MAC Address",	false },
-	{ ABP_NWETN_IA_MAC_ADDRESS,			"MAC Address",			false },
-	{ ABP_NWETN_IA_INTERFACE_COUNTERS,	"Interface Counters",	false },
-	{ ABP_NWETN_IA_MEDIA_COUNTERS,		"Media Counters",		false }
-};
-
-static const tValueName asNwPnioInstAttrNames[] =
-{
-	{ ABP_NWPNIO_IA_ONLINE_TRANS,			"Number of on-line transitions",		false },
-	{ ABP_NWPNIO_IA_OFFLINE_TRANS,			"Number of off-line transitions",		false },
-	{ ABP_NWPNIO_IA_OFFLINE_REASON_CODE,	"Reason code of last off-line",			false },
-	{ ABP_NWPNIO_IA_ABORT_REASON_CODE,		"Last abort reason code",				false },
-	{ ABP_NWPNIO_IA_ADDED_APIS,				"Number of added APIs",					false },
-	{ ABP_NWPNIO_IA_API_LIST,				"List of the added APIs",				false },
-	{ ABP_NWPNIO_IA_EST_ARS,				"Number of established ARs",			false },
-	{ ABP_NWPNIO_IA_AR_LIST,				"List of established ARs (handles)",	false },
-	{ ABP_NWPNIO_IA_PNIO_INIT_ERR_CODE,		"Error code PROFINET IO stack init",	false },
-	{ ABP_NWPNIO_IA_PORT1_MAC_ADDRESS,		"PROFINET IO port 1 MAC address",		false },
-	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		false }
-};
-
-static const tValueName asSocObjAttrNames[] =
-{
-	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	false }
-};
-
-static const tValueName asSocInstAttrNames[] =
-{
-	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			false },
-	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			false },
-	{ ABP_SOC_IA_HOST_IP,			"Host IP Address",		false },
-	{ ABP_SOC_IA_HOST_PORT,			"Host Port",			false },
-	{ ABP_SOC_IA_TCP_STATE,			"TCP State",			false },
-	{ ABP_SOC_IA_RX_BYTES,			"Bytes in RX Buffer",	false },
-	{ ABP_SOC_IA_TX_BYTES,			"Bytes in TX Buffer",	false },
-	{ ABP_SOC_IA_SO_REUSE_ADDR,		"Reuse Address Option",	false },
-	{ ABP_SOC_IA_SO_KEEP_ALIVE,		"Keep Alive Option",	false },
-	{ ABP_SOC_IA_IP_MULT_TTL,		"IP Multicast TTL",		false },
-	{ ABP_SOC_IA_IP_MULT_LOOP,		"IP Multicast Loop",	false },
-	{ ABP_SOC_IA_TCP_ACKDELAYTIME,	"TCP Ack Delay Time",	false },
-	{ ABP_SOC_IA_TCP_NODELAY,		"TCP No Delay",			false },
-	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	false }
-};
-
-static const tValueName asSmtpObjAttrNames[] =
-{
-	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	false },
-	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					false },
-	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		false }
-};
-
-static const tValueName asSmtpInstAttrNames[] =
-{
-	{ ABP_SMTP_IA_FROM,		"From Address",		false },
-	{ ABP_SMTP_IA_TO,		"To Address",		false },
-	{ ABP_SMTP_IA_SUBJECT,	"Message Subject",  false },
-	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		false }
-};
-
-static const tValueName asNcInstAttrNames[] =
-{
-	{ ABP_NC_VAR_IA_NAME,			"Name",					false },
-	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			false },
-	{ ABP_NC_VAR_IA_NUM_ELEM,		"Number of Elements",	false },
-	{ ABP_NC_VAR_IA_DESCRIPTOR,		"Descriptor",			false },
-	{ ABP_NC_VAR_IA_VALUE,			"Value",				false },
-	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		false }
-};
-
-static const tValueName asEtnInstAttrNames[] =
-{
-	{ ABP_ETN_IA_MAC_ADDRESS,					"MAC Address",						false },
-	{ ABP_ETN_IA_ENABLE_HICP,					"Enable HICP",						false },
-	{ ABP_ETN_IA_ENABLE_WEB,					"Enable Web Server",				false },
-	{ ABP_ETN_IA_ENABLE_MOD_TCP ,				"Enable Modbus TCP",				false },
-	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,			"Enable Web ADI Access",			false },
-	{ ABP_ETN_IA_ENABLE_FTP,					"Enable FTP Server",				false },
-	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,				"Enable Admin Mode",				false },
-	{ ABP_ETN_IA_NETWORK_STATUS,				"Network Status",					false },
-	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,				"Port 1 MAC Address",				false },
-	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,				"Port 2 MAC Address",				false },
-	{ ABP_ETN_IA_ENABLE_ACD,					"Enable ACD",						false },
-	{ ABP_ETN_IA_PORT1_STATE,					"Port 1 State",						false },
-	{ ABP_ETN_IA_PORT2_STATE,					"Port 2 State",						false },
-	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,				"Enable Web Update",				false },
-	{ ABP_ETN_IA_ENABLE_HICP_RESET,				"Enable Reset From HICP",			false },
-	{ ABP_ETN_IA_IP_CONFIGURATION,				"IP Configuration",					false },
-	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,			"IP Address Byte 0-2",				false },
-	{ ABP_ETN_IA_ETH_PHY_CONFIG,				"PHY Duplex Fallback Config",		false },
-	{ ABP_ETN_IA_SNMP_READ_ONLY,				"SNMP Read-Only",					false },
-	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					false },
-	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			false },
-	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	false },
-	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				false }
-};
-
-static const tValueName asCpcObjAttrNames[] =
-{
-	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	false }
-};
-
-static const tValueName asCpcInstAttrNames[] =
-{
-	{ ABP_CPC_IA_PORT_TYPE,					"Port Type",					false },
-	{ ABP_CPC_IA_PORT_NUMBER,				"Port Number",					false },
-	{ ABP_CPC_IA_LINK_PATH,					"Link Path",					false },
-	{ ABP_CPC_IA_PORT_NAME,					"Port Name",					false },
-	{ ABP_CPC_IA_NODE_ADDRESS,				"Node Address",					false },
-	{ ABP_CPC_IA_PORT_NODE_RANGE,			"Port Node Range",				false },
-	{ ABP_CPC_IA_PORT_ROUTING_CAPABILITIES,	"Port Routing Capabilities",	false }
-};
-
-static const tValueName asCipIdInstAttrNames[] =
-{
-	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		false },
-	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		false },
-	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		false },
-	{ ABP_CIPID_IA_REVISION,		"Revision",			false },
-	{ ABP_CIPID_IA_STATUS,			"Status",			false },
-	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	false },
-	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		false }
-};
-
-static const tValueName asEplInstAttrNames[] =
-{
-	{ ABP_EPL_IA_VENDOR_ID,		"Vendor ID",						false },
-	{ ABP_EPL_IA_PRODUCT_CODE,	"Product Code",						false },
-	{ ABP_EPL_IA_MAJOR_REV,		"Revision High Word",				false },
-	{ ABP_EPL_IA_MINOR_REV,		"Revision Low Word",				false },
-	{ ABP_EPL_IA_SERIAL_NUMBER,	"Serial Number",					false },
-	{ ABP_EPL_IA_MANF_DEV_NAME,	"Manufacturer Device Name",			false },
-	{ ABP_EPL_IA_MANF_HW_VER,	"Manufacturer Hardware Verison",	false },
-	{ ABP_EPL_IA_MANF_SW_VER,	"Manufacturer Software Version",	false },
-	{ ABP_EPL_IA_DEVICE_TYPE,	"Device Type",						false },
-	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
-};
-
-static const tValueName asPnamInstAttrNames[] =
-{
-	{ ABP_PNAM_IA_INFO_TYPE,		"Info Type",							false },
-	{ ABP_PNAM_IA_UNIQUE_ID,		"Unique ID",							false },
-	{ ABP_PNAM_IA_LOCATION_TYPE,	"Location Type",						false },
-	{ ABP_PNAM_IA_LOCATION_LT,		"Location Level Tree",					false },
-	{ ABP_PNAM_IA_LOCATION_SS,		"Location Slot Subslot",				false },
-	{ ABP_PNAM_IA_ANNOTATION,		"Annotation",							false },
-	{ ABP_PNAM_IA_ORDER_ID,			"Order ID",								false },
-	{ ABP_PNAM_IA_SERIAL,			"Serial",								false },
-	{ ABP_PNAM_IA_DEVICE_ID,		"Device ID",							false },
-	{ ABP_PNAM_IA_TYPE_ID,			"Type ID",								false },
-	{ ABP_PNAM_IA_AM_SW_REV,		"Asset Management Software Revision",	false },
-	{ ABP_PNAM_IA_IM_SW_REV,		"I&M Software Revision",				false },
-	{ ABP_PNAM_IA_AM_HW_REV,		"Asset Management Hardware Revision",	false },
-	{ ABP_PNAM_IA_IM_HW_REV,		"I&M Hardware Revision",				false }
-};
-
-static const tValueName asPnioInstAttrNames[] =
-{
-	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						false },
-	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	false },
-	{ ABP_PNIO_IA_STATION_TYPE,				"Station Type",						false },
-	{ ABP_PNIO_IA_MAX_AR,					"MaxAr",							false },
-	{ 0x05,									"Reserved",							true  },
-	{ 0x06,									"Reserved",							true  },
-	{ ABP_PNIO_IA_RTM,						"Record Data Mode",					false },
-	{ ABP_PNIO_IA_IM_ORDER_ID,				"I&M Order ID",						false },
-	{ ABP_PNIO_IA_IM_SERIAL_NBR,			"I&M Serial Number",				false },
-	{ ABP_PNIO_IA_IM_HW_REV,				"I&M Hardware Revision",			false },
-	{ ABP_PNIO_IA_IM_SW_REV,				"I&M Software Revision",			false },
-	{ ABP_PNIO_IA_IM_REV_CNT,				"I&M Revision Counter",				false },
-	{ ABP_PNIO_IA_IM_PROFILE_ID,			"I&M Profile ID",					false },
-	{ ABP_PNIO_IA_IM_PROFILE_SPEC_TYPE,		"I&M Profile Specific Type",		false },
-	{ ABP_PNIO_IA_IM_VER,					"I&M Version",						false },
-	{ ABP_PNIO_IA_IM_SUPPORTED,				"I&M Supported",					false },
-	{ ABP_PNIO_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",				false },
-	{ ABP_PNIO_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",				false },
-	{ ABP_PNIO_IA_SYSTEM_DESCRIPTION,		"System Description",				false },
-	{ ABP_PNIO_IA_INTERFACE_DESCRIPTION,	"Interface Description",			false },
-	{ ABP_PNIO_IA_MOD_ID_ASSIGN_MODE,		"Module Id Assignment Mode",		false },
-	{ ABP_PNIO_IA_SYSTEM_CONTACT,			"System Contact",					false },
-	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		false },
-	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				false },
-	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				false },
-	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					false },
-	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						false }
-};
-
 static const tValueName asEipNcInstAttrNames[] =
 {
 	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										false },
@@ -840,6 +854,29 @@ static const tValueName asEmeInstAttrNames[] =
 	{ ABP_EME_IA_TOTAL_APPARENT_ENERGY,			"Total Apparent Energy",		false }
 };
 
+static const tValueName asEplInstAttrNames[] =
+{
+	{ ABP_EPL_IA_VENDOR_ID,		"Vendor ID",						false },
+	{ ABP_EPL_IA_PRODUCT_CODE,	"Product Code",						false },
+	{ ABP_EPL_IA_MAJOR_REV,		"Revision High Word",				false },
+	{ ABP_EPL_IA_MINOR_REV,		"Revision Low Word",				false },
+	{ ABP_EPL_IA_SERIAL_NUMBER,	"Serial Number",					false },
+	{ ABP_EPL_IA_MANF_DEV_NAME,	"Manufacturer Device Name",			false },
+	{ ABP_EPL_IA_MANF_HW_VER,	"Manufacturer Hardware Verison",	false },
+	{ ABP_EPL_IA_MANF_SW_VER,	"Manufacturer Software Version",	false },
+	{ ABP_EPL_IA_DEVICE_TYPE,	"Device Type",						false },
+	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
+};
+
+static const tValueName asErInstAttrNames[] =
+{
+	{ ABP_ER_IA_ENERGY_READING,				"Energy Reading",				false },
+	{ ABP_ER_IA_DIRECTION,					"Direction",					false },
+	{ ABP_ER_IA_ACCURACY,					"Accuracy",						false },
+	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	false },
+	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	false },
+};
+
 static const tValueName asEtcNcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
@@ -867,40 +904,31 @@ static const tValueName asEtcNcInstAttrNames[] =
 	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					false }
 };
 
-static const tValueName asAppdObjAttrNames[] =
+static const tValueName asEtnInstAttrNames[] =
 {
-	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	false },
-	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	false },
-	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	false }
-};
-
-static const tValueName asAppdInstAttrNames[] =
-{
-	{ ABP_APPD_IA_NAME,			"Name",						false },
-	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				false },
-	{ ABP_APPD_IA_NUM_ELEM,		"Number of Elements",		false },
-	{ ABP_APPD_IA_DESCRIPTOR,	"Descriptor",				false },
-	{ ABP_APPD_IA_VALUE,		"Value(s)",					false },
-	{ ABP_APPD_IA_MAX_VALUE,	"Max Value",				false },
-	{ ABP_APPD_IA_MIN_VALUE,	"Min Value",				false },
-	{ ABP_APPD_IA_DFLT_VALUE,	"Default Value",			false },
-	{ ABP_APPD_IA_NUM_SUB_ELEM,	"Number of SubElements",	false },
-	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				false }
-};
-
-static const tValueName asAppInstAttrNames[] =
-{
-	{ ABP_APP_IA_CONFIGURED,	"Configured",						false },
-	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				false },
-	{ ABP_APP_IA_SER_NUM,		"Serial Number",					false },
-	{ ABP_APP_IA_PAR_CRTL_SUM,	"Parameter Control Sum",			false },
-	{ ABP_APP_IA_FW_AVAILABLE,	"Candidate Firmware Available",		false },
-	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	false },
-	{ ABP_APP_IA_MODE,			"Mode",								false },
-	{ ABP_APP_IA_VENDOR_NAME,	"Vendor Name",						false },
-	{ ABP_APP_IA_PRODUCT_NAME,	"Product Name",						false },
-	{ ABP_APP_IA_FW_VERSION,	"FW Version",						false },
-	{ ABP_APP_IA_HW_VERSION,	"HW Version",						false },
+	{ ABP_ETN_IA_MAC_ADDRESS,					"MAC Address",						false },
+	{ ABP_ETN_IA_ENABLE_HICP,					"Enable HICP",						false },
+	{ ABP_ETN_IA_ENABLE_WEB,					"Enable Web Server",				false },
+	{ ABP_ETN_IA_ENABLE_MOD_TCP ,				"Enable Modbus TCP",				false },
+	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,			"Enable Web ADI Access",			false },
+	{ ABP_ETN_IA_ENABLE_FTP,					"Enable FTP Server",				false },
+	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,				"Enable Admin Mode",				false },
+	{ ABP_ETN_IA_NETWORK_STATUS,				"Network Status",					false },
+	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,				"Port 1 MAC Address",				false },
+	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,				"Port 2 MAC Address",				false },
+	{ ABP_ETN_IA_ENABLE_ACD,					"Enable ACD",						false },
+	{ ABP_ETN_IA_PORT1_STATE,					"Port 1 State",						false },
+	{ ABP_ETN_IA_PORT2_STATE,					"Port 2 State",						false },
+	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,				"Enable Web Update",				false },
+	{ ABP_ETN_IA_ENABLE_HICP_RESET,				"Enable Reset From HICP",			false },
+	{ ABP_ETN_IA_IP_CONFIGURATION,				"IP Configuration",					false },
+	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,			"IP Address Byte 0-2",				false },
+	{ ABP_ETN_IA_ETH_PHY_CONFIG,				"PHY Duplex Fallback Config",		false },
+	{ ABP_ETN_IA_SNMP_READ_ONLY,				"SNMP Read-Only",					false },
+	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					false },
+	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			false },
+	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	false },
+	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				false }
 };
 
 static const tValueName asFsiObjAttrNames[] =
@@ -921,32 +949,104 @@ static const tValueName asFsiInstAttrNames[] =
 	{ ABP_FSI_IA_PATH,		"Current Instance Path",	false }
 };
 
-static const tValueName asAsmObjAttrNames[] =
+static const tValueName asFusmInstAttrNames[] =
 {
-	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	false },
-	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	false }
-};
-
-static const tValueName asAsmInstAttrNames[] =
-{
-	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false }
+	{ ABP_FUSM_IA_STATE,		"State",					false },
+	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				false },
+	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			false },
+	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			false },
+	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			false },
+	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				false },
+	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				false },
+	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			false },
+	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				false },
+	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	false },
+	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		false }
 };
 
 static const tValueName asMddObjAttrNames[] =
 {
 	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			false },
 	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	false }
+};
+
+static const tValueName asModInstAttrNames[] =
+{
+	{ ABP_MOD_IA_VENDOR_NAME,			"Vendor Name",									false },
+	{ ABP_MOD_IA_PRODUCT_CODE,			"Product Code",									false },
+	{ ABP_MOD_IA_REVISION,				"Major Minor Revision",							false },
+	{ ABP_MOD_IA_VENDOR_URL,			"Vendor URL",									false },
+	{ ABP_MOD_IA_PRODUCT_NAME,			"Product Name",									false },
+	{ ABP_MOD_IA_MODEL_NAME,			"Model Name",									false },
+	{ ABP_MOD_IA_USER_APP_NAME,			"User Application Name",						false },
+	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									false },
+	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						false },
+	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				false },
+	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	false },
+	{ ABP_MOD_IA_DISABLE_DEVICE_ID_FC,	"Disable Device ID Function Code",				false }
+};
+
+static const tValueName asNcInstAttrNames[] =
+{
+	{ ABP_NC_VAR_IA_NAME,			"Name",					false },
+	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			false },
+	{ ABP_NC_VAR_IA_NUM_ELEM,		"Number of Elements",	false },
+	{ ABP_NC_VAR_IA_DESCRIPTOR,		"Descriptor",			false },
+	{ ABP_NC_VAR_IA_VALUE,			"Value",				false },
+	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		false }
+};
+
+static const tValueName asNwInstAttrNames[] =
+{
+	{ ABP_NW_IA_NW_TYPE,		"Network Type",				false },
+	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		false },
+	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",				false },
+	{ ABP_NW_IA_PARAM_SUPPORT,	"Parameter Support",		false },
+	{ ABP_NW_IA_WRITE_PD_SIZE,	"Write Process Data Size",	false },
+	{ ABP_NW_IA_READ_PD_SIZE,	"Read Process Data Size",	false },
+	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	false }
+};
+
+static const tValueName asNwCclInstAttrNames[] =
+{
+	{ ABP_NWCCL_IA_NETWORK_SETTINGS,	"Network Settings",				false },
+	{ ABP_NWCCL_IA_SYSTEM_AREA_HANDLER,	"System Area Handler",			false },
+	{ ABP_NWCCL_IA_ERROR_CODE_POSITION,	"Error Code Position",			false },
+	{ ABP_NWCCL_IA_LAST_MAPPING_INFO,	"Last Mapping Info",			false },
+	{ ABP_NWCCL_IA_CCL_CONF_TEST_MODE,	"CCL Conformance Test Mode",	false },
+	{ ABP_NWCCL_IA_ERROR_INFO,			"Error Information",			false }
+};
+
+static const tValueName asNwCfnInstAttrNames[] =
+{
+	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",			false },
+	{ ABP_NWCFN_IA_APP_OP_STATUS,	"Application OP Status",	false },
+	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		false }
+};
+
+static const tValueName asNwEtnInstAttrNames[] =
+{
+	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			false },
+	{ ABP_NWETN_IA_PORT1_MAC_ID,		"Port 1 MAC Address",	false },
+	{ ABP_NWETN_IA_PORT2_MAC_ID,		"Port 2 MAC Address",	false },
+	{ ABP_NWETN_IA_MAC_ADDRESS,			"MAC Address",			false },
+	{ ABP_NWETN_IA_INTERFACE_COUNTERS,	"Interface Counters",	false },
+	{ ABP_NWETN_IA_MEDIA_COUNTERS,		"Media Counters",		false }
+};
+
+static const tValueName asNwPnioInstAttrNames[] =
+{
+	{ ABP_NWPNIO_IA_ONLINE_TRANS,			"Number of on-line transitions",		false },
+	{ ABP_NWPNIO_IA_OFFLINE_TRANS,			"Number of off-line transitions",		false },
+	{ ABP_NWPNIO_IA_OFFLINE_REASON_CODE,	"Reason code of last off-line",			false },
+	{ ABP_NWPNIO_IA_ABORT_REASON_CODE,		"Last abort reason code",				false },
+	{ ABP_NWPNIO_IA_ADDED_APIS,				"Number of added APIs",					false },
+	{ ABP_NWPNIO_IA_API_LIST,				"List of the added APIs",				false },
+	{ ABP_NWPNIO_IA_EST_ARS,				"Number of established ARs",			false },
+	{ ABP_NWPNIO_IA_AR_LIST,				"List of established ARs (handles)",	false },
+	{ ABP_NWPNIO_IA_PNIO_INIT_ERR_CODE,		"Error code PROFINET IO stack init",	false },
+	{ ABP_NWPNIO_IA_PORT1_MAC_ADDRESS,		"PROFINET IO port 1 MAC address",		false },
+	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		false }
 };
 
 static const tValueName asOpcuaInstAttrNames[] =
@@ -957,6 +1057,102 @@ static const tValueName asOpcuaInstAttrNames[] =
 	{ ABP_OPCUA_IA_DEVICE_TYPE_NAME,		"Device Type Name",		false },
 	{ ABP_OPCUA_IA_DEVICE_INST_NAME,		"Device Instance Name",	false },
 	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			false }
+};
+
+static const tValueName asPnamInstAttrNames[] =
+{
+	{ ABP_PNAM_IA_INFO_TYPE,		"Info Type",							false },
+	{ ABP_PNAM_IA_UNIQUE_ID,		"Unique ID",							false },
+	{ ABP_PNAM_IA_LOCATION_TYPE,	"Location Type",						false },
+	{ ABP_PNAM_IA_LOCATION_LT,		"Location Level Tree",					false },
+	{ ABP_PNAM_IA_LOCATION_SS,		"Location Slot Subslot",				false },
+	{ ABP_PNAM_IA_ANNOTATION,		"Annotation",							false },
+	{ ABP_PNAM_IA_ORDER_ID,			"Order ID",								false },
+	{ ABP_PNAM_IA_SERIAL,			"Serial",								false },
+	{ ABP_PNAM_IA_DEVICE_ID,		"Device ID",							false },
+	{ ABP_PNAM_IA_TYPE_ID,			"Type ID",								false },
+	{ ABP_PNAM_IA_AM_SW_REV,		"Asset Management Software Revision",	false },
+	{ ABP_PNAM_IA_IM_SW_REV,		"I&M Software Revision",				false },
+	{ ABP_PNAM_IA_AM_HW_REV,		"Asset Management Hardware Revision",	false },
+	{ ABP_PNAM_IA_IM_HW_REV,		"I&M Hardware Revision",				false }
+};
+
+static const tValueName asPnioInstAttrNames[] =
+{
+	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						false },
+	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	false },
+	{ ABP_PNIO_IA_STATION_TYPE,				"Station Type",						false },
+	{ ABP_PNIO_IA_MAX_AR,					"MaxAr",							false },
+	{ 0x05,									"Reserved",							true  },
+	{ 0x06,									"Reserved",							true  },
+	{ ABP_PNIO_IA_RTM,						"Record Data Mode",					false },
+	{ ABP_PNIO_IA_IM_ORDER_ID,				"I&M Order ID",						false },
+	{ ABP_PNIO_IA_IM_SERIAL_NBR,			"I&M Serial Number",				false },
+	{ ABP_PNIO_IA_IM_HW_REV,				"I&M Hardware Revision",			false },
+	{ ABP_PNIO_IA_IM_SW_REV,				"I&M Software Revision",			false },
+	{ ABP_PNIO_IA_IM_REV_CNT,				"I&M Revision Counter",				false },
+	{ ABP_PNIO_IA_IM_PROFILE_ID,			"I&M Profile ID",					false },
+	{ ABP_PNIO_IA_IM_PROFILE_SPEC_TYPE,		"I&M Profile Specific Type",		false },
+	{ ABP_PNIO_IA_IM_VER,					"I&M Version",						false },
+	{ ABP_PNIO_IA_IM_SUPPORTED,				"I&M Supported",					false },
+	{ ABP_PNIO_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",				false },
+	{ ABP_PNIO_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",				false },
+	{ ABP_PNIO_IA_SYSTEM_DESCRIPTION,		"System Description",				false },
+	{ ABP_PNIO_IA_INTERFACE_DESCRIPTION,	"Interface Description",			false },
+	{ ABP_PNIO_IA_MOD_ID_ASSIGN_MODE,		"Module Id Assignment Mode",		false },
+	{ ABP_PNIO_IA_SYSTEM_CONTACT,			"System Contact",					false },
+	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		false },
+	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				false },
+	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				false },
+	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					false },
+	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						false }
+};
+
+static const tValueName asSafeInstAttrNames[] =
+{
+	{ ABP_SAFE_IA_SAFETY_ENABLED,			"Safety Enabled",			false },
+	{ ABP_SAFE_IA_BAUD_RATE,				"Baud Rate",				false },
+	{ ABP_SAFE_IA_IO_CONFIG,				"I/O Configuration",		false },
+	{ ABP_SAFE_IA_CYCLE_TIME,				"Cycle Time",				false },
+	{ ABP_SAFE_IA_FW_UPGRADE_IN_PROGRESS,	"FW Upgrade In Progress",	false }
+};
+
+static const tValueName asSmtpObjAttrNames[] =
+{
+	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	false },
+	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					false },
+	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		false }
+};
+
+static const tValueName asSmtpInstAttrNames[] =
+{
+	{ ABP_SMTP_IA_FROM,		"From Address",		false },
+	{ ABP_SMTP_IA_TO,		"To Address",		false },
+	{ ABP_SMTP_IA_SUBJECT,	"Message Subject",  false },
+	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		false }
+};
+
+static const tValueName asSocObjAttrNames[] =
+{
+	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	false }
+};
+
+static const tValueName asSocInstAttrNames[] =
+{
+	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			false },
+	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			false },
+	{ ABP_SOC_IA_HOST_IP,			"Host IP Address",		false },
+	{ ABP_SOC_IA_HOST_PORT,			"Host Port",			false },
+	{ ABP_SOC_IA_TCP_STATE,			"TCP State",			false },
+	{ ABP_SOC_IA_RX_BYTES,			"Bytes in RX Buffer",	false },
+	{ ABP_SOC_IA_TX_BYTES,			"Bytes in TX Buffer",	false },
+	{ ABP_SOC_IA_SO_REUSE_ADDR,		"Reuse Address Option",	false },
+	{ ABP_SOC_IA_SO_KEEP_ALIVE,		"Keep Alive Option",	false },
+	{ ABP_SOC_IA_IP_MULT_TTL,		"IP Multicast TTL",		false },
+	{ ABP_SOC_IA_IP_MULT_LOOP,		"IP Multicast Loop",	false },
+	{ ABP_SOC_IA_TCP_ACKDELAYTIME,	"TCP Ack Delay Time",	false },
+	{ ABP_SOC_IA_TCP_NODELAY,		"TCP No Delay",			false },
+	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	false }
 };
 
 static const tValueName asSrc3InstAttrNames[] =
@@ -982,98 +1178,11 @@ static const tValueName asSyncInstAttrNames[] =
 	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",		false }
 };
 
-static const tValueName asFusmInstAttrNames[] =
-{
-	{ ABP_FUSM_IA_STATE,		"State",					false },
-	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				false },
-	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			false },
-	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			false },
-	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			false },
-	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				false },
-	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				false },
-	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			false },
-	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				false },
-	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	false },
-	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		false }
-};
-
-static const tValueName asSafeInstAttrNames[] =
-{
-	{ ABP_SAFE_IA_SAFETY_ENABLED,			"Safety Enabled",			false },
-	{ ABP_SAFE_IA_BAUD_RATE,				"Baud Rate",				false },
-	{ ABP_SAFE_IA_IO_CONFIG,				"I/O Configuration",		false },
-	{ ABP_SAFE_IA_CYCLE_TIME,				"Cycle Time",				false },
-	{ ABP_SAFE_IA_FW_UPGRADE_IN_PROGRESS,	"FW Upgrade In Progress",	false }
-};
-
-
-static const tValueName asObjAttrNames[] =
-{
-	{ ABP_OA_NAME,			"Name",						false },
-	{ ABP_OA_REV,			"Revision",					false },
-	{ ABP_OA_NUM_INST,		"Number of Instances",		false },
-	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	false }
-};
-
-static const tValueName asObjectNames[] =
-{
-	/*------------------------------------------------------------------------------
-	** Anybus module objects
-	**------------------------------------------------------------------------------
-	*/
-	{ ABP_OBJ_NUM_ANB,		"Anybus",							false },
-	{ ABP_OBJ_NUM_DI,		"Diagnostic",						false },
-	{ ABP_OBJ_NUM_NW,		"Network",							false },
-	{ ABP_OBJ_NUM_NC,		"Network Configuration",			false },
-	{ ABP_OBJ_NUM_ADD,		"PROFIBUS DP-V1 Additional Diag",	false },
-	{ ABP_OBJ_NUM_RSV1,		"Reserved",							true  },
-	{ ABP_OBJ_NUM_SOC,		"Socket Interface",					false },
-	{ ABP_OBJ_NUM_NWCCL,	"Network CC-Link",					false },
-	{ ABP_OBJ_NUM_SMTP,		"SMTP Client",						false },
-	{ ABP_OBJ_NUM_FSI,		"Anybus File System Interface",		false },
-	{ ABP_OBJ_NUM_NWDPV1,	"Network PROFIBUS DP-V1",			false },
-	{ ABP_OBJ_NUM_NWETN,	"Network Ethernet",					false },
-	{ ABP_OBJ_NUM_CPC,		"CIP Port Configuration",			false },
-	{ ABP_OBJ_NUM_NWPNIO,	"Network PROFINET IO",				false },
-	{ ABP_OBJ_NUM_PNIOADD,	"PROFINET IO Additional Diag",		false },
-	{ ABP_OBJ_NUM_DPV0DI,	"PROFIBUS DP-V0 Diagnostic",		false },
-	{ ABP_OBJ_NUM_FUSM,		"Functional Safety Module",			false },
-	{ ABP_OBJ_NUM_NWCFN,	"Network CC-Link IE Field Network",	false },
-	/*------------------------------------------------------------------------------
-	** Host application objects
-	**------------------------------------------------------------------------------
-	*/
-	{ 0x80,					"Host Application Specific",			false }, /* No abp define exists yet */
-	{ ABP_OBJ_NUM_OPCUA,	"OPC Unified Architecture",				false },
-	{ ABP_OBJ_NUM_EME,		"Energy Measurement",					false },
-	{ ABP_OBJ_NUM_PNAM,		"PROFINET Asset Management",			false },
-	{ ABP_OBJ_NUM_CFN,		"CC-Link IE Field Network",				false },
-	{ ABP_OBJ_NUM_ER,		"Energy Reporting",						false },
-	{ ABP_OBJ_NUM_SAFE,		"Functional Safety",					false },
-	{ ABP_OBJ_NUM_EPL,		"POWERLINK",							false },
-	{ ABP_OBJ_NUM_AFSI,		"Application File System Interface",	false },
-	{ ABP_OBJ_NUM_ASM,		"Assembly Mapping",						false },
-	{ ABP_OBJ_NUM_MDD,		"Modular Device",						false },
-	{ ABP_OBJ_NUM_CIPID,	"CIP Identity",							false },
-	{ ABP_OBJ_NUM_SYNC,		"Sync",									false },
-	{ ABP_OBJ_NUM_BAC,		"BACnet",								false },
-	{ ABP_OBJ_NUM_ECO,		"Energy Control",						false },
-	{ ABP_OBJ_NUM_SRC3,		"SERCOS III",							false },
-	{ ABP_OBJ_NUM_PRD,		"PROFIdrive",							false },
-	{ ABP_OBJ_NUM_CNT,		"ControlNet",							false },
-	{ ABP_OBJ_NUM_CPN,		"CompoNet",								false },
-	{ ABP_OBJ_NUM_ECT,		"EtherCAT",								false },
-	{ ABP_OBJ_NUM_PNIO,		"PROFINET IO",							false },
-	{ ABP_OBJ_NUM_CCL,		"CC-Link",								false },
-	{ ABP_OBJ_NUM_EIP,		"EtherNet/IP",							false },
-	{ ABP_OBJ_NUM_ETN,		"Ethernet",								false },
-	{ ABP_OBJ_NUM_MOD,		"Modbus",								false },
-	{ ABP_OBJ_NUM_COP,		"CANopen",								false },
-	{ ABP_OBJ_NUM_DEV,		"DeviceNet",							false },
-	{ ABP_OBJ_NUM_DPV1,		"PROFIBUS DP-V1",						false },
-	{ ABP_OBJ_NUM_APPD,		"Application Data",						false },
-	{ ABP_OBJ_NUM_APP,		"Application",							false }
-};
+/*******************************************************************************
+**
+** Common command lookup table
+**
+*******************************************************************************/
 
 static const tValueName asCmdNames[] =
 {
@@ -1087,9 +1196,38 @@ static const tValueName asCmdNames[] =
 	{ ABP_CMD_SET_INDEXED_ATTR,	"Set_Indexed_Attribute",	false }
 };
 
+/*******************************************************************************
+**
+** Object-specific command lookup tables
+**
+*******************************************************************************/
+
 static const tValueName asAddCmdNames[] =
 {
 	{ ABP_ADD_CMD_ALARM_NOTIFICATION,	"Alarm_Notification",	true }
+};
+
+static const tValueName asAppCmdNames[] =
+{
+	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			false },
+	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	false },
+	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
+};
+
+static const tValueName asAppDataCmdNames[] =
+{
+	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	false },
+	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		false },
+	{ ABP_APPD_GET_ADI_INFO,				"Get_ADI_Info (Deprecated)",	true  }, /* ABCC40 deprecated shall not be used */
+	{ ABP_APPD_REMAP_ADI_WRITE_AREA,		"Remap_ADI_Write_Area",			false },
+	{ ABP_APPD_REMAP_ADI_READ_AREA,			"Remap_Adi_Read_Area",			false },
+	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			false }
+};
+
+static const tValueName asAsmCmdNames[] =
+{
+	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	false },
+	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	false }
 };
 
 static const tValueName asBacCmdNames[] =
@@ -1145,28 +1283,23 @@ static const tValueName asEcoCmdNames[] =
 	{ ABP_ECO_CMD_PREVIEW_PAUSE_TIME,	"Preview_Pause_Time",	false }
 };
 
+static const tValueName asEctCmdNames[] =
+{
+	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	false }
+};
+
+static const tValueName asEipCmdNames[] =
+{
+	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		false },
+	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				false },
+	{ ABP_EIP_CMD_PROCESS_CIP_ROUTING_REQUEST,	"Process_CIP_Routing_Request",	false },
+	{ ABP_EIP_CMD_GET_CONFIG_DATA,				"Get_Config_Data",				false },
+	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	false }
+};
+
 static const tValueName asEmeCmdNames[] =
 {
 	{ ABP_EME_CMD_GET_ATTRIBUTE_MEASUREMENT_LIST,	"Get_Attribute_Measurement_List",	false }
-};
-
-static const tValueName asMddCmdNames[] =
-{
-	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false }
-};
-
-static const tValueName asAsmCmdNames[] =
-{
-	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	false },
-	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	false }
-};
-
-static const tValueName asFusmCmdNames[] =
-{
-	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,		"Error_Confirmation",		true  },
-	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,		"Set_IO_Cfg_String",		false },
-	{ ABP_FUSM_CMD_GET_SAFETY_OUTPUT_PDU,	"Get_Safety_Output_PDU",	false },
-	{ ABP_FUSM_CMD_GET_SAFETY_INPUT_PDU,	"Get_Safety_Input_PDU",		false }
 };
 
 static const tValueName asFsiCmdNames[] =
@@ -1187,58 +1320,22 @@ static const tValueName asFsiCmdNames[] =
 	{ ABP_FSI_CMD_FORMAT_DISC,			"Format_Disc",		false }
 };
 
-static const tValueName asEipCmdNames[] =
+static const tValueName asFusmCmdNames[] =
 {
-	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		false },
-	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				false },
-	{ ABP_EIP_CMD_PROCESS_CIP_ROUTING_REQUEST,	"Process_CIP_Routing_Request",	false },
-	{ ABP_EIP_CMD_GET_CONFIG_DATA,				"Get_Config_Data",				false },
-	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	false }
+	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,		"Error_Confirmation",		true  },
+	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,		"Set_IO_Cfg_String",		false },
+	{ ABP_FUSM_CMD_GET_SAFETY_OUTPUT_PDU,	"Get_Safety_Output_PDU",	false },
+	{ ABP_FUSM_CMD_GET_SAFETY_INPUT_PDU,	"Get_Safety_Input_PDU",		false }
 };
 
-static const tValueName asEctCmdNames[] =
+static const tValueName asMddCmdNames[] =
 {
-	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	false }
+	{ ABP_MDD_CMD_GET_LIST, "Get_List",	false }
 };
 
 static const tValueName asModCmdNames[] =
 {
 	{ ABP_MOD_CMD_PROCESS_MODBUS_MESSAGE,	"Process_Modbus_Message",	false }
-};
-
-static const tValueName asPnioCmdNames[] =
-{
-	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
-	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			false },
-	{ ABP_PNIO_CMD_GET_IM_RECORD,		"Get_IM_Record",		false },
-	{ ABP_PNIO_CMD_SET_IM_RECORD,		"Set_IM_Record",		false },
-	{ ABP_PNIO_CMD_AR_CHECK_IND,		"AR_Check_Ind",			false },
-	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		true  }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_AR_INFO_IND,			"AR_Info_Ind",			false },
-	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		false },
-	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			true  }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_PLUG_SUB_FAILED,		"Plug_Sub_Failed",		true  }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	false },
-	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		false },
-	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	false },
-	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		false }
-};
-
-static const tValueName asAppCmdNames[] =
-{
-	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			false },
-	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	false },
-	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
-};
-
-static const tValueName asAppDataCmdNames[] =
-{
-	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	false },
-	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		false },
-	{ ABP_APPD_GET_ADI_INFO,				"Get_ADI_Info (Deprecated)",	true  }, /* ABCC40 deprecated shall not be used */
-	{ ABP_APPD_REMAP_ADI_WRITE_AREA,		"Remap_ADI_Write_Area",			false },
-	{ ABP_APPD_REMAP_ADI_READ_AREA,			"Remap_Adi_Read_Area",			false },
-	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			false }
 };
 
 static const tValueName asNwCmdNames[] =
@@ -1282,10 +1379,66 @@ static const tValueName asNwPnioCmdNames[] =
 	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	false }
 };
 
+static const tValueName asPnioCmdNames[] =
+{
+	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			false },
+	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			false },
+	{ ABP_PNIO_CMD_GET_IM_RECORD,		"Get_IM_Record",		false },
+	{ ABP_PNIO_CMD_SET_IM_RECORD,		"Set_IM_Record",		false },
+	{ ABP_PNIO_CMD_AR_CHECK_IND,		"AR_Check_Ind",			false },
+	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		true  }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_AR_INFO_IND,			"AR_Info_Ind",			false },
+	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		false },
+	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			true  }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_PLUG_SUB_FAILED,		"Plug_Sub_Failed",		true  }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	false },
+	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		false },
+	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	false },
+	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		false }
+};
+
 static const tValueName asSrc3CmdNames[] =
 {
 	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnositic",	false }
 };
+
+/*******************************************************************************
+**
+** Common Error response lookup table
+**
+*******************************************************************************/
+
+static const tValueName asErrorRspNames[] =
+{
+	{ ABP_ERR_INV_MSG_FORMAT,					"Invalid message format",							true },
+	{ ABP_ERR_UNSUP_OBJ,						"Unsupported object",								true },
+	{ ABP_ERR_UNSUP_INST,						"Unsupported instance",								true },
+	{ ABP_ERR_UNSUP_CMD,						"Unsupported command",								true },
+	{ ABP_ERR_INV_CMD_EXT_0,					"Invalid CmdExt0",									true },
+	{ ABP_ERR_INV_CMD_EXT_1,					"Invalid CmdExt1",									true },
+	{ ABP_ERR_ATTR_NOT_SETABLE,					"Attribute not settable",							true },
+	{ ABP_ERR_ATTR_NOT_GETABLE,					"Attribute not gettable",							true },
+	{ ABP_ERR_TOO_MUCH_DATA,					"Too much data",									true },
+	{ ABP_ERR_NOT_ENOUGH_DATA,					"Not enough data",									true },
+	{ ABP_ERR_OUT_OF_RANGE,						"Out of range",										true },
+	{ ABP_ERR_INV_STATE,						"Invalid state",									true },
+	{ ABP_ERR_NO_RESOURCES,						"Out of resources",									true },
+	{ ABP_ERR_SEG_FAILURE,						"Segmentation failure",								true },
+	{ ABP_ERR_SEG_BUF_OVERFLOW,					"Segmentation buffer overflow",						true },
+	{ ABP_ERR_VAL_TOO_HIGH,						"Value too high",									true },
+	{ ABP_ERR_VAL_TOO_LOW,						"Value too low",									true },
+	{ ABP_ERR_CONTROLLED_FROM_OTHER_CHANNEL,	"NAK writes to \"read process data\" mapped attr.",	true },
+	{ ABP_ERR_MSG_CHANNEL_TOO_SMALL,			"Response does not fit",							true },
+	{ ABP_ERR_GENERAL_ERROR,					"General error",									true },
+	{ ABP_ERR_PROTECTED_ACCESS,					"Protected access",									true },
+	{ 0xFF,										"Object specific error",							true }
+};
+
+/*******************************************************************************
+**
+** Object specific error response lookup tables
+**
+*******************************************************************************/
 
 static const tValueName asAnbErrNames[] =
 {
@@ -1294,11 +1447,51 @@ static const tValueName asAnbErrNames[] =
 	{ ABP_ANB_ERR_INV_COM_SETTINGS,	"Invalid communication settings",	true }
 };
 
+static const tValueName asAppdErrNames[] =
+{
+	{ ABP_APPD_ERR_MAPPING_ITEM_NAK,				"Mapping item NAK",				true },
+	{ ABP_APPD_ERR_INVALID_TOTAL_SIZE,				"Invalid total size",			true },
+	{ ABP_APPD_ERR_ATTR_CTRL_FROM_OTHER_CHANNEL,	"Attr ctrl from other channel",	true }
+};
+
 static const tValueName asDiErrNames[] =
 {
 	{ ABP_DI_ERR_NOT_REMOVED,		"Event could not be removed",		true },
 	{ ABP_DI_LATCH_NOT_SUPPORTED,	"Latching events not supported",	true },
 	{ ABP_DI_ERR_NW_SPECIFIC,		"Network specific error",			true }
+};
+
+static const tValueName asEipErrNames[] =
+{
+	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
+	{ ABP_EIP_ERR_INVALID_CONFIG,		"Invalid configuration",	true }
+};
+
+static const tValueName asFsiErrNames[] =
+{
+	{ ABP_FSI_ERR_FILE_OPEN_FAILED,				"File_Open Failed",			true },
+	{ ABP_FSI_ERR_FILE_CLOSE_FAILED,			"File_Close Failed",		true },
+	{ ABP_FSI_ERR_FILE_DELETE_FAILED,			"File_Delete Failed",		true },
+	{ ABP_FSI_ERR_DIRECTORY_OPEN_FAILED,		"Directory_Open Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CLOSE_FAILED,		"Directory_Close Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CREATE_FAILED,		"Directory_Create Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_DELETE_FAILED,		"Directory_Delete Failed",	true },
+	{ ABP_FSI_ERR_DIRECTORY_CHANGE_FAILED,		"Directory_Change Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED,	"Copy Open Read Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_OPEN_WRITE_FAILED,	"Copy Open Write Failed",	true },
+	{ ABP_FSI_ERR_FILE_COPY_WRITE_FAILED,		"Copy Write Failed",		true },
+	{ ABP_FSI_ERR_FILE_RENAME_FAILED,			"File_Rename Failed",		true }
+};
+
+static const tValueName asFusmErrNames[] =
+{
+	{ ABP_FUSM_ERR_REJECT_BY_MODULE,	"Rejected by module",			true },
+	{ ABP_FUSM_ERR_MODULE_RSP_FAULTY,	"Module response is faulty",	true }
+};
+
+static const tValueName asModErrNames[] =
+{
+	{ ABP_MOD_NW_EXCPT_MISSING_MAC_ADDRESS,	"Missing MAC Address",	true }
 };
 
 static const tValueName asNwErrNames[] =
@@ -1364,35 +1557,6 @@ static const tValueName asNwPnioErrNames[] =
 	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true }
 };
 
-static const tValueName asAppdErrNames[] =
-{
-	{ ABP_APPD_ERR_MAPPING_ITEM_NAK,				"Mapping item NAK",				true },
-	{ ABP_APPD_ERR_INVALID_TOTAL_SIZE,				"Invalid total size",			true },
-	{ ABP_APPD_ERR_ATTR_CTRL_FROM_OTHER_CHANNEL,	"Attr ctrl from other channel",	true }
-};
-
-static const tValueName asSmtpErrNames[] =
-{
-	{ ABP_SMTP_NO_EMAIL_SERVER,			"No e-mail server",			true },
-	{ ABP_SMTP_SERVER_NOT_READY,		"Server not ready",			true },
-	{ ABP_SMTP_AUTHENTICATION_ERROR,	"Authentication error",		true },
-	{ ABP_SMTP_SOCKET_ERROR,			"Socket error",				true },
-	{ ABP_SMTP_SSI_SCAN_ERROR,			"SSI scan error",			true },
-	{ ABP_SMTP_FILE_ERROR,				"File error",				true },
-	{ ABP_SMTP_OTHER,					"Other",					true }
-};
-
-static const tValueName asEipErrNames[] =
-{
-	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
-	{ ABP_EIP_ERR_INVALID_CONFIG,		"Invalid configuration",	true }
-};
-
-static const tValueName asModErrNames[] =
-{
-	{ ABP_MOD_NW_EXCPT_MISSING_MAC_ADDRESS,	"Missing MAC Address",	true }
-};
-
 static const tValueName asPnioErrNames[] =
 {
 	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI write not mapped",				true },
@@ -1419,6 +1583,18 @@ static const tValueName asPnioErrNames[] =
 	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			true },
 	{ ABP_NWPNIO_ERR_ASM_ALREADY_PLUGGED,		"ASM Already Plugged",				true },
 };
+
+static const tValueName asSmtpErrNames[] =
+{
+	{ ABP_SMTP_NO_EMAIL_SERVER,			"No e-mail server",			true },
+	{ ABP_SMTP_SERVER_NOT_READY,		"Server not ready",			true },
+	{ ABP_SMTP_AUTHENTICATION_ERROR,	"Authentication error",		true },
+	{ ABP_SMTP_SOCKET_ERROR,			"Socket error",				true },
+	{ ABP_SMTP_SSI_SCAN_ERROR,			"SSI scan error",			true },
+	{ ABP_SMTP_FILE_ERROR,				"File error",				true },
+	{ ABP_SMTP_OTHER,					"Other",					true }
+};
+
 
 static const tValueName asSocErrNames[] =
 {
@@ -1447,123 +1623,6 @@ static const tValueName asSocErrNames[] =
 	{ SOC_ERR_DNS_NAME,			"DNS_NAME",			true },
 	{ SOC_ERR_DNS_TIMEOUT,		"DNS_TIMEOUT",		true },
 	{ SOC_ERR_DNS_CMD_FAILED,	"DNS_CMD_FAILED",	true }
-};
-
-static const tValueName asFusmErrNames[] =
-{
-	{ ABP_FUSM_ERR_REJECT_BY_MODULE,	"Rejected by module",			true },
-	{ ABP_FUSM_ERR_MODULE_RSP_FAULTY,	"Module response is faulty",	true }
-};
-
-
-static const tValueName asFsiErrNames[] =
-{
-	{ ABP_FSI_ERR_FILE_OPEN_FAILED,				"File_Open Failed",			true },
-	{ ABP_FSI_ERR_FILE_CLOSE_FAILED,			"File_Close Failed",		true },
-	{ ABP_FSI_ERR_FILE_DELETE_FAILED,			"File_Delete Failed",		true },
-	{ ABP_FSI_ERR_DIRECTORY_OPEN_FAILED,		"Directory_Open Failed",	true },
-	{ ABP_FSI_ERR_DIRECTORY_CLOSE_FAILED,		"Directory_Close Failed",	true },
-	{ ABP_FSI_ERR_DIRECTORY_CREATE_FAILED,		"Directory_Create Failed",	true },
-	{ ABP_FSI_ERR_DIRECTORY_DELETE_FAILED,		"Directory_Delete Failed",	true },
-	{ ABP_FSI_ERR_DIRECTORY_CHANGE_FAILED,		"Directory_Change Failed",	true },
-	{ ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED,	"Copy Open Read Failed",	true },
-	{ ABP_FSI_ERR_FILE_COPY_OPEN_WRITE_FAILED,	"Copy Open Write Failed",	true },
-	{ ABP_FSI_ERR_FILE_COPY_WRITE_FAILED,		"Copy Write Failed",		true },
-	{ ABP_FSI_ERR_FILE_RENAME_FAILED,			"File_Rename Failed",		true }
-};
-
-static const tValueName asIntMaskNames[] =
-{
-	{ ABP_INTMASK_RDPDIEN,		"RDPD",		false },
-	{ ABP_INTMASK_RDMSGIEN,		"RDMSG",	false },
-	{ ABP_INTMASK_WRMSGIEN,		"WRMSG",	false },
-	{ ABP_INTMASK_ANBRIEN,		"ANBR",		false },
-	{ ABP_INTMASK_STATUSIEN,	"STATUS",	false },
-	{ 0x20,						"RESERVED",	true  }, /* No ABP mask exists */
-	{ ABP_INTMASK_SYNCIEN,		"SYNC",		false },
-	{ 0x80,						"RESERVED",	true  }  /* No ABP mask exists */
-};
-
-static const tValueName asLedStsNames[] =
-{
-	{ 0x0001, "LED1A",		false },
-	{ 0x0002, "LED1B",		false },
-	{ 0x0004, "LED2A",		false },
-	{ 0x0008, "LED2B",		false },
-	{ 0x0010, "LED3A",		false },
-	{ 0x0020, "LED3B",		false },
-	{ 0x0040, "LED4A",		false },
-	{ 0x0080, "LED4B",		false },
-	{ 0xFF00, "RESERVED",	true }
-};
-
-static const tValueName asErrorRspNames[] =
-{
-	{ ABP_ERR_INV_MSG_FORMAT,					"Invalid message format",							true },
-	{ ABP_ERR_UNSUP_OBJ,						"Unsupported object",								true },
-	{ ABP_ERR_UNSUP_INST,						"Unsupported instance",								true },
-	{ ABP_ERR_UNSUP_CMD,						"Unsupported command",								true },
-	{ ABP_ERR_INV_CMD_EXT_0,					"Invalid CmdExt0",									true },
-	{ ABP_ERR_INV_CMD_EXT_1,					"Invalid CmdExt1",									true },
-	{ ABP_ERR_ATTR_NOT_SETABLE,					"Attribute not settable",							true },
-	{ ABP_ERR_ATTR_NOT_GETABLE,					"Attribute not gettable",							true },
-	{ ABP_ERR_TOO_MUCH_DATA,					"Too much data",									true },
-	{ ABP_ERR_NOT_ENOUGH_DATA,					"Not enough data",									true },
-	{ ABP_ERR_OUT_OF_RANGE,						"Out of range",										true },
-	{ ABP_ERR_INV_STATE,						"Invalid state",									true },
-	{ ABP_ERR_NO_RESOURCES,						"Out of resources",									true },
-	{ ABP_ERR_SEG_FAILURE,						"Segmentation failure",								true },
-	{ ABP_ERR_SEG_BUF_OVERFLOW,					"Segmentation buffer overflow",						true },
-	{ ABP_ERR_VAL_TOO_HIGH,						"Value too high",									true },
-	{ ABP_ERR_VAL_TOO_LOW,						"Value too low",									true },
-	{ ABP_ERR_CONTROLLED_FROM_OTHER_CHANNEL,	"NAK writes to \"read process data\" mapped attr.",	true },
-	{ ABP_ERR_MSG_CHANNEL_TOO_SMALL,			"Response does not fit",							true },
-	{ ABP_ERR_GENERAL_ERROR,					"General error",									true },
-	{ ABP_ERR_PROTECTED_ACCESS,					"Protected access",									true },
-	{ 0xFF,										"Object specific error",							true }
-};
-
-static const tValueName asAnybusStsNames[] =
-{
-	{ ABP_ANB_STATE_SETUP,			"SETUP",			false },
-	{ ABP_ANB_STATE_NW_INIT,		"NW_INIT",			false },
-	{ ABP_ANB_STATE_WAIT_PROCESS,	"WAIT_PROCESS",		false },
-	{ ABP_ANB_STATE_IDLE,			"IDLE",				false },
-	{ ABP_ANB_STATE_PROCESS_ACTIVE, "PROCESS_ACTIVE",	false },
-	{ ABP_ANB_STATE_ERROR,			"ERROR",			true  },
-	{ ABP_ANB_STATE_EXCEPTION,		"EXCEPTION",		true  }
-};
-
-static const tValueName asApplStsNames[] =
-{
-	{ ABP_APPSTAT_NO_ERROR,			"No Error",									false },
-	{ ABP_APPSTAT_NOT_SYNCED,		"Not yet synchronized",						false },
-	{ ABP_APPSTAT_SYNC_CFG_ERR,		"Sync configuration error",					true  },
-	{ ABP_APPSTAT_READ_PD_CFG_ERR,	"Read process data configuration error",	true  },
-	{ ABP_APPSTAT_WRITE_PD_CFG_ERR,	"Write process data configuration error",	true  },
-	{ ABP_APPSTAT_SYNC_LOSS,		"Synchronization loss",						true  },
-	{ ABP_APPSTAT_PD_DATA_LOSS,		"Excessive data loss",						true  },
-	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								true  }
-};
-
-static const tValueName asSpiStsNames[] =
-{
-	{ 0xC0,							"RESERVED",		true  }, /* No ABP mask exists */
-	{ ABP_SPI_STATUS_NEW_PD,		"NEW_PD",		false },
-	{ ABP_SPI_STATUS_LAST_FRAG,		"LAST_FRAG",	false },
-	{ ABP_SPI_STATUS_M,				"M",			false },
-	{ ABP_SPI_STATUS_CMDCNT,		"CMDCNT",		false },
-	{ ABP_SPI_STATUS_WRMSG_FULL,	"WRMSG_FULL",	true  }
-};
-
-static const tValueName asSpiCtrlNames[] =
-{
-	{ ABP_SPI_CTRL_T,			"TOGGLE",		false },
-	{ 0x60,						"RESERVED",		true  }, /* No ABP mask exists */
-	{ ABP_SPI_CTRL_LAST_FRAG,	"LAST_FRAG",	false },
-	{ ABP_SPI_CTRL_M,			"M",			false },
-	{ ABP_SPI_CTRL_CMDCNT,		"CMDCNT",		false },
-	{ ABP_SPI_CTRL_WRPD_VALID,	"WRPD_VALID",	false }
 };
 
 bool GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
