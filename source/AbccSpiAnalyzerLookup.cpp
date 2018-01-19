@@ -1968,19 +1968,17 @@ bool GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase display
 bool GetNamedInstString(U16 val,
 	char* str, U16 max_str_len,
 	DisplayBase display_base,
-	const tValueName* pasInstNames, U8 NoInstNames)
+	const tValueName* inst_names, U8 num_inst_names)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	U8 bNoAttrs = 0;
 	bool alert = false;
 	bool found = false;
 
-	for (U8 i = 0; i < NoInstNames; i++)
+	for (U8 i = 0; i < num_inst_names; i++)
 	{
-		if (pasInstNames[i].value == val)
+		if (inst_names[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, pasInstNames[i].name);
-			alert = pasInstNames[i].alert;
+			SNPRINTF(str, max_str_len, inst_names[i].name);
+			alert = inst_names[i].alert;
 			found = true;
 		}
 	}
@@ -1996,8 +1994,8 @@ bool GetNamedInstString(U16 val,
 bool GetNamedAttrString(U16 inst, U8 val,
 	char* str, U16 max_str_len,
 	DisplayBase display_base,
-	const tValueName* pasObjNames, U8 NoObjNames,
-	const tValueName* pasInstNames, U8 NoInstNames)
+	const tValueName* obj_names, U8 num_obj_names,
+	const tValueName* inst_names, U8 num_inst_names)
 {
 	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	const tValueName* pasAttrNames = NULL;
@@ -2014,10 +2012,10 @@ bool GetNamedAttrString(U16 inst, U8 val,
 		}
 		else
 		{
-			if (pasObjNames != NULL)
+			if (obj_names != NULL)
 			{
-				pasAttrNames = pasObjNames;
-				bNoAttrs = NoObjNames;
+				pasAttrNames = obj_names;
+				bNoAttrs = num_obj_names;
 			}
 			else
 			{
@@ -2027,10 +2025,10 @@ bool GetNamedAttrString(U16 inst, U8 val,
 	}
 	else
 	{
-		if (pasInstNames != NULL)
+		if (num_inst_names != NULL)
 		{
-			pasAttrNames = pasInstNames;
-			bNoAttrs = NoInstNames;
+			pasAttrNames = inst_names;
+			bNoAttrs = num_inst_names;
 		}
 		else
 		{
