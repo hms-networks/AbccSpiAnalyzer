@@ -193,7 +193,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		** ignore data as long as the enable-line is high */
 		mEnable->Transition();
 		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-		OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
+		OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
 		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		mValue++;
 
@@ -214,7 +214,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			/* Add extra clocking */
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
-			OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
+			OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mValue++;
 		}
@@ -222,7 +222,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			/* Create a fragment (1 byte) */
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-			OutputWord_CPOL1_CPHA1(mValue, mValue + 1);
+			OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mValue++;
 		}
@@ -246,16 +246,16 @@ void SpiSimulationDataGenerator::SendPacketData(bool fClockIdleHigh, U32 dwLengt
 	{
 		if (fClockIdleHigh == true)
 		{
-			OutputWord_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
+			OutputByte_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 		}
 		else
 		{
-			OutputWord_CPOL0_CPHA0(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
+			OutputByte_CPOL0_CPHA0(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 		}
 	}
 }
 
-void SpiSimulationDataGenerator::OutputWord_CPOL0_CPHA0(U64 mosi_data, U64 miso_data)
+void SpiSimulationDataGenerator::OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_data)
 {
 	const U32 dwBitsPerTransfer = 8;
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
@@ -286,7 +286,7 @@ void SpiSimulationDataGenerator::OutputWord_CPOL0_CPHA0(U64 mosi_data, U64 miso_
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
 }
 
-void SpiSimulationDataGenerator::OutputWord_CPOL1_CPHA1(U64 mosi_data, U64 miso_data)
+void SpiSimulationDataGenerator::OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_data)
 {
 	const U32 dwBitsPerTransfer = 8;
 	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
