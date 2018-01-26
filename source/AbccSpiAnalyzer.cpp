@@ -46,56 +46,56 @@ SpiAnalyzer::SpiAnalyzer()
 {
 	SetAnalyzerSettings(mSettings.get());
 
-	bSettingsChangeID   = mSettings->mChangeID;
+	mSettingsChangeID   = mSettings->mChangeID;
 
-	eMosiState              = e_ABCC_MOSI_IDLE;
-	eMisoState              = e_ABCC_MISO_IDLE;
-	bLastAnbSts             = 0xFF;
-	bLastApplSts            = 0xFF;
-	bMosiLastToggleState    = 0xFF;
-	dwMosiMsgLen            = 0;
-	dwMosiPdLen             = 0;
-	dwMisoMsgLen            = 0;
-	dwMisoPdLen             = 0;
+	mMosiVars.eState              = e_ABCC_MOSI_IDLE;
+	mMisoVars.eState              = e_ABCC_MISO_IDLE;
+	mMisoVars.bLastAnbSts         = 0xFF;
+	mMosiVars.bLastApplSts        = 0xFF;
+	mMosiVars.bLastToggleState    = 0xFF;
+	mMosiVars.dwMsgLen            = 0;
+	mMosiVars.dwPdLen             = 0;
+	mMisoVars.dwMsgLen            = 0;
+	mMisoVars.dwPdLen             = 0;
 
-	fMisoNewMsg             = false;
-	fMisoErrorRsp           = true;
-	fMisoFragmentation      = false;
-	fMisoFirstFrag          = false;
-	fMisoLastFrag           = false;
-	fMisoNewRdPd            = false;
-	fMosiNewMsg             = false;
-	fMosiErrorRsp           = true;
-	fMosiFragmentation      = false;
-	fMosiFirstFrag          = false;
-	fMosiLastFrag           = false;
-	fMosiWrPdValid          = false;
+	mMisoVars.fNewMsg             = false;
+	mMisoVars.fErrorRsp           = true;
+	mMisoVars.fFragmentation      = false;
+	mMisoVars.fFirstFrag          = false;
+	mMisoVars.fLastFrag           = false;
+	mMisoVars.fNewRdPd            = false;
+	mMosiVars.fNewMsg             = false;
+	mMosiVars.fErrorRsp           = true;
+	mMosiVars.fFragmentation      = false;
+	mMosiVars.fFirstFrag          = false;
+	mMosiVars.fLastFrag           = false;
+	mMosiVars.fWrPdValid          = false;
 
-	fMisoReadyForNewPacket  = false;
-	fMosiReadyForNewPacket  = false;
+	mMisoVars.fReadyForNewPacket  = false;
+	mMosiVars.fReadyForNewPacket  = false;
 
-	memset(&sMisoMsgHeader, 0, sizeof(sMisoMsgHeader));
-	dwMisoPdCnt = 0;
-	dwMisoMdCnt = 0;
-	wMisoMdSize = 0;
+	memset(&mMisoVars.sMsgHeader, 0, sizeof(mMisoVars.sMsgHeader));
+	mMisoVars.dwPdCnt = 0;
+	mMisoVars.dwMdCnt = 0;
+	mMisoVars.wMdSize = 0;
 
-	memset(&sMosiMsgHeader, 0, sizeof(sMosiMsgHeader));
-	dwMosiPdCnt = 0;
-	dwMosiMdCnt = 0;
-	wMosiMdSize = 0;
+	memset(&mMosiVars.sMsgHeader, 0, sizeof(mMosiVars.sMsgHeader));
+	mMosiVars.dwPdCnt = 0;
+	mMosiVars.dwMdCnt = 0;
+	mMosiVars.wMdSize = 0;
 
-	dwLastMisoTimestamp = 0;
+	mMisoVars.dwLastTimestamp = 0;
 
-	eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
-	dwMisoByteCnt    = 0;
-	lMisoFrameData   = 0;
+	mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+	mMisoVars.dwByteCnt    = 0;
+	mMisoVars.lFrameData   = 0;
 
-	eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
-	dwMosiByteCnt    = 0;
-	lMosiFrameData   = 0;
+	mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+	mMosiVars.dwByteCnt    = 0;
+	mMosiVars.lFrameData   = 0;
 
-	bMosiByteCnt2 = 0;
-	bMisoByteCnt2 = 0;
+	mMosiVars.bByteCnt2 = 0;
+	mMisoVars.bByteCnt2 = 0;
 }
 
 SpiAnalyzer::~SpiAnalyzer()
@@ -133,16 +133,16 @@ void SpiAnalyzer::WorkerThread()
 	/* Check that all required channels are valid */
 	if ( (mMiso != NULL) && (mMosi != NULL) && (mClock != NULL) )
 	{
-		mMisoChecksum = AbccCrc();
-		mMosiChecksum = AbccCrc();
+		mMisoVars.oChecksum = AbccCrc();
+		mMosiVars.oChecksum = AbccCrc();
 
 		AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 
 		/* Reset persistent state logic between captures */
-		eMosiState = e_ABCC_MOSI_IDLE;
-		eMisoState = e_ABCC_MISO_IDLE;
-		bLastAnbSts = 0xFF;
-		bLastApplSts = 0xFF;
+		mMosiVars.eState = e_ABCC_MOSI_IDLE;
+		mMisoVars.eState = e_ABCC_MISO_IDLE;
+		mMisoVars.bLastAnbSts = 0xFF;
+		mMosiVars.bLastApplSts = 0xFF;
 
 		RunAbccMosiMsgSubStateMachine(true, NULL, NULL);
 		RunAbccMisoMsgSubStateMachine(true, NULL, NULL);
@@ -180,16 +180,16 @@ void SpiAnalyzer::WorkerThread()
 				{
 					if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 					{
-						eMosiState = e_ABCC_MOSI_SPI_CTRL;
-						eMisoState = e_ABCC_MISO_Reserved1;
-						eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
-						eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
-						mMisoChecksum.Init();
-						mMosiChecksum.Init();
-						lMisoFrameData = 0;
-						lMosiFrameData = 0;
-						dwMisoByteCnt = 0;
-						dwMosiByteCnt = 0;
+						mMosiVars.eState = e_ABCC_MOSI_SPI_CTRL;
+						mMisoVars.eState = e_ABCC_MISO_Reserved1;
+						mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+						mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+						mMisoVars.oChecksum.Init();
+						mMosiVars.oChecksum.Init();
+						mMisoVars.lFrameData = 0;
+						mMosiVars.lFrameData = 0;
+						mMisoVars.dwByteCnt = 0;
+						mMosiVars.dwByteCnt = 0;
 						fError = true;
 					}
 				}
@@ -208,8 +208,8 @@ void SpiAnalyzer::WorkerThread()
 				}
 				else
 				{
-					AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleOfNextEdge());
-					AddFragFrame(true,  lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
+					AddFragFrame(false, mMisoVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
+					AddFragFrame(true, mMosiVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				}
 			}
@@ -517,9 +517,9 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 
 bool SpiAnalyzer::NeedsRerun()
 {
-	if (bSettingsChangeID != mSettings->mChangeID)
+	if (mSettingsChangeID != mSettings->mChangeID)
 	{
-		bSettingsChangeID = mSettings->mChangeID;
+		mSettingsChangeID = mSettings->mChangeID;
 		return true;
 	}
 	else
@@ -605,10 +605,10 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	** ErrorX - Checksum Error
 	** ErrorSquare - Protocol Error or Multiple Events with at least one error
 	*/
-	if ((eMosiPacketType != e_NULL_PACKET) && (eMisoPacketType != e_NULL_PACKET))
+	if ((mMosiVars.ePacketType != e_NULL_PACKET) && (mMisoVars.ePacketType != e_NULL_PACKET))
 	{
 		/* Multiple events (at least one on each channel, or multiple events on one channel) */
-		if (IsErrorPacketType(eMosiPacketType) || IsErrorPacketType(eMisoPacketType))
+		if (IsErrorPacketType(mMosiVars.ePacketType) || IsErrorPacketType(mMisoVars.ePacketType))
 		{
 			eMarkerType = AnalyzerResults::ErrorSquare;
 		}
@@ -620,39 +620,39 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	else
 	{
 		/* Only one event */
-		if ((eMosiPacketType == e_MULTI_ERROR_PACKET) || (eMisoPacketType == e_MULTI_ERROR_PACKET))
+		if ((mMosiVars.ePacketType == e_MULTI_ERROR_PACKET) || (mMisoVars.ePacketType == e_MULTI_ERROR_PACKET))
 		{
 			eMarkerType = AnalyzerResults::ErrorSquare;
 		}
-		else if ((eMosiPacketType == e_PROTOCOL_ERROR_PACKET) || (eMisoPacketType == e_PROTOCOL_ERROR_PACKET))
+		else if ((mMosiVars.ePacketType == e_PROTOCOL_ERROR_PACKET) || (mMisoVars.ePacketType == e_PROTOCOL_ERROR_PACKET))
 		{
 			eMarkerType = AnalyzerResults::ErrorSquare;
 		}
-		else if ((eMosiPacketType == e_CHECKSUM_ERROR_PACKET) || (eMisoPacketType == e_CHECKSUM_ERROR_PACKET))
+		else if ((mMosiVars.ePacketType == e_CHECKSUM_ERROR_PACKET) || (mMisoVars.ePacketType == e_CHECKSUM_ERROR_PACKET))
 		{
 			eMarkerType = AnalyzerResults::ErrorX;
 		}
-		else if ((eMosiPacketType == e_ERROR_RESPONSE_PACKET) || (eMisoPacketType == e_ERROR_RESPONSE_PACKET))
+		else if ((mMosiVars.ePacketType == e_ERROR_RESPONSE_PACKET) || (mMisoVars.ePacketType == e_ERROR_RESPONSE_PACKET))
 		{
 			eMarkerType = AnalyzerResults::ErrorDot;
 		}
-		else if ((eMosiPacketType == e_MULTI_PACKET) || (eMisoPacketType == e_MULTI_PACKET))
+		else if ((mMosiVars.ePacketType == e_MULTI_PACKET) || (mMisoVars.ePacketType == e_MULTI_PACKET))
 		{
 			eMarkerType = AnalyzerResults::Square;
 		}
-		else if ((eMosiPacketType == e_RESPONSE_PACKET) || (eMisoPacketType == e_RESPONSE_PACKET))
+		else if ((mMosiVars.ePacketType == e_RESPONSE_PACKET) || (mMisoVars.ePacketType == e_RESPONSE_PACKET))
 		{
 			eMarkerType = AnalyzerResults::Stop;
 		}
-		else if ((eMosiPacketType == e_COMMAND_PACKET) || (eMisoPacketType == e_COMMAND_PACKET))
+		else if ((mMosiVars.ePacketType == e_COMMAND_PACKET) || (mMisoVars.ePacketType == e_COMMAND_PACKET))
 		{
 			eMarkerType = AnalyzerResults::Start;
 		}
-		else if ((eMosiPacketType == e_MSG_FRAGMENT_PACKET) || (eMisoPacketType == e_MSG_FRAGMENT_PACKET))
+		else if ((mMosiVars.ePacketType == e_MSG_FRAGMENT_PACKET) || (mMisoVars.ePacketType == e_MSG_FRAGMENT_PACKET))
 		{
 			eMarkerType = AnalyzerResults::Dot;
 		}
-		else if ((eMosiPacketType == e_NULL_PACKET) || (eMisoPacketType == e_NULL_PACKET))
+		else if ((mMosiVars.ePacketType == e_NULL_PACKET) || (mMisoVars.ePacketType == e_NULL_PACKET))
 		{
 			eMarkerType = AnalyzerResults::One;
 		}
@@ -670,14 +670,14 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel)
 	bool fStartNewPacket = false;
 	if (fMosiChannel)
 	{
-		fMosiReadyForNewPacket = true;
+		mMosiVars.fReadyForNewPacket = true;
 	}
 	else
 	{
-		fMisoReadyForNewPacket = true;
+		mMisoVars.fReadyForNewPacket = true;
 	}
 
-	if (eMosiPacketType == e_CANCEL_PACKET)
+	if (mMosiVars.ePacketType == e_CANCEL_PACKET)
 	{
 		fStartNewPacket = true;
 		mResults->CancelPacketAndStartNewPacket();
@@ -686,7 +686,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel)
 			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mEnableChannel);
 		}
 	}
-	else if (fMisoReadyForNewPacket && fMosiReadyForNewPacket)
+	else if (mMisoVars.fReadyForNewPacket && mMosiVars.fReadyForNewPacket)
 	{
 		U64 packet_id = mResults->CommitPacketAndStartNewPacket();
 		fStartNewPacket = true;
@@ -716,10 +716,10 @@ void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel)
 	}
 	if (fStartNewPacket)
 	{
-		fMosiReadyForNewPacket = false;
-		fMisoReadyForNewPacket = false;
-		eMosiPacketType = e_NULL_PACKET;
-		eMisoPacketType = e_NULL_PACKET;
+		mMosiVars.fReadyForNewPacket = false;
+		mMisoVars.fReadyForNewPacket = false;
+		mMosiVars.ePacketType = e_NULL_PACKET;
+		mMisoVars.ePacketType = e_NULL_PACKET;
 
 		/* Check if any additional clocks appear on SCLK before enable goes inactive */
 		CheckForIdleAfterPacket();
@@ -818,37 +818,37 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_obj)
 	{
-		sMisoMsgHeader.obj = (U8)lFrameData;
-		dwMisoMdCnt = 0;
+		mMisoVars.sMsgHeader.obj = (U8)lFrameData;
+		mMisoVars.dwMdCnt = 0;
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_inst)
 	{
-		sMisoMsgHeader.inst = (U16)lFrameData;
+		mMisoVars.sMsgHeader.inst = (U16)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = sMisoMsgHeader.obj;
+		result_frame.mData2 = mMisoVars.sMsgHeader.obj;
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_cmd)
 	{
-		sMisoMsgHeader.cmd = (U8)lFrameData;
+		mMisoVars.sMsgHeader.cmd = (U8)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = sMisoMsgHeader.obj;
+		result_frame.mData2 = mMisoVars.sMsgHeader.obj;
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
-			fMisoErrorRsp = true;
+			mMisoVars.fErrorRsp = true;
 		}
 		else
 		{
-			fMisoErrorRsp = false;
+			mMisoVars.fErrorRsp = false;
 		}
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt)
 	{
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
-		memcpy(&result_frame.mData2, &sMisoMsgHeader, sizeof(sMisoMsgHeader));
+		memcpy(&result_frame.mData2, &mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_size)
 	{
@@ -856,36 +856,36 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		{
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			wMisoMdSize = 0;
+			mMisoVars.wMdSize = 0;
 			//TODO joca: the last state (where a valid packet was received) should be restored
-			fMisoFirstFrag = false;
-			fMisoLastFrag = false;
-			fMisoFragmentation = false;
+			mMisoVars.fFirstFrag = false;
+			mMisoVars.fLastFrag = false;
+			mMisoVars.fFragmentation = false;
 		}
 		else
 		{
-			wMisoMdSize = (U16)lFrameData;
+			mMisoVars.wMdSize = (U16)lFrameData;
 		}
 	}
 	else if (eState == e_ABCC_MISO_RD_MSG_SUBFIELD_data)
 	{
-		if (fMisoErrorRsp)
+		if (mMisoVars.fErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			/* Check if data is 0xFF, if so delay de-assertion of fMisoErrorRsp
 			** so that the object specific error response can be detected */
-			if ((((U8)lFrameData != (U8)0xFF) && (dwMisoMdCnt == 0)) ||
-				(dwMisoMdCnt > 1))
+			if ((((U8)lFrameData != (U8)0xFF) && (mMisoVars.dwMdCnt == 0)) ||
+				(mMisoVars.dwMdCnt > 1))
 			{
-				fMisoErrorRsp = false;
+				mMisoVars.fErrorRsp = false;
 			}
 		}
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		result_frame.mData2 = (U64)dwMisoMdCnt;
-		dwMisoMdCnt++;
+		result_frame.mData2 = (U64)mMisoVars.dwMdCnt;
+		mMisoVars.dwMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
-		if (dwMisoMdCnt > wMisoMdSize)
+		if (mMisoVars.dwMdCnt > mMisoVars.wMdSize)
 		{
 			/* Override frame type */
 			result_frame.mType = (U8)e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid;
@@ -893,22 +893,22 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	}
 	else if (eState == e_ABCC_MISO_ANB_STAT)
 	{
-		if (bLastAnbSts != (U8)lFrameData)
+		if (mMisoVars.bLastAnbSts != (U8)lFrameData)
 		{
 			/* Anybus status change event */
-			bLastAnbSts = (U8)lFrameData;
+			mMisoVars.bLastAnbSts = (U8)lFrameData;
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG);
 		}
 	}
 	else if (eState == e_ABCC_MISO_NET_TIME)
 	{
 		/* Compute delta from last timestamp and save it */
-		((tNetworkTimeInfo*)&result_frame.mData2)->deltaTime = (U32)result_frame.mData1 - dwLastMisoTimestamp;
-		((tNetworkTimeInfo*)&result_frame.mData2)->newRdPd = fMisoNewRdPd;
-		((tNetworkTimeInfo*)&result_frame.mData2)->wrPdValid = fMosiWrPdValid;
-		fMisoNewRdPd = false;
-		fMosiWrPdValid = false;
-		dwLastMisoTimestamp = (U32)result_frame.mData1;
+		((tNetworkTimeInfo*)&result_frame.mData2)->deltaTime = (U32)result_frame.mData1 - mMisoVars.dwLastTimestamp;
+		((tNetworkTimeInfo*)&result_frame.mData2)->newRdPd = mMisoVars.fNewRdPd;
+		((tNetworkTimeInfo*)&result_frame.mData2)->wrPdValid = mMosiVars.fWrPdValid;
+		mMisoVars.fNewRdPd = false;
+		mMosiVars.fWrPdValid = false;
+		mMisoVars.dwLastTimestamp = (U32)result_frame.mData1;
 	}
 	else if (eState == e_ABCC_MISO_SPI_STAT)
 	{
@@ -921,15 +921,15 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	else if (eState == e_ABCC_MISO_CRC32)
 	{
 		/* Save the computed CRC32 to the unused frameData */
-		result_frame.mData2 = mMisoChecksum.Crc32();
+		result_frame.mData2 = mMisoVars.oChecksum.Crc32();
 		if (result_frame.mData2 != result_frame.mData1)
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			//TODO joca: the last state (where a valid packet was received) should be restored
-			fMisoFirstFrag = false;
-			fMisoLastFrag = false;
-			fMisoFragmentation = false;
+			mMisoVars.fFirstFrag = false;
+			mMisoVars.fLastFrag = false;
+			mMisoVars.fFragmentation = false;
 		}
 	}
 
@@ -937,29 +937,29 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 	** in the results for easy tracking of specific values */
 	if (eState == e_ABCC_MISO_RD_PD_FIELD)
 	{
-		result_frame.mData2 = (U64)dwMisoPdCnt;
-		dwMisoPdCnt++;
+		result_frame.mData2 = (U64)mMisoVars.dwPdCnt;
+		mMisoVars.dwPdCnt++;
 	}
 	else
 	{
-		dwMisoPdCnt = 0;
+		mMisoVars.dwPdCnt = 0;
 	}
 
 	/* Handle indication of the SPI message fragmentation protocol */
-	if (fMisoFragmentation)
+	if (mMisoVars.fFragmentation)
 	{
 		result_frame.mFlags |= (SPI_MSG_FRAG_FLAG);
-		if (fMisoFirstFrag)
+		if (mMisoVars.fFirstFrag)
 		{
 			result_frame.mFlags |= (SPI_MSG_FIRST_FRAG_FLAG);
 		}
 		if (eState == e_ABCC_MISO_CRC32)
 		{
-			fMisoFirstFrag = false;
-			if (fMisoLastFrag)
+			mMisoVars.fFirstFrag = false;
+			if (mMisoVars.fLastFrag)
 			{
-				fMisoLastFrag = false;
-				fMisoFragmentation = false;
+				mMisoVars.fLastFrag = false;
+				mMisoVars.fFragmentation = false;
 			}
 		}
 	}
@@ -983,7 +983,7 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			}
 		}
 
-		if (fMisoNewMsg)
+		if (mMisoVars.fNewMsg)
 		{
 			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
 				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
@@ -992,11 +992,11 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			}
 			else
 			{
-				if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
+				if (mMisoVars.sMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
 					SetMisoPacketType(e_COMMAND_PACKET);
 				}
-				else if (sMisoMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
+				else if (mMisoVars.sMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
 				{
 					SetMisoPacketType(e_ERROR_RESPONSE_PACKET);
 				}
@@ -1022,37 +1022,37 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_obj)
 	{
-		sMosiMsgHeader.obj = (U8)lFrameData;
-		dwMosiMdCnt = 0;
+		mMosiVars.sMsgHeader.obj = (U8)lFrameData;
+		mMosiVars.dwMdCnt = 0;
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_inst)
 	{
-		sMosiMsgHeader.inst = (U16)lFrameData;
+		mMosiVars.sMsgHeader.inst = (U16)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = sMosiMsgHeader.obj;
+		result_frame.mData2 = mMosiVars.sMsgHeader.obj;
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd)
 	{
-		sMosiMsgHeader.cmd = (U8)lFrameData;
+		mMosiVars.sMsgHeader.cmd = (U8)lFrameData;
 
 		/* Store the object code in frame data to handle object specific data */
-		result_frame.mData2 = sMosiMsgHeader.obj;
+		result_frame.mData2 = mMosiVars.sMsgHeader.obj;
 
 		if ((lFrameData & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
-			fMosiErrorRsp = true;
+			mMosiVars.fErrorRsp = true;
 		}
 		else
 		{
-			fMosiErrorRsp = false;
+			mMosiVars.fErrorRsp = false;
 		}
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt)
 	{
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
-		memcpy(&result_frame.mData2, &sMosiMsgHeader, sizeof(sMosiMsgHeader));
+		memcpy(&result_frame.mData2, &mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_size)
 	{
@@ -1060,37 +1060,37 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 		{
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			wMosiMdSize = 0;
-			fMosiFirstFrag = false;
-			fMosiLastFrag = false;
-			fMosiFragmentation = false;
+			mMosiVars.wMdSize = 0;
+			mMosiVars.fFirstFrag = false;
+			mMosiVars.fLastFrag = false;
+			mMosiVars.fFragmentation = false;
 		}
 		else
 		{
-			wMosiMdSize = (U16)lFrameData;
+			mMosiVars.wMdSize = (U16)lFrameData;
 		}
 	}
 	else if (eState == e_ABCC_MOSI_WR_MSG_SUBFIELD_data)
 	{
-		if (fMosiErrorRsp)
+		if (mMosiVars.fErrorRsp)
 		{
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			/* Check if data is 0xFF, if so delay de-assertion of fMosiErrorRsp
 			** so that the object specific error response can be detected */
-			if ((((U8)lFrameData != (U8)0xFF) && (dwMosiMdCnt == 0)) ||
-				(dwMosiMdCnt > 1))
+			if ((((U8)lFrameData != (U8)0xFF) && (mMosiVars.dwMdCnt == 0)) ||
+				(mMosiVars.dwMdCnt > 1))
 			{
-				fMosiErrorRsp = false;
+				mMosiVars.fErrorRsp = false;
 			}
 		}
-		result_frame.mData2 = ((U64)sMosiMsgHeader.obj) << (8 * sizeof(U32));
+		result_frame.mData2 = ((U64)mMosiVars.sMsgHeader.obj) << (8 * sizeof(U32));
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		result_frame.mData2 |= (U64)dwMosiMdCnt;
-		dwMosiMdCnt++;
+		result_frame.mData2 |= (U64)mMosiVars.dwMdCnt;
+		mMosiVars.dwMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
-		if (dwMosiMdCnt > wMosiMdSize)
+		if (mMosiVars.dwMdCnt > mMosiVars.wMdSize)
 		{
 			/* Override frame type */
 			result_frame.mType = (U8)e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid;
@@ -1098,36 +1098,36 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	}
 	else if (eState == e_ABCC_MOSI_APP_STAT)
 	{
-		if (bLastApplSts != (U8)lFrameData)
+		if (mMosiVars.bLastApplSts != (U8)lFrameData)
 		{
 			/* Application status change event */
-			bLastApplSts = (U8)lFrameData;
+			mMosiVars.bLastApplSts = (U8)lFrameData;
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG);
 		}
 	}
 	else if (eState == e_ABCC_MOSI_SPI_CTRL)
 	{
-		if (bMosiLastToggleState == (U8)(lFrameData & ABP_SPI_CTRL_T))
+		if (mMosiVars.bLastToggleState == (U8)(lFrameData & ABP_SPI_CTRL_T))
 		{
 			/* Retransmit event */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG);
 		}
 		else
 		{
-			bMosiLastToggleState = (U8)(lFrameData & ABP_SPI_CTRL_T);
+			mMosiVars.bLastToggleState = (U8)(lFrameData & ABP_SPI_CTRL_T);
 		}
 	}
 	else if (eState == e_ABCC_MOSI_CRC32)
 	{
 		/* Save the computed CRC32 to the unused frameData */
-		result_frame.mData2 = mMosiChecksum.Crc32();
+		result_frame.mData2 = mMosiVars.oChecksum.Crc32();
 		if (result_frame.mData2 != result_frame.mData1)
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			fMosiFirstFrag = false;
-			fMosiLastFrag = false;
-			fMosiFragmentation = false;
+			mMosiVars.fFirstFrag = false;
+			mMosiVars.fLastFrag = false;
+			mMosiVars.fFragmentation = false;
 		}
 	}
 
@@ -1135,29 +1135,29 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 	** in the results for easy tracking of specific values */
 	if (eState == e_ABCC_MOSI_WR_PD_FIELD)
 	{
-		result_frame.mData2 = (U64)dwMosiPdCnt;
-		dwMosiPdCnt++;
+		result_frame.mData2 = (U64)mMosiVars.dwPdCnt;
+		mMosiVars.dwPdCnt++;
 	}
 	else
 	{
-		dwMosiPdCnt = 0;
+		mMosiVars.dwPdCnt = 0;
 	}
 
 	/* Handle indication of the SPI message fragmentation protocol */
-	if (fMosiFragmentation)
+	if (mMosiVars.fFragmentation)
 	{
 		result_frame.mFlags |= (SPI_MSG_FRAG_FLAG);
-		if (fMosiFirstFrag)
+		if (mMosiVars.fFirstFrag)
 		{
 			result_frame.mFlags |= (SPI_MSG_FIRST_FRAG_FLAG);
 		}
 		if (eState == e_ABCC_MOSI_PAD)
 		{
-			fMosiFirstFrag = false;
-			if (fMosiLastFrag)
+			mMosiVars.fFirstFrag = false;
+			if (mMosiVars.fLastFrag)
 			{
-				fMosiLastFrag = false;
-				fMosiFragmentation = false;
+				mMosiVars.fLastFrag = false;
+				mMosiVars.fFragmentation = false;
 			}
 		}
 	}
@@ -1180,7 +1180,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MOSI_PAD)
 	{
-		if (fMosiNewMsg)
+		if (mMosiVars.fNewMsg)
 		{
 			if (((result_frame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
 				!((result_frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
@@ -1189,11 +1189,11 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates eState, U64 lFrameData, S64 l
 			}
 			else
 			{
-				if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
+				if (mMosiVars.sMsgHeader.cmd & ABP_MSG_HEADER_C_BIT)
 				{
 					SetMosiPacketType(e_COMMAND_PACKET);
 				}
-				else if (sMosiMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
+				else if (mMosiVars.sMsgHeader.cmd & ABP_MSG_HEADER_E_BIT)
 				{
 					SetMosiPacketType(e_ERROR_RESPONSE_PACKET);
 				}
@@ -1213,34 +1213,34 @@ void SpiAnalyzer::SetMosiPacketType(tPacketType ePacketType)
 	{
 	case e_NULL_PACKET:
 	case e_CANCEL_PACKET:
-		eMosiPacketType = ePacketType;
+		mMosiVars.ePacketType = ePacketType;
 		break;
 	case e_PROTOCOL_ERROR_PACKET:
 	case e_CHECKSUM_ERROR_PACKET:
 	case e_ERROR_RESPONSE_PACKET:
-		if (eMosiPacketType == e_NULL_PACKET)
+		if (mMosiVars.ePacketType == e_NULL_PACKET)
 		{
-			eMosiPacketType = ePacketType;
+			mMosiVars.ePacketType = ePacketType;
 		}
-		else if (eMosiPacketType != ePacketType)
+		else if (mMosiVars.ePacketType != ePacketType)
 		{
-			eMosiPacketType = e_MULTI_ERROR_PACKET;
+			mMosiVars.ePacketType = e_MULTI_ERROR_PACKET;
 		}
 		break;
 	case e_RESPONSE_PACKET:
 	case e_COMMAND_PACKET:
 	case e_MSG_FRAGMENT_PACKET:
-		if (eMosiPacketType == e_NULL_PACKET)
+		if (mMosiVars.ePacketType == e_NULL_PACKET)
 		{
-			eMosiPacketType = ePacketType;
+			mMosiVars.ePacketType = ePacketType;
 		}
-		else if (IsErrorPacketType(eMosiPacketType))
+		else if (IsErrorPacketType(mMosiVars.ePacketType))
 		{
-			eMosiPacketType = e_MULTI_ERROR_PACKET;
+			mMosiVars.ePacketType = e_MULTI_ERROR_PACKET;
 		}
-		else if (eMosiPacketType != ePacketType)
+		else if (mMosiVars.ePacketType != ePacketType)
 		{
-			eMosiPacketType = e_MULTI_PACKET;
+			mMosiVars.ePacketType = e_MULTI_PACKET;
 		}
 		break;
 	default:
@@ -1256,34 +1256,34 @@ void SpiAnalyzer::SetMisoPacketType(tPacketType ePacketType)
 	{
 	case e_NULL_PACKET:
 	case e_CANCEL_PACKET:
-		eMisoPacketType = ePacketType;
+		mMisoVars.ePacketType = ePacketType;
 		break;
 	case e_PROTOCOL_ERROR_PACKET:
 	case e_CHECKSUM_ERROR_PACKET:
 	case e_ERROR_RESPONSE_PACKET:
-		if (eMisoPacketType == e_NULL_PACKET)
+		if (mMisoVars.ePacketType == e_NULL_PACKET)
 		{
-			eMisoPacketType = ePacketType;
+			mMisoVars.ePacketType = ePacketType;
 		}
-		else if (eMisoPacketType != ePacketType)
+		else if (mMisoVars.ePacketType != ePacketType)
 		{
-			eMisoPacketType = e_MULTI_ERROR_PACKET;
+			mMisoVars.ePacketType = e_MULTI_ERROR_PACKET;
 		}
 		break;
 	case e_RESPONSE_PACKET:
 	case e_COMMAND_PACKET:
 	case e_MSG_FRAGMENT_PACKET:
-		if (eMisoPacketType == e_NULL_PACKET)
+		if (mMisoVars.ePacketType == e_NULL_PACKET)
 		{
-			eMisoPacketType = ePacketType;
+			mMisoVars.ePacketType = ePacketType;
 		}
-		else if (IsErrorPacketType(eMisoPacketType))
+		else if (IsErrorPacketType(mMisoVars.ePacketType))
 		{
-			eMisoPacketType = e_MULTI_ERROR_PACKET;
+			mMisoVars.ePacketType = e_MULTI_ERROR_PACKET;
 		}
-		else if (eMisoPacketType != ePacketType)
+		else if (mMisoVars.ePacketType != ePacketType)
 		{
-			eMisoPacketType = e_MULTI_PACKET;
+			mMisoVars.ePacketType = e_MULTI_PACKET;
 		}
 		break;
 	default:
@@ -1299,161 +1299,161 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	tAbccMisoStates eMisoState_Current = e_ABCC_MISO_IDLE;
 	bool fAddFrame = false;
 
-	eMisoState_Current = eMisoState;
+	eMisoState_Current = mMisoVars.eState;
 
 	/* If an error is signaled we jump into IDLE and wait to be reset.
 	** A reset should be logically signaled when CS# is brought HIGH.
 	** This would essentially indicate the begining of a new transaction. */
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
-		eMisoState = e_ABCC_MISO_IDLE;
-		if (dwMisoByteCnt == 0)
+		mMisoVars.eState = e_ABCC_MISO_IDLE;
+		if (mMisoVars.dwByteCnt == 0)
 		{
-			lMisoFramesFirstSample = lFirstSample;
+			mMisoVars.lFramesFirstSample = lFirstSample;
 		}
 		if (mEnable != NULL)
 		{
-			AddFragFrame(false, lMisoFramesFirstSample, mEnable->GetSampleOfNextEdge());
+			AddFragFrame(false, mMisoVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
 		else
 		{
 			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
-			AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleOfNextEdge());
+			AddFragFrame(false, mMisoVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 		}
 		mResults->CommitResults();
 		return true;
 	}
 
-	if (eMisoState == e_ABCC_MISO_IDLE)
+	if (mMisoVars.eState == e_ABCC_MISO_IDLE)
 	{
-		mMisoChecksum.Init();
-		lMisoFrameData = 0;
-		dwMisoByteCnt = 0;
+		mMisoVars.oChecksum.Init();
+		mMisoVars.lFrameData = 0;
+		mMisoVars.dwByteCnt = 0;
 		if (fReset)
 		{
-			eMisoState = e_ABCC_MISO_Reserved1;
-			eMisoState_Current = eMisoState;
+			mMisoVars.eState = e_ABCC_MISO_Reserved1;
+			eMisoState_Current = mMisoVars.eState;
 		}
 	}
 
-	if (dwMisoByteCnt == 0)
+	if (mMisoVars.dwByteCnt == 0)
 	{
-		lMisoFramesFirstSample = lFirstSample;
+		mMisoVars.lFramesFirstSample = lFirstSample;
 	}
 
-	lMisoFrameData |= (lMisoData << (8 * dwMisoByteCnt));
-	dwMisoByteCnt++;
+	mMisoVars.lFrameData |= (lMisoData << (8 * mMisoVars.dwByteCnt));
+	mMisoVars.dwByteCnt++;
 
-	if (eMisoState != e_ABCC_MISO_CRC32)
+	if (mMisoVars.eState != e_ABCC_MISO_CRC32)
 	{
-		mMisoChecksum.Update((U8*)&lMisoData, 1);
+		mMisoVars.oChecksum.Update((U8*)&lMisoData, 1);
 	}
 
-	switch (eMisoState)
+	switch (mMisoVars.eState)
 	{
 	case e_ABCC_MISO_IDLE:
 		/* We wait here until a reset is signaled */
 		break;
 	case e_ABCC_MISO_Reserved1:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_Reserved2;
+			mMisoVars.eState = e_ABCC_MISO_Reserved2;
 		}
 		break;
 	case e_ABCC_MISO_Reserved2:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_LED_STAT;
+			mMisoVars.eState = e_ABCC_MISO_LED_STAT;
 		}
 		break;
 	case e_ABCC_MISO_LED_STAT:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_ANB_STAT;
+			mMisoVars.eState = e_ABCC_MISO_ANB_STAT;
 		}
 		break;
 	case e_ABCC_MISO_ANB_STAT:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_SPI_STAT;
+			mMisoVars.eState = e_ABCC_MISO_SPI_STAT;
 		}
 		break;
 	case e_ABCC_MISO_SPI_STAT:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
-			if((lMisoFrameData & ABP_SPI_STATUS_NEW_PD) == ABP_SPI_STATUS_NEW_PD)
+			if((mMisoVars.lFrameData & ABP_SPI_STATUS_NEW_PD) == ABP_SPI_STATUS_NEW_PD)
 			{
-				fMisoNewRdPd = true;
+				mMisoVars.fNewRdPd = true;
 			}
 			else
 			{
-				fMisoNewRdPd = false;
+				mMisoVars.fNewRdPd = false;
 			}
-			if ((lMisoFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == ABP_SPI_STATUS_M)
+			if ((mMisoVars.lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == ABP_SPI_STATUS_M)
 			{
 				/* New message but not the last */
-				fMisoNewMsg = true;
-				if (!fMisoFragmentation)
+				mMisoVars.fNewMsg = true;
+				if (!mMisoVars.fFragmentation)
 				{
 					/* Message fragmentation starts */
-					fMisoFragmentation = true;
-					fMisoFirstFrag = true;
-					fMisoLastFrag = false;
+					mMisoVars.fFragmentation = true;
+					mMisoVars.fFirstFrag = true;
+					mMisoVars.fLastFrag = false;
 				}
 			}
-			else if ((lMisoFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M))
+			else if ((mMisoVars.lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M))
 			{
 				/* New message and last */
-				fMisoNewMsg = true;
-				if (fMisoFragmentation)
+				mMisoVars.fNewMsg = true;
+				if (mMisoVars.fFragmentation)
 				{
 					/* Message fragmentation ends */
-					fMisoFirstFrag = false;
-					fMisoLastFrag = true;
+					mMisoVars.fFirstFrag = false;
+					mMisoVars.fLastFrag = true;
 				}
 			}
 			else
 			{
 				/* No new message */
-				fMisoNewMsg = false;
-				eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid;
-				dwMisoMdCnt = 0;
-				wMisoMdSize = 0;
+				mMisoVars.fNewMsg = false;
+				mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid;
+				mMisoVars.dwMdCnt = 0;
+				mMisoVars.wMdSize = 0;
 			}
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_NET_TIME;
+			mMisoVars.eState = e_ABCC_MISO_NET_TIME;
 		}
 		break;
 	case e_ABCC_MISO_NET_TIME:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			if (dwMisoMsgLen != 0)
+			if (mMisoVars.dwMsgLen != 0)
 			{
-				eMisoState = e_ABCC_MISO_RD_MSG_FIELD;
-				if (fMisoNewMsg)
+				mMisoVars.eState = e_ABCC_MISO_RD_MSG_FIELD;
+				if (mMisoVars.fNewMsg)
 				{
 					RunAbccMisoMsgSubStateMachine(true, NULL, &eMsgSubState);
 				}
 			}
-			else if (dwMisoPdLen != 0)
+			else if (mMisoVars.dwPdLen != 0)
 			{
-				eMisoState = e_ABCC_MISO_RD_PD_FIELD;
+				mMisoVars.eState = e_ABCC_MISO_RD_PD_FIELD;
 			}
 			else
 			{
-				eMisoState = e_ABCC_MISO_CRC32;
+				mMisoVars.eState = e_ABCC_MISO_CRC32;
 			}
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_FIELD:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
-			if (fMisoFragmentation && !fMisoFirstFrag)
+			if (mMisoVars.fFragmentation && !mMisoVars.fFirstFrag)
 			{
 				eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data;
 				fAddFrame = true;
@@ -1463,40 +1463,40 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 				if (!RunAbccMisoMsgSubStateMachine(false, &fAddFrame, &eMsgSubState))
 				{
 					/* Error */
-					eMisoState = e_ABCC_MISO_IDLE;
+					mMisoVars.eState = e_ABCC_MISO_IDLE;
 				}
 			}
-			if (dwMisoMsgLen == 1)
+			if (mMisoVars.dwMsgLen == 1)
 			{
-				if (dwMisoPdLen != 0)
+				if (mMisoVars.dwPdLen != 0)
 				{
-					eMisoState = e_ABCC_MISO_RD_PD_FIELD;
+					mMisoVars.eState = e_ABCC_MISO_RD_PD_FIELD;
 				}
 				else
 				{
-					eMisoState = e_ABCC_MISO_CRC32;
+					mMisoVars.eState = e_ABCC_MISO_CRC32;
 				}
 			}
 			//fAddFrame = true;
-			dwMisoMsgLen--;
+			mMisoVars.dwMsgLen--;
 		}
 		break;
 	case e_ABCC_MISO_RD_PD_FIELD:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
-			if (dwMisoPdLen == 1)
+			if (mMisoVars.dwPdLen == 1)
 			{
-				eMisoState = e_ABCC_MISO_CRC32;
+				mMisoVars.eState = e_ABCC_MISO_CRC32;
 			}
 			fAddFrame = true;
-			dwMisoPdLen--;
+			mMisoVars.dwPdLen--;
 		}
 		break;
 	case e_ABCC_MISO_CRC32:
-		if (dwMisoByteCnt >= GET_MISO_FRAME_SIZE(eMisoState))
+		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			eMisoState = e_ABCC_MISO_IDLE;
+			mMisoVars.eState = e_ABCC_MISO_IDLE;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
@@ -1509,26 +1509,26 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
 	default:
-		eMisoState = e_ABCC_MISO_IDLE;
+		mMisoVars.eState = e_ABCC_MISO_IDLE;
 		break;
 	}
 
 	if (WouldAdvancingTheClockToggleEnable() == true)
 	{
-		if (eMisoState != e_ABCC_MISO_IDLE)
+		if (mMisoVars.eState != e_ABCC_MISO_IDLE)
 		{
 			/* We have a fragmented message */
 			if (mEnable != NULL)
 			{
-				AddFragFrame(false, lMisoFramesFirstSample, mEnable->GetSampleOfNextEdge());
+				AddFragFrame(false, mMisoVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 			}
 			else
 			{
-				AddFragFrame(false, lMisoFramesFirstSample, mClock->GetSampleNumber());
+				AddFragFrame(false, mMisoVars.lFramesFirstSample, mClock->GetSampleNumber());
 			}
-			eMisoState = e_ABCC_MISO_IDLE;
-			lMisoFrameData = 0;
-			dwMisoByteCnt = 0;
+			mMisoVars.eState = e_ABCC_MISO_IDLE;
+			mMisoVars.lFrameData = 0;
+			mMisoVars.dwByteCnt = 0;
 			return true;
 		}
 	}
@@ -1537,26 +1537,26 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoDat
 	{
 		if (eMisoState_Current == e_ABCC_MISO_RD_MSG_FIELD)
 		{
-			ProcessMisoFrame(eMsgSubState, lMisoFrameData, lMisoFramesFirstSample);
+			ProcessMisoFrame(eMsgSubState, mMisoVars.lFrameData, mMisoVars.lFramesFirstSample);
 		}
 		else
 		{
-			ProcessMisoFrame(eMisoState_Current, lMisoFrameData, lMisoFramesFirstSample);
+			ProcessMisoFrame(eMisoState_Current, mMisoVars.lFrameData, mMisoVars.lFramesFirstSample);
 		}
 
 		/* Reset the state variables */
-		lMisoFrameData = 0;
-		dwMisoByteCnt = 0;
+		mMisoVars.lFrameData = 0;
+		mMisoVars.dwByteCnt = 0;
 	}
 
 	if (WouldAdvancingTheClockToggleEnable() == true)
 	{
-		eMisoState = e_ABCC_MISO_IDLE;
-		lMisoFrameData = 0;
-		dwMisoByteCnt = 0;
+		mMisoVars.eState = e_ABCC_MISO_IDLE;
+		mMisoVars.lFrameData = 0;
+		mMisoVars.dwByteCnt = 0;
 	}
 
-	if (eMisoState == e_ABCC_MISO_IDLE)
+	if (mMisoVars.eState == e_ABCC_MISO_IDLE)
 	{
 		return true;
 	}
@@ -1572,166 +1572,166 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	tAbccMosiStates eMosiState_Current = e_ABCC_MOSI_IDLE;
 	bool fAddFrame = false;
 
-	eMosiState_Current = eMosiState;
+	eMosiState_Current = mMosiVars.eState;
 
 	/* If an error is signaled we jump into IDLE and wait to be reset.
 	** A reset should be logically signaled when CS# is brought HIGH.
 	** This would essentially indicate the begining of a new transaction. */
 	if (fError || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
 	{
-		if (dwMosiByteCnt == 0)
+		if (mMosiVars.dwByteCnt == 0)
 		{
-			lMosiFramesFirstSample = lFirstSample;
+			mMosiVars.lFramesFirstSample = lFirstSample;
 		}
-		eMosiState = e_ABCC_MOSI_IDLE;
+		mMosiVars.eState = e_ABCC_MOSI_IDLE;
 		if (mEnable != NULL)
 		{
-			AddFragFrame(true, lMosiFramesFirstSample, mEnable->GetSampleOfNextEdge());
+			AddFragFrame(true, mMosiVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
 		else
 		{
 			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
-			AddFragFrame(true, lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
+			AddFragFrame(true, mMosiVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 		}
 		mResults->CommitResults();
 		return true;
 	}
 
-	if (eMosiState == e_ABCC_MOSI_IDLE)
+	if (mMosiVars.eState == e_ABCC_MOSI_IDLE)
 	{
-		mMosiChecksum.Init();
-		lMosiFrameData = 0;
-		dwMosiByteCnt = 0;
+		mMosiVars.oChecksum.Init();
+		mMosiVars.lFrameData = 0;
+		mMosiVars.dwByteCnt = 0;
 		if (fReset)
 		{
-			eMosiState = e_ABCC_MOSI_SPI_CTRL;
-			eMosiState_Current = eMosiState;
+			mMosiVars.eState = e_ABCC_MOSI_SPI_CTRL;
+			eMosiState_Current = mMosiVars.eState;
 		}
 	}
 
-	if (dwMosiByteCnt == 0)
+	if (mMosiVars.dwByteCnt == 0)
 	{
-		lMosiFramesFirstSample = lFirstSample;
+		mMosiVars.lFramesFirstSample = lFirstSample;
 	}
 
-	lMosiFrameData |= (lMosiData << (8 * dwMosiByteCnt));
-	dwMosiByteCnt++;
+	mMosiVars.lFrameData |= (lMosiData << (8 * mMosiVars.dwByteCnt));
+	mMosiVars.dwByteCnt++;
 
-	if (eMosiState != e_ABCC_MOSI_CRC32)
+	if (mMosiVars.eState != e_ABCC_MOSI_CRC32)
 	{
-		mMosiChecksum.Update((U8*)&lMosiData, 1);
+		mMosiVars.oChecksum.Update((U8*)&lMosiData, 1);
 	}
 
-	switch (eMosiState)
+	switch (mMosiVars.eState)
 	{
 	case e_ABCC_MOSI_IDLE:
 		/* We wait here until a reset is signaled */
 		break;
 	case e_ABCC_MOSI_SPI_CTRL:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if((lMosiFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
+			if((mMosiVars.lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
 			{
-				fMosiWrPdValid = true;
+				mMosiVars.fWrPdValid = true;
 			}
 			else
 			{
-				fMosiWrPdValid = false;
+				mMosiVars.fWrPdValid = false;
 			}
 
-			if ((lMosiFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == ABP_SPI_CTRL_M)
+			if ((mMosiVars.lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == ABP_SPI_CTRL_M)
 			{
 				/* New message but not the last */
-				fMosiNewMsg = true;
-				if (!fMosiFragmentation)
+				mMosiVars.fNewMsg = true;
+				if (!mMosiVars.fFragmentation)
 				{
 					/* Message fragmentation starts */
-					fMosiFragmentation = true;
-					fMosiFirstFrag = true;
-					fMosiLastFrag = false;
+					mMosiVars.fFragmentation = true;
+					mMosiVars.fFirstFrag = true;
+					mMosiVars.fLastFrag = false;
 				}
 			}
-			else if ((lMosiFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M))
+			else if ((mMosiVars.lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M))
 			{
 				/* New message and last */
-				fMosiNewMsg = true;
-				if (fMosiFragmentation)
+				mMosiVars.fNewMsg = true;
+				if (mMosiVars.fFragmentation)
 				{
 					/* Message fragmentation ends */
-					fMosiFirstFrag = false;
-					fMosiLastFrag = true;
+					mMosiVars.fFirstFrag = false;
+					mMosiVars.fLastFrag = true;
 				}
 			}
 			else
 			{
 				/* No new message */
-				fMosiNewMsg = false;
-				eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid;
-				dwMosiMdCnt = 0;
-				wMosiMdSize = 0;
+				mMosiVars.fNewMsg = false;
+				mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid;
+				mMosiVars.dwMdCnt = 0;
+				mMosiVars.wMdSize = 0;
 			}
 			fAddFrame = true;
-			eMosiState = e_ABCC_MOSI_RESERVED1;
+			mMosiVars.eState = e_ABCC_MOSI_RESERVED1;
 		}
 		break;
 	case e_ABCC_MOSI_RESERVED1:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			eMosiState = e_ABCC_MOSI_MSG_LEN;
+			mMosiVars.eState = e_ABCC_MOSI_MSG_LEN;
 		}
 		break;
 	case e_ABCC_MOSI_MSG_LEN:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			dwMosiMsgLen = (U32)lMosiFrameData * 2;
-			dwMisoMsgLen = dwMosiMsgLen;
-			eMosiState = e_ABCC_MOSI_PD_LEN;
+			mMosiVars.dwMsgLen = (U32)mMosiVars.lFrameData * 2;
+			mMisoVars.dwMsgLen = mMosiVars.dwMsgLen;
+			mMosiVars.eState = e_ABCC_MOSI_PD_LEN;
 		}
 		break;
 	case e_ABCC_MOSI_PD_LEN:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			dwMosiPdLen = (U32)lMosiFrameData * 2;
-			dwMisoPdLen = dwMosiPdLen;
-			eMosiState = e_ABCC_MOSI_APP_STAT;
+			mMosiVars.dwPdLen = (U32)mMosiVars.lFrameData * 2;
+			mMisoVars.dwPdLen = mMosiVars.dwPdLen;
+			mMosiVars.eState = e_ABCC_MOSI_APP_STAT;
 		}
 		break;
 	case e_ABCC_MOSI_APP_STAT:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			eMosiState = e_ABCC_MOSI_INT_MASK;
+			mMosiVars.eState = e_ABCC_MOSI_INT_MASK;
 		}
 		break;
 	case e_ABCC_MOSI_INT_MASK:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			if (dwMosiMsgLen != 0)
+			if (mMosiVars.dwMsgLen != 0)
 			{
-				eMosiState = e_ABCC_MOSI_WR_MSG_FIELD;
-				if (fMosiNewMsg)
+				mMosiVars.eState = e_ABCC_MOSI_WR_MSG_FIELD;
+				if (mMosiVars.fNewMsg)
 				{
 					RunAbccMosiMsgSubStateMachine(true, NULL, &eMsgSubState);
 				}
 			}
-			else if (dwMosiPdLen != 0)
+			else if (mMosiVars.dwPdLen != 0)
 			{
-				eMosiState = e_ABCC_MOSI_WR_PD_FIELD;
+				mMosiVars.eState = e_ABCC_MOSI_WR_PD_FIELD;
 			}
 			else
 			{
-				eMosiState = e_ABCC_MOSI_CRC32;
+				mMosiVars.eState = e_ABCC_MOSI_CRC32;
 			}
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_FIELD:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if (fMosiFragmentation && !fMosiFirstFrag)
+			if (mMosiVars.fFragmentation && !mMosiVars.fFirstFrag)
 			{
 				eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data;
 				fAddFrame = true;
@@ -1741,46 +1741,46 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 				if (!RunAbccMosiMsgSubStateMachine(false, &fAddFrame, &eMsgSubState))
 				{
 					/* Error */
-					eMosiState = e_ABCC_MOSI_IDLE;
+					mMosiVars.eState = e_ABCC_MOSI_IDLE;
 				}
 			}
-			if (dwMosiMsgLen == 1)
+			if (mMosiVars.dwMsgLen == 1)
 			{
-				if (dwMosiPdLen != 0)
+				if (mMosiVars.dwPdLen != 0)
 				{
-					eMosiState = e_ABCC_MOSI_WR_PD_FIELD;
+					mMosiVars.eState = e_ABCC_MOSI_WR_PD_FIELD;
 				}
 				else
 				{
-					eMosiState = e_ABCC_MOSI_CRC32;
+					mMosiVars.eState = e_ABCC_MOSI_CRC32;
 				}
 			}
-			dwMosiMsgLen--;
+			mMosiVars.dwMsgLen--;
 		}
 		break;
 	case e_ABCC_MOSI_WR_PD_FIELD:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if (dwMosiPdLen == 1)
+			if (mMosiVars.dwPdLen == 1)
 			{
-				eMosiState = e_ABCC_MOSI_CRC32;
+				mMosiVars.eState = e_ABCC_MOSI_CRC32;
 			}
 			fAddFrame = true;
-			dwMosiPdLen--;
+			mMosiVars.dwPdLen--;
 		}
 		break;
 	case e_ABCC_MOSI_CRC32:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			eMosiState = e_ABCC_MOSI_PAD;
+			mMosiVars.eState = e_ABCC_MOSI_PAD;
 		}
 		break;
 	case e_ABCC_MOSI_PAD:
-		if (dwMosiByteCnt >= GET_MOSI_FRAME_SIZE(eMosiState))
+		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			eMosiState = e_ABCC_MOSI_IDLE;
+			mMosiVars.eState = e_ABCC_MOSI_IDLE;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_size:
@@ -1793,26 +1793,26 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 	default:
-		eMosiState = e_ABCC_MOSI_IDLE;
+		mMosiVars.eState = e_ABCC_MOSI_IDLE;
 		break;
 	}
 
 	if (WouldAdvancingTheClockToggleEnable() == true)
 	{
-		if (eMosiState != e_ABCC_MOSI_IDLE)
+		if (mMosiVars.eState != e_ABCC_MOSI_IDLE)
 		{
 			/* We have a fragmented message */
 			if (mEnable != NULL)
 			{
-				AddFragFrame(true, lMosiFramesFirstSample, mEnable->GetSampleOfNextEdge());
+				AddFragFrame(true, mMosiVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 			}
 			else
 			{
-				AddFragFrame(true, lMosiFramesFirstSample, mClock->GetSampleOfNextEdge());
+				AddFragFrame(true, mMosiVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 			}
-			eMosiState = e_ABCC_MOSI_IDLE;
-			lMosiFrameData = 0;
-			dwMosiByteCnt = 0;
+			mMosiVars.eState = e_ABCC_MOSI_IDLE;
+			mMosiVars.lFrameData = 0;
+			mMosiVars.dwByteCnt = 0;
 			return true;
 		}
 	}
@@ -1821,26 +1821,26 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiDat
 	{
 		if (eMosiState_Current == e_ABCC_MOSI_WR_MSG_FIELD)
 		{
-			ProcessMosiFrame(eMsgSubState, lMosiFrameData, lMosiFramesFirstSample);
+			ProcessMosiFrame(eMsgSubState, mMosiVars.lFrameData, mMosiVars.lFramesFirstSample);
 		}
 		else
 		{
-			ProcessMosiFrame(eMosiState_Current, lMosiFrameData, lMosiFramesFirstSample);
+			ProcessMosiFrame(eMosiState_Current, mMosiVars.lFrameData, mMosiVars.lFramesFirstSample);
 		}
 
 		/* Reset the state variables */
-		lMosiFrameData = 0;
-		dwMosiByteCnt = 0;
+		mMosiVars.lFrameData = 0;
+		mMosiVars.dwByteCnt = 0;
 	}
 
 	if (WouldAdvancingTheClockToggleEnable() == true)
 	{
-		eMosiState = e_ABCC_MOSI_IDLE;
-		lMosiFrameData = 0;
-		dwMosiByteCnt = 0;
+		mMosiVars.eState = e_ABCC_MOSI_IDLE;
+		mMosiVars.lFrameData = 0;
+		mMosiVars.dwByteCnt = 0;
 	}
 
-	if (eMosiState == e_ABCC_MOSI_IDLE)
+	if (mMosiVars.eState == e_ABCC_MOSI_IDLE)
 	{
 		return true;
 	}
@@ -1857,8 +1857,8 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		/* Perform checks here that we were in the last state and that the
 		** number of bytes seen in this state matched the header's msg len specifier
 		** In such cases a "framing error" should be signaled */
-		eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
-		bMisoByteCnt2 = 0;
+		mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_size;
+		mMisoVars.bByteCnt2 = 0;
 		return true;
 	}
 
@@ -1867,70 +1867,70 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		return false;
 	}
 
-	*peMisoMsgSubState = eMisoMsgSubState;
-	bMisoByteCnt2++;
+	*peMisoMsgSubState = mMisoVars.eMsgSubState;
+	mMisoVars.bByteCnt2++;
 
-	switch (eMisoMsgSubState)
+	switch (mMisoVars.eMsgSubState)
 	{
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_res1;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_res1;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_res1:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_srcId;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_srcId;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_obj;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_obj;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_inst;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_inst;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_cmd;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_cmd;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_res2;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_res2;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_res2:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data;
+			mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid:
-		if (bMisoByteCnt2 >= GET_MISO_FRAME_SIZE(eMisoMsgSubState))
+		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
 		}
@@ -1946,13 +1946,13 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 	case e_ABCC_MISO_RD_PD_FIELD:
 	case e_ABCC_MISO_CRC32:
 	default:
-		eMisoMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data;
+		mMisoVars.eMsgSubState = e_ABCC_MISO_RD_MSG_SUBFIELD_data;
 		return false;
 	}
 
 	if (*pfAddFrame == true)
 	{
-		bMisoByteCnt2 = 0;
+		mMisoVars.bByteCnt2 = 0;
 	}
 
 	return true;
@@ -1965,8 +1965,8 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		/* Perform checks here that we were in the last state and that the
 		** number of bytes seen in this state matched the header's msg len specifier
 		** In such cases a "framing error" should be signaled */
-		eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
-		bMosiByteCnt2 = 0;
+		mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_size;
+		mMosiVars.bByteCnt2 = 0;
 		return true;
 	}
 
@@ -1975,70 +1975,70 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 		return false;
 	}
 
-	*peMosiMsgSubState = eMosiMsgSubState;
-	bMosiByteCnt2++;
+	*peMosiMsgSubState = mMosiVars.eMsgSubState;
+	mMosiVars.bByteCnt2++;
 
-	switch (eMosiMsgSubState)
+	switch (mMosiVars.eMsgSubState)
 	{
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_size:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_res1;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_res1;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_res1:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_obj;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_obj;
 		}
 		break;
 	case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_inst;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_inst;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_res2;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_res2;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_res2:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
-			eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data;
+			mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data;
 		}
 		break;
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 	case e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid:
-		if (bMosiByteCnt2 >= GET_MOSI_FRAME_SIZE(eMosiMsgSubState))
+		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*pfAddFrame = true;
 		}
@@ -2055,13 +2055,13 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, t
 	case e_ABCC_MOSI_SPI_CTRL:
 	case e_ABCC_MOSI_IDLE:
 	default:
-		eMosiMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data;
+		mMosiVars.eMsgSubState = e_ABCC_MOSI_WR_MSG_SUBFIELD_data;
 		return false;
 	}
 
 	if (*pfAddFrame == true)
 	{
-		bMosiByteCnt2 = 0;
+		mMosiVars.bByteCnt2 = 0;
 	}
 
 	return true;

@@ -192,6 +192,60 @@ typedef struct tNetworkTimeInfo
 	bool wrPdValid;
 }tNetworkTimeInfo;
 
+typedef struct tMosiVars
+{
+	S64 lFramesFirstSample;
+	U64 lFrameData;
+	tMsgHeaderInfo sMsgHeader;
+	AbccCrc oChecksum;
+	U32 dwPdLen;
+	U32 dwPdCnt;
+	U32 dwMsgLen;
+	U32 dwByteCnt;
+	U8 bByteCnt2;
+	U32 dwMdCnt;
+	U16 wMdSize;
+	tAbccMosiStates eState;
+	tAbccMosiStates eMsgSubState;
+	tPacketType ePacketType;
+	U8 bLastToggleState;
+	U8 bLastApplSts;
+	bool fNewMsg;
+	bool fErrorRsp;
+	bool fFragmentation;
+	bool fFirstFrag;
+	bool fLastFrag;
+	bool fWrPdValid;
+	bool fReadyForNewPacket;
+}tMosiVars;
+
+typedef struct tMisoVars
+{
+	S64 lFramesFirstSample;
+	U64 lFrameData;
+	tMsgHeaderInfo sMsgHeader;
+	AbccCrc oChecksum;
+	U32 dwLastTimestamp;
+	U32 dwPdLen;
+	U32 dwPdCnt;
+	U32 dwMsgLen;
+	U32 dwByteCnt;
+	U8 bByteCnt2;
+	U32 dwMdCnt;
+	U16 wMdSize;
+	tAbccMisoStates eState;
+	tAbccMisoStates eMsgSubState;
+	tPacketType ePacketType;
+	U8 bLastAnbSts;
+	bool fNewMsg;
+	bool fErrorRsp;
+	bool fFragmentation;
+	bool fFirstFrag;
+	bool fLastFrag;
+	bool fNewRdPd;
+	bool fReadyForNewPacket;
+}tMisoVars;
+
 extern const tAbccMosiInfo asMosiStates[];
 extern const tAbccMisoInfo asMisoStates[];
 extern const tAbccMsgInfo asMsgStates[];
@@ -261,80 +315,11 @@ protected: /* variables */
 	AnalyzerChannelData* mEnable;
 
 	U64 mCurrentSample;
-
-	S64 lMosiFramesFirstSample;
-	S64 lMisoFramesFirstSample;
-
-	U64 lMosiFrameData;
-	U64 lMisoFrameData;
-
 	std::vector<U64> mArrowLocations;
+	U8 mSettingsChangeID;
 
-	tMsgHeaderInfo sMosiMsgHeader;
-	tMsgHeaderInfo sMisoMsgHeader;
-
-	AbccCrc mMosiChecksum;
-	AbccCrc mMisoChecksum;
-
-	U32 dwLastMisoTimestamp;
-
-	U32 dwMosiPdLen;
-	U32 dwMisoPdLen;
-
-	U32 dwMosiPdCnt;
-	U32 dwMisoPdCnt;
-
-	U32 dwMosiMsgLen;
-	U32 dwMisoMsgLen;
-
-	U32 dwMosiByteCnt;
-	U32 dwMisoByteCnt;
-
-	U8 bMosiByteCnt2;
-	U8 bMisoByteCnt2;
-
-	U32 dwMosiMdCnt;
-	U32 dwMisoMdCnt;
-
-	U16 wMosiMdSize;
-	U16 wMisoMdSize;
-
-	tAbccMosiStates eMosiState;
-	tAbccMisoStates eMisoState;
-
-	tAbccMosiStates eMosiMsgSubState;
-	tAbccMisoStates eMisoMsgSubState;
-
-	tPacketType eMosiPacketType;
-	tPacketType eMisoPacketType;
-
-	U8 bLastAnbSts;
-	U8 bLastApplSts;
-
-	U8 bMosiLastToggleState;
-
-	U8 bSettingsChangeID;
-
-	bool fMosiNewMsg;
-	bool fMisoNewMsg;
-
-	bool fMosiErrorRsp;
-	bool fMisoErrorRsp;
-
-	bool fMosiFragmentation;
-	bool fMisoFragmentation;
-
-	bool fMosiFirstFrag;
-	bool fMisoFirstFrag;
-
-	bool fMosiLastFrag;
-	bool fMisoLastFrag;
-
-	bool fMosiWrPdValid;
-	bool fMisoNewRdPd;
-
-	bool fMosiReadyForNewPacket;
-	bool fMisoReadyForNewPacket;
+	tMosiVars mMosiVars;
+	tMisoVars mMisoVars;
 
 	bool mSimulationInitialized;
 
