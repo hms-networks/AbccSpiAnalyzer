@@ -970,7 +970,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 
 	if (eState == e_ABCC_MISO_CRC32)
 	{
-		tPacketType ePacketType = e_NULL_PACKET;
 		if ((result_frame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 		{
 			if (eState == e_ABCC_MISO_CRC32)
