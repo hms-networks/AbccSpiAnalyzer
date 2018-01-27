@@ -1967,7 +1967,7 @@ bool GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase display
 
 bool GetNamedInstString(U16 val,
 	char* str, U16 max_str_len,
-	DisplayBase display_base,
+	DisplayBase /* display_base */,
 	const tValueName* inst_names, U8 num_inst_names)
 {
 	bool alert = false;
