@@ -2249,7 +2249,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase displa
 			break;
 		default:
 			AnalyzerHelpers::GetNumberString(cmd, display_base, 8, strBuffer, sizeof(strBuffer));
-			alert = true; //TODO: We only alert here because we have not implemented all object specific commands yet.
+			alert = true;
 			break;
 		}
 		SNPRINTF(str, max_str_len, "%s", strBuffer);
