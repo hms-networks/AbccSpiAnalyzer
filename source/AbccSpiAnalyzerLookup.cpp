@@ -1706,7 +1706,7 @@ bool GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_bas
 
 bool GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = false;
 	bool found = false;
 
@@ -1723,8 +1723,8 @@ bool GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_ba
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(e_ABCC_MOSI_APP_STAT), number_str, sizeof(number_str));
-		SNPRINTF(str, max_str_len, "Reserved: %s", number_str);
+		AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(e_ABCC_MOSI_APP_STAT), numberStr, sizeof(numberStr));
+		SNPRINTF(str, max_str_len, "Reserved: %s", numberStr);
 		alert = true;
 	}
 
@@ -1733,7 +1733,7 @@ bool GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_ba
 
 bool GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = false;
 	bool found = false;
 	char tmpstr[FORMATTED_STRING_BUFFER_SIZE];
@@ -1751,8 +1751,8 @@ bool GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MISO_ANB_STAT), number_str, sizeof(number_str));
-		SNPRINTF(tmpstr, sizeof(tmpstr), "Reserved: %s", number_str);
+		AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(e_ABCC_MISO_ANB_STAT), numberStr, sizeof(numberStr));
+		SNPRINTF(tmpstr, sizeof(tmpstr), "Reserved: %s", numberStr);
 		alert = true;
 	}
 
@@ -1770,7 +1770,7 @@ bool GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display
 
 bool GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < NUM_ENTRIES(asErrorRspNames); i++)
 	{
 		if (asErrorRspNames[i].value == val)
@@ -1780,14 +1780,14 @@ bool GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase display_b
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
-	SNPRINTF(str, max_str_len, "Reserved: %s", number_str);
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	SNPRINTF(str, max_str_len, "Reserved: %s", numberStr);
 	return true;
 }
 
 bool GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const tValueName* pasErrNames, U8 bNoErrors, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < bNoErrors; i++)
 	{
 		if (pasErrNames[i].value == val)
@@ -1797,14 +1797,14 @@ bool GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const tValueNam
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
-	SNPRINTF(str, max_str_len, "Unknown: %s", number_str);
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 	return true;
 }
 
 bool GetErrorRspString(U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
 	switch (obj)
 	{
@@ -1892,8 +1892,8 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase d
 	case ABP_OBJ_NUM_DEV:
 		/* DeviceNet Object */
 	default:
-		AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, max_str_len);
-		SNPRINTF(str, max_str_len, "Unknown: 0x%02X, %s", obj, number_str);
+		AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, max_str_len);
+		SNPRINTF(str, max_str_len, "Unknown: 0x%02X, %s", obj, numberStr);
 		break;
 	}
 	return true;
@@ -1997,7 +1997,7 @@ bool GetNamedAttrString(U16 inst, U8 val,
 	const tValueName* obj_names, U8 num_obj_names,
 	const tValueName* inst_names, U8 num_inst_names)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	const tValueName* pasAttrNames = NULL;
 	U8 bNoAttrs = 0;
 	bool alert = false;
@@ -2051,8 +2051,8 @@ bool GetNamedAttrString(U16 inst, U8 val,
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
-		SNPRINTF(str, max_str_len, "Unknown: %s", number_str);
+		AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+		SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 		alert = true;
 	}
 	return alert;
@@ -2060,7 +2060,7 @@ bool GetNamedAttrString(U16 inst, U8 val,
 
 bool GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
 	for (U8 i = 0; i < NUM_ENTRIES(asObjectNames); i++)
 	{
@@ -2071,14 +2071,14 @@ bool GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase display_bas
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
-	SNPRINTF(str, max_str_len, "Unknown: %s", number_str);
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 	return true;
 }
 
 bool GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const tValueName* command_names, U8 num_commands, DisplayBase display_base)
 {
-	char number_str[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	for (U8 i = 0; i < num_commands; i++)
 	{
 		if (command_names[i].value == val)
@@ -2088,8 +2088,8 @@ bool GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const tValueNam
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, number_str, sizeof(number_str));
-	SNPRINTF(str, max_str_len, "Unknown: %s", number_str);
+	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 	return true;
 }
 
