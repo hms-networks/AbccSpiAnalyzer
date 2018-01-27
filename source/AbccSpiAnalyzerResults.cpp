@@ -339,7 +339,7 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetErrorRspString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
 	StringBuilder("ERR_CODE", numberStr, str, alert);
 }
 
@@ -348,7 +348,7 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 obj, U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetErrorRspString(obj, val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, 8, numberStr, sizeof(numberStr));
+	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
 	StringBuilder("OBJ_ERR", numberStr, str, alert);
 }
 

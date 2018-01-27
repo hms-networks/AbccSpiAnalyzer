@@ -24,6 +24,8 @@
 #define SNPRINTF snprintf
 #endif
 
+#define SIZE_IN_BITS(var)					( sizeof(var) * 8 )
+
 #define FORMATTED_STRING_BUFFER_SIZE		256
 #define DISPLAY_NUMERIC_STRING_BUFFER_SIZE	128
 
