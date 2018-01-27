@@ -1998,8 +1998,8 @@ bool GetNamedAttrString(U16 inst, U8 val,
 	const tValueName* inst_names, U8 num_inst_names)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	const tValueName* pasAttrNames = NULL;
-	U8 bNoAttrs = 0;
+	const tValueName* attrNames = NULL;
+	U8 numAttrs = 0;
 	bool alert = false;
 	bool found = false;
 
@@ -2007,15 +2007,15 @@ bool GetNamedAttrString(U16 inst, U8 val,
 	{
 		if (val <= asObjAttrNames[NUM_ENTRIES(asObjAttrNames) - 1].value)
 		{
-			pasAttrNames = &asObjAttrNames[0];
-			bNoAttrs = NUM_ENTRIES(asObjAttrNames);
+			attrNames = &asObjAttrNames[0];
+			numAttrs = NUM_ENTRIES(asObjAttrNames);
 		}
 		else
 		{
 			if (obj_names != NULL)
 			{
-				pasAttrNames = obj_names;
-				bNoAttrs = num_obj_names;
+				attrNames = obj_names;
+				numAttrs = num_obj_names;
 			}
 			else
 			{
@@ -2027,8 +2027,8 @@ bool GetNamedAttrString(U16 inst, U8 val,
 	{
 		if (num_inst_names != NULL)
 		{
-			pasAttrNames = inst_names;
-			bNoAttrs = num_inst_names;
+			attrNames = inst_names;
+			numAttrs = num_inst_names;
 		}
 		else
 		{
@@ -2038,12 +2038,12 @@ bool GetNamedAttrString(U16 inst, U8 val,
 
 	if (!alert)
 	{
-		for (U8 i = 0; i < bNoAttrs; i++)
+		for (U8 i = 0; i < numAttrs; i++)
 		{
-			if (pasAttrNames[i].value == val)
+			if (attrNames[i].value == val)
 			{
-				SNPRINTF(str, max_str_len, pasAttrNames[i].name);
-				alert = pasAttrNames[i].alert;
+				SNPRINTF(str, max_str_len, attrNames[i].name);
+				alert = attrNames[i].alert;
 				found = true;
 			}
 		}
@@ -2341,233 +2341,233 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, bool indexed, bool* pAlert, DisplayBase display_base)
 {
 	bool objFound = true;
-	U8 ofst = 0;
+	U8 offset = 0;
 	if (indexed)
 	{
 		SNPRINTF(str, max_str_len, "Index %d, ", (U8)(val >> 8));
-		ofst = (U8)strlen(str);
+		offset = (U8)strlen(str);
 	}
 	switch (obj)
 	{
 	case ABP_OBJ_NUM_ADD:
 		/* Additional Diagnostic Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asAddObjAttrNames[0], NUM_ENTRIES(asAddObjAttrNames),
 			&asAddInstAttrNames[0], NUM_ENTRIES(asAddInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ANB:
 		/* Anybus Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asAnbInstAttrNames[0], NUM_ENTRIES(asAnbInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_BAC:
 		/* BacNet Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asBacInstAttrNames[0], NUM_ENTRIES(asBacInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CCL:
 		/* CC-Link Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCclInstAttrNames[0], NUM_ENTRIES(asCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CFN:
 		/* CFN Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCfnInstAttrNames[0], NUM_ENTRIES(asCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CNT:
 		/* ControlNet Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCntInstAttrNames[0], NUM_ENTRIES(asCntInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_COP:
 		/* CANopen Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCopInstAttrNames[0], NUM_ENTRIES(asCopInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPN:
 		/* CompoNet Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCpnInstAttrNames[0], NUM_ENTRIES(asCpnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DEV:
 		/* DeviceNet Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asDevInstAttrNames[0], NUM_ENTRIES(asDevInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asDiObjAttrNames[0], NUM_ENTRIES(asDiObjAttrNames),
 			&asDiInstAttrNames[0], NUM_ENTRIES(asDiInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DPV1:
 		/* DPV1 Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asDpv1InstAttrNames[0], NUM_ENTRIES(asDpv1InstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECO:
 		/* Energy Control Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asEcoObjAttrNames[0], NUM_ENTRIES(asEcoObjAttrNames),
 			&asEcoInstAttrNames[0], NUM_ENTRIES(asEcoInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ER:
 		/* Energy Reporting Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asErInstAttrNames[0], NUM_ENTRIES(asErInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MOD:
 		/* Modbus Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asModInstAttrNames[0], NUM_ENTRIES(asModInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwInstAttrNames[0], NUM_ENTRIES(asNwInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NC:
 		/* Network Configuration Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNcInstAttrNames[0], NUM_ENTRIES(asNcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SOC:
 		/* Socket Interface Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asSocObjAttrNames[0], NUM_ENTRIES(asSocObjAttrNames),
 			&asSocInstAttrNames[0], NUM_ENTRIES(asSocInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SMTP:
 		/* SMTP Client Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asSmtpObjAttrNames[0], NUM_ENTRIES(asSmtpObjAttrNames),
 			&asSmtpInstAttrNames[0], NUM_ENTRIES(asSmtpInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_FSI:
 	case ABP_OBJ_NUM_AFSI:
 		/* File system objects */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asFsiObjAttrNames[0], NUM_ENTRIES(asFsiObjAttrNames),
 			&asFsiInstAttrNames[0], NUM_ENTRIES(asFsiInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_FUSM:
 		/* Functional Safety Module Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asFusmInstAttrNames[0], NUM_ENTRIES(asFusmInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWETN:
 		/* Network Ethernet Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCCL:
 		/* Network CCL Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwCclInstAttrNames[0], NUM_ENTRIES(asNwCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCFN:
 		/* Network CFN Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwCfnInstAttrNames[0], NUM_ENTRIES(asNwCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWPNIO:
 		/* Network PNIO Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwPnioInstAttrNames[0], NUM_ENTRIES(asNwPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWDPV1:
 		/* Network DPV1 Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ETN:
 		/* Ethernet Host Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asEtnInstAttrNames[0], NUM_ENTRIES(asEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPC:
 		/* CIP Port Configuration Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asCpcObjAttrNames[0], NUM_ENTRIES(asCpcObjAttrNames),
 			&asCpcInstAttrNames[0], NUM_ENTRIES(asCpcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SAFE:
 		/* Functional Safety Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asSafeInstAttrNames[0], NUM_ENTRIES(asSafeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EPL:
 		/* Ethernet POWERLINK Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asEplInstAttrNames[0], NUM_ENTRIES(asEplInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ASM:
 		/* Assembly Mapping Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asAsmObjAttrNames[0], NUM_ENTRIES(asAsmObjAttrNames),
 			&asAsmInstAttrNames[0], NUM_ENTRIES(asAsmInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MDD:
 		/* Modular Device Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asMddObjAttrNames[0], NUM_ENTRIES(asMddObjAttrNames),
 			NULL, 0);
 		break;
 	case ABP_OBJ_NUM_CIPID:
 		/* CIP Identity Host Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asCipIdInstAttrNames[0], NUM_ENTRIES(asCipIdInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SYNC:
 		/* Sync Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asSyncInstAttrNames[0], NUM_ENTRIES(asSyncInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECT:
 		/* EtherCAT Host Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asEtcInstAttrNames[0], NUM_ENTRIES(asEtcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asPnioInstAttrNames[0], NUM_ENTRIES(asPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Host Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asEipInstAttrNames[0], NUM_ENTRIES(asEipInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			&asAppdObjAttrNames[0], NUM_ENTRIES(asAppdObjAttrNames),
 			&asAppdInstAttrNames[0], NUM_ENTRIES(asAppdInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_APP:
 		/* Application Object */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asAppInstAttrNames[0], NUM_ENTRIES(asAppInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNAM:
 		/* PROFINET Asset Management */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asPnamInstAttrNames[0], NUM_ENTRIES(asPnamInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EME:
 		/* Energy Measurement */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asEmeInstAttrNames[0], NUM_ENTRIES(asEmeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_OPCUA:
 		/* OPC Unified Architecture */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SRC3:
 		/* SERCOS III */
-		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asSrc3InstAttrNames[0], NUM_ENTRIES(asSrc3InstAttrNames));
 		break;
 	default:
