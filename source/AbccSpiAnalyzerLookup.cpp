@@ -785,7 +785,7 @@ static const tValueName asEcoInstAttrNames[] =
 	{ ABP_ECO_IA_POWER_CONSUMPTION,			"Power Consumption",				false }
 };
 
-static const tValueName asEipNcInstAttrNames[] =
+static const tValueName asEipInstAttrNames[] =
 {
 	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										false },
 	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										false },
@@ -877,7 +877,7 @@ static const tValueName asErInstAttrNames[] =
 	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	false },
 };
 
-static const tValueName asEtcNcInstAttrNames[] =
+static const tValueName asEtcInstAttrNames[] =
 {
 	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								false },
 	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								false },
@@ -1214,7 +1214,7 @@ static const tValueName asAppCmdNames[] =
 	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
 };
 
-static const tValueName asAppDataCmdNames[] =
+static const tValueName asAppdCmdNames[] =
 {
 	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	false },
 	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		false },
@@ -2213,7 +2213,7 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase displa
 		case ABP_OBJ_NUM_APPD:
 			/* Application Data Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
-				&asAppDataCmdNames[0], (sizeof(asAppDataCmdNames) / sizeof(tValueName)), display_base);
+				&asAppdCmdNames[0], (sizeof(asAppdCmdNames) / sizeof(tValueName)), display_base);
 			break;
 		case ABP_OBJ_NUM_APP:
 			/* Application Object */
@@ -2527,7 +2527,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, bool i
 	case ABP_OBJ_NUM_ECT:
 		/* EtherCAT Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEtcNcInstAttrNames[0], sizeof(asEtcNcInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEtcInstAttrNames[0], sizeof(asEtcInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
@@ -2537,7 +2537,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, bool i
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Host Object */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[ofst], max_str_len, display_base,
-			NULL, 0, &asEipNcInstAttrNames[0], sizeof(asEipNcInstAttrNames) / sizeof(tValueName));
+			NULL, 0, &asEipInstAttrNames[0], sizeof(asEipInstAttrNames) / sizeof(tValueName));
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
