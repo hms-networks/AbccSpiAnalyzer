@@ -47,10 +47,23 @@ protocol.
 * Saleae Logic Software (version 1.2.7)
   * Other versions will work so long as **Analyzer SDK version 1.1.32** is
     compatible
+* Saleae Logic Hardware
+  * While any of Saleae Logic hardware offerings is expected to be compatible,
+  it is important to consider sample rate limitations of the Logic hardware and
+  what SPI data rate the ABCC host-module communication is using. The absolute
+  minimum requirement for sufficiently sampling the communication is 2x the
+  frequency of the SPI SCLK. The ABCC is able to work over a wide range of
+  clock rates where the maximum is specified at 20MHz. So to be able to support
+  this would require at a minimum the ability to sample at 40MSamples/second.
+  Keep in mind that these analyzers may reduce sample rate depending on how many
+  channels on the analyzer are active, so it is imperative that the hardware
+  is able to sufficiently sample the SPI bus for the number of channels required.
 * PC running:
   * Windows 7 or later
   * Ubuntu 12.04.2+
   * Mac OSX 10.7 Lion+
+* USB 2.0 or 3.0 port
+  * Using the Saleae Logic on a dedicated USB controller is recommended for ensuring the best sampling performance of the hardware will be possible.
 
 ## [Installation](#table-of-contents)
 
