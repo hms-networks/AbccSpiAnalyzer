@@ -60,7 +60,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 	StringBuilder(tag, value, verbose, alert, false);
 }
 
-void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue)
+void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritize_value)
 {
 	const char alertStr[] = "!ALERT - ";
 	U16 len2, len3;
@@ -95,13 +95,13 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 			str[0] = tag[0];
 		}
 
-		if (alert || !prioritizeValue)
+		if (alert || !prioritize_value)
 		{
 			str[1] = '\0';
 			AddResultString(str);
 		}
 
-		if (prioritizeValue)
+		if (prioritize_value)
 		{
 			if (value)
 			{
@@ -209,14 +209,14 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 	}
 }
 
-void SpiAnalyzerResults::TableBuilder(bool fMosiChannel, char* text, bool alert)
+void SpiAnalyzerResults::TableBuilder(bool is_mosi_channel, char* text, bool alert)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char* prefix;
 	char mosiPrefix[] = MOSI_TAG_STR;
 	char misoPrefix[] = MISO_TAG_STR;
 
-	if(fMosiChannel)
+	if(is_mosi_channel)
 	{
 		prefix = &mosiPrefix[0];
 	}
@@ -1183,7 +1183,7 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 	}
 }
 
-U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type)
+U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool is_mosi_channel, U8 type)
 {
 	U64 frameIndex = INVALID_RESULT_INDEX;
 	U64 firstFrameIndex;
@@ -1197,8 +1197,8 @@ U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index,
 			for(frameIndex = firstFrameIndex; frameIndex <= lastFrameIndex; frameIndex++)
 			{
 				Frame frame = GetFrame(frameIndex);
-				if( ((fMosiChannel) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
-					((!fMosiChannel) && IS_MISO_FRAME(frame) && (frame.mType == type)) )
+				if( ((is_mosi_channel) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
+					((!is_mosi_channel) && IS_MISO_FRAME(frame) && (frame.mType == type)) )
 				{
 					break;
 				}

@@ -665,10 +665,10 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	return eMarkerType;
 }
 
-void SpiAnalyzer::SignalReadyForNewPacket(bool fMosiChannel)
+void SpiAnalyzer::SignalReadyForNewPacket(bool is_mosi_channel)
 {
 	bool fStartNewPacket = false;
-	if (fMosiChannel)
+	if (is_mosi_channel)
 	{
 		mMosiVars.fReadyForNewPacket = true;
 	}

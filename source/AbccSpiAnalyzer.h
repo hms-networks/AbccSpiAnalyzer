@@ -285,7 +285,7 @@ protected: /* functions */
 
 	void CheckForIdleAfterPacket(void);
 	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);
-	void SignalReadyForNewPacket(bool fMosiChannel);
+	void SignalReadyForNewPacket(bool is_mosi_channel);
 
 	void SetMosiPacketType(tPacketType ePacketType);
 	void SetMisoPacketType(tPacketType ePacketType);

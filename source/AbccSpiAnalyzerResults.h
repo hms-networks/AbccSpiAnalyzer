@@ -57,12 +57,12 @@ public:
 	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
 	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
 
-	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool fMosiChannel, U8 type);
+	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool is_mosi_channel, U8 type);
 
 protected: /* functions */
 	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert);
-	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue);
-	virtual void TableBuilder(bool fMosiChannel, char* text, bool alert);
+	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritize_value);
+	virtual void TableBuilder(bool is_mosi_channel, char* text, bool alert);
 
 	virtual void BuildSpiCtrlString(U8 val, DisplayBase display_base);
 	virtual void BuildSpiStsString(U8 val, DisplayBase display_base);
