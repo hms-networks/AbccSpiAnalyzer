@@ -20,13 +20,13 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define CSV_DELIMITER "\t"
-
 #define IS_MISO_FRAME(frame) 			((frame.mFlags & SPI_MOSI_FLAG)!=SPI_MOSI_FLAG)
 #define IS_MOSI_FRAME(frame)			((frame.mFlags & SPI_MOSI_FLAG)==SPI_MOSI_FLAG)
 
-#define MOSI_TAG_STR "MOSI-"
-#define MISO_TAG_STR "MISO-"
+#define MOSI_TAG_STR	"MOSI-"
+#define MISO_TAG_STR	"MISO-"
+
+#define CSV_DELIMITER	"\t"
 
 #ifdef _DEBUG
 /* Dummy macros, the old SDK does not support these */
@@ -45,8 +45,8 @@ SpiAnalyzerResults::SpiAnalyzerResults(SpiAnalyzer* analyzer, SpiAnalyzerSetting
 	memset(acMsgInstStr, 0, sizeof(acMsgInstStr));
 	memset(acMsgCmdStr, 0, sizeof(acMsgCmdStr));
 	memset(acMsgExtStr, 0, sizeof(acMsgExtStr));
-	fMsgValid[0] = false;
-	fMsgValid[1] = false;
+	fMsgValid[0]    = false;
+	fMsgValid[1]    = false;
 	fMsgErrorRsp[0] = false;
 	fMsgErrorRsp[1] = false;
 }
@@ -62,10 +62,10 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 
 void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritizeValue)
 {
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	U16 len2, len3;
-	char pad[32] = "";
 	const char alertStr[] = "!ALERT - ";
+	U16 len2, len3;
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char pad[32] = "";
 	bool applyPad = false;
 
 	if (verbose && value)
@@ -241,7 +241,9 @@ bool SpiAnalyzerResults::BuildCmdString(U8 val, U8 obj, DisplayBase display_base
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool alert = GetCmdString(val, obj, &str[0], sizeof(str), display_base);
+
 	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(e_ABCC_MSG_CMD), numberStr, sizeof(numberStr));
+
 	if ((val & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 	{
 		errorRspMsg = true;
@@ -737,7 +739,11 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 	U32 sampleRate = mAnalyzer->GetSampleRate();
 	U64 numFrames = GetNumFrames();
 
-	ss << "Channel" CSV_DELIMITER "Time [s]" CSV_DELIMITER "Packet ID" CSV_DELIMITER "Frame Type" CSV_DELIMITER "Frame Data" << std::endl;
+	ss <<	"Channel" CSV_DELIMITER
+			"Time [s]" CSV_DELIMITER
+			"Packet ID" CSV_DELIMITER
+			"Frame Type" CSV_DELIMITER
+			"Frame Data" << std::endl;
 
 	for (U32 i = 0; i < numFrames; i++)
 	{
@@ -838,7 +844,18 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 	U64 i = 0;
 
 	/* Add header fields */
-	ssMosi << "Channel" CSV_DELIMITER "Time [s]" CSV_DELIMITER "Packet ID" CSV_DELIMITER "LAST_FRAG" CSV_DELIMITER "Message Size [bytes]" CSV_DELIMITER "Source ID" CSV_DELIMITER "Object" CSV_DELIMITER "Instance" CSV_DELIMITER "Command" CSV_DELIMITER "CmdExt" CSV_DELIMITER "Message Data" << std::endl;
+	ssMosi <<	"Channel" CSV_DELIMITER
+				"Time [s]" CSV_DELIMITER
+				"Packet ID" CSV_DELIMITER
+				"LAST_FRAG" CSV_DELIMITER
+				"Message Size [bytes]" CSV_DELIMITER
+				"Source ID" CSV_DELIMITER
+				"Object" CSV_DELIMITER
+				"Instance" CSV_DELIMITER
+				"Command" CSV_DELIMITER
+				"CmdExt" CSV_DELIMITER
+				"Message Data" << std::endl;
+
 	AnalyzerHelpers::AppendToFile((U8*)ssMosi.str().c_str(), (U32)ssMosi.str().length(), f);
 	ssMosi.str(std::string());
 
@@ -1009,7 +1026,8 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 		U64 packetId = GetPacketContainingFrameSequential(i);
 		char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 		char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE] = "";
-		bool fAddMosiEntry = false;		bool fAddMisoEntry = false;
+		bool fAddMosiEntry = false;
+		bool fAddMisoEntry = false;
 
 		if (packetId != INVALID_RESULT_INDEX)
 		{
@@ -1033,7 +1051,11 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 							U32 dwBytes = ((U16)frame.mData1) << 1;
 							/* Add header fields */
 							std::stringstream ssHeader;
-							ssHeader << "Channel" CSV_DELIMITER "Time [s]" CSV_DELIMITER "Packet ID" CSV_DELIMITER "Network Time";
+							ssHeader << "Channel" CSV_DELIMITER
+										"Time [s]" CSV_DELIMITER
+										"Packet ID" CSV_DELIMITER
+										"Network Time";
+
 							for(U16 cnt = 0; cnt < dwBytes; cnt++)
 							{
 								ssHeader << CSV_DELIMITER "Process Data " << cnt;
