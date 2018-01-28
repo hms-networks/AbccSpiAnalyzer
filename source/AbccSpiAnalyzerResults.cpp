@@ -63,24 +63,24 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bo
 void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritize_value)
 {
 	const char alertStr[] = "!ALERT - ";
-	U16 len2, len3;
+	U16 strLenValue, strLenVerbose;
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char pad[32] = "";
 	bool applyPad = false;
 
 	if (verbose && value)
 	{
-		len2 = (U16)strlen(value);
+		strLenValue = (U16)strlen(value);
 		if(alert)
 		{
-			len2 += sizeof(alertStr);
+			strLenValue += sizeof(alertStr);
 		}
-		len3 = (U16)strlen(verbose);
-		if (len3 <= len2)
+		strLenVerbose = (U16)strlen(verbose);
+		if (strLenVerbose <= strLenValue)
 		{
 			/* We must pad the level3 (bit states) text to maintain display priority */
 			applyPad = true;
-			memset(pad, ' ', ((len2 - len3) >> 1) + 1);
+			memset(pad, ' ', ((strLenValue - strLenVerbose) >> 1) + 1);
 		}
 	}
 
