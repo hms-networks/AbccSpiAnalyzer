@@ -1,0 +1,8 @@
+[submodule "sdk/release"]
+	path = sdk/release
+	url = https://github.com/saleae/AnalyzerSDK.git
+	branch = master
+[submodule "sdk/debug"]
+	path = sdk/debug
+	url = https://github.com/saleae/AnalyzerSDK.git
+	branch = 1.1.14-legacy

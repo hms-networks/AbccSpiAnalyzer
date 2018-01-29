@@ -94,8 +94,11 @@ cpp_files = glob.glob( "*.cpp" )
 os.chdir( ".." )
 
 # Specify the search paths/dependencies/options for gcc
-include_paths = [ "./include" ]
-link_paths = [ "./lib" ]
+include_paths = [ "./sdk/release/include" ]
+link_paths = [ "./sdk/release/lib" ]
+include_paths_dbg = [ "./sdk/debug/include" ]
+link_paths_dbg = [ "./sdk/debug/lib" ]
+
 if arch == "64":
     link_dependencies = [ "-lAnalyzer" + arch ]
     link_dependencies32 =  [ "-lAnalyzer" ]
@@ -108,10 +111,14 @@ release_compile_flags = "-O3 -w -c -fpic -std=c++11"
 # Loop through all the cpp files, build up the gcc command line, and attempt to compile each cpp file
 for cpp_file in cpp_files:
     command = "g++ "
+    command_dbg = "g++ "
 
     #Include paths
     for path in include_paths:
         command += "-I\"" + path + "\" "
+
+    for path in include_paths_dbg:
+        command_dbg += "-I\"" + path + "\" "
 
     release_command = command
     release_command += release_compile_flags
@@ -125,10 +132,12 @@ for cpp_file in cpp_files:
             release_command32 += " -m32 -o " + "\"" + release_path32 + cpp_file.replace( ".cpp", ".o" ) + "\"" #the output file
             release_command32 += " \"" + "source/" + cpp_file + "\"" #the cpp file to compile
 
-    debug_command = command
+    debug_command = command_dbg
     debug_command += debug_compile_flags
+    if dylib_ext == ".dylib":
+        debug_command += " -m32"
     debug_command += " -o " + "\"" + debug_path + cpp_file.replace( ".cpp", ".o" ) + "\"" #the output file
-    debug_command += " \"" + "source/" + cpp_file + "\"" #the cpp file to compile
+    debug_command += " \"" + "source/" + cpp_file + "\"" + " -D _DEBUG" #the cpp file to compile
 
     # Run the commands from the command line
     print(release_command)
@@ -142,16 +151,21 @@ for cpp_file in cpp_files:
 
 #Lastly, link
 command = "g++ "
+command_dbg = command
 
 #Add the library search paths
 for link_path in link_paths:
     command += "-L\"" + link_path + "\" "
+
+for link_path in link_paths_dbg:
+    command_dbg += "-L\"" + link_path + "\" "
 
 command32 = command
 
 #Add libraries to link against
 for link_dependency in link_dependencies:
     command += link_dependency + " "
+    command_dbg += link_dependency + " "
 
 if arch == "64":
     for link_dependency in link_dependencies32:
@@ -161,9 +175,11 @@ if arch == "64":
 # Make a dynamic (shared) library (.so/.dylib)
 if dylib_ext == ".dylib":
     command += "-dynamiclib "
+    command_dbg += "-dynamiclib "
 else:
     command += "-shared "
     command32 += "-shared "
+    command_dbg += "-shared "
 
 # Figure out what the name of this analyzer is
 analyzer_name = ""
@@ -175,12 +191,12 @@ for cpp_file in cpp_files:
 # The files to create (.so/.dylib files)
 if dylib_ext == ".dylib":
     release_command = command + "-o \"" + release_path + "lib" + analyzer_name + "Analyzer.dylib\" "
-    debug_command = command + "-o \"" + debug_path + "lib" + analyzer_name + "Analyzer.dylib\" "
+    debug_command = command_dbg + "-m32 -o \"" + debug_path + "lib" + analyzer_name + "Analyzer.dylib\" "
 else:
     release_command = command + "-o \"" + release_path + "lib" + analyzer_name + "Analyzer" + arch + ".so\" "
     if arch == "64":
         release_command32 = command32 + "-m32 " + "-o \"" + release_path32 + "lib" + analyzer_name + "Analyzer" + ".so\" "
-    debug_command = command + "-o \"" + debug_path + "lib" + analyzer_name + "Analyzer" + arch + ".so\" "
+    debug_command = command_dbg + "-o \"" + debug_path + "lib" + analyzer_name + "Analyzer" + arch + ".so\" "
 
 # Add all the object files to link
 for cpp_file in cpp_files:
