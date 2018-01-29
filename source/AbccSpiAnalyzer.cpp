@@ -123,7 +123,7 @@ void SpiAnalyzer::WorkerThread()
 	U64 lMosiData;
 	U64 lMisoData;
 	U64 lFirstSample;
-	tGetWordStatus eWordStatus;
+	tGetByteStatus eByteStatus;
 	bool fReset;
 	bool fError;
 	bool fReady1 = true;
@@ -150,19 +150,19 @@ void SpiAnalyzer::WorkerThread()
 		for (;;)
 		{
 			/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
-			eWordStatus = GetByte(&lMosiData, &lMisoData, &lFirstSample);
-			switch (eWordStatus)
+			eByteStatus = GetByte(&lMosiData, &lMisoData, &lFirstSample);
+			switch (eByteStatus)
 			{
-			case e_GET_WORD_OK:
+			case e_GET_BYTE_OK:
 				fError = false;
 				fReset = false;
 				break;
-			case e_GET_WORD_RESET:
+			case e_GET_BYTE_RESET:
 				fError = false;
 				fReset = true;
 				break;
 			default:
-			case e_GET_WORD_ERROR:
+			case e_GET_BYTE_ERROR:
 				fError = true;
 				fReset = true;
 				break;
@@ -382,14 +382,14 @@ bool SpiAnalyzer::Is3WireIdleCondition(float rIdleTimeCondition)
 	return (rIdleTime >= rIdleTimeCondition);
 }
 
-tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
+tGetByteStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample)
 {
 	/* We're assuming we come into this function with the clock in the idle state */
 	const U32 dwBitsPerTransfer = 8;
 	const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
 	DataBuilder mosi_result;
 	DataBuilder miso_result;
-	tGetWordStatus status = e_GET_WORD_OK;
+	tGetByteStatus status = e_GET_BYTE_OK;
 	bool fClkIdleHigh = false;
 
 	mosi_result.Reset(plMosiData, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
@@ -414,7 +414,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			{
 				/* The enable state changed in the middle of acquiring a byte.
 				** Suggests we are not byte-synchronized. */
-				status = e_GET_WORD_RESET;
+				status = e_GET_BYTE_RESET;
 				break;
 			}
 		}
@@ -443,7 +443,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 				else
 				{
 					/* Reset everything and return. */
-					status = e_GET_WORD_ERROR;
+					status = e_GET_BYTE_ERROR;
 					break;
 				}
 			}
@@ -469,7 +469,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 		if (WouldAdvancingTheClockToggleEnable() == true)
 		{
 			/* Error: reset everything and return. */
-			status = e_GET_WORD_ERROR;
+			status = e_GET_BYTE_ERROR;
 			break;
 		}
 
@@ -481,7 +481,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
 				/* Error: reset everything and return. */
-				status = e_GET_WORD_ERROR;
+				status = e_GET_BYTE_ERROR;
 				break;
 			}
 		}
@@ -500,7 +500,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 		mArrowLocations.push_back(mCurrentSample);
 	}
 
-	if(status == e_GET_WORD_OK)
+	if(status == e_GET_BYTE_OK)
 	{
 		/* Add sample markers to the results */
 		U32 count = (U32)mArrowLocations.size();

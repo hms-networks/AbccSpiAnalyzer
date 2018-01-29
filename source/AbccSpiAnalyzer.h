@@ -52,12 +52,12 @@
 #define GET_MOSI_FRAME_BITSIZE(x)		((asMosiStates[x].frameSize)*8)
 #define GET_MISO_FRAME_BITSIZE(x)		((asMisoStates[x].frameSize)*8)
 
-typedef enum tGetWordStatus
+typedef enum tGetByteStatus
 {
-	e_GET_WORD_OK,		/* WORD was successfully read */
-	e_GET_WORD_ERROR,	/* Reading WORD resulted in a logical error (requires statemachine reset) */
-	e_GET_WORD_RESET	/* Reading WORD resulted in a event that requires state machine reset */
-}tGetWordStatus;
+	e_GET_BYTE_OK,		/* BYTE was successfully read */
+	e_GET_BYTE_ERROR,	/* Reading BYTE resulted in a logical error (requires statemachine reset) */
+	e_GET_BYTE_RESET	/* Reading BYTE resulted in a event that requires state machine reset */
+}tGetByteStatus;
 
 typedef enum tPacketType
 {
@@ -280,7 +280,7 @@ protected: /* functions */
 
 	bool WouldAdvancingTheClockToggleEnable();
 
-	tGetWordStatus GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
+	tGetByteStatus GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
 
 	void CheckForIdleAfterPacket(void);
 	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);
