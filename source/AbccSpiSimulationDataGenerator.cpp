@@ -236,15 +236,15 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	}
 }
 
-void SpiSimulationDataGenerator::SendPacketData(bool fClockIdleHigh, U32 dwLength)
+void SpiSimulationDataGenerator::SendPacketData(bool is_clock_idle_high, U32 length)
 {
-	if (dwLength > sizeof(tAbccMosiPacket))
+	if (length > sizeof(tAbccMosiPacket))
 	{
-		dwLength = sizeof(tAbccMosiPacket);
+		length = sizeof(tAbccMosiPacket);
 	}
-	for (U16 i = 0; i < dwLength; i++)
+	for (U16 i = 0; i < length; i++)
 	{
-		if (fClockIdleHigh == true)
+		if (is_clock_idle_high == true)
 		{
 			OutputByte_CPOL1_CPHA1(((uAbccPacket*)&mMosiData)->raw[i], ((uAbccPacket*)&mMisoData)->raw[i]);
 		}
