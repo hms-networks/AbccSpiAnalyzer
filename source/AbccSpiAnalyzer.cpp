@@ -738,7 +738,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 		U64 lNextSample = mEnable->GetSampleOfNextEdge();
 		if (lNextSample <= mClock->GetSampleNumber())
 		{
-			mEnable->AdvanceToAbsPosition(mClock->GetSampleNumber()); //TODO joca: this fixes the crashing...other changes dont do much
+			mEnable->AdvanceToAbsPosition(mClock->GetSampleNumber());
 			lNextSample = mEnable->GetSampleOfNextEdge();
 		}
 
@@ -857,7 +857,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 			/* Max message data size exceeded */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			mMisoVars.wMdSize = 0;
-			//TODO joca: the last state (where a valid packet was received) should be restored
 			mMisoVars.fFirstFrag = false;
 			mMisoVars.fLastFrag = false;
 			mMisoVars.fFragmentation = false;
@@ -926,7 +925,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates eState, U64 lFrameData, S64 l
 		{
 			/* CRC Error */
 			result_frame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			//TODO joca: the last state (where a valid packet was received) should be restored
 			mMisoVars.fFirstFrag = false;
 			mMisoVars.fLastFrag = false;
 			mMisoVars.fFragmentation = false;

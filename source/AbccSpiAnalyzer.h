@@ -149,7 +149,6 @@ typedef enum tAbccMsgField
 	e_ABCC_MSG_DATA
 }tAbccMsgField;
 
-//TODO joca consider adding a "full name" element here that would be used for printing to tabular text
 typedef struct tAbccMosiInfo
 {
 	tAbccMosiStates eMosiState;
