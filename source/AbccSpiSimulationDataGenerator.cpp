@@ -173,7 +173,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 
 	if (mEnable != NULL)
 	{
-		/* Occassionally create additional distubances after the packet (~20% chance) */
+		/* Occasionally create additional disturbances after the packet (~20% chance) */
 		if (distr(eng) < 10)
 		{
 			/* Create an additional transaction before enable goes high (cause clocking errors) */
@@ -209,7 +209,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	}
 	else
 	{
-		/* Occassionally create additional distubances after the packet (~20% chance) */
+		/* Occasionally create additional disturbances after the packet (~20% chance) */
 		if (distr(eng) < 10)
 		{
 			/* Add extra clocking */

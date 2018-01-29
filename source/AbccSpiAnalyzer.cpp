@@ -412,7 +412,7 @@ tGetWordStatus SpiAnalyzer::GetByte(U64* plMosiData, U64* plMisoData, U64* plFir
 			}
 			else
 			{
-				/* The enable state changed in the middle of aquiring a byte.
+				/* The enable state changed in the middle of acquiring a byte.
 				** Suggests we are not byte-synchronized. */
 				status = e_GET_WORD_RESET;
 				break;
