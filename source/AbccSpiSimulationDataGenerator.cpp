@@ -122,14 +122,14 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
 
 void SpiSimulationDataGenerator::CreateSpiTransaction()
 {
-	bool fClockIdleHigh;
+	bool clockIdleHigh;
 	std::random_device rd;
 	std::mt19937 eng(rd());
 	std::uniform_int_distribution<> distr(0, 100);
 	AbccCrc mosiChecksum = AbccCrc();
 	AbccCrc misoChecksum = AbccCrc();
 
-	fClockIdleHigh = (mClock->GetCurrentBitState() == BIT_HIGH);
+	clockIdleHigh = (mClock->GetCurrentBitState() == BIT_HIGH);
 
 	if (mEnable != NULL)
 		mEnable->Transition();
@@ -169,7 +169,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	}
 
 	/* Produce the transaction (10% using CPHA0; 90% using CPHA1) */
-	SendPacketData(fClockIdleHigh, sizeof(tAbccMosiPacket));
+	SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
 
 	if (mEnable != NULL)
 	{
@@ -177,7 +177,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		if (distr(eng) < 10)
 		{
 			/* Create an additional transaction before enable goes high (cause clocking errors) */
-			SendPacketData(fClockIdleHigh, sizeof(tAbccMosiPacket));
+			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
 		}
 		else if (distr(eng) < 20)
 		{
@@ -186,7 +186,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mEnable->Transition();
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
-			SendPacketData(fClockIdleHigh, sizeof(tAbccMosiPacket)-1);
+			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket)-1);
 		}
 
 		/* Create an out-of-band SPI transaction to illustrate that the analyzer will
@@ -230,7 +230,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			/* Create a fragment (short 1 byte) */
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-			SendPacketData(fClockIdleHigh, sizeof(tAbccMosiPacket)-1);
+			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket)-1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 		}
 	}
@@ -257,9 +257,9 @@ void SpiSimulationDataGenerator::SendPacketData(bool is_clock_idle_high, U32 len
 
 void SpiSimulationDataGenerator::OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_data)
 {
-	const U32 dwBitsPerTransfer = 8;
-	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
-	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
+	const U32 bitsPerTransfer = 8;
+	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, bitsPerTransfer);
+	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, bitsPerTransfer);
 
 	/* First ensure clock is low */
 	if (mClock->GetCurrentBitState() == BIT_HIGH)
@@ -268,7 +268,7 @@ void SpiSimulationDataGenerator::OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_
 		return;
 	}
 
-	for (U32 i = 0; i < dwBitsPerTransfer; i++)
+	for (U32 i = 0; i < bitsPerTransfer; i++)
 	{
 		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
 		mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
@@ -288,9 +288,9 @@ void SpiSimulationDataGenerator::OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_
 
 void SpiSimulationDataGenerator::OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_data)
 {
-	const U32 dwBitsPerTransfer = 8;
-	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
-	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, dwBitsPerTransfer);
+	const U32 bitsPerTransfer = 8;
+	BitExtractor mosi_bits(mosi_data, AnalyzerEnums::MsbFirst, bitsPerTransfer);
+	BitExtractor miso_bits(miso_data, AnalyzerEnums::MsbFirst, bitsPerTransfer);
 
 	/* First ensure clock is high */
 	if (mClock->GetCurrentBitState() == BIT_LOW)
@@ -299,7 +299,7 @@ void SpiSimulationDataGenerator::OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_
 		return;
 	}
 
-	for (U32 i = 0; i < dwBitsPerTransfer; i++)
+	for (U32 i = 0; i < bitsPerTransfer; i++)
 	{
 		mClock->Transition();  /* data invalid */
 		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
