@@ -864,7 +864,7 @@ static const tValueName asEplInstAttrNames[] =
 	{ ABP_EPL_IA_MINOR_REV,		"Revision Low Word",				false },
 	{ ABP_EPL_IA_SERIAL_NUMBER,	"Serial Number",					false },
 	{ ABP_EPL_IA_MANF_DEV_NAME,	"Manufacturer Device Name",			false },
-	{ ABP_EPL_IA_MANF_HW_VER,	"Manufacturer Hardware Verison",	false },
+	{ ABP_EPL_IA_MANF_HW_VER,	"Manufacturer Hardware Version",	false },
 	{ ABP_EPL_IA_MANF_SW_VER,	"Manufacturer Software Version",	false },
 	{ ABP_EPL_IA_DEVICE_TYPE,	"Device Type",						false },
 	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
@@ -1242,8 +1242,8 @@ static const tValueName asBacCmdNames[] =
 
 static const tValueName asCclCmdNames[] =
 {
-	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notfication",					false },
-	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notfication",	false }
+	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notification",				false },
+	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notification",	false }
 };
 
 static const tValueName asCfnCmdNames[] =
@@ -1401,7 +1401,7 @@ static const tValueName asPnioCmdNames[] =
 
 static const tValueName asSrc3CmdNames[] =
 {
-	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnositic",	false }
+	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnostic",	false }
 };
 
 /*******************************************************************************
