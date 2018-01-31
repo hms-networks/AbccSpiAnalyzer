@@ -280,26 +280,26 @@ protected: /* functions */
 
 	bool WouldAdvancingTheClockToggleEnable();
 
-	tGetByteStatus GetByte(U64* plMosiData, U64* plMisoData, U64* plFirstSample);
+	tGetByteStatus GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr);
 
 	void CheckForIdleAfterPacket(void);
-	void AddFragFrame(bool fMosi, U64 lFirstSample, U64 lLastSample);
+	void AddFragFrame(bool is_mosi_channel, U64 first_sample, U64 last_sample);
 	void SignalReadyForNewPacket(bool is_mosi_channel);
 
-	void SetMosiPacketType(tPacketType ePacketType);
-	void SetMisoPacketType(tPacketType ePacketType);
+	void SetMosiPacketType(tPacketType e_packet_type);
+	void SetMisoPacketType(tPacketType e_packet_type);
 	AnalyzerResults::MarkerType GetPacketMarkerType(void);
 
-	void ProcessMosiFrame(tAbccMosiStates eMosiState, U64 lFrameData, S64 lFramesFirstSample);
-	void ProcessMisoFrame(tAbccMisoStates eMisoState, U64 lFrameData, S64 lFramesFirstSample);
+	void ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 frames_first_sample);
+	void ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 frames_first_sample);
 
-	bool RunAbccMosiStateMachine(bool fReset, bool fError, U64 lMosiData, S64 lFirstSample);
-	bool RunAbccMisoStateMachine(bool fReset, bool fError, U64 lMisoData, S64 lFirstSample);
+	bool RunAbccMosiStateMachine(bool reset_state, bool acquisition_error, U64 mosi_data, S64 first_sample);
+	bool RunAbccMisoStateMachine(bool reset_state, bool acquisition_error, U64 miso_data, S64 first_sample);
 
-	bool RunAbccMisoMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMisoStates* peMisoMsgSubState);
-	bool RunAbccMosiMsgSubStateMachine(bool fReset, bool* pfAddFrame, tAbccMosiStates* peMosiMsgSubState);
+	bool RunAbccMisoMsgSubStateMachine(bool reset_state, bool* add_frame_ptr, tAbccMisoStates* e_msg_substate_ptr);
+	bool RunAbccMosiMsgSubStateMachine(bool reset_state, bool* add_frame_ptr, tAbccMosiStates* e_msg_substate_ptr);
 
-	bool Is3WireIdleCondition(float rIdleTimeCondition);
+	bool Is3WireIdleCondition(float idle_time_condition);
 
 
 #pragma warning( push )
