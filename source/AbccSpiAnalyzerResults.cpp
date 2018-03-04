@@ -828,8 +828,10 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 
 void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase display_base)
 {
-	std::stringstream ssMosi;
-	std::stringstream ssMiso;
+	std::stringstream ssMosiHead;
+	std::stringstream ssMisoHead;
+	std::stringstream ssMisoTail;
+	std::stringstream ssMosiTail;
 	char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool addMosiEntry;
@@ -844,20 +846,21 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 	U64 i = 0;
 
 	/* Add header fields */
-	ssMosi <<	"Channel" CSV_DELIMITER
-				"Time [s]" CSV_DELIMITER
-				"Packet ID" CSV_DELIMITER
-				"LAST_FRAG" CSV_DELIMITER
-				"Message Size [bytes]" CSV_DELIMITER
-				"Source ID" CSV_DELIMITER
-				"Object" CSV_DELIMITER
-				"Instance" CSV_DELIMITER
-				"Command" CSV_DELIMITER
-				"CmdExt" CSV_DELIMITER
-				"Message Data" << std::endl;
+	ssMosiHead <<	"Channel" CSV_DELIMITER
+					"Time [s]" CSV_DELIMITER
+					"Packet ID" CSV_DELIMITER
+					"CRC Error" CSV_DELIMITER
+					"LAST_FRAG" CSV_DELIMITER
+					"Message Size [bytes]" CSV_DELIMITER
+					"Source ID" CSV_DELIMITER
+					"Object" CSV_DELIMITER
+					"Instance" CSV_DELIMITER
+					"Command" CSV_DELIMITER
+					"CmdExt" CSV_DELIMITER
+					"Message Data";
 
-	AnalyzerHelpers::AppendToFile((U8*)ssMosi.str().c_str(), (U32)ssMosi.str().length(), f);
-	ssMosi.str(std::string());
+	AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
+	ssMosiHead.str(std::string());
 
 	while (i < numFrames)
 	{
@@ -888,12 +891,14 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 						{
 							/* Add in the timestamp, packet ID */
 							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosi << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId << CSV_DELIMITER;
+							ssMosiHead << std::endl << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 							addMosiEntry = true;
 						}
+
+						ssMosiTail << CSV_DELIMITER;
 						if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
 						{
-							ssMosi << "L";
+							ssMosiTail << "L";
 						}
 						break;
 					}
@@ -905,7 +910,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
 					{
 						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-						ssMosi << CSV_DELIMITER << dataStr;
+						ssMosiTail << CSV_DELIMITER << dataStr;
 						addLastMosiMsgHeader = false;
 						break;
 					}
@@ -914,11 +919,16 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 					{
 						if (addLastMosiMsgHeader)
 						{
-							ssMosi << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
+							ssMosiTail << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
 							addLastMosiMsgHeader = false;
 						}
 						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-						ssMosi << CSV_DELIMITER << dataStr;
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MOSI_CRC32:
+					{
+						ssMosiHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
 						break;
 					}
 					default:
@@ -935,12 +945,14 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 							{
 								/* Add in the timestamp, packet ID */
 								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMiso << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId << CSV_DELIMITER;
+								ssMisoHead << std::endl << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 								addMisoEntry = true;
 							}
+
+							ssMisoTail << CSV_DELIMITER;
 							if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
 							{
-								ssMiso << "L";
+								ssMisoTail << "L";
 							}
 							break;
 						}
@@ -952,7 +964,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 						case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
 						{
 							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMiso << CSV_DELIMITER << dataStr;
+							ssMisoTail << CSV_DELIMITER << dataStr;
 							addLastMisoMsgHeader = false;
 							break;
 						}
@@ -962,10 +974,15 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 							if (addLastMisoMsgHeader)
 							{
 								addLastMisoMsgHeader = false;
-								ssMiso << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
+								ssMisoTail << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
 							}
 							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMiso << CSV_DELIMITER << dataStr;
+							ssMisoTail << CSV_DELIMITER << dataStr;
+							break;
+						}
+						case e_ABCC_MISO_CRC32:
+						{
+							ssMisoHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
 							break;
 						}
 						default:
@@ -976,18 +993,20 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 
 			if (addMosiEntry)
 			{
-				ssMosi << std::endl;
-				AnalyzerHelpers::AppendToFile((U8*)ssMosi.str().c_str(), (U32)ssMosi.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMosiTail.str().c_str(), (U32)ssMosiTail.str().length(), f);
 			}
 
 			if (addMisoEntry)
 			{
-				ssMiso << std::endl;
-				AnalyzerHelpers::AppendToFile((U8*)ssMiso.str().c_str(), (U32)ssMiso.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMisoHead.str().c_str(), (U32)ssMisoHead.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMisoTail.str().c_str(), (U32)ssMisoTail.str().length(), f);
 			}
 
-			ssMiso.str(std::string());
-			ssMosi.str(std::string());
+			ssMisoHead.str(std::string());
+			ssMosiHead.str(std::string());
+			ssMisoTail.str(std::string());
+			ssMosiTail.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
 			i = lastFrameId + 1;
@@ -1011,8 +1030,10 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 
 void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase display_base)
 {
-	std::stringstream ssMosi;
-	std::stringstream ssMiso;
+	std::stringstream ssMosiHead;
+	std::stringstream ssMisoHead;
+	std::stringstream ssMosiTail;
+	std::stringstream ssMisoTail;
 	void* f = AnalyzerHelpers::StartFile(file);
 	bool addCsvHeader = true;
 
@@ -1054,6 +1075,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 							ssHeader << "Channel" CSV_DELIMITER
 										"Time [s]" CSV_DELIMITER
 										"Packet ID" CSV_DELIMITER
+										"CRC Error" CSV_DELIMITER
 										"Network Time";
 
 							for(U16 cnt = 0; cnt < dwBytes; cnt++)
@@ -1062,7 +1084,6 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 								AnalyzerHelpers::AppendToFile((U8*)ssHeader.str().c_str(), (U32)ssHeader.str().length(), f);
 								ssHeader.str(std::string());
 							}
-							ssHeader << std::endl;
 							AnalyzerHelpers::AppendToFile((U8*)ssHeader.str().c_str(), (U32)ssHeader.str().length(), f);
 							addCsvHeader = false;
 						}
@@ -1073,7 +1094,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 						{
 							/* Add in the timestamp, packet ID */
 							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosi << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+							ssMosiHead << std::endl << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 							addMosiEntry = true;
 						}
 						break;
@@ -1081,7 +1102,12 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					case e_ABCC_MOSI_WR_PD_FIELD:
 					{
 						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-						ssMosi << CSV_DELIMITER << dataStr;
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MOSI_CRC32:
+					{
+						ssMosiHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
 						break;
 					}
 					default:
@@ -1098,7 +1124,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 							{
 								/* Add in the timestamp, packet ID */
 								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMiso << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+								ssMisoHead << std::endl << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 								addMisoEntry = true;
 							}
 							break;
@@ -1107,14 +1133,19 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 						{
 							/* Append network time stamp to both string streams */
 							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMiso << CSV_DELIMITER << dataStr;
-							ssMosi << CSV_DELIMITER << dataStr;
+							ssMisoTail << CSV_DELIMITER << dataStr;
+							ssMosiTail << CSV_DELIMITER << dataStr;
 							break;
 						}
 						case e_ABCC_MISO_RD_PD_FIELD:
 						{
 							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMiso << CSV_DELIMITER << dataStr;
+							ssMisoTail << CSV_DELIMITER << dataStr;
+							break;
+						}
+						case e_ABCC_MISO_CRC32:
+						{
+							ssMisoHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
 							break;
 						}
 						default:
@@ -1131,18 +1162,20 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 
 			if (addMosiEntry)
 			{
-				ssMosi << std::endl;
-				AnalyzerHelpers::AppendToFile((U8*)ssMosi.str().c_str(), (U32)ssMosi.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMosiTail.str().c_str(), (U32)ssMosiTail.str().length(), f);
 			}
 
 			if (addMisoEntry)
 			{
-				ssMiso << std::endl;
-				AnalyzerHelpers::AppendToFile((U8*)ssMiso.str().c_str(), (U32)ssMiso.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMisoHead.str().c_str(), (U32)ssMisoHead.str().length(), f);
+				AnalyzerHelpers::AppendToFile((U8*)ssMisoTail.str().c_str(), (U32)ssMisoTail.str().length(), f);
 			}
 
-			ssMiso.str(std::string());
-			ssMosi.str(std::string());
+			ssMisoHead.str(std::string());
+			ssMosiHead.str(std::string());
+			ssMisoTail.str(std::string());
+			ssMosiTail.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
 			i = lastFrameId + 1;
