@@ -84,6 +84,7 @@ protected:
 	U32 mSimulationSampleRateHz;
 	U64 mValue;
 	U32 mNetTime;
+	U8  mMsgCmdRespState;
 
 protected: /* SPI specific */
 	ClockGenerator mClockGenerator;

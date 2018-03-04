@@ -28,7 +28,7 @@ static const tAbccMosiPacket sMosiData =
 	0x10,						/* INT_MSK */
 	0x0004,						/* MD_SIZE */
 	0x0000,						/* RESERVED */
-	0x01,						/* SRC_ID */
+	0x00,						/* SRC_ID */
 	0xFE,						/* OBJ */
 	0x0001,						/* INST */
 	0x01,						/* CMD */
@@ -66,6 +66,7 @@ static const tAbccMisoPacket sMisoData =
 
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
+	mMsgCmdRespState = 0;
 	mNetTime = 0x00000001;
 	memcpy(&mMosiData, &sMosiData, sizeof(tAbccMosiPacket));
 	memcpy(&mMisoData, &sMisoData, sizeof(tAbccMosiPacket));
@@ -95,7 +96,14 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 	mClock = mSpiSimulationChannels.Add(settings->mClockChannel, mSimulationSampleRateHz, BIT_HIGH);
 
 	if (settings->mEnableChannel != UNDEFINED_CHANNEL)
-		mEnable = mSpiSimulationChannels.Add(settings->mEnableChannel, mSimulationSampleRateHz, BIT_HIGH);
+	{
+		BitState enableInitState = BIT_HIGH;
+		if(mSettings->m3WireOn4Channels)
+		{
+			enableInitState = BIT_LOW;
+		}
+		mEnable = mSpiSimulationChannels.Add(settings->mEnableChannel, mSimulationSampleRateHz, enableInitState);
+	}
 	else
 		mEnable = NULL;
 
@@ -122,31 +130,77 @@ U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
 
 void SpiSimulationDataGenerator::CreateSpiTransaction()
 {
+	const int maxMsgCmdRespStates = 7;
 	bool clockIdleHigh;
 	std::random_device rd;
-	std::mt19937 eng(rd());
+	std::mt19937 prng(rd());
 	std::uniform_int_distribution<> distr(0, 100);
 	AbccCrc mosiChecksum = AbccCrc();
 	AbccCrc misoChecksum = AbccCrc();
 
+	bool generateClockIdleLow = (distr(prng) < 10);
+	bool generateOutOfBandClocking = (distr(prng) < 5);
+	bool generateMosiErrorRespMsg = (distr(prng) < 1);
+
+	bool generateClockingError = (distr(prng) < 1);
+
+	bool generateMisoCrcError = (distr(prng) < 2);
+	bool generateMosiCrcError = (distr(prng) < 2);
+	bool generateFragmentError = (distr(prng) < 1);
+	bool generate1ByteFragError = false;
+	bool errorPresent = false;
+
+	/* In this simulation, a MOSI CRC error implies a MISO CRC error as well
+	** which simulates the error detection/reporting mechanism of the ABCC. */
+	generateMisoCrcError = generateMisoCrcError || generateMosiCrcError;
+
+	if (generateFragmentError || generateMisoCrcError || generateMosiCrcError)
+	{
+		errorPresent = true;
+	}
+
+	if (((mEnable == NULL) && (mSettings->m4WireOn3Channels == false)) || (mSettings->m3WireOn4Channels == true))
+	{
+		generate1ByteFragError = (distr(prng) < 1);
+		errorPresent = errorPresent || generate1ByteFragError;
+	}
+
 	clockIdleHigh = (mClock->GetCurrentBitState() == BIT_HIGH);
 
-	if (mEnable != NULL)
+	if ((mEnable != NULL) && (mSettings->m3WireOn4Channels == false))
 		mEnable->Transition();
 
 	mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
 
-	/* Update toggle bit */
-	mMosiData.spiCtrl ^= ABP_SPI_CTRL_T;
+	switch (mMsgCmdRespState)
+	{
+	case 1:
+		/* new miso (command) message */
+		mMisoData.spiStat |= (ABP_SPI_STATUS_M | ABP_SPI_STATUS_LAST_FRAG);
+		break;
+	case 2:
+		/* new mosi (response) message */
+		mMosiData.spiCtrl |= (ABP_SPI_CTRL_M | ABP_SPI_CTRL_LAST_FRAG);
+		if (generateMosiErrorRespMsg)
+		{
+			mMosiData.cmd |= ABP_MSG_HEADER_E_BIT;
+			mMosiData.msgData[0] = ABP_ERR_GENERAL_ERROR;
+		}
+		else
+		{
+			mMosiData.cmd &= ~ABP_MSG_HEADER_E_BIT;
+			mMosiData.msgData[0] = 0x11;
+		}
+		break;
+	default:
+		/* no message */
+		break;
+	}
 
 	/* Update Network Time */
 	mMisoData.netTime_lo = mNetTime & 0xFFFF;
 	mMisoData.netTime_hi = (mNetTime >> 16) & 0xFFFF;
 	mNetTime += 0x1234;
-
-	/* Update source ID */
-	mMisoData.srcId = mMosiData.srcId;
-	mMosiData.srcId++;
 
 	/* Update the CRC32 */
 	mosiChecksum.Init();
@@ -159,27 +213,19 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	mMisoData.crc32_hi = (misoChecksum.Crc32() >> 16) & 0xFFFF;
 
 	/* Create occasional CRC errors */
-	if (distr(eng) < 10)
+	if (generateMosiCrcError)
 	{
 		mMosiData.crc32_lo++;
 	}
-	else if (distr(eng) < 10)
+
+	if (generateMisoCrcError)
 	{
 		mMisoData.crc32_lo++;
 	}
 
-	/* Produce the transaction (10% using CPHA0; 90% using CPHA1) */
-	SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
-
-	if (mEnable != NULL)
+	if ((mEnable != NULL) && (mSettings->m3WireOn4Channels == false))
 	{
-		/* Occasionally create additional disturbances after the packet (~20% chance) */
-		if (distr(eng) < 10)
-		{
-			/* Create an additional transaction before enable goes high (cause clocking errors) */
-			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
-		}
-		else if (distr(eng) < 20)
+		if (generateFragmentError)
 		{
 			/* Create a fragment (short 1 byte) */
 			mEnable->Transition();
@@ -188,17 +234,33 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(2.0));
 			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket)-1);
 		}
+		else
+		{
+			/* Produce the transaction */
+			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
 
-		/* Create an out-of-band SPI transaction to illustrate that the analyzer will
-		** ignore data as long as the enable-line is high */
+			/* Occasionally create additional disturbances after the packet */
+			if (generateClockingError)
+			{
+				/* Create an additional transaction before enable goes high (cause clocking errors) */
+				SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
+			}
+		}
+
 		mEnable->Transition();
-		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-		OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
-		mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-		mValue++;
+		if (generateOutOfBandClocking)
+		{
+			/* Create an out-of-band SPI transaction to illustrate that the analyzer will
+			** ignore data as long as the enable-line is high */
+			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+			OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
+			mValue++;
+		}
 
-		/* Switch Clock IDLE LOW/HIGH (10/90%) */
-		if (distr(eng) < 10)
+		mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
+
+		/* Switch Clock IDLE LOW/HIGH */
+		if (generateClockIdleLow)
 		{
 			mClock->TransitionIfNeeded(BIT_LOW);
 		}
@@ -209,16 +271,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	}
 	else
 	{
-		/* Occasionally create additional disturbances after the packet (~20% chance) */
-		if (distr(eng) < 10)
-		{
-			/* Add extra clocking */
-			mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
-			OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
-			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
-			mValue++;
-		}
-		else if (distr(eng) < 15)
+		if (generateFragmentError)
 		{
 			/* Create a fragment (1 byte) */
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
@@ -226,12 +279,52 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			mValue++;
 		}
-		else if (distr(eng) < 20)
+		else if (generate1ByteFragError)
 		{
 			/* Create a fragment (short 1 byte) */
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
 			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket)-1);
 			mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+		}
+		else
+		{
+			/* Produce the transaction */
+			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
+
+			/* Occasionally create additional disturbances after the packet (~10% chance) */
+			if (generateClockingError)
+			{
+				/* Add extra clocking */
+				mSpiSimulationChannels.AdvanceAll(mClockGenerator.AdvanceByHalfPeriod(0.5));
+				OutputByte_CPOL1_CPHA1(mValue, mValue + 1);
+				mSpiSimulationChannels.AdvanceAll((U32)(mSimulationSampleRateHz * MIN_IDLE_GAP_TIME));
+				mValue++;
+			}
+		}
+	}
+
+	/* Update toggle bit only when no error in communication was
+	** generated. The toggle bit should be left as-is in case of
+	** errors to indicate the need for a retransmission. */
+	if (!errorPresent)
+	{
+		/* Update toggle bit */
+		mMosiData.spiCtrl ^= ABP_SPI_CTRL_T;
+
+		/* Deassert message flags */
+		mMisoData.spiStat &= ~(ABP_SPI_STATUS_M | ABP_SPI_STATUS_LAST_FRAG);
+		mMosiData.spiCtrl &= ~(ABP_SPI_CTRL_M | ABP_SPI_CTRL_LAST_FRAG);
+
+		mMsgCmdRespState++;
+
+		/* Update the source ID each cycle of the message command-response state */
+		if (mMsgCmdRespState >= maxMsgCmdRespStates)
+		{
+			mMsgCmdRespState = 0;
+
+			/* Update source ID */
+			mMisoData.srcId++;
+			mMosiData.srcId = mMisoData.srcId;
 		}
 	}
 }
