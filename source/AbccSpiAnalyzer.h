@@ -13,7 +13,8 @@
 #define ABCC_SPI_ANALYZER_H
 
 #include <stdio.h>
-#include <Analyzer.h>
+
+#include "Analyzer.h"
 #include "AbccSpiAnalyzerResults.h"
 #include "AbccSpiSimulationDataGenerator.h"
 #include "AbccCrc.h"

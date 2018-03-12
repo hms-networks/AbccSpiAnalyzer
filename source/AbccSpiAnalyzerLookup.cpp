@@ -9,9 +9,11 @@
 *******************************************************************************
 ******************************************************************************/
 
+#include <cstring>
 #include <iostream>
 #include <sstream>
-#include <AnalyzerHelpers.h>
+
+#include "AnalyzerHelpers.h"
 #include "AbccSpiAnalyzer.h"
 #include "AbccSpiAnalyzerResults.h"
 #include "AbccSpiAnalyzerSettings.h"

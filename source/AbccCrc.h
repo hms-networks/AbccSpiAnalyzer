@@ -11,7 +11,7 @@
 #ifndef ABCC_CRC_H
 #define ABCC_CRC_H
 
-#include <Analyzer.h>
+#include "Analyzer.h"
 
 class AbccCrc
 {

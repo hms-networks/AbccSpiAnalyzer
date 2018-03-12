@@ -9,16 +9,16 @@
 *******************************************************************************
 ******************************************************************************/
 
-#include "AbccSpiAnalyzerSettings.h"
-
-#include <AnalyzerHelpers.h>
-#include <sstream>
 #include <cstring>
-
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
+
 #include "rapidxml-1.13/rapidxml.hpp"
+
+#include "AbccSpiAnalyzerSettings.h"
+#include "AnalyzerHelpers.h"
 
 /* Anytime behavior or definition of settings change, increment this counter. */
 #define SETTINGS_REVISION_STRING "REVISION_00000003"

@@ -12,7 +12,7 @@
 #ifndef ABCC_SPI_ANALYZER_RESULTS_H
 #define ABCC_SPI_ANALYZER_RESULTS_H
 
-#include <AnalyzerResults.h>
+#include "AnalyzerResults.h"
 
 #ifndef FORMATTED_STRING_BUFFER_SIZE
 #define FORMATTED_STRING_BUFFER_SIZE		256

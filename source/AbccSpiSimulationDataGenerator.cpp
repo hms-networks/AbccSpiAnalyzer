@@ -9,7 +9,9 @@
 *******************************************************************************
 ******************************************************************************/
 
+#include <cstring>
 #include <random>
+
 #include "AbccSpiSimulationDataGenerator.h"
 #include "AbccSpiAnalyzerSettings.h"
 #include "AbccSpiAnalyzer.h"

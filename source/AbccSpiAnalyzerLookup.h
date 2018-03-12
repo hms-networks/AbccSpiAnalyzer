@@ -11,6 +11,8 @@
 #ifndef ABCC_SPI_ANALYZER_LOOKUP_H_
 #define ABCC_SPI_ANALYZER_LOOKUP_H_
 
+#include "Analyzer.h"
+
 bool GetSpiCtrlString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
 
 bool GetSpiStsString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
