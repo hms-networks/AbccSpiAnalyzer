@@ -1288,14 +1288,14 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
-					AddTabularText("!Application Status : (", str, ")");
+					AddTabularText("!Application Status: ", str);
 					return;
 				}
 				else
 				{
 					if (mSettings->mApplStatusIndexing == true)
 					{
-						AddTabularText("Application Status : (", str, ")");
+						AddTabularText("Application Status: ", str);
 						return;
 					}
 				}
@@ -1311,19 +1311,19 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				if (alert || (mSettings->mAnybusStatusIndexing == true))
 				{
-					SNPRINTF(tabText, sizeof(tabText), "Anybus Status : (%s)", str);
+					SNPRINTF(tabText, sizeof(tabText), "Anybus Status: (%s)", str);
 					TableBuilder(true, tabText, alert);
 				}
 				return;
 			}
 			else if ((frame.mType == e_ABCC_MISO_RD_MSG_SUBFIELD_size) && IS_MISO_FRAME(frame))
 			{
-				TableBuilder(false, "Message Size : Exceeds Maximum", true);
+				TableBuilder(false, "Message Size: Exceeds Maximum", true);
 				return;
 			}
 			else if ((frame.mType == e_ABCC_MOSI_WR_MSG_SUBFIELD_size) && IS_MOSI_FRAME(frame))
 			{
-				TableBuilder(true, "Message Size : Exceeds Maximum", true);
+				TableBuilder(true, "Message Size: Exceeds Maximum", true);
 				return;
 			}
 		}
@@ -1334,26 +1334,26 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		switch(mSettings->mTimestampIndexing)
 		{
 		case e_TIMESTAMP_ALL_PACKETS:
-			SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
-			AddTabularText("Time : ", str);
-			SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
+			SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
+			AddTabularText("Time: ", str);
+			SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
 			AddTabularText(str);
 			break;
 		case e_TIMESTAMP_WRITE_PROCESS_DATA_VALID:
 			if (((tNetworkTimeInfo*)&frame.mData2)->wrPdValid)
 			{
-				SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
-				AddTabularText("Time : ", str);
-				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
+				SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
+				AddTabularText("Time: ", str);
+				SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
 				AddTabularText(str);
 			}
 			break;
 		case e_TIMESTAMP_NEW_READ_PROCESS_DATA:
 			if (((tNetworkTimeInfo*)&frame.mData2)->newRdPd)
 			{
-				SNPRINTF(str, sizeof(str), "0x%08X (Delta : 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
-				AddTabularText("Time : ", str);
-				SNPRINTF(str, sizeof(str), "Packet : 0x%016llX", packetId);
+				SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
+				AddTabularText("Time: ", str);
+				SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
 				AddTabularText(str);
 			}
 			break;
@@ -1373,11 +1373,11 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
-					AddTabularText("!Application Status : (", str, ")");
+					AddTabularText("!Application Status: ", str);
 				}
 				else
 				{
-					AddTabularText("Application Status : (", str, ")");
+					AddTabularText("Application Status: ", str);
 				}
 				return;
 			}
@@ -1392,11 +1392,11 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			{
 				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
 				{
-					AddTabularText("!Anybus Status : (", str, ")");
+					AddTabularText("!Anybus Status: ", str);
 				}
 				else
 				{
-					AddTabularText("Anybus Status : (", str, ")");
+					AddTabularText("Anybus Status: ", str);
 				}
 				return;
 			}
