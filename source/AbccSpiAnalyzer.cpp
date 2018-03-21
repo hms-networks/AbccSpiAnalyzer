@@ -881,9 +881,12 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 
 				mMisoVars.fErrorRsp = false;
 			}
 		}
+		/* Store the object code in frame data to handle object specific data */
+		resultFrame.mData2 = ((U64)mMisoVars.sMsgHeader.obj) << (8 * sizeof(U32));
+
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		resultFrame.mData2 = (U64)mMisoVars.dwMdCnt;
+		resultFrame.mData2 |= (U64)mMisoVars.dwMdCnt;
 		mMisoVars.dwMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
 		if (mMisoVars.dwMdCnt > mMisoVars.wMdSize)
@@ -1082,6 +1085,7 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 
 				mMosiVars.fErrorRsp = false;
 			}
 		}
+		/* Store the object code in frame data to handle object specific data */
 		resultFrame.mData2 = ((U64)mMosiVars.sMsgHeader.obj) << (8 * sizeof(U32));
 
 		/* Add a byte counter that can be displayed
