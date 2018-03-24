@@ -860,16 +860,18 @@ static const tValueName asEmeInstAttrNames[] =
 
 static const tValueName asEplInstAttrNames[] =
 {
-	{ ABP_EPL_IA_VENDOR_ID,		"Vendor ID",						false },
-	{ ABP_EPL_IA_PRODUCT_CODE,	"Product Code",						false },
-	{ ABP_EPL_IA_MAJOR_REV,		"Revision High Word",				false },
-	{ ABP_EPL_IA_MINOR_REV,		"Revision Low Word",				false },
-	{ ABP_EPL_IA_SERIAL_NUMBER,	"Serial Number",					false },
-	{ ABP_EPL_IA_MANF_DEV_NAME,	"Manufacturer Device Name",			false },
-	{ ABP_EPL_IA_MANF_HW_VER,	"Manufacturer Hardware Version",	false },
-	{ ABP_EPL_IA_MANF_SW_VER,	"Manufacturer Software Version",	false },
-	{ ABP_EPL_IA_DEVICE_TYPE,	"Device Type",						false },
-	{ ABP_EPL_IA_MANF_NAME,		"Manufacturer Name",				false }
+	{ ABP_EPL_IA_VENDOR_ID,			"Vendor ID",						false },
+	{ ABP_EPL_IA_PRODUCT_CODE,		"Product Code",						false },
+	{ ABP_EPL_IA_MAJOR_REV,			"Revision High Word",				false },
+	{ ABP_EPL_IA_MINOR_REV,			"Revision Low Word",				false },
+	{ ABP_EPL_IA_SERIAL_NUMBER,		"Serial Number",					false },
+	{ ABP_EPL_IA_MANF_DEV_NAME,		"Manufacturer Device Name",			false },
+	{ ABP_EPL_IA_MANF_HW_VER,		"Manufacturer Hardware Version",	false },
+	{ ABP_EPL_IA_MANF_SW_VER,		"Manufacturer Software Version",	false },
+	{ ABP_EPL_IA_DEVICE_TYPE,		"Device Type",						false },
+	{ ABP_EPL_IA_MANF_NAME,			"Manufacturer Name",				false },
+	{ ABP_EPL_ENABLE_IT_FUNC,		"Enable IT Functionality",			false },
+	{ ABP_EPL_SDO_IT_FRAME_RATIO,	"SDO IT Frame Ratio",				false },
 };
 
 static const tValueName asErInstAttrNames[] =
