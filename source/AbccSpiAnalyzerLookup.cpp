@@ -289,34 +289,34 @@ static const tValueName asObjectNames[] =
 /* Specified in same order as ABP.h */
 const U8 abNetworkTypeValue[] =
 {
-    0x00, /* Unspecified */
-    0x01, /* PROFIBUS DP-V0 */
-    0x05, /* PROFIBUS DP-V1 */
-    0x20, /* CANopen */
-    0x25, /* DeviceNet */
-    0x45, /* Modbus-RTU */
-    0x65, /* ControlNet */
-    0x80, /* Modbus-TCP */
-    0x84, /* PROFINET RT */
-    0x85, /* EtherNet/IP */
-    0x87, /* EtherCAT */
-    0x89, /* PROFINET IRT */
-    0x90, /* CC-Link */
-    0x93, /* Modbus-TCP 2-Port */
-    0x95, /* CompoNet */
-    0x96, /* PROFINET RT 2-port */
-    0x98, /* SERCOS III */
-    0x99, /* BACnet MS/TP */
-    0x9A, /* BACnet/IP */
-    0x9B, /* EtherNet/IP 2-Port BB DLR */
-    0x9C, /* EtherNet/IP 2-Port */
-    0x9D, /* PROFINET IRT FO */
-    0x9F, /* POWERLINK */
-    0x9E, /* CC-Link IE Field Network */
-    0xA3, /* Common Ethernet */
-    0xAB, /* EtherNet/IP IIoT */
-    0xAD, /* PROFINET IRT IIoT */
-    0xAE  /* PROFINET IRT FO IIoT */
+	0x00,						/* Unspecified */
+	ABP_NW_TYPE_PDPV0,			/* PROFIBUS DP-V0 */
+	ABP_NW_TYPE_PDPV1,			/* PROFIBUS DP-V1 */
+	ABP_NW_TYPE_COP,			/* CANopen */
+	ABP_NW_TYPE_DEV,			/* DeviceNet */
+	ABP_NW_TYPE_RTU,			/* Modbus-RTU */
+	ABP_NW_TYPE_CNT,			/* ControlNet */
+	ABP_NW_TYPE_ETN_1P,			/* Modbus-TCP */
+	ABP_NW_TYPE_PRT,			/* PROFINET RT */
+	ABP_NW_TYPE_EIP_1P,			/* EtherNet/IP */
+	ABP_NW_TYPE_ECT,			/* EtherCAT */
+	ABP_NW_TYPE_PIR,			/* PROFINET IRT */
+	ABP_NW_TYPE_CCL,			/* CC-Link */
+	ABP_NW_TYPE_ETN_2P,			/* Modbus-TCP 2-Port */
+	ABP_NW_TYPE_CPN,			/* CompoNet */
+	ABP_NW_TYPE_PRT_2P,			/* PROFINET RT 2-port */
+	ABP_NW_TYPE_SRC3,			/* SERCOS III */
+	ABP_NW_TYPE_BMP,			/* BACnet MS/TP */
+	ABP_NW_TYPE_BIP,			/* BACnet/IP */
+	ABP_NW_TYPE_EIP_2P_BB,		/* EtherNet/IP 2-Port BB DLR */
+	ABP_NW_TYPE_EIP_2P,			/* EtherNet/IP 2-Port */
+	ABP_NW_TYPE_PIR_FO,			/* PROFINET IRT FO */
+	ABP_NW_TYPE_EPL,			/* POWERLINK */
+	ABP_NW_TYPE_CFN,			/* CC-Link IE Field Network */
+	ABP_NW_TYPE_CET,			/* Common Ethernet */
+	ABP_NW_TYPE_EIP_2P_BB_IIOT,	/* EtherNet/IP IIoT */
+	ABP_NW_TYPE_PIR_IIOT,		/* PROFINET IRT IIoT */
+	ABP_NW_TYPE_PIR_FO_IIOT		/* PROFINET IRT FO IIoT */
 };
 
 /*******************************************************************************
