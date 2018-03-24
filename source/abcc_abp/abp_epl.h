@@ -59,10 +59,10 @@
 #define ABP_EPL_IA_MANF_DEV_NAME          6
 #define ABP_EPL_IA_MANF_HW_VER            7
 #define ABP_EPL_IA_MANF_SW_VER            8
-
 #define ABP_EPL_IA_DEVICE_TYPE            10
-
 #define ABP_EPL_IA_MANF_NAME              14
+#define ABP_EPL_ENABLE_IT_FUNC            17
+#define ABP_EPL_SDO_IT_FRAME_RATIO        19
 
 
 /*------------------------------------------------------------------------------
@@ -82,9 +82,10 @@
 #define ABP_EPL_IA_MANF_DEV_NAME_MAX_DS   ( ABP_CHAR_SIZEOF * ABP_EPL_CFG_STR_LEN )
 #define ABP_EPL_IA_MANF_HW_VER_MAX_DS     ( ABP_CHAR_SIZEOF * ABP_EPL_CFG_STR_LEN )
 #define ABP_EPL_IA_MANF_SW_VER_MAX_DS     ( ABP_CHAR_SIZEOF * ABP_EPL_CFG_STR_LEN )
-
 #define ABP_EPL_IA_DEVICE_TYPE_DS         ABP_UINT32_SIZEOF
 #define ABP_EPL_IA_MANF_NAME_MAX_DS       ( ABP_CHAR_SIZEOF * ABP_EPL_CFG_STR_LEN )
+#define ABP_EPL_ENABLE_IT_FUNC_DS         ABP_BOOL_SIZEOF
+#define ABP_EPL_SDO_IT_FRAME_RATIO_DS     ABP_UINT8_SIZEOF
 
 /*******************************************************************************
 **
@@ -102,6 +103,7 @@
 */
 
 #define ABP_EPL_NW_EXCPT_GET_INST_NUMBERS_ERROR      7
+#define ABP_EPL_NW_EXCPT_NO_MAC_ADDR                 8
 
 
 /*******************************************************************************

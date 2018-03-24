@@ -38,7 +38,13 @@
 ** The data size of the OPC UA instance attributes
 **------------------------------------------------------------------------------
 */
-#define ABP_OPCUA_IA_MODEL_DS                ( ABP_UINT8_SIZEOF )
+#define ABP_OPCUA_IA_MODEL_DS                    ( ABP_UINT8_SIZEOF )
+#define ABP_OPCUA_IA_APPLICATION_URI_MAX_DS      ( 128 * ABP_CHAR_SIZEOF )
+#define ABP_OPCUA_IA_VENDOR_NAMESPACE_URI_MAX_DS ( 128 * ABP_CHAR_SIZEOF )
+#define ABP_OPCUA_IA_DEVICE_TYPE_NAME_MAX_DS     ( 64 * ABP_CHAR_SIZEOF )
+#define ABP_OPCUA_IA_DEVICE_INST_NAME_MAX_DS     ( 64 * ABP_CHAR_SIZEOF )
+#define ABP_OPCUA_IA_PRODUCT_URI_MAX_DS          ( 128 * ABP_CHAR_SIZEOF )
+
 
 /*------------------------------------------------------------------------------
 ** Values of Model attribute
