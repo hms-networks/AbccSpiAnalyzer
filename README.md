@@ -113,6 +113,8 @@ software installation in the "Analyzers" folder.
 For complete details regarding this plugin's functionality please consult the
 [Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_QSG.pdf) included in this repository's documentation folder.
 
+For details on the Logic SDK's API please refer to the Saleae's [Protocol Analyzer SDK](https://support.saleae.com/hc/en-us/articles/115005987726-Protocol-Analyzer-SDK) page.
+
 ## [Changelog](#table-of-contents)
 
 Please see [CHANGELOG.md](CHANGELOG.md) provided within this repository for details on the changelog history.
