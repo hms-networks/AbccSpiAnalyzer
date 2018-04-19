@@ -907,7 +907,9 @@ static const tValueName asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							false },
 	{ ABP_ECT_IA_COMP_IDENT_LISTS,		"Compare Identity Lists",					false },
 	{ ABP_ECT_IA_FSOE_STATUS_IND,		"FSoE Status Indication",					false },
-	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					false }
+	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					false },
+	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							false },
+	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							false }
 };
 
 static const tValueName asEtnInstAttrNames[] =
