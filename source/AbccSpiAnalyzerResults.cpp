@@ -1731,7 +1731,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					if (mSettings->mMessageIndexingVerbosityLevel == e_VERBOSITY_LEVEL_DETAILED)
 					{
-						bool alert = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[ABCC_MOSI_CHANNEL], sizeof(str), display_base);
+						bool alert = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[0], sizeof(str), display_base);
 						if ((fMsgErrorRsp[ABCC_MOSI_CHANNEL] == true) || (alert == true))
 						{
 							if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
