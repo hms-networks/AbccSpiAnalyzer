@@ -63,7 +63,8 @@ protocol.
   * Ubuntu 12.04.2+
   * Mac OSX 10.7 Lion+
 * USB 2.0 or 3.0 port
-  * Using the Saleae Logic on a dedicated USB controller is recommended for ensuring the best sampling performance of the hardware will be possible.
+  * Using the Saleae Logic on a dedicated USB controller is recommended for
+  ensuring the best sampling performance of the hardware will be possible.
 
 ## [Installation](#table-of-contents)
 
@@ -73,12 +74,26 @@ To compile the project please ensure the **additional** requirements are met:
 
 * Visual Studio 2012 or later *(retargetting project may be necessary)*
 
-When compiling the project, please ensure that the correct library is linked
-for your Windows OS.
+> NOTE: **Express** or **Community** versions of Visual Studio may require
+additional steps to replace occurances of `#include "afxres.h"` with `#include "windows.h"`.
 
-* If you are using **Win64**, specify `Analyzer64.lib` in your linker input.
+When compiling the project, please ensure that the correct library is linked
+for your Windows OS. The VS solutions provided are setup with the expectation
+that the host system will be x64. The solutions are also setup for batch build
+such that an x64 system can compile all supported build configurations with
+one request. To access this, right-click the **Solution 'AbccSpiAnalyzer'** item
+in the **Solution Explorer** subwindow to access the context emnu and select
+**Batch Build...**.
+
+#### Custom Visual Studio Projects
+
+If you decide to make your own Visual Studio project (perhaps to use some other
+version), ensure that you configure the linker to correctly select the proper
+library
+
+* If you are using **Win64**, specify `./sdk/release/Analyzer64.lib` in your linker input.
   * The configuration manager has this setup as x64.
-* If you are using **Win32**, specify `Analyzer.lib` in your linker input.
+* If you are using **Win32**, specify `./sdk/release/Analyzer.lib` in your linker input.
   * The configuration manager has this setup as Win32.
 
 Once compiled, a file called `AbccSpiAnalyzer.dll` or `AbccSpiAnalyzer64.dll`
@@ -94,6 +109,7 @@ other protocol analyzers are added to the Logic software.
 
 * To compile simply run the `build_analyzer.py` python script. This script will
   compile the appropriate shared object library based on the host system.
+> DEPENDANCIES: **Python**, **G++**
 
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`
 will reside in the either `./plugins/Linux/` or `./plugins/Linux64` folder,
@@ -103,6 +119,7 @@ installation in the "Analyzers" folder.
 ### [OS X](#table-of-contents)
 
 * To compile simply run the `build_analyzer.py` python script.
+> DEPENDANCIES: **Python**, **G++**
 
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside
 in the `./plugins/OSX/` folder. Copy this dynamic object to your Saleae Logic
