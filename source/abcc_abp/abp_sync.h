@@ -1,6 +1,6 @@
 /*******************************************************************************
 ********************************************************************************
-** COPYRIGHT NOTIFICATION (c) 2014 HMS Industrial Networks AB                 **
+** COPYRIGHT NOTIFICATION (c) 2018 HMS Industrial Networks AB                 **
 **                                                                            **
 ** This code is the property of HMS Industrial Networks AB.                   **
 ** The source code may not be reproduced, distributed, or used without        **
@@ -16,7 +16,7 @@
 ********************************************************************************
 ********************************************************************************
 ** This file contains Sync Object specific definitions used by
-** ABCC modules as well as applications designed to use the Sync Object..
+** ABCC modules as well as applications designed to use the Sync Object.
 ********************************************************************************
 ********************************************************************************
 */
@@ -38,10 +38,10 @@
 #define ABP_SYNC_IA_MIN_CYCLE_TIME           6    /* Min cycle time */
 #define ABP_SYNC_IA_SYNC_MODE                7    /* Sync mode */
 #define ABP_SYNC_IA_SUPPORTED_SYNC_MODES     8    /* Supported sync modes */
+#define ABP_SYNC_IA_CONTROL_CYCLE_FACTOR     9    /* Control task cycle factor */
 
 /*------------------------------------------------------------------------------
-** The data size of the sync object specific instance attributes
-** (in bytes).
+** The data size of the Sync Object specific instance attributes (in bytes).
 **------------------------------------------------------------------------------
 */
 #define ABP_SYNC_IA_CYCLE_TIME_DS            ABP_UINT32_SIZEOF
@@ -52,5 +52,6 @@
 #define ABP_SYNC_IA_MIN_CYCLE_TIME_DS        ABP_UINT32_SIZEOF
 #define ABP_SYNC_IA_SYNC_MODE_DS             ABP_UINT16_SIZEOF
 #define ABP_SYNC_IA_SUPPORTED_SYNC_MODES_DS  ABP_UINT16_SIZEOF
+#define ABP_SYNC_IA_CONTROL_CYCLE_FACTOR_DS  ABP_UINT16_SIZEOF
 
 #endif  /* inclusion lock */

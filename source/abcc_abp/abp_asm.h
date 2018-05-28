@@ -51,6 +51,7 @@
 */
 #define ABP_ASM_IA_DESCRIPTOR               1    /* Descriptor                */
 #define ABP_ASM_IA_ADI_MAP_XX               2    /* Attributes 2-12 are valid */
+#define ABP_ASM_IA_NAME                     13   /* Name                      */
 
 /*------------------------------------------------------------------------------
 ** The data size of the Assembly Mapping object specific instance attributes
@@ -58,6 +59,21 @@
 **------------------------------------------------------------------------------
 */
 #define ABP_ASM_IA_DESCRIPTOR_DS                   ABP_UINT32_SIZEOF
+
+/*------------------------------------------------------------------------------
+** Descriptor instance attribute specific defines.
+**------------------------------------------------------------------------------
+*/
+#define ABP_ASM_IA_DESC_WRITE               0x00000000
+#define ABP_ASM_IA_DESC_READ                0x00000001
+#define ABP_ASM_IA_DESC_STATIC              0x00000000
+#define ABP_ASM_IA_DESC_DYNAMIC             0x00000002
+#define ABP_ASM_IA_DESC_PD_MAPPABLE         0x00000000
+#define ABP_ASM_IA_DESC_NON_PD_MAPPABLE     0x00000004
+
+#define ABP_ASM_IA_DESC_WRITE_READ_MASK     0x00000001
+#define ABP_ASM_IA_DESC_STATIC_DYNAMIC_MASK 0x00000002
+#define ABP_ASM_IA_DESC_PD_MAPPABLE_MASK    0x00000004
 
 /*------------------------------------------------------------------------------
 ** The Assembly Mapping object specific message commands.

@@ -45,6 +45,7 @@
 #include "abcc_abp/abp_fusm.h"
 #include "abcc_abp/abp_mdd.h"
 #include "abcc_abp/abp_mod.h"
+#include "abcc_abp/abp_mqtt.h"
 #include "abcc_abp/abp_nwccl.h"
 #include "abcc_abp/abp_nwcfn.h"
 #include "abcc_abp/abp_nwdpv1.h"
@@ -255,6 +256,7 @@ static const tValueName asObjectNames[] =
 	**--------------------------------------------------------------------------
 	*/
 	{ 0x80,					"Host Application Specific",			false }, /* No abp define exists yet */
+	{ ABP_OBJ_NUM_MQTT,		"MQTT",									false },
 	{ ABP_OBJ_NUM_OPCUA,	"OPC Unified Architecture",				false },
 	{ ABP_OBJ_NUM_EME,		"Energy Measurement",					false },
 	{ ABP_OBJ_NUM_PNAM,		"PROFINET Asset Management",			false },
@@ -596,7 +598,8 @@ static const tValueName asAsmInstAttrNames[] =
 	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			false },
 	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			false },
 	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			false },
-	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false }
+	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			false },
+	{ ABP_ASM_IA_NAME,				"Assembly Name",		false }
 };
 
 static const tValueName asBacInstAttrNames[] =
@@ -1057,6 +1060,12 @@ static const tValueName asNwPnioInstAttrNames[] =
 	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		false }
 };
 
+static const tValueName asMqttInstAttrNames[] =
+{
+	{ ABP_MQTT_IA_MODE,			"Mode",				false },
+	{ APB_MQTT_IA_LAST_WILL,	"Last Will",		false }
+};
+
 static const tValueName asOpcuaInstAttrNames[] =
 {
 	{ ABP_OPCUA_IA_MODEL,					"Model",				false },
@@ -1176,14 +1185,15 @@ static const tValueName asSrc3InstAttrNames[] =
 
 static const tValueName asSyncInstAttrNames[] =
 {
-	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",				false },
-	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",				false },
-	{ ABP_SYNC_IA_INPUT_CAPTURE,		"Input Capture",			false },
-	{ ABP_SYNC_IA_OUTPUT_PROCESSING,	"Output Processing Time",	false },
-	{ ABP_SYNC_IA_INPUT_PROCESSING,		"Input Processing Time",	false },
-	{ ABP_SYNC_IA_MIN_CYCLE_TIME,		"Minimum Cycle Time",		false },
-	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",				false },
-	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",		false }
+	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",					false },
+	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",					false },
+	{ ABP_SYNC_IA_INPUT_CAPTURE,		"Input Capture",				false },
+	{ ABP_SYNC_IA_OUTPUT_PROCESSING,	"Output Processing Time",		false },
+	{ ABP_SYNC_IA_INPUT_PROCESSING,		"Input Processing Time",		false },
+	{ ABP_SYNC_IA_MIN_CYCLE_TIME,		"Minimum Cycle Time",			false },
+	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",					false },
+	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",			false },
+	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	false },
 };
 
 /*******************************************************************************
@@ -1219,7 +1229,8 @@ static const tValueName asAppCmdNames[] =
 {
 	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			false },
 	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	false },
-	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false }
+	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			false },
+	{ ABP_APP_CMD_GET_DATA_NOTIF,		"Get_Data_Notification",	false }
 };
 
 static const tValueName asAppdCmdNames[] =
@@ -1346,6 +1357,11 @@ static const tValueName asModCmdNames[] =
 	{ ABP_MOD_CMD_PROCESS_MODBUS_MESSAGE,	"Process_Modbus_Message",	false }
 };
 
+static const tValueName asMqttCmdNames[] =
+{
+	{ ABP_MQTT_CMD_GET_PUBLISH_CONFIGURATION,	"Get_Publish_Configuration",	false }
+};
+
 static const tValueName asNwCmdNames[] =
 {
 	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		false },
@@ -1439,7 +1455,8 @@ static const tValueName asErrorRspNames[] =
 	{ ABP_ERR_MSG_CHANNEL_TOO_SMALL,			"Response does not fit",							true },
 	{ ABP_ERR_GENERAL_ERROR,					"General error",									true },
 	{ ABP_ERR_PROTECTED_ACCESS,					"Protected access",									true },
-	{ 0xFF,										"Object specific error",							true }
+	{ ABP_ERR_DATA_NOT_AVAILABLE,				"Data not available",								true },
+	{ ABP_ERR_OBJ_SPECIFIC,						"Object specific error",							true }
 };
 
 /*******************************************************************************
@@ -2201,6 +2218,11 @@ bool GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase displa
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
 				&asMddCmdNames[0], NUM_ENTRIES(asMddCmdNames), display_base);
 			break;
+		case ABP_OBJ_NUM_MQTT:
+			/* MQTT */
+			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
+				&asMqttCmdNames[0], NUM_ENTRIES(asMqttCmdNames), display_base);
+			break;
 		case ABP_OBJ_NUM_PNIO:
 			/* PROFINET IO Object */
 			alert = GetObjSpecificCmdString(cmd, strBuffer, sizeof(strBuffer),
@@ -2570,6 +2592,11 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, bool i
 		/* OPC Unified Architecture */
 		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 			NULL, 0, &asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
+		break;
+	case ABP_OBJ_NUM_MQTT:
+		/* MQTT */
+		*pAlert = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
+			NULL, 0, &asMqttInstAttrNames[0], NUM_ENTRIES(asMqttInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SRC3:
 		/* SERCOS III */
