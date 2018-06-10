@@ -49,8 +49,10 @@ END
 // Version
 //
 
+#include "../../source/AbccSpiMetadata.h"
+
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2018,1,9,1
+ FILEVERSION ABCC_SPI_METADATA_FILEVERSION_RAW
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -65,15 +67,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "HMS Industrial Networks, Inc."
-            VALUE "FileDescription", "Anybus CompactCom SPI Protocol Analyzer for Saleae Logic"
-            //VALUE "FileVersion", "1.0"
-            VALUE "InternalName", "AbccSpiAnalyzer"
-            VALUE "LegalCopyright", "Copyright (C) 2015-2018 HMS Industrial Networks"
-            //VALUE "LegalTrademarks", "Anybus CompactCom"
-            VALUE "OriginalFilename", "AbccSpiAnalyzer.dll"
-            VALUE "ProductName", "ABCC SPI Protocol Analyzer"
-            VALUE "ProductVersion", "1.1.32"
+            VALUE METADATA_COMPANYNAME_KEY, ABCC_SPI_METADATA_COMPANYNAME
+            VALUE METADATA_FILEDESCRIPTION_KEY, ABCC_SPI_METADATA_FILEDESCRIPTION
+            //VALUE METADATA_FILEVERSION_KEY, "1.0"
+            VALUE METADATA_INTERNALNAME_KEY, ABCC_SPI_METADATA_INTERNALNAME
+            VALUE METADATA_LEGALCOPYRIGHT_KEY, ABCC_SPI_METADATA_LEGALCOPYRIGHT
+            //VALUE METADATA_LEGALTRADEMARKS_KEY, ABCC_SPI_METADATA_LEGALTRADEMARKS
+            VALUE METADATA_ORIGINALFILENAME_KEY, ABCC_SPI_METADATA_ORIGINALFILENAME
+            VALUE METADATA_PRODUCTNAME_KEY, ABCC_SPI_METADATA_PRODUCTNAME
+            VALUE METADATA_PRODUCTVERSION_KEY, ABCC_SPI_METADATA_PRODUCTVERSION
         END
     END
     BLOCK "VarFileInfo"

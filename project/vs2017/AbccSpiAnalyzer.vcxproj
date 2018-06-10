@@ -183,6 +183,7 @@
     <ClInclude Include="..\..\source\AbccSpiAnalyzerLookup.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerResults.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerSettings.h" />
+    <ClInclude Include="..\..\source\AbccSpiMetadata.h" />
     <ClInclude Include="..\..\source\AbccSpiSimulationDataGenerator.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
