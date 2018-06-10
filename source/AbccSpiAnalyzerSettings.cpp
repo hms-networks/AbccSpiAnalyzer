@@ -14,6 +14,9 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
+#include <cctype>
+#include <locale>
 
 #include "rapidxml-1.13/rapidxml.hpp"
 
@@ -33,6 +36,11 @@ static const bool d_ErrorIndexing                 = true;
 static const bool d_AnybusStatusIndexing          = true;
 static const bool d_ApplStatusIndexing            = true;
 static const char* d_AdvSettingsPath              = "";
+
+/* Forward declarations */
+static inline void TrimLeft(std::string &s);
+static inline void TrimRight(std::string &s);
+static inline void TrimString(std::string &s);
 
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
@@ -198,13 +206,20 @@ bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
 {
 	rapidxml::xml_document<> doc;
 	rapidxml::xml_node<> * root_node;
+	std::string trimmedPath(mAdvSettingsPath);
 	std::string type;
 	std::string value;
 
+	/*
+	** Trim the file path so that an entry with nothing
+	** but whitespace is ignored as a valid file path
+	*/
+	TrimString(trimmedPath);
+
 	/* Read the xml file into a vector */
-	if( strlen(mAdvSettingsPath) > 0 )
+	if( trimmedPath.length() > 0 )
 	{
-		std::ifstream filestream(mAdvSettingsPath);
+		std::ifstream filestream(trimmedPath);
 
 		if(!filestream)
 		{
@@ -446,4 +461,46 @@ U8 SpiAnalyzerSettings::SaveSettingChangeID( void )
 {
 	mChangeID++;
 	return mChangeID;
+}
+
+/*******************************************************************************
+** Static helper routines
+********************************************************************************
+*/
+
+/* Trim from start (in place) */
+static inline void TrimLeft(std::string &s)
+{
+	s.erase(
+		s.begin(),
+		std::find_if(
+			s.begin(),
+			s.end(),
+			[](int ch) {
+				return !std::isspace(ch);
+			}
+		)
+	);
+}
+
+/* Trim from end (in place) */
+static inline void TrimRight(std::string &s)
+{
+	s.erase(
+		std::find_if(
+			s.rbegin(),
+			s.rend(),
+			[](int ch) {
+				return !std::isspace(ch);
+			}
+		).base(),
+		s.end()
+	);
+}
+
+/* Trim from both ends (in place) */
+static inline void TrimString(std::string &s)
+{
+	TrimLeft(s);
+	TrimRight(s);
 }
