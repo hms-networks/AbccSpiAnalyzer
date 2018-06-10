@@ -45,7 +45,8 @@ enum class ErrorEvent
 **   - ANB_STS: signals a Anybus status changed event
 **   - SPI_STS: signals a toggle error (retransmission event)
 **   - APP_STS: signals an application status changed event
-**   - MSG_CMD: signals an error response message
+**   - MD_SIZE: signals that the value in this field is out-of-spec
+**   - CMD/RSP: signals an error response message
 **   - CRC32: signals a checksum error */
 #define SPI_PROTO_EVENT_FLAG				( 1 << 5 )
 
