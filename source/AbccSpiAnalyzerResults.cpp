@@ -1800,36 +1800,39 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 	if ((frame.mType == e_ABCC_MISO_NET_TIME) && IS_MISO_FRAME(frame))
 	{
+		bool addEntry = false;
+
 		switch(mSettings->mTimestampIndexing)
 		{
 		case e_TIMESTAMP_ALL_PACKETS:
-			SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, (U32)frame.mData2);
-			AddTabularText("Time: ", str);
-			SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
-			AddTabularText(str);
+			addEntry = true;
 			break;
 		case e_TIMESTAMP_WRITE_PROCESS_DATA_VALID:
 			if (((tNetworkTimeInfo*)&frame.mData2)->wrPdValid)
 			{
-				SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
-				AddTabularText("Time: ", str);
-				SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
-				AddTabularText(str);
+				addEntry = true;
 			}
 			break;
 		case e_TIMESTAMP_NEW_READ_PROCESS_DATA:
 			if (((tNetworkTimeInfo*)&frame.mData2)->newRdPd)
 			{
-				SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, ((tNetworkTimeInfo*)&frame.mData2)->deltaTime);
-				AddTabularText("Time: ", str);
-				SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
-				AddTabularText(str);
+				addEntry = true;
 			}
 			break;
 		default:
 		case e_TIMESTAMP_DISABLED:
 			break;
 		}
+
+		if (addEntry)
+		{
+			U32 delta = ((tNetworkTimeInfo*)&frame.mData2)->deltaTime;
+			SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, delta);
+			AddTabularText("Time: ", str);
+			SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
+			AddTabularText(str);
+		}
+
 		return;
 	}
 
