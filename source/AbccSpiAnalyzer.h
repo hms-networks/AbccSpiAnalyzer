@@ -203,6 +203,7 @@ typedef struct tMosiVars
 	U32 dwPdLen;
 	U32 dwPdCnt;
 	U32 dwMsgLen;
+	U32 dwMsgLenCnt;
 	U32 dwByteCnt;
 	U8 bByteCnt2;
 	U32 dwMdCnt;
@@ -231,6 +232,7 @@ typedef struct tMisoVars
 	U32 dwPdLen;
 	U32 dwPdCnt;
 	U32 dwMsgLen;
+	U32 dwMsgLenCnt;
 	U32 dwByteCnt;
 	U8 bByteCnt2;
 	U32 dwMdCnt;
@@ -301,6 +303,7 @@ protected: /* functions */
 	bool RunAbccMosiMsgSubStateMachine(bool reset_state, bool* add_frame_ptr, tAbccMosiStates* e_msg_substate_ptr);
 
 	bool Is3WireIdleCondition(float idle_time_condition);
+	void RestorePreviousStateVars();
 
 
 #pragma warning( push )
@@ -322,6 +325,11 @@ protected: /* variables */
 
 	tMosiVars mMosiVars;
 	tMisoVars mMisoVars;
+
+	/* Backup variables to recover from error cases
+	** that require knowledge of the last valid state */
+	tMosiVars mPreviousMosiVars;
+	tMisoVars mPreviousMisoVars;
 
 	bool mSimulationInitialized;
 

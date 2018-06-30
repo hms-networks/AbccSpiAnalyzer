@@ -56,8 +56,10 @@ SpiAnalyzer::SpiAnalyzer()
 	mMosiVars.bLastApplSts        = 0xFF;
 	mMosiVars.bLastToggleState    = 0xFF;
 	mMosiVars.dwMsgLen            = 0;
+	mMosiVars.dwMsgLenCnt         = 0;
 	mMosiVars.dwPdLen             = 0;
 	mMisoVars.dwMsgLen            = 0;
+	mMisoVars.dwMsgLenCnt         = 0;
 	mMisoVars.dwPdLen             = 0;
 
 	mMisoVars.fNewMsg             = false;
@@ -789,6 +791,7 @@ void SpiAnalyzer::AddFragFrame(bool is_mosi_channel, U64 first_sample, U64 last_
 	errorFrame.mData1 = 0;
 	errorFrame.mType = e_ABCC_SPI_ERROR_FRAGMENTATION;
 	errorFrame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+
 	if (is_mosi_channel)
 	{
 		errorFrame.mFlags |= SPI_MOSI_FLAG;
@@ -805,7 +808,10 @@ void SpiAnalyzer::AddFragFrame(bool is_mosi_channel, U64 first_sample, U64 last_
 			mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
 		}
 	}
+
 	mResults->AddFrame(errorFrame);
+
+	RestorePreviousStateVars();
 }
 
 void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 frames_first_sample)
@@ -930,9 +936,6 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 
 		{
 			/* CRC Error */
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			mMisoVars.fFirstFrag = false;
-			mMisoVars.fLastFrag = false;
-			mMisoVars.fFragmentation = false;
 		}
 	}
 
@@ -967,22 +970,18 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 
 		}
 	}
 
-	/* Commit the processed frame */
-	mResults->AddFrame(resultFrame);
-	mResults->CommitResults();
-
 	if (e_state == e_ABCC_MISO_CRC32)
 	{
 		if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 		{
-			if (e_state == e_ABCC_MISO_CRC32)
-			{
-				SetMisoPacketType(e_CHECKSUM_ERROR_PACKET);
-			}
-			else
-			{
-				SetMisoPacketType(e_PROTOCOL_ERROR_PACKET);
-			}
+			SetMisoPacketType(e_CHECKSUM_ERROR_PACKET);
+			RestorePreviousStateVars();
+		}
+		else
+		{
+			/* Backup state variables for both MOSI and MISO */
+			memcpy(&mPreviousMisoVars, &mMisoVars, sizeof(tMisoVars));
+			memcpy(&mPreviousMosiVars, &mMosiVars, sizeof(tMosiVars));
 		}
 
 		if (mMisoVars.fNewMsg)
@@ -1008,6 +1007,18 @@ void SpiAnalyzer::ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 
 				}
 			}
 		}
+	}
+	else if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	{
+		SetMisoPacketType(e_PROTOCOL_ERROR_PACKET);
+	}
+
+	/* Commit the processed frame */
+	mResults->AddFrame(resultFrame);
+	mResults->CommitResults();
+
+	if(e_state == e_ABCC_MISO_CRC32)
+	{
 		SignalReadyForNewPacket(false);
 	}
 }
@@ -1128,9 +1139,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 
 		{
 			/* CRC Error */
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
-			mMosiVars.fFirstFrag = false;
-			mMosiVars.fLastFrag = false;
-			mMosiVars.fFragmentation = false;
 		}
 	}
 
@@ -1164,10 +1172,6 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 
 			}
 		}
 	}
-
-	/* Commit the processed frame */
-	mResults->AddFrame(resultFrame);
-	mResults->CommitResults();
 
 	if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
 	{
@@ -1206,6 +1210,14 @@ void SpiAnalyzer::ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 
 				}
 			}
 		}
+	}
+
+	/* Commit the processed frame */
+	mResults->AddFrame(resultFrame);
+	mResults->CommitResults();
+
+	if (e_state == e_ABCC_MOSI_PAD)
+	{
 		SignalReadyForNewPacket(true);
 	}
 }
@@ -1435,7 +1447,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool reset_state, bool acquisition_err
 		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
 			fAddFrame = true;
-			if (mMisoVars.dwMsgLen != 0)
+			if (mMisoVars.dwMsgLenCnt != 0)
 			{
 				mMisoVars.eState = e_ABCC_MISO_RD_MSG_FIELD;
 				if (mMisoVars.fNewMsg)
@@ -1469,7 +1481,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool reset_state, bool acquisition_err
 					mMisoVars.eState = e_ABCC_MISO_IDLE;
 				}
 			}
-			if (mMisoVars.dwMsgLen == 1)
+			if (mMisoVars.dwMsgLenCnt == 1)
 			{
 				if (mMisoVars.dwPdLen != 0)
 				{
@@ -1481,7 +1493,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(bool reset_state, bool acquisition_err
 				}
 			}
 			//fAddFrame = true;
-			mMisoVars.dwMsgLen--;
+			mMisoVars.dwMsgLenCnt--;
 		}
 		break;
 	case e_ABCC_MISO_RD_PD_FIELD:
@@ -1689,7 +1701,9 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool reset_state, bool acquisition_err
 		{
 			fAddFrame = true;
 			mMosiVars.dwMsgLen = (U32)mMosiVars.lFrameData * 2;
+			mMosiVars.dwMsgLenCnt = mMosiVars.dwMsgLen;
 			mMisoVars.dwMsgLen = mMosiVars.dwMsgLen;
+			mMisoVars.dwMsgLenCnt = mMosiVars.dwMsgLen;
 			mMosiVars.eState = e_ABCC_MOSI_PD_LEN;
 		}
 		break;
@@ -1713,7 +1727,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool reset_state, bool acquisition_err
 		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
 			fAddFrame = true;
-			if (mMosiVars.dwMsgLen != 0)
+			if (mMosiVars.dwMsgLenCnt != 0)
 			{
 				mMosiVars.eState = e_ABCC_MOSI_WR_MSG_FIELD;
 				if (mMosiVars.fNewMsg)
@@ -1747,7 +1761,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool reset_state, bool acquisition_err
 					mMosiVars.eState = e_ABCC_MOSI_IDLE;
 				}
 			}
-			if (mMosiVars.dwMsgLen == 1)
+			if (mMosiVars.dwMsgLenCnt == 1)
 			{
 				if (mMosiVars.dwPdLen != 0)
 				{
@@ -1758,7 +1772,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(bool reset_state, bool acquisition_err
 					mMosiVars.eState = e_ABCC_MOSI_CRC32;
 				}
 			}
-			mMosiVars.dwMsgLen--;
+			mMosiVars.dwMsgLenCnt--;
 		}
 		break;
 	case e_ABCC_MOSI_WR_PD_FIELD:
@@ -2068,4 +2082,20 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(bool reset_state, bool* add_fram
 	}
 
 	return true;
+}
+
+void SpiAnalyzer::RestorePreviousStateVars()
+{
+	/* In the event of an error packet that would otherwise result in a
+	** 'retransmit' event, this routine must be called to put the revelant
+	** state variable back to the last known 'good state' */
+	mMisoVars.dwMdCnt = mPreviousMisoVars.dwMdCnt;
+	mMisoVars.fFirstFrag = mPreviousMisoVars.fFirstFrag;
+	mMisoVars.fLastFrag = mPreviousMisoVars.fLastFrag;
+	mMisoVars.fFragmentation = mPreviousMisoVars.fFragmentation;
+
+	mMosiVars.dwMdCnt = mPreviousMosiVars.dwMdCnt;
+	mMosiVars.fFirstFrag = mPreviousMosiVars.fFirstFrag;
+	mMosiVars.fLastFrag = mPreviousMosiVars.fLastFrag;
+	mMosiVars.fFragmentation = mPreviousMosiVars.fFragmentation;
 }
