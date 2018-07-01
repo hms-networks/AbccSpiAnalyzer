@@ -466,7 +466,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					break;
 				case e_ABCC_MOSI_WR_MSG_FIELD:
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
-					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+					if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 					{
 						if (((U8)frame.mData2) == 0)
 						{
@@ -635,7 +635,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 					break;
 				case e_ABCC_MISO_RD_MSG_FIELD:
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
-					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+					if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 					{
 						if (((U8)frame.mData2) == 0)
 						{
@@ -1141,7 +1141,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 					case e_ABCC_MOSI_WR_MSG_FIELD:
 					{
-						if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 						{
 							if ((U32)frame.mData2 == 0)
 							{
