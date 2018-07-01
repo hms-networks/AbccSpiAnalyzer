@@ -24,7 +24,7 @@
 #include "AnalyzerHelpers.h"
 
 /* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION_STRING "REVISION_00000003"
+#define SETTINGS_REVISION_STRING "REVISION_00000004"
 
 /* Default setting states */
 static const U32  d_MessageIndexingVerbosityLevel = e_VERBOSITY_LEVEL_DETAILED;

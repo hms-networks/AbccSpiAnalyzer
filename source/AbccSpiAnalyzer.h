@@ -309,8 +309,8 @@ protected: /* functions */
 #pragma warning( push )
 #pragma warning( disable : 4251 ) //warning C4251: 'SerialAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
 protected: /* variables */
-	std::auto_ptr< SpiAnalyzerSettings > mSettings;
-	std::auto_ptr< SpiAnalyzerResults > mResults;
+	std::unique_ptr< SpiAnalyzerSettings > mSettings;
+	std::unique_ptr< SpiAnalyzerResults > mResults;
 
 	SpiSimulationDataGenerator mSimulationDataGenerator;
 

@@ -116,21 +116,21 @@ public:
 
 
 protected:
-	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mMosiChannelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mMisoChannelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mClockChannelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceChannel >	mEnableChannelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList >	mNetworkTypeInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMessageIndexingVerbosityLevelInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mMsgDataPriorityInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mProcessDataPriorityInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mIndexTimestampsInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexMessageSrcIdInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexErrorsInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexAnybusStatusInterface;
-	std::auto_ptr< AnalyzerSettingInterfaceBool > 		mIndexApplStatusInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceChannel >		mMosiChannelInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceChannel >		mMisoChannelInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceChannel >		mClockChannelInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceChannel >		mEnableChannelInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceNumberList >	mNetworkTypeInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceNumberList >	mMessageIndexingVerbosityLevelInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceNumberList >	mMsgDataPriorityInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceNumberList >	mProcessDataPriorityInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceNumberList >	mIndexTimestampsInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceBool >			mIndexMessageSrcIdInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceBool >			mIndexErrorsInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceBool >			mIndexAnybusStatusInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceBool >			mIndexApplStatusInterface;
 #if ENABLE_ADVANCED_SETTINGS
-	std::auto_ptr< AnalyzerSettingInterfaceText > 		mAdvancedSettingsInterface;
+	std::unique_ptr< AnalyzerSettingInterfaceText >			mAdvancedSettingsInterface;
 	bool ParseAdavancedSettingsFile( void );
 #endif
 };
