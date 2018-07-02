@@ -811,6 +811,7 @@ void SpiAnalyzer::AddFragFrame(bool is_mosi_channel, U64 first_sample, U64 last_
 
 	mResults->AddFrame(errorFrame);
 
+	SignalReadyForNewPacket(is_mosi_channel);
 	RestorePreviousStateVars();
 }
 
