@@ -13,10 +13,10 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 
 1. [Description](#description)
 2. [System Requirements](#system-requirements)
-3. [Installation](#installation)
+3. [Compile & Install](#compile-&-install)
     * [Windows](#windows)
-    * [Linux](#linux)
-    * [OS X](#os-x)
+    * [GNU/Linux](#gnulinux)
+    * [macOS](#macos)
 4. [Documentation](#documentation)
 5. [Changelog](#changelog)
 6. [Licenses](#licenses)
@@ -26,19 +26,20 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 ## [Description](#table-of-contents)
 
 This plugin in conjunction with the Saleae 'Logic' hardware and software provides
-an easy-to-use interface for analyzing bi-directional (full-duplex) ABCC SPI
-communication. This analyzer plugin parses SPI communication according to the
-ABCC SPI protocol. Each field within an SPI telegram is added as a multi-layered
-bubble-text within the Logic software. This means basic markup is displayed
-when zoomed-out and very detailed information when zoomed-in on the capture.
-By coupling this protocol analyzer with other physical signals from the target
-device (such as CAN, Serial, GPIO, etc.) this tool can help solve
-difficult-to-diagnose issues that arise during initial development efforts. In
-spirit, this plugin is intended as an educational tool that equips developers
-with an accessible interface into host and module communication following the
-SPI communication thus allowing them to observe the real world startup and
-operational behavior of a device communicating with the ABCC over the SPI
-protocol.
+an easy-to-use interface for analyzing bi-directional (full-duplex) Anybus
+CompactCom (ABCC) SPI protocol communication.
+
+Each field within an SPI packet is added as a multi-layered bubble-text
+within the Logic software. Basic markup is displayed when zoomed-out, while
+more detailed information is displayed when zoomed-in.
+
+The decoded results are indexed and searchable within the Logic software; and
+for even more detail, the user can export the message data or process data
+to a CSV file to be imported into Excel (or similar) for further analysis. This
+functionality makes it a fairly straight-forward task to extract file transfer
+data from ABCC object messaging, or to plot a waveform extracted from the
+process data data field with accurate local timestamp information and
+(if supported by the network) the network time information.
 
 ![Overview of Plugin](https://github.com/HMSAB/AbccSpiAnalyzer/wiki/overview.gif "Overview of Plugin")
 
@@ -66,24 +67,36 @@ protocol.
   * Using the Saleae Logic on a dedicated USB controller is recommended for
   ensuring the best sampling performance of the hardware will be possible.
 
-## [Installation](#table-of-contents)
+## [Compile & Install](#table-of-contents)
+
+While tagged releaves are provided which contain precompiled libraries and
+associated documentation, you may still opt to compile the libraries yourself.
 
 ### [Windows](#table-of-contents)
 
 To compile the project please ensure the **additional** requirements are met:
 
-* Visual Studio 2012 or later *(retargetting project may be necessary)*
+> DEPENDENCIES: **Visual Studio 2012** or later *(retargetting project may be necessary)*
 
 > NOTE: **Express** or **Community** versions of Visual Studio may require
-additional steps to replace occurances of `#include "afxres.h"` with `#include "windows.h"`.
+additional steps to replace occurrences of `#include "afxres.h"` with `#include "windows.h"`.
 
 When compiling the project, please ensure that the correct library is linked
 for your Windows OS. The VS solutions provided are setup with the expectation
 that the host system will be x64. The solutions are also setup for batch build
 such that an x64 system can compile all supported build configurations with
 one request. To access this, right-click the **Solution 'AbccSpiAnalyzer'** item
-in the **Solution Explorer** subwindow to access the context emnu and select
+in the **Solution Explorer** subwindow to access the context menu and select
 **Batch Build...**.
+
+#### Cross-compile for GNU/Linux Operating Systems
+
+Also included in the repository is a simple batch file that can be used to quickly
+launch an instance of Windows 10 WSL (Windows Subsystem for Linux) and then launch
+the build_analyzer.py script. This can be included as part of the post/pre-build
+process in a Visual Studio project to support automatic cross-compilation for
+GNU/Linux. This functionality requires the same set of dependencies documented below
+for GNU/Linux.
 
 #### Custom Visual Studio Projects
 
@@ -97,7 +110,7 @@ library
   * The configuration manager has this setup as Win32.
 
 Once compiled, a file called `AbccSpiAnalyzer.dll` or `AbccSpiAnalyzer64.dll`
-in the either ./plugins/Win32/ or ./plugins/Win64 folder, respectively. Copy
+in the either `./plugins/Win32/` or `./plugins/Win64` folder, respectively. Copy
 this DLL to your Saleae Logic software installation in the "Analyzers" folder:
 
 * Example: `C:\Program Files\Saleae LLC\Analyzers\AbccSpiAnalyzer.dll`
@@ -105,21 +118,21 @@ this DLL to your Saleae Logic software installation in the "Analyzers" folder:
 The analyzer is now ready to be used and can be found in the same way that
 other protocol analyzers are added to the Logic software.
 
-### [Linux](#table-of-contents)
+### [GNU/Linux](#table-of-contents)
 
 * To compile simply run the `build_analyzer.py` python script. This script will
   compile the appropriate shared object library based on the host system.
-> DEPENDANCIES: **Python**, **G++**
+> DEPENDENCIES: **Python**, **G++**
 
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`
 will reside in the either `./plugins/Linux/` or `./plugins/Linux64` folder,
 respectively. Copy this shared object to your Saleae Logic software
 installation in the "Analyzers" folder.
 
-### [OS X](#table-of-contents)
+### [macOS](#table-of-contents)
 
 * To compile simply run the `build_analyzer.py` python script.
-> DEPENDANCIES: **Python**, **G++**
+> DEPENDENCIES: **Python**, **G++**
 
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside
 in the `./plugins/OSX/` folder. Copy this dynamic object to your Saleae Logic
