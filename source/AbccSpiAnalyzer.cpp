@@ -550,8 +550,20 @@ U32 SpiAnalyzer::GenerateSimulationData(U64 minimum_sample_index, U32 device_sam
 
 U32 SpiAnalyzer::GetMinimumSampleRateHz()
 {
-	/* Use Logic's lowest supported sample rate */
-	return 10000;
+	if (IS_3WIRE_MODE())
+	{
+		/* In 3-wire mode, there is a requirement for the maximum time the
+		** clock can idle high during a transfer of 5us. This means the
+		** minimum SPI clock frequency supported in 3-wire mode is 100Khz.
+		** Nyquist rate means sampling above 200kHz is required,
+		** use 3x as the minimum supported option. */
+		return 300000;
+	}
+	else
+	{
+		/* In 4-wire mode, use Logic's lowest supported sample rate. */
+		return 10000;
+	}
 }
 
 const char* SpiAnalyzer::GetAnalyzerName() const
