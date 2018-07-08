@@ -12,6 +12,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "AbccSpiAnalyzerResults.h"
 #include "AnalyzerHelpers.h"
@@ -22,13 +23,24 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define IS_MISO_FRAME(frame) 			((frame.mFlags & SPI_MOSI_FLAG)!=SPI_MOSI_FLAG)
-#define IS_MOSI_FRAME(frame)			((frame.mFlags & SPI_MOSI_FLAG)==SPI_MOSI_FLAG)
+#define IS_MISO_FRAME(frame)	((frame.mFlags & SPI_MOSI_FLAG) != SPI_MOSI_FLAG)
+#define IS_MOSI_FRAME(frame)	((frame.mFlags & SPI_MOSI_FLAG) == SPI_MOSI_FLAG)
 
-#define MOSI_TAG_STR	"MOSI-"
-#define MISO_TAG_STR	"MISO-"
+#define MOSI_TAG_STR			"MOSI-"
+#define MISO_TAG_STR			"MISO-"
 
-#define CSV_DELIMITER	"\t"
+#define MOSI_STR				"MOSI"
+#define MISO_STR				"MISO"
+
+#define FIRST_FRAG_STR			"FIRST_FRAGMENT"
+#define FRAGMENT_STR			"FRAGMENT"
+#define LAST_FRAG_STR			"LAST_FRAGMENT"
+
+#define ERROR_RESPONSE_STR		" (ERR_RSP)"
+#define RESPONSE_STR			" (RSP)"
+#define COMMAND_STR				" (CMD)"
+
+#define CSV_DELIMITER			"\t"
 
 #ifdef _DEBUG
 /* Dummy macros, the old SDK does not support these */
@@ -735,17 +747,18 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase display_base)
 {
 	std::stringstream ss;
-	void* f = AnalyzerHelpers::StartFile(file);
+	void *f = AnalyzerHelpers::StartFile(file);
 
 	U64 triggerSample = mAnalyzer->GetTriggerSample();
 	U32 sampleRate = mAnalyzer->GetSampleRate();
 	U64 numFrames = GetNumFrames();
 
-	ss <<	"Channel" CSV_DELIMITER
-			"Time [s]" CSV_DELIMITER
-			"Packet ID" CSV_DELIMITER
-			"Frame Type" CSV_DELIMITER
-			"Frame Data" << std::endl;
+	ss << "Channel" CSV_DELIMITER
+		  "Time [s]" CSV_DELIMITER
+		  "Packet ID" CSV_DELIMITER
+		  "Frame Type" CSV_DELIMITER
+		  "Frame Data"
+	   << std::endl;
 
 	for (U32 i = 0; i < numFrames; i++)
 	{
@@ -764,12 +777,13 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 		{
 			if (IS_MOSI_FRAME(frame))
 			{
-				ss << "MOSI";
+				ss << MOSI_STR;
 			}
 			else
 			{
-				ss << "MISO";
+				ss << MISO_STR;
 			}
+
 			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), frameDataStr, sizeof(frameDataStr));
 		}
 
@@ -828,18 +842,85 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 	AnalyzerHelpers::EndFile(f);
 }
 
-void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase display_base)
+void SpiAnalyzerResults::AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event)
+{
+	ss_csv_head << CSV_DELIMITER;
+
+	switch (event)
+	{
+	case ErrorEvent::SpiFragmentationError:
+		ss_csv_head << "SPI_ERROR";
+		break;
+	case ErrorEvent::RetransmitWarning:
+		ss_csv_head << "RETRANSMIT";
+		break;
+	case ErrorEvent::CrcError:
+		ss_csv_head << "CRC_ERROR";
+		break;
+	case ErrorEvent::None:
+	default:
+		break;
+	}
+
+	AnalyzerHelpers::AppendToFile((U8*)ss_csv_head.str().c_str(), (U32)ss_csv_head.str().length(), file);
+	AnalyzerHelpers::AppendToFile((U8*)ss_csv_body.str().c_str(), (U32)ss_csv_body.str().length(), file);
+	AnalyzerHelpers::AppendToFile((U8*)ss_csv_tail.str().c_str(), (U32)ss_csv_tail.str().length(), file);
+}
+
+void SpiAnalyzerResults::AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str)
+{
+	std::string csvStr;
+
+	csvStr.assign(input_data_str);
+
+	ss_csv_data << CSV_DELIMITER;
+
+	if (csvStr.find('"') != std::string::npos)
+	{
+		/* Escape double-quotes */
+		for (std::string::size_type n = 0;
+			 (n = csvStr.find('"', n)) != std::string::npos;
+			 n += 2)
+		{
+			csvStr.replace(n, 1, "\"\"");
+		}
+
+		ss_csv_data << '"' << csvStr << '"';
+	}
+	else if (csvStr.find("COMMA") != std::string::npos)
+	{
+		/* Replace with comma-character and surround with double quotes */
+		ss_csv_data << "\",\"";
+	}
+	else if (csvStr.find("' '") != std::string::npos)
+	{
+		/* Replace with space-character */
+		ss_csv_data << ' ';
+	}
+	else
+	{
+		/* No escaping needed */
+		ss_csv_data << csvStr;
+	}
+}
+
+void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase display_base)
 {
 	std::stringstream ssMosiHead;
 	std::stringstream ssMisoHead;
 	std::stringstream ssMisoTail;
 	std::stringstream ssMosiTail;
+	std::stringstream ssSharedBody;
 	char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	bool addMosiEntry;
 	bool addMisoEntry;
 	bool addLastMosiMsgHeader;
 	bool addLastMisoMsgHeader;
+	bool mosiFragmentation = false;
+	bool misoFragmentation = false;
+	bool mosiPreviousFragState = false;
+	bool misoPreviousFragState = false;
 	void* f = AnalyzerHelpers::StartFile(file);
 
 	U64 triggerSample = mAnalyzer->GetTriggerSample();
@@ -848,18 +929,20 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 	U64 i = 0;
 
 	/* Add header fields */
-	ssMosiHead <<	"Channel" CSV_DELIMITER
-					"Time [s]" CSV_DELIMITER
-					"Packet ID" CSV_DELIMITER
-					"CRC Error" CSV_DELIMITER
-					"LAST_FRAG" CSV_DELIMITER
-					"Message Size [bytes]" CSV_DELIMITER
-					"Source ID" CSV_DELIMITER
-					"Object" CSV_DELIMITER
-					"Instance" CSV_DELIMITER
-					"Command" CSV_DELIMITER
-					"CmdExt" CSV_DELIMITER
-					"Message Data";
+	ssMosiHead << "Channel" CSV_DELIMITER
+				  "Time [s]" CSV_DELIMITER
+				  "Packet ID" CSV_DELIMITER
+				  "Error Event" CSV_DELIMITER
+				  "Anybus State" CSV_DELIMITER
+				  "Application State" CSV_DELIMITER
+				  "Message Fragmentation" CSV_DELIMITER
+				  "Message Size [bytes]" CSV_DELIMITER
+				  "Source ID" CSV_DELIMITER
+				  "Object" CSV_DELIMITER
+				  "Instance" CSV_DELIMITER
+				  "Command" CSV_DELIMITER
+				  "CmdExt" CSV_DELIMITER
+				  "Message Data";
 
 	AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
 	ssMosiHead.str(std::string());
@@ -867,10 +950,16 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 	while (i < numFrames)
 	{
 		U64 packetId = GetPacketContainingFrameSequential(i);
+
 		if (packetId != INVALID_RESULT_INDEX)
 		{
 			U64 firstFrameId;
 			U64 lastFrameId;
+			ErrorEvent mosiEvent = ErrorEvent::None;
+			ErrorEvent misoEvent = ErrorEvent::None;
+			bool mosiAppStatReached = false;
+			bool misoAnbStatReached = false;
+
 			addMosiEntry = false;
 			addMisoEntry = false;
 			addLastMosiMsgHeader = true;
@@ -887,31 +976,137 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 				{
 					switch (frame.mType)
 					{
+					case e_ABCC_SPI_ERROR_FRAGMENTATION:
+						mosiEvent = ErrorEvent::SpiFragmentationError;
+						break;
 					case e_ABCC_MOSI_SPI_CTRL:
 					{
-						if (frame.mData1 & ABP_SPI_CTRL_M)
+						bool message = ((frame.mData1 & ABP_SPI_CTRL_M) != 0);
+
+						if (message)
 						{
 							/* Add in the timestamp, packet ID */
 							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosiHead << std::endl << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+							ssMosiHead << std::endl
+									   << MOSI_STR CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 							addMosiEntry = true;
 						}
 
-						ssMosiTail << CSV_DELIMITER;
-						if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
+						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 						{
-							ssMosiTail << "L";
+							mosiEvent = ErrorEvent::RetransmitWarning;
+							misoEvent = ErrorEvent::RetransmitWarning;
 						}
+
+						ssMosiTail << CSV_DELIMITER;
+
+						if (message)
+						{
+							if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
+							{
+								if (mosiFragmentation)
+								{
+									ssMosiTail << LAST_FRAG_STR;
+									mosiFragmentation = false;
+								}
+							}
+							else
+							{
+								if (!mosiFragmentation)
+								{
+									mosiFragmentation = true;
+									ssMosiTail << FIRST_FRAG_STR;
+								}
+								else
+								{
+									ssMosiTail << FRAGMENT_STR;
+								}
+							}
+						}
+
+						break;
+					}
+					case e_ABCC_MOSI_APP_STAT:
+					{
+						mosiAppStatReached = true;
+						GetApplStsString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_size:
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId:
+					{
+						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						addLastMosiMsgHeader = false;
+						break;
+					}
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_obj:
+					{
+						GetObjectString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						addLastMosiMsgHeader = false;
+						break;
+					}
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_inst:
+					{
+						bool alert = false;
+						bool found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, dataStr, sizeof(dataStr), &alert, display_base);
+
+						if (!found)
+						{
+							SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
+						}
+
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						addLastMosiMsgHeader = false;
+						break;
+					}
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd:
+					{
+						GetCmdString((U8)frame.mData1, (U8)frame.mData2, &dataStr[0], sizeof(dataStr), display_base);
+
+						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
+						{
+							ssMosiTail << CSV_DELIMITER << dataStr << ERROR_RESPONSE_STR;
+						}
+						else
+						{
+							if (((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
+							{
+								ssMosiTail << CSV_DELIMITER << dataStr << COMMAND_STR;
+							}
+							else
+							{
+								ssMosiTail << CSV_DELIMITER << dataStr << RESPONSE_STR;
+							}
+						}
+
+						addLastMosiMsgHeader = false;
+						break;
+					}
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						bool alert = false;
+						DisplayBase displayBase = DisplayBase::Hexadecimal;
+
+						if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+							((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR))
+						{
+							tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, dataStr, sizeof(dataStr), false, &alert, displayBase);
+						}
+						else if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+								 ((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+						{
+							tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, dataStr, sizeof(dataStr), true, &alert, displayBase);
+						}
+						else
+						{
+							AnalyzerHelpers::GetNumberString(frame.mData1, displayBase, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						}
+
 						ssMosiTail << CSV_DELIMITER << dataStr;
 						addLastMosiMsgHeader = false;
 						break;
@@ -919,18 +1114,48 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 					case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 					case e_ABCC_MOSI_WR_MSG_FIELD:
 					{
+						if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+						{
+							if ((U32)frame.mData2 == 0)
+							{
+								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+							}
+							else
+							{
+								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
+								GetErrorRspString(obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+							}
+						}
+						else
+						{
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						}
+
 						if (addLastMosiMsgHeader)
 						{
 							ssMosiTail << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
 							addLastMosiMsgHeader = false;
 						}
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-						ssMosiTail << CSV_DELIMITER << dataStr;
+
+						if ((display_base == DisplayBase::ASCII) ||
+							(display_base == DisplayBase::AsciiHex))
+						{
+							AppendCsvSafeString(ssMosiTail, dataStr);
+						}
+						else
+						{
+							ssMosiTail << CSV_DELIMITER << dataStr;
+						}
+
 						break;
 					}
 					case e_ABCC_MOSI_CRC32:
 					{
-						ssMosiHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
+						if ((U32)frame.mData1 != (U32)frame.mData2)
+						{
+							mosiEvent = ErrorEvent::CrcError;
+						}
+
 						break;
 					}
 					default:
@@ -939,76 +1164,235 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char* file, DisplayBase d
 				}
 				else
 				{
+					/* MISO Frame */
 					switch (frame.mType)
 					{
-						case e_ABCC_MISO_SPI_STAT:
-						{
-							if (frame.mData1 & ABP_SPI_STATUS_M)
-							{
-								/* Add in the timestamp, packet ID */
-								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMisoHead << std::endl << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
-								addMisoEntry = true;
-							}
+					case e_ABCC_SPI_ERROR_FRAGMENTATION:
+						misoEvent = ErrorEvent::SpiFragmentationError;
+						break;
+					case e_ABCC_MISO_ANB_STAT:
+					{
+						misoAnbStatReached = true;
+						GetAbccStatusString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssSharedBody << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MISO_SPI_STAT:
+					{
+						bool message = ((frame.mData1 & ABP_SPI_STATUS_M) != 0);
 
-							ssMisoTail << CSV_DELIMITER;
+						if (message)
+						{
+							/* Add in the timestamp, packet ID, and Anybus state */
+							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+							ssMisoHead << std::endl
+									   << MISO_STR CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+							addMisoEntry = true;
+						}
+
+						ssMisoTail << CSV_DELIMITER;
+
+						if (message)
+						{
 							if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
 							{
-								ssMisoTail << "L";
+								if (misoFragmentation)
+								{
+									ssMisoTail << LAST_FRAG_STR;
+									misoFragmentation = false;
+								}
 							}
-							break;
-						}
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
-						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMisoTail << CSV_DELIMITER << dataStr;
-							addLastMisoMsgHeader = false;
-							break;
-						}
-						case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
-						case e_ABCC_MISO_RD_MSG_FIELD:
-						{
-							if (addLastMisoMsgHeader)
+							else
 							{
-								addLastMisoMsgHeader = false;
-								ssMisoTail << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
+								if (!misoFragmentation)
+								{
+									misoFragmentation = true;
+									ssMisoTail << FIRST_FRAG_STR;
+								}
+								else
+								{
+									ssMisoTail << FRAGMENT_STR;
+								}
 							}
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMisoTail << CSV_DELIMITER << dataStr;
-							break;
 						}
-						case e_ABCC_MISO_CRC32:
-						{
-							ssMisoHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
-							break;
-						}
-						default:
-							break;
+
+						break;
 					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_size:
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_srcId:
+					{
+						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						addLastMisoMsgHeader = false;
+						break;
+					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_obj:
+					{
+						GetObjectString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						addLastMisoMsgHeader = false;
+						break;
+					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_inst:
+					{
+						bool alert = false;
+						bool found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, dataStr, sizeof(dataStr), &alert, display_base);
+
+						if (!found)
+						{
+							SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
+						}
+
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						addLastMisoMsgHeader = false;
+						break;
+					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_cmd:
+					{
+						GetCmdString((U8)frame.mData1, (U8)frame.mData2, &dataStr[0], sizeof(dataStr), display_base);
+
+						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
+						{
+							ssMisoTail << CSV_DELIMITER << dataStr << ERROR_RESPONSE_STR;
+						}
+						else
+						{
+							if (((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
+							{
+								ssMisoTail << CSV_DELIMITER << dataStr << COMMAND_STR;
+							}
+							else
+							{
+								ssMisoTail << CSV_DELIMITER << dataStr << RESPONSE_STR;
+							}
+						}
+
+						addLastMisoMsgHeader = false;
+						break;
+					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt:
+					{
+						bool alert = false;
+						DisplayBase displayBase = DisplayBase::Hexadecimal;
+
+						if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+							((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR))
+						{
+							tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, dataStr, sizeof(dataStr), false, &alert, displayBase);
+						}
+						else if (((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+								 ((ABP_MsgCmdType)(frame.mData2 & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+						{
+							tMsgHeaderInfo* psMsgHdr = (tMsgHeaderInfo*)&frame.mData2;
+							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, (U16)frame.mData1, dataStr, sizeof(dataStr), true, &alert, displayBase);
+						}
+						else
+						{
+							AnalyzerHelpers::GetNumberString(frame.mData1, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						}
+
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						addLastMisoMsgHeader = false;
+						break;
+					}
+					case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
+					case e_ABCC_MISO_RD_MSG_FIELD:
+					{
+						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+						{
+							if ((U32)frame.mData2 == 0)
+							{
+								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+							}
+							else
+							{
+								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
+								GetErrorRspString(obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+							}
+						}
+						else
+						{
+							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						}
+
+						if (addLastMisoMsgHeader)
+						{
+							ssMisoTail << CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER CSV_DELIMITER;
+							addLastMisoMsgHeader = false;
+						}
+
+						if ((display_base == DisplayBase::ASCII) ||
+							(display_base == DisplayBase::AsciiHex))
+						{
+							AppendCsvSafeString(ssMisoTail, dataStr);
+						}
+						else
+						{
+							ssMisoTail << CSV_DELIMITER << dataStr;
+						}
+
+						break;
+					}
+					case e_ABCC_MISO_CRC32:
+					{
+						if ((U32)frame.mData1 != (U32)frame.mData2)
+						{
+							misoEvent = ErrorEvent::CrcError;
+							mosiEvent = ErrorEvent::CrcError;
+						}
+
+						break;
+					}
+					default:
+						break;
+					}
+				}
+			}
+
+			if ((mosiEvent == ErrorEvent::SpiFragmentationError) ||
+				(misoEvent == ErrorEvent::SpiFragmentationError))
+			{
+				mosiFragmentation = mosiPreviousFragState;
+				misoFragmentation = misoPreviousFragState;
+
+				/* Determine if additional tabs need to be added to get correct alignment in CSV */
+				if (!mosiAppStatReached)
+				{
+					ssSharedBody << CSV_DELIMITER;
+				}
+
+				if (!misoAnbStatReached)
+				{
+					ssSharedBody << CSV_DELIMITER;
 				}
 			}
 
 			if (addMosiEntry)
 			{
-				AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
-				AnalyzerHelpers::AppendToFile((U8*)ssMosiTail.str().c_str(), (U32)ssMosiTail.str().length(), f);
+				if (mosiEvent == ErrorEvent::None)
+				{
+					mosiPreviousFragState = mosiFragmentation;
+				}
+
+				AppendCsvMessageEntry(f, ssMosiHead, ssSharedBody, ssMosiTail, mosiEvent);
 			}
 
 			if (addMisoEntry)
 			{
-				AnalyzerHelpers::AppendToFile((U8*)ssMisoHead.str().c_str(), (U32)ssMisoHead.str().length(), f);
-				AnalyzerHelpers::AppendToFile((U8*)ssMisoTail.str().c_str(), (U32)ssMisoTail.str().length(), f);
+				if (misoEvent == ErrorEvent::None)
+				{
+					misoPreviousFragState = misoFragmentation;
+				}
+
+				AppendCsvMessageEntry(f, ssMisoHead, ssSharedBody, ssMisoTail, misoEvent);
 			}
 
 			ssMisoHead.str(std::string());
 			ssMosiHead.str(std::string());
 			ssMisoTail.str(std::string());
 			ssMosiTail.str(std::string());
+			ssSharedBody.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
 			i = lastFrameId + 1;
@@ -1036,6 +1420,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 	std::stringstream ssMisoHead;
 	std::stringstream ssMosiTail;
 	std::stringstream ssMisoTail;
+	std::stringstream ssSharedBody;
 	void* f = AnalyzerHelpers::StartFile(file);
 	bool addCsvHeader = true;
 
@@ -1056,6 +1441,10 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 		{
 			U64 firstFrameId;
 			U64 lastFrameId;
+			ErrorEvent mosiEvent = ErrorEvent::None;
+			ErrorEvent misoEvent = ErrorEvent::None;
+			bool mosiAppStatReached = false;
+			bool misoAnbStatReached = false;
 
 			GetFramesContainedInPacket(packetId, &firstFrameId, &lastFrameId);
 
@@ -1064,12 +1453,16 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 			for (U64 frameId = firstFrameId; frameId <= lastFrameId; frameId++)
 			{
 				Frame frame = GetFrame(frameId);
+
 				if (IS_MOSI_FRAME(frame))
 				{
 					switch (frame.mType)
 					{
+					case e_ABCC_SPI_ERROR_FRAGMENTATION:
+						mosiEvent = ErrorEvent::SpiFragmentationError;
+						break;
 					case e_ABCC_MOSI_PD_LEN:
-						if(addCsvHeader)
+						if (addCsvHeader)
 						{
 							U32 dwBytes = ((U16)frame.mData1) << 1;
 							/* Add header fields */
@@ -1077,18 +1470,22 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 							ssHeader << "Channel" CSV_DELIMITER
 										"Time [s]" CSV_DELIMITER
 										"Packet ID" CSV_DELIMITER
-										"CRC Error" CSV_DELIMITER
+										"Error Event" CSV_DELIMITER
+										"Anybus State" CSV_DELIMITER
+										"Application State" CSV_DELIMITER
 										"Network Time";
 
-							for(U16 cnt = 0; cnt < dwBytes; cnt++)
+							for (U16 cnt = 0; cnt < dwBytes; cnt++)
 							{
 								ssHeader << CSV_DELIMITER "Process Data " << cnt;
 								AnalyzerHelpers::AppendToFile((U8*)ssHeader.str().c_str(), (U32)ssHeader.str().length(), f);
 								ssHeader.str(std::string());
 							}
+
 							AnalyzerHelpers::AppendToFile((U8*)ssHeader.str().c_str(), (U32)ssHeader.str().length(), f);
 							addCsvHeader = false;
 						}
+
 						break;
 					case e_ABCC_MOSI_SPI_CTRL:
 					{
@@ -1096,9 +1493,18 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 						{
 							/* Add in the timestamp, packet ID */
 							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosiHead << std::endl << "MOSI" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+							ssMosiHead << std::endl
+									   << MOSI_STR CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
 							addMosiEntry = true;
 						}
+
+						break;
+					}
+					case e_ABCC_MOSI_APP_STAT:
+					{
+						mosiAppStatReached = true;
+						GetApplStsString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
 					case e_ABCC_MOSI_WR_PD_FIELD:
@@ -1109,7 +1515,11 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					}
 					case e_ABCC_MOSI_CRC32:
 					{
-						ssMosiHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
+						if ((U32)frame.mData1 != (U32)frame.mData2)
+						{
+							mosiEvent = ErrorEvent::CrcError;
+						}
+
 						break;
 					}
 					default:
@@ -1118,40 +1528,58 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 				}
 				else
 				{
+					/* MISO Frame */
 					switch (frame.mType)
 					{
-						case e_ABCC_MISO_SPI_STAT:
+					case e_ABCC_SPI_ERROR_FRAGMENTATION:
+						misoEvent = ErrorEvent::SpiFragmentationError;
+						break;
+					case e_ABCC_MISO_ANB_STAT:
+					{
+						misoAnbStatReached = true;
+						GetAbccStatusString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						ssSharedBody << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MISO_SPI_STAT:
+					{
+						if (frame.mData1 & ABP_SPI_STATUS_NEW_PD)
 						{
-							if (frame.mData1 & ABP_SPI_STATUS_NEW_PD)
-							{
-								/* Add in the timestamp, packet ID */
-								AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-								ssMisoHead << std::endl << "MISO" CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
-								addMisoEntry = true;
-							}
-							break;
+							/* Add in the timestamp, packet ID */
+							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+							ssMisoHead << std::endl
+									   << MISO_STR CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
+							addMisoEntry = true;
 						}
-						case e_ABCC_MISO_NET_TIME:
+
+						break;
+					}
+					case e_ABCC_MISO_NET_TIME:
+					{
+						/* Append network time stamp to both string streams */
+						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						ssMosiTail << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MISO_RD_PD_FIELD:
+					{
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						ssMisoTail << CSV_DELIMITER << dataStr;
+						break;
+					}
+					case e_ABCC_MISO_CRC32:
+					{
+						if ((U32)frame.mData1 != (U32)frame.mData2)
 						{
-							/* Append network time stamp to both string streams */
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMisoTail << CSV_DELIMITER << dataStr;
-							ssMosiTail << CSV_DELIMITER << dataStr;
-							break;
+							misoEvent = ErrorEvent::CrcError;
+							mosiEvent = ErrorEvent::CrcError;
 						}
-						case e_ABCC_MISO_RD_PD_FIELD:
-						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
-							ssMisoTail << CSV_DELIMITER << dataStr;
-							break;
-						}
-						case e_ABCC_MISO_CRC32:
-						{
-							ssMisoHead << CSV_DELIMITER << (int)(frame.mData1 != frame.mData2);
-							break;
-						}
-						default:
-							break;
+
+						break;
+					}
+					default:
+						break;
 					}
 				}
 
@@ -1162,22 +1590,36 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 				}
 			}
 
+			if ((mosiEvent == ErrorEvent::SpiFragmentationError) ||
+				(misoEvent == ErrorEvent::SpiFragmentationError))
+			{
+				/* Determine if additional tabs need to be added to get correct alignment in CSV */
+				if (!mosiAppStatReached)
+				{
+					ssSharedBody << CSV_DELIMITER;
+				}
+
+				if (!misoAnbStatReached)
+				{
+					ssSharedBody << CSV_DELIMITER;
+				}
+			}
+
 			if (addMosiEntry)
 			{
-				AnalyzerHelpers::AppendToFile((U8*)ssMosiHead.str().c_str(), (U32)ssMosiHead.str().length(), f);
-				AnalyzerHelpers::AppendToFile((U8*)ssMosiTail.str().c_str(), (U32)ssMosiTail.str().length(), f);
+				AppendCsvMessageEntry(f, ssMosiHead, ssSharedBody, ssMosiTail, mosiEvent);
 			}
 
 			if (addMisoEntry)
 			{
-				AnalyzerHelpers::AppendToFile((U8*)ssMisoHead.str().c_str(), (U32)ssMisoHead.str().length(), f);
-				AnalyzerHelpers::AppendToFile((U8*)ssMisoTail.str().c_str(), (U32)ssMisoTail.str().length(), f);
+				AppendCsvMessageEntry(f, ssMisoHead, ssSharedBody, ssMisoTail, misoEvent);
 			}
 
 			ssMisoHead.str(std::string());
 			ssMosiHead.str(std::string());
 			ssMisoTail.str(std::string());
 			ssMosiTail.str(std::string());
+			ssSharedBody.str(std::string());
 
 			/* Jump to the next frame after the processed packet */
 			i = lastFrameId + 1;
@@ -1203,15 +1645,15 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 {
 	switch (export_type_user_id)
 	{
-		case 0:
+		case e_EXPORT_FRAMES:
 			/* Export all frame data */
 			ExportAllFramesToFile(file, display_base);
 			break;
-		case 1:
+		case e_EXPORT_MESSAGE_DATA:
 			/* Export 'valid' message data */
 			ExportMessageDataToFile(file, display_base);
 			break;
-		case 2:
+		case e_EXPORT_PROCESS_DATA:
 			/* Export 'valid' process data */
 			ExportProcessDataToFile(file, display_base);
 			break;

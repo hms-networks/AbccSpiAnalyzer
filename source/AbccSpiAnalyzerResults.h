@@ -18,6 +18,14 @@
 #define FORMATTED_STRING_BUFFER_SIZE		256
 #endif
 
+enum class ErrorEvent
+{
+	None,
+	RetransmitWarning,
+	CrcError,
+	SpiFragmentationError
+};
+
 /* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
 #define SPI_ERROR_FLAG						( 1 << 0 )
 
@@ -80,6 +88,9 @@ protected: /* functions */
 	virtual void ExportAllFramesToFile(const char* file, DisplayBase display_base);
 	virtual void ExportMessageDataToFile(const char* file, DisplayBase display_base);
 	virtual void ExportProcessDataToFile(const char* file, DisplayBase display_base);
+
+	virtual void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);
+	virtual void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str);
 
 protected:  /* variables */
 	SpiAnalyzerSettings* mSettings;

@@ -173,12 +173,12 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mAdvancedSettingsInterface.get());
 #endif
 
-	AddExportOption(0, "Export All Frame Data");
-	AddExportExtension(0, "All Frame Data", "csv");
-	AddExportOption(1, "Export Message Data");
-	AddExportExtension(1, "Message Data", "csv");
-	AddExportOption(2, "Export Process Data");
-	AddExportExtension(2, "Process Data", "csv");
+	AddExportOption(e_EXPORT_FRAMES, "Export All Frame Data");
+	AddExportExtension(e_EXPORT_FRAMES, "All Frame Data", "csv");
+	AddExportOption(e_EXPORT_PROCESS_DATA, "Export Process Data");
+	AddExportExtension(e_EXPORT_PROCESS_DATA, "Process Data", "csv");
+	AddExportOption(e_EXPORT_MESSAGE_DATA, "Export Message Data");
+	AddExportExtension(e_EXPORT_MESSAGE_DATA, "Message Data", "csv");
 
 	//AddExportOption(3, "Export as XML file");
 	//AddExportExtension(3, "XML-File", "xml");

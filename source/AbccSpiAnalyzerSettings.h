@@ -17,6 +17,12 @@
 
 #define ENABLE_ADVANCED_SETTINGS 1
 
+typedef enum tExportType {
+	e_EXPORT_FRAMES,
+	e_EXPORT_PROCESS_DATA,
+	e_EXPORT_MESSAGE_DATA,
+} tExportType;
+
 typedef enum tNetworkType {
 	e_NW_TYPE_UNSPECIFIED,
 	e_NW_TYPE_PDPV0,		  /* PROFIBUS DP-V0 */
