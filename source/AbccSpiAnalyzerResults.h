@@ -13,42 +13,20 @@
 #define ABCC_SPI_ANALYZER_RESULTS_H
 
 #include "AnalyzerResults.h"
+#include "AbccSpiAnalyzerTypes.h"
 
 #ifndef FORMATTED_STRING_BUFFER_SIZE
 #define FORMATTED_STRING_BUFFER_SIZE		256
 #endif
 
-enum class ErrorEvent
+enum class ErrorEvent : U32
 {
 	None,
 	RetransmitWarning,
 	CrcError,
-	SpiFragmentationError
+	SpiFragmentationError,
+	SizeOfEnum
 };
-
-/* Indicates a SPI settings error (e.g. CPOL, CPHA, EN Active Hi/Lo) */
-#define SPI_ERROR_FLAG						( 1 << 0 )
-
-/* Direction flag. When asserted, MOSI, when de-asserted MISO */
-#define SPI_MOSI_FLAG						( 1 << 1 )
-
-/* Indicates the first message in a fragmented message transfer */
-#define SPI_MSG_FIRST_FRAG_FLAG				( 1 << 2 )
-
-/* Indicates that message fragmentation is in progress */
-#define SPI_MSG_FRAG_FLAG					( 1 << 3 )
-
-/* Event flag to indicate any critical events that are part of the ABCC SPI protocol
-** This flag is field-specific.
-** This flag is relevant for the following fields (not all supported yet):
-**   - SPI_CTL: signals a toggle error (retransmission event)
-**   - ANB_STS: signals a Anybus status changed event
-**   - SPI_STS: signals a toggle error (retransmission event)
-**   - APP_STS: signals an application status changed event
-**   - MD_SIZE: signals that the value in this field is out-of-spec
-**   - CMD/RSP: signals an error response message
-**   - CRC32: signals a checksum error */
-#define SPI_PROTO_EVENT_FLAG				( 1 << 5 )
 
 class SpiAnalyzer;
 class SpiAnalyzerSettings;
@@ -56,6 +34,7 @@ class SpiAnalyzerSettings;
 class SpiAnalyzerResults : public AnalyzerResults
 {
 public:
+
 	SpiAnalyzerResults(SpiAnalyzer* analyzer, SpiAnalyzerSettings* settings);
 	virtual ~SpiAnalyzerResults();
 
@@ -66,44 +45,55 @@ public:
 	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
 	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
 
-	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, bool is_mosi_channel, U8 type);
+	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, SpiChannel_t e_channel, U8 type);
 
-protected: /* functions */
-	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert);
-	virtual void StringBuilder(char* tag, char* value, char* verbose, bool alert, bool prioritize_value);
-	virtual void TableBuilder(bool is_mosi_channel, char* text, bool alert);
+protected: /* Enums, Types, and Classes */
 
-	virtual void BuildSpiCtrlString(U8 val, DisplayBase display_base);
-	virtual void BuildSpiStsString(U8 val, DisplayBase display_base);
-	virtual bool BuildCmdString(U8 val, U8 obj, DisplayBase display_base);
-	virtual void BuildErrorRsp(U8 val, DisplayBase display_base);
-	virtual void BuildErrorRsp(U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
-	virtual void BuildAbccStatus(U8 val, DisplayBase display_base);
-	virtual void BuildApplStatus(U8 val, DisplayBase display_base);
-	virtual void BuildIntMask(U8 val, DisplayBase display_base);
-	virtual void BuildObjectString(U8 val, DisplayBase display_base);
+	typedef union AbccSpiStatesUnion
+	{
+		U8						bState;
+		AbccMisoStates::Enum	eMiso;
+		AbccMosiStates::Enum	eMosi;
+	} AbccSpiStatesUnion_t;
 
-	virtual void BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base);
-	virtual void BuildAttrString(U8 obj, U16 inst, U16 val, bool indexed, DisplayBase display_base);
+protected:  /* Members */
 
-	virtual void ExportAllFramesToFile(const char* file, DisplayBase display_base);
-	virtual void ExportMessageDataToFile(const char* file, DisplayBase display_base);
-	virtual void ExportProcessDataToFile(const char* file, DisplayBase display_base);
-
-	virtual void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);
-	virtual void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str);
-
-protected:  /* variables */
 	SpiAnalyzerSettings* mSettings;
 	SpiAnalyzer* mAnalyzer;
-	char acMsgSizeStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char acMsgSrcStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char acMsgObjStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char acMsgInstStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char acMsgCmdStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char acMsgExtStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	bool fMsgValid[2];
-	bool fMsgErrorRsp[2];
+	char mMsgSizeStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgSrcStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgObjStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgInstStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgCmdStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgExtStr[2][FORMATTED_STRING_BUFFER_SIZE];
+	bool mMsgValidFlag[2];
+	bool mMsgErrorRspFlag[2];
+
+protected: /* Methods */
+
+	void StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification);
+	void StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
+	void TableBuilder(SpiChannel_t e_channel, char* text, NotifEvent_t notification);
+
+	void BuildSpiCtrlString(U8 val, DisplayBase display_base);
+	void BuildSpiStsString(U8 val, DisplayBase display_base);
+	bool BuildCmdString(U8 val, U8 obj, DisplayBase display_base);
+	void BuildErrorRsp(U8 val, DisplayBase display_base);
+	void BuildErrorRsp(U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
+	void BuildAbccStatus(U8 val, DisplayBase display_base);
+	void BuildApplStatus(U8 val, DisplayBase display_base);
+	void BuildIntMask(U8 val, DisplayBase display_base);
+	void BuildObjectString(U8 val, DisplayBase display_base);
+
+	void BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base);
+	void BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAccessMode_t access_mode, DisplayBase display_base);
+
+	void ExportAllFramesToFile(const char* file, DisplayBase display_base);
+	void ExportMessageDataToFile(const char* file, DisplayBase display_base);
+	void ExportProcessDataToFile(const char* file, DisplayBase display_base);
+
+	void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);
+	void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str);
 };
 
 #endif /* ABCC_SPI_ANALYZER_RESULTS_H */

@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include "Analyzer.h"
+#include "AbccSpiAnalyzerTypes.h"
 #include "AbccSpiAnalyzerResults.h"
 #include "AbccSpiSimulationDataGenerator.h"
 #include "AbccCrc.h"
@@ -37,222 +38,49 @@
 #define ABCC_STATUS_SUP_MASK				0x08
 #define ABCC_STATUS_CODE_MASK				0x07
 
-/* Macros to access information stored in arrays */
-#define ABCC_MOSI_CHANNEL 0
-#define ABCC_MISO_CHANNEL 1
-
-#define GET_MSG_FRAME_TAG(x)			(asMsgStates[x].tag)
-#define GET_MOSI_FRAME_TAG(x)			(asMosiStates[x].tag)
-#define GET_MISO_FRAME_TAG(x)			(asMisoStates[x].tag)
-
-#define GET_MSG_FRAME_SIZE(x)			(asMsgStates[x].frameSize)
-#define GET_MOSI_FRAME_SIZE(x)			(asMosiStates[x].frameSize)
-#define GET_MISO_FRAME_SIZE(x)			(asMisoStates[x].frameSize)
-
-#define GET_MSG_FRAME_BITSIZE(x)		((asMsgStates[x].frameSize)*8)
-#define GET_MOSI_FRAME_BITSIZE(x)		((asMosiStates[x].frameSize)*8)
-#define GET_MISO_FRAME_BITSIZE(x)		((asMisoStates[x].frameSize)*8)
-
-typedef enum tGetByteStatus
+enum class GetByteStatus : U32
 {
-	e_GET_BYTE_OK,		/* BYTE was successfully read */
-	e_GET_BYTE_ERROR,	/* Reading BYTE resulted in a logical error (requires statemachine reset) */
-	e_GET_BYTE_RESET	/* Reading BYTE resulted in a event that requires state machine reset */
-}tGetByteStatus;
+	OK,		/* BYTE was successfully read */
+	Error,	/* Reading BYTE resulted in a logical error (requires statemachine reset) */
+	Reset,	/* Reading BYTE resulted in a event that requires state machine reset */
+	SizeOfEnum
+};
 
-typedef enum tPacketType
+/* Enum for indicating when to reset a statemachine */
+enum class StateOperation : U32
 {
-	e_NULL_PACKET,
-	e_COMMAND_PACKET,
-	e_RESPONSE_PACKET,
-	e_MSG_FRAGMENT_PACKET,
-	e_ERROR_RESPONSE_PACKET,
-	e_PROTOCOL_ERROR_PACKET,
-	e_CHECKSUM_ERROR_PACKET,
-	e_MULTI_PACKET,
-	e_MULTI_ERROR_PACKET,
-	e_CANCEL_PACKET
-}tPacketType;
+	Run,
+	Reset,
+	SizeOfEnum
+};
 
-typedef enum tAbccMosiStates
+/* Enum for indicating whether or not the analyzer succeeded in acquiring an SPI byte */
+enum class AcquisitionStatus : U32
 {
-	e_ABCC_MOSI_IDLE,
-	e_ABCC_MOSI_SPI_CTRL,
-	e_ABCC_MOSI_RESERVED1,
-	e_ABCC_MOSI_MSG_LEN,
-	e_ABCC_MOSI_PD_LEN,
-	e_ABCC_MOSI_APP_STAT,
-	e_ABCC_MOSI_INT_MASK,
-	e_ABCC_MOSI_WR_MSG_FIELD,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_size,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_res1,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_srcId,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_obj,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_inst,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_cmd,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_res2,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_cmdExt,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_data,
-	e_ABCC_MOSI_WR_PD_FIELD,
-	e_ABCC_MOSI_CRC32,
-	e_ABCC_MOSI_PAD,
-	e_ABCC_MOSI_WR_MSG_SUBFIELD_data_not_valid
-}tAbccMosiStates;
+	OK,
+	Reset,
+	Error,
+	SizeOfEnum
+};
 
-typedef enum tAbccMisoStates
+enum class PacketType : U32
 {
-	e_ABCC_MISO_IDLE,
-	e_ABCC_MISO_Reserved1,
-	e_ABCC_MISO_Reserved2,
-	e_ABCC_MISO_LED_STAT,
-	e_ABCC_MISO_ANB_STAT,
-	e_ABCC_MISO_SPI_STAT,
-	e_ABCC_MISO_NET_TIME,
-	e_ABCC_MISO_RD_MSG_FIELD,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_size,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_res1,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_srcId,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_obj,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_inst,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_cmd,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_res2,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_cmdExt,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_data,
-	e_ABCC_MISO_RD_PD_FIELD,
-	e_ABCC_MISO_CRC32,
-	e_ABCC_MISO_RD_MSG_SUBFIELD_data_not_valid
-}tAbccMisoStates;
+	Empty,
+	Command,
+	Response,
+	MessageFragment,
+	ErrorResponse,
+	ProtocolError,
+	ChecksumError,
+	MultiEvent,
+	MultiEventWithError,
+	Cancel,
+	SizeOfEnum
+};
 
-typedef enum tAbccSpiError
-{
-	e_ABCC_SPI_ERROR_GENERIC			= 0x80,
-	e_ABCC_SPI_ERROR_FRAGMENTATION		= 0x81,
-	e_ABCC_SPI_ERROR_END_OF_TRANSFER	= 0x82
-}tAbccSpiError;
-
-typedef union uAbccSpiStates
-{
-	U8				bState;
-	tAbccMisoStates	eMiso;
-	tAbccMosiStates	eMosi;
-}uAbccSpiStates;
-
-typedef enum tAbccMsgField
-{
-	e_ABCC_MSG_SIZE,
-	e_ABCC_MSG_RESERVED1,
-	e_ABCC_MSG_SOURCE_ID,
-	e_ABCC_MSG_OBJECT,
-	e_ABCC_MSG_INST,
-	e_ABCC_MSG_CMD,
-	e_ABCC_MSG_RESERVED2,
-	e_ABCC_MSG_CMD_EXT,
-	e_ABCC_MSG_DATA
-}tAbccMsgField;
-
-typedef struct tAbccMosiInfo
-{
-	tAbccMosiStates eMosiState;
-	char* tag;
-	U8 frameSize;
-}tAbccMosiInfo;
-
-typedef struct tAbccMisoInfo
-{
-	tAbccMisoStates eMisoState;
-	char* tag;
-	U8 frameSize;
-}tAbccMisoInfo;
-
-typedef struct tAbccMsgInfo
-{
-	tAbccMsgField eMsgState;
-	char* tag;
-	U8 frameSize;
-}tAbccMsgInfo;
-
-typedef struct tValueName
-{
-	U16		value;
-	char*	name;
-	bool	alert;
-}tValueName;
-
-typedef struct tMsgHeaderInfo
-{
-	U8  cmd;
-	U8  obj;
-	U16 inst;
-	U16 cmdExt;
-}tMsgHeaderInfo;
-
-typedef struct tNetworkTimeInfo
-{
-	U32 deltaTime;
-	U16 pad;
-	bool newRdPd;
-	bool wrPdValid;
-}tNetworkTimeInfo;
-
-typedef struct tMosiVars
-{
-	S64 lFramesFirstSample;
-	U64 lFrameData;
-	tMsgHeaderInfo sMsgHeader;
-	AbccCrc oChecksum;
-	U32 dwPdLen;
-	U32 dwPdCnt;
-	U32 dwMsgLen;
-	U32 dwMsgLenCnt;
-	U32 dwByteCnt;
-	U8 bByteCnt2;
-	U32 dwMdCnt;
-	U16 wMdSize;
-	tAbccMosiStates eState;
-	tAbccMosiStates eMsgSubState;
-	tPacketType ePacketType;
-	U8 bLastToggleState;
-	U8 bLastApplSts;
-	bool fNewMsg;
-	bool fErrorRsp;
-	bool fFragmentation;
-	bool fFirstFrag;
-	bool fLastFrag;
-	bool fWrPdValid;
-	bool fReadyForNewPacket;
-}tMosiVars;
-
-typedef struct tMisoVars
-{
-	S64 lFramesFirstSample;
-	U64 lFrameData;
-	tMsgHeaderInfo sMsgHeader;
-	AbccCrc oChecksum;
-	U32 dwLastTimestamp;
-	U32 dwPdLen;
-	U32 dwPdCnt;
-	U32 dwMsgLen;
-	U32 dwMsgLenCnt;
-	U32 dwByteCnt;
-	U8 bByteCnt2;
-	U32 dwMdCnt;
-	U16 wMdSize;
-	tAbccMisoStates eState;
-	tAbccMisoStates eMsgSubState;
-	tPacketType ePacketType;
-	U8 bLastAnbSts;
-	bool fNewMsg;
-	bool fErrorRsp;
-	bool fFragmentation;
-	bool fFirstFrag;
-	bool fLastFrag;
-	bool fNewRdPd;
-	bool fReadyForNewPacket;
-}tMisoVars;
-
-extern const tAbccMosiInfo asMosiStates[];
-extern const tAbccMisoInfo asMisoStates[];
-extern const tAbccMsgInfo asMsgStates[];
+extern const AbccMosiInfo_t asMosiStates[];
+extern const AbccMisoInfo_t asMisoStates[];
+extern const AbccMsgInfo_t asMsgStates[];
 
 class SpiAnalyzerSettings;
 #ifdef _DEBUG
@@ -262,6 +90,7 @@ class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
 #endif
 {
 public:
+
 	SpiAnalyzer();
 	virtual ~SpiAnalyzer();
 	virtual void SetupResults();
@@ -273,44 +102,71 @@ public:
 	virtual const char* GetAnalyzerName() const;
 	virtual bool NeedsRerun();
 
-protected: /* functions */
-	void Setup();
-	void AdvanceToActiveEnableEdge();
-	void AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+protected: /* Enums, Classes, Types */
 
-	bool IsEnableActive(void);
-	bool IsInitialClockPolarityCorrect();
+	typedef struct MosiVars
+	{
+		S64 lFramesFirstSample;
+		U64 lFrameData;
+		PacketType ePacketType;
+		AbccMosiStates::Enum eState;
+		AbccMosiStates::Enum eMsgSubState;
+		MsgHeaderInfo_t sMsgHeader;
+		AbccCrc oChecksum;
+		U32 dwPdLen;
+		U32 dwPdCnt;
+		U32 dwMsgLen;
+		U32 dwMsgLenCnt;
+		U32 dwByteCnt;
+		U8 bByteCnt2;
+		U32 dwMdCnt;
+		U16 wMdSize;
+		U8 bLastToggleState;
+		U8 bLastApplSts;
+		bool fNewMsg;
+		bool fErrorRsp;
+		bool fFragmentation;
+		bool fFirstFrag;
+		bool fLastFrag;
+		bool fWrPdValid;
+		bool fReadyForNewPacket;
+	} MosiVars_t;
 
-	bool WouldAdvancingTheClockToggleEnable();
-
-	tGetByteStatus GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr);
-
-	void CheckForIdleAfterPacket(void);
-	void AddFragFrame(bool is_mosi_channel, U64 first_sample, U64 last_sample);
-	void SignalReadyForNewPacket(bool is_mosi_channel);
-
-	void SetMosiPacketType(tPacketType e_packet_type);
-	void SetMisoPacketType(tPacketType e_packet_type);
-	AnalyzerResults::MarkerType GetPacketMarkerType(void);
-
-	void ProcessMosiFrame(tAbccMosiStates e_state, U64 frame_data, S64 frames_first_sample);
-	void ProcessMisoFrame(tAbccMisoStates e_state, U64 frame_data, S64 frames_first_sample);
-
-	bool RunAbccMosiStateMachine(bool reset_state, bool acquisition_error, U64 mosi_data, S64 first_sample);
-	bool RunAbccMisoStateMachine(bool reset_state, bool acquisition_error, U64 miso_data, S64 first_sample);
-
-	bool RunAbccMisoMsgSubStateMachine(bool reset_state, bool* add_frame_ptr, tAbccMisoStates* e_msg_substate_ptr);
-	bool RunAbccMosiMsgSubStateMachine(bool reset_state, bool* add_frame_ptr, tAbccMosiStates* e_msg_substate_ptr);
-
-	bool Is3WireIdleCondition(float idle_time_condition);
-	void RestorePreviousStateVars();
-
+	typedef struct MisoVars
+	{
+		S64 lFramesFirstSample;
+		U64 lFrameData;
+		PacketType ePacketType;
+		AbccMisoStates::Enum eState;
+		AbccMisoStates::Enum eMsgSubState;
+		MsgHeaderInfo_t sMsgHeader;
+		AbccCrc oChecksum;
+		U32 dwLastTimestamp;
+		U32 dwPdLen;
+		U32 dwPdCnt;
+		U32 dwMsgLen;
+		U32 dwMsgLenCnt;
+		U32 dwByteCnt;
+		U8 bByteCnt2;
+		U32 dwMdCnt;
+		U16 wMdSize;
+		U8 bLastAnbSts;
+		bool fNewMsg;
+		bool fErrorRsp;
+		bool fFragmentation;
+		bool fFirstFrag;
+		bool fLastFrag;
+		bool fNewRdPd;
+		bool fReadyForNewPacket;
+	} MisoVars_t;
 
 #pragma warning( push )
-#pragma warning( disable : 4251 ) //warning C4251: 'SerialAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
-protected: /* variables */
-	std::unique_ptr< SpiAnalyzerSettings > mSettings;
-	std::unique_ptr< SpiAnalyzerResults > mResults;
+#pragma warning( disable : 4251 ) //warning C4251: 'SpiAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
+
+protected: /* Members */
+
+	std::unique_ptr<SpiAnalyzerSettings> mSettings;
+	std::unique_ptr<SpiAnalyzerResults> mResults;
 
 	SpiSimulationDataGenerator mSimulationDataGenerator;
 
@@ -323,17 +179,52 @@ protected: /* variables */
 	std::vector<U64> mArrowLocations;
 	U8 mSettingsChangeID;
 
-	tMosiVars mMosiVars;
-	tMisoVars mMisoVars;
+	MosiVars_t mMosiVars;
+	MisoVars_t mMisoVars;
 
 	/* Backup variables to recover from error cases
 	** that require knowledge of the last valid state */
-	tMosiVars mPreviousMosiVars;
-	tMisoVars mPreviousMisoVars;
+	MosiVars_t mPreviousMosiVars;
+	MisoVars_t mPreviousMisoVars;
 
 	bool mSimulationInitialized;
 
 #pragma warning( pop )
+
+protected: /* Methods */
+
+	inline void ProcessSample(AnalyzerChannelData* chn_data, DataBuilder& data, Channel& chn);
+
+	void Setup();
+	void AdvanceToActiveEnableEdge();
+	void AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+
+	bool IsEnableActive(void);
+	bool IsInitialClockPolarityCorrect();
+
+	bool WouldAdvancingTheClockToggleEnable();
+
+	GetByteStatus GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr);
+
+	void CheckForIdleAfterPacket(void);
+	void AddFragFrame(SpiChannel_t e_channel, U64 first_sample, U64 last_sample);
+	void SignalReadyForNewPacket(SpiChannel_t e_channel);
+
+	void SetMosiPacketType(PacketType packet_type);
+	void SetMisoPacketType(PacketType packet_type);
+	AnalyzerResults::MarkerType GetPacketMarkerType(void);
+
+	void ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
+	void ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
+
+	bool RunAbccMosiStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 mosi_data, S64 first_sample);
+	bool RunAbccMisoStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 miso_data, S64 first_sample);
+
+	bool RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMisoStates::Enum* e_substate_ptr);
+	bool RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMosiStates::Enum* e_substate_ptr);
+
+	bool Is3WireIdleCondition(float idle_time_condition);
+	void RestorePreviousStateVars();
 };
 
 extern "C" ANALYZER_EXPORT const char* __cdecl GetAnalyzerName();

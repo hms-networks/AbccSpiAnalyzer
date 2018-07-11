@@ -65,7 +65,7 @@ protected: /* Enums, Types, and Classes */
 		High
 	};
 
-	typedef struct tAbccMosiPacket
+	typedef struct AbccMosiPacket
 	{
 		U8	spiCtrl;
 		U8	res1;
@@ -78,9 +78,9 @@ protected: /* Enums, Types, and Classes */
 		U16	crc32_lo;
 		U16	crc32_hi;
 		U16	pad;
-	} tAbccMosiPacket;
+	} AbccMosiPacket_t;
 
-	typedef struct tAbccMisoPacket
+	typedef struct AbccMisoPacket
 	{
 		U16	res1;
 		U16	ledStat;
@@ -92,7 +92,7 @@ protected: /* Enums, Types, and Classes */
 		U8	processData[ABCC_CFG_MAX_PROCESS_DATA_SIZE];
 		U16	crc32_lo;
 		U16	crc32_hi;
-	} tAbccMisoPacket;
+	} AbccMisoPacket_t;
 
 protected: /* Members */
 
@@ -110,8 +110,8 @@ protected: /* Members */
 	double mTargetClockFrequencyHz;
 
 	/* SPI (fragmentation) packet variables */
-	tAbccMisoPacket mMisoPacket;
-	tAbccMosiPacket mMosiPacket;
+	AbccMisoPacket_t mMisoPacket;
+	AbccMosiPacket_t mMosiPacket;
 	U32 mPacketOffset;
 	U32 mPacketMsgFieldSize;
 	bool mAbortTransfer;

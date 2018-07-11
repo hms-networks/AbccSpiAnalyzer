@@ -22,20 +22,41 @@
 
 #include "AbccSpiAnalyzerSettings.h"
 #include "AnalyzerHelpers.h"
+#include "AbccSpiAnalyzerTypes.h"
 
 /* Anytime behavior or definition of settings change, increment this counter. */
 #define SETTINGS_REVISION_STRING "REVISION_00000004"
 
-/* Default setting states */
-static const U32  d_MessageIndexingVerbosityLevel = e_VERBOSITY_LEVEL_DETAILED;
-static const U32  d_MsgDataPriority               = e_MSG_DATA_PRIORITIZE_TAG;
-static const U32  d_ProcessDataPriority           = e_PROCESS_DATA_PRIORITIZE_TAG;
-static const U32  d_TimestampIndexing             = e_TIMESTAMP_DISABLED;
-static const bool d_MessageSrcIdIndexing          = true;
-static const bool d_ErrorIndexing                 = true;
-static const bool d_AnybusStatusIndexing          = true;
-static const bool d_ApplStatusIndexing            = true;
-static const char* d_AdvSettingsPath              = "";
+/*
+** Overloads reading the SimpleArchive as a U32 and feeding the result
+** into an enum class. For this to work the enum class MUST define a
+** contiguous range of enums starting at 0 and end with "SizeOfEnum".
+*/
+template <class T>
+bool operator>> (SimpleArchive &archive, T &custom_enum_class)
+{
+	U32 temp;
+	archive >> temp;
+
+	if( temp >= static_cast<U32>(T::SizeOfEnum) )
+	{
+		custom_enum_class = T::SizeOfEnum ;
+	}
+
+	custom_enum_class = static_cast<T>(temp);
+	return true;
+}
+
+/*
+** This routine is just here to provide some symmetry with accessing
+** the SimpleArchine with enum classes
+*/
+template <class T>
+bool operator<< (SimpleArchive &archive, T custom_enum_class)
+{
+	archive << static_cast<U32>(custom_enum_class);
+	return true;
+}
 
 /* Forward declarations */
 static inline void TrimLeft(std::string &s);
@@ -48,16 +69,16 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mClockChannel(UNDEFINED_CHANNEL),
 	mEnableChannel(UNDEFINED_CHANNEL),
 	mNetworkType(e_NW_TYPE_UNSPECIFIED),
-	mMessageIndexingVerbosityLevel(d_MessageIndexingVerbosityLevel),
-	mMsgDataPriority(d_MsgDataPriority),
-	mProcessDataPriority(d_ProcessDataPriority),
-	mMessageSrcIdIndexing(d_MessageSrcIdIndexing),
-	mErrorIndexing(d_ErrorIndexing),
-	mTimestampIndexing(d_TimestampIndexing),
-	mAnybusStatusIndexing(d_AnybusStatusIndexing),
-	mApplStatusIndexing(d_ApplStatusIndexing),
+	mMessageIndexingVerbosityLevel(MessageIndexing::Detailed),
+	mMsgDataPriority(DisplayPriority::Tag),
+	mProcessDataPriority(DisplayPriority::Tag),
+	mTimestampIndexing(TimestampIndexing::Disabled),
+	mMessageSrcIdIndexing(true),
+	mErrorIndexing(true),
+	mAnybusStatusIndexing(true),
+	mApplStatusIndexing(true),
 #if ENABLE_ADVANCED_SETTINGS
-	mAdvSettingsPath(d_AdvSettingsPath),
+	mAdvSettingsPath(""),
 	m3WireOn4Channels(false),
 	m4WireOn3Channels(false),
 #endif
@@ -83,34 +104,34 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 
 	mNetworkTypeInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mNetworkTypeInterface->SetTitleAndTooltip("Network Type :", "Used to process network specific details such as the network configuration object's instance names.\nCan be set to \"Unspecified\", if unsure or if such details are not important.");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,  "Unspecified","");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,  "PROFIBUS DP-V0", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,  "PROFIBUS DP-V1", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_COP,  "CANopen", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_DEV,  "DeviceNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,  "Modbus-RTU", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,  "ControlNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,  "Modbus-TCP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,  "PROFINET RT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,  "EtherNet/IP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ECT,  "EtherCAT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR,  "PROFINET IRT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CCL,  "CC-Link", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_2P,  "Modbus-TCP 2-Port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,  "CompoNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,  "PROFINET RT 2-port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,  "SERCOS III", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,  "BACnet MS/TP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BIP,  "BACnet/IP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB,  "EtherNet/IP 2-Port BB DLR", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,  "EtherNet/IP 2-Port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO,  "PROFINET IRT FO", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EPL,  "POWERLINK", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CFN,  "CC-Link IE Field Network", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET,  "Common Ethernet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB_IIOT,  "EtherNet/IP IIoT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_IIOT,  "PROFINET IRT IIoT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO_IIOT,  "PROFINET IRT FO IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,		"Unspecified","");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,			"PROFIBUS DP-V0", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,			"PROFIBUS DP-V1", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_COP,				"CANopen", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_DEV,				"DeviceNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,				"Modbus-RTU", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,				"ControlNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,			"Modbus-TCP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,				"PROFINET RT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,			"EtherNet/IP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ECT,				"EtherCAT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR,				"PROFINET IRT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CCL,				"CC-Link", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_2P,			"Modbus-TCP 2-Port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,				"CompoNet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,			"PROFINET RT 2-port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,			"SERCOS III", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,				"BACnet MS/TP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BIP,				"BACnet/IP", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB,		"EtherNet/IP 2-Port BB DLR", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,			"EtherNet/IP 2-Port", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO,			"PROFINET IRT FO", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EPL,				"POWERLINK", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CFN,				"CC-Link IE Field Network", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET,				"Common Ethernet", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB_IIOT,	"EtherNet/IP IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_IIOT,		"PROFINET IRT IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO_IIOT,		"PROFINET IRT FO IIoT", "");
 	mNetworkTypeInterface->SetNumber(mNetworkType);
 
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());
@@ -127,11 +148,11 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 
 	mIndexTimestampsInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mIndexTimestampsInterface->SetTitleAndTooltip("Index - Network Timestamp :", "Enable indexed searching of ABCC network timestamps.\nUseful for benchmarking; otherwise it is recommended to keep this option disabled.");
-	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_DISABLED,  "Disabled", "No network timestamps will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_ALL_PACKETS,  "All Packets", "The timestamp from every ABCC SPI packet will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_WRITE_PROCESS_DATA_VALID, "Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(e_TIMESTAMP_NEW_READ_PROCESS_DATA, "New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
-	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::Disabled),  "Disabled", "No network timestamps will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::AllPackets),  "All Packets", "The timestamp from every ABCC SPI packet will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::WriteProcessDataValid), "Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::NewReadProcessData), "New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
+	mIndexTimestampsInterface->SetNumber(static_cast<double>(mTimestampIndexing));
 
 	mIndexMessageSrcIdInterface.reset(new AnalyzerSettingInterfaceBool());
 	mIndexMessageSrcIdInterface->SetTitleAndTooltip("Index - Message 'Source ID' :", "Enable indexed searching of the source ID associated with an ABCC transaction.");
@@ -139,22 +160,22 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 
 	mMessageIndexingVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :", "Specifies how detailed the decoded protcols entries are.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DISABLED,  "Disabled", "Messages will not be indexed in searchable results.\nUse when object messaging is of no interest.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_COMPACT,  "Compact Results", "Message header information is added to a single tabular result.\nThis option is useful when looking for very specific messages.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(e_VERBOSITY_LEVEL_DETAILED, "Verbose Results", "Message header information is added to tabular results individually.\nRecommended setting for general use.");
-	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Disabled),  "Disabled", "Messages will not be indexed in searchable results.\nUse when object messaging is of no interest.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Compact),  "Compact Results", "Message header information is added to a single tabular result.\nThis option is useful when looking for very specific messages.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Detailed), "Verbose Results", "Message header information is added to tabular results individually.\nRecommended setting for general use.");
+	mMessageIndexingVerbosityLevelInterface->SetNumber(static_cast<double>(mMessageIndexingVerbosityLevel));
 
 	mMsgDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Priority :", "Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
-	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_DATA, "Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
-	mMsgDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
-	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
+	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value), "Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag), "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->SetNumber(static_cast<double>(mMsgDataPriority));
 
 	mProcessDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
 	mProcessDataPriorityInterface->SetTitleAndTooltip("Process Data Priority :", "Specifies if the Process Data or Tag information is given priority in the display of multi-layered bubble-text.");
-	mProcessDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_DATA, "Prioritize Data", "Process Data will be displayed as first layer of bubble text in analyzer results.");
-	mProcessDataPriorityInterface->AddNumber(e_MSG_DATA_PRIORITIZE_TAG, "Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
-	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
+	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value), "Prioritize Data", "Process Data will be displayed as first layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag), "Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->SetNumber(static_cast<double>(mProcessDataPriority));
 
 #if ENABLE_ADVANCED_SETTINGS
 	mAdvancedSettingsInterface.reset(new AnalyzerSettingInterfaceText());
@@ -181,15 +202,12 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mAdvancedSettingsInterface.get());
 #endif
 
-	AddExportOption(e_EXPORT_FRAMES, "Export All Frame Data");
-	AddExportExtension(e_EXPORT_FRAMES, "All Frame Data", "csv");
-	AddExportOption(e_EXPORT_PROCESS_DATA, "Export Process Data");
-	AddExportExtension(e_EXPORT_PROCESS_DATA, "Process Data", "csv");
-	AddExportOption(e_EXPORT_MESSAGE_DATA, "Export Message Data");
-	AddExportExtension(e_EXPORT_MESSAGE_DATA, "Message Data", "csv");
-
-	//AddExportOption(3, "Export as XML file");
-	//AddExportExtension(3, "XML-File", "xml");
+	AddExportOption(static_cast<U32>(ExportType::Frames), "Export All Frame Data");
+	AddExportExtension(static_cast<U32>(ExportType::Frames), "All Frame Data", "csv");
+	AddExportOption(static_cast<U32>(ExportType::ProcessData), "Export Process Data");
+	AddExportExtension(static_cast<U32>(ExportType::ProcessData), "Process Data", "csv");
+	AddExportOption(static_cast<U32>(ExportType::MessageData), "Export Message Data");
+	AddExportExtension(static_cast<U32>(ExportType::MessageData), "Message Data", "csv");
 
 	ClearChannels();
 	AddChannel(mMosiChannel, "MOSI", false);
@@ -205,7 +223,7 @@ SpiAnalyzerSettings::~SpiAnalyzerSettings()
 bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
 {
 	rapidxml::xml_document<> doc;
-	rapidxml::xml_node<> * root_node;
+	rapidxml::xml_node<> * rootNode;
 	std::string trimmedPath(mAdvSettingsPath);
 	std::string type;
 	std::string value;
@@ -235,12 +253,12 @@ bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
 			doc.parse<0>(&buffer[0]);
 
 			/* Jump to root node */
-			root_node = doc.first_node("AdvancedSettings");
+			rootNode = doc.first_node("AdvancedSettings");
 
-			if (root_node)
+			if (rootNode)
 			{
 				/* Iterate over each available setting */
-				for (rapidxml::xml_node<> * settings_node = root_node->first_node("Setting"); settings_node; settings_node = settings_node->next_sibling())
+				for (rapidxml::xml_node<> * settings_node = rootNode->first_node("Setting"); settings_node; settings_node = settings_node->next_sibling())
 				{
 					rapidxml::xml_attribute<char>* ptr = settings_node->first_attribute("type");
 
@@ -315,7 +333,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	channels.push_back(clock);
 	channels.push_back(enable);
 
-	if (AnalyzerHelpers::DoChannelsOverlap(&channels[0], (U32)channels.size()) == true)
+	if (AnalyzerHelpers::DoChannelsOverlap(&channels[0], (U32)channels.size()))
 	{
 		SetErrorText("Please select different channels for each input.");
 		return false;
@@ -333,12 +351,12 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mEnableChannel = mEnableChannelInterface->GetChannel();
 
 	mNetworkType                   = U32(mNetworkTypeInterface->GetNumber());
-	mMessageIndexingVerbosityLevel = U32(mMessageIndexingVerbosityLevelInterface->GetNumber());
-	mMsgDataPriority               = U32(mMsgDataPriorityInterface->GetNumber());
-	mProcessDataPriority           = U32(mProcessDataPriorityInterface->GetNumber());
+	mMessageIndexingVerbosityLevel = static_cast<MessageIndexing>(U32(mMessageIndexingVerbosityLevelInterface->GetNumber()));
+	mMsgDataPriority               = static_cast<DisplayPriority>(U32(mMsgDataPriorityInterface->GetNumber()));
+	mProcessDataPriority           = static_cast<DisplayPriority>(U32(mProcessDataPriorityInterface->GetNumber()));
 	mMessageSrcIdIndexing          = bool(mIndexMessageSrcIdInterface->GetValue());
 	mErrorIndexing                 = bool(mIndexErrorsInterface->GetValue());
-	mTimestampIndexing             = U32(mIndexTimestampsInterface->GetNumber());
+	mTimestampIndexing             = static_cast<TimestampIndexing>(U32(mIndexTimestampsInterface->GetNumber()));
 	mAnybusStatusIndexing          = bool(mIndexAnybusStatusInterface->GetValue());
 	mApplStatusIndexing            = bool(mIndexApplStatusInterface->GetValue());
 	#if ENABLE_ADVANCED_SETTINGS
@@ -362,39 +380,39 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 
 void SpiAnalyzerSettings::LoadSettings(const char* settings)
 {
-	SimpleArchive text_archive;
+	SimpleArchive textArchive;
 	const char* pcPluginName;
 	const char* pcSettingsVersionString;
 
-	text_archive.SetString(settings);
+	textArchive.SetString(settings);
 
 	/* The first thing in the archive is the name of the protocol analyzer that the data belongs to. */
-	text_archive >> &pcPluginName;
+	textArchive >> &pcPluginName;
 	if (strcmp(pcPluginName, "AbccSpiAnalyzer") != 0)
 	{
 		AnalyzerHelpers::Assert("AbccSpiAnalyzer: Provided with a settings string that doesn't belong to us.");
 	}
 
-	text_archive >> mMosiChannel;
-	text_archive >> mMisoChannel;
-	text_archive >> mClockChannel;
-	text_archive >> mEnableChannel;
+	textArchive >> mMosiChannel;
+	textArchive >> mMisoChannel;
+	textArchive >> mClockChannel;
+	textArchive >> mEnableChannel;
 
 	/* Compare version in archive to what the plugin's "settings" version is */
-	text_archive >> &pcSettingsVersionString;
+	textArchive >> &pcSettingsVersionString;
 	if (strcmp(pcSettingsVersionString, SETTINGS_REVISION_STRING) == 0)
 	{
-		text_archive >> mNetworkType;
-		text_archive >> mMessageIndexingVerbosityLevel;
-		text_archive >> mMsgDataPriority;
-		text_archive >> mProcessDataPriority;
-		text_archive >> mMessageSrcIdIndexing;
-		text_archive >> mErrorIndexing;
-		text_archive >> mTimestampIndexing;
-		text_archive >> mAnybusStatusIndexing;
-		text_archive >> mApplStatusIndexing;
+		textArchive >> mNetworkType;
+		textArchive >> mMessageIndexingVerbosityLevel;
+		textArchive >> mMsgDataPriority;
+		textArchive >> mProcessDataPriority;
+		textArchive >> mMessageSrcIdIndexing;
+		textArchive >> mErrorIndexing;
+		textArchive >> mTimestampIndexing;
+		textArchive >> mAnybusStatusIndexing;
+		textArchive >> mApplStatusIndexing;
 		#if ENABLE_ADVANCED_SETTINGS
-		text_archive >> &mAdvSettingsPath;
+		textArchive >> &mAdvSettingsPath;
 		#endif
 	}
 
@@ -409,31 +427,31 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 
 const char* SpiAnalyzerSettings::SaveSettings()
 {
-	SimpleArchive text_archive;
+	SimpleArchive textArchive;
 
-	text_archive << "AbccSpiAnalyzer";
-	text_archive << mMosiChannel;
-	text_archive << mMisoChannel;
-	text_archive << mClockChannel;
-	text_archive << mEnableChannel;
+	textArchive << "AbccSpiAnalyzer";
+	textArchive << mMosiChannel;
+	textArchive << mMisoChannel;
+	textArchive << mClockChannel;
+	textArchive << mEnableChannel;
 
-	text_archive << SETTINGS_REVISION_STRING;
-	text_archive << mNetworkType;
-	text_archive << mMessageIndexingVerbosityLevel;
-	text_archive << mMsgDataPriority;
-	text_archive << mProcessDataPriority;
-	text_archive << mMessageSrcIdIndexing;
-	text_archive << mErrorIndexing;
-	text_archive << mTimestampIndexing;
-	text_archive << mAnybusStatusIndexing;
-	text_archive << mApplStatusIndexing;
+	textArchive << SETTINGS_REVISION_STRING;
+	textArchive << mNetworkType;
+	textArchive << mMessageIndexingVerbosityLevel;
+	textArchive << mMsgDataPriority;
+	textArchive << mProcessDataPriority;
+	textArchive << mMessageSrcIdIndexing;
+	textArchive << mErrorIndexing;
+	textArchive << mTimestampIndexing;
+	textArchive << mAnybusStatusIndexing;
+	textArchive << mApplStatusIndexing;
 	#if ENABLE_ADVANCED_SETTINGS
-	text_archive << mAdvSettingsPath;
+	textArchive << mAdvSettingsPath;
 	#endif
 
 	SaveSettingChangeID();
 
-	return SetReturnString(text_archive.GetString());
+	return SetReturnString(textArchive.GetString());
 }
 
 void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
@@ -444,12 +462,12 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 
 	mNetworkTypeInterface->SetNumber(mNetworkType);
-	mMessageIndexingVerbosityLevelInterface->SetNumber(mMessageIndexingVerbosityLevel);
-	mMsgDataPriorityInterface->SetNumber(mMsgDataPriority);
-	mProcessDataPriorityInterface->SetNumber(mProcessDataPriority);
+	mMessageIndexingVerbosityLevelInterface->SetNumber(static_cast<double>(mMessageIndexingVerbosityLevel));
+	mMsgDataPriorityInterface->SetNumber(static_cast<double>(mMsgDataPriority));
+	mProcessDataPriorityInterface->SetNumber(static_cast<double>(mProcessDataPriority));
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
-	mIndexTimestampsInterface->SetNumber(mTimestampIndexing);
+	mIndexTimestampsInterface->SetNumber(static_cast<double>(mTimestampIndexing));
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
 	#if ENABLE_ADVANCED_SETTINGS

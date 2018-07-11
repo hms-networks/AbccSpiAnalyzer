@@ -12,37 +12,45 @@
 #define ABCC_SPI_ANALYZER_LOOKUP_H_
 
 #include "Analyzer.h"
+#include "AbccSpiAnalyzerTypes.h"
 
-bool GetSpiCtrlString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+typedef struct LookupTable_t
+{
+	U16	value;
+	char* name;
+	NotifEvent_t notification;
+} LookupTable_t;
 
-bool GetSpiStsString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetApplStsString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetAbccStatusString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetErrorRspString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetIntMaskString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetLedStatusString(U16 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetIntMaskString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetNamedAttrString(U16 inst, U8 val,
-						char *str, U16 max_str_len,
-						DisplayBase display_base,
-						tValueName *pasObjNames, U8 NoObjNames,
-						tValueName *pasInstNames, U8 NoInstNames);
+NotifEvent_t GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetObjectString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
+								char* str, U16 max_str_len,
+								DisplayBase display_base,
+								LookupTable_t* pasObjNames, U8 NoObjNames,
+								LookupTable_t* pasInstNames, U8 NoInstNames);
 
-bool GetObjSpecificCmdString(U8 val, char *str, U16 max_str_len, tValueName *command_names, U8 num_commands, DisplayBase display_base);
+NotifEvent_t GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetCmdString(U8 val, U8 obj, char *str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, LookupTable_t* command_names, U8 num_commands, DisplayBase display_base);
 
-bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char *str, U16 max_str_len, bool *pAlert, DisplayBase display_base);
+NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBase display_base);
 
-bool GetAttrString(U8 obj, U16 inst, U16 val, char *str, U16 max_str_len, bool indexed, bool *pAlert, DisplayBase display_base);
+bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base);
+
+bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, AttributeAccessMode_t access_mode, NotifEvent_t* notif_ptr, DisplayBase display_base);
 
 #endif /* ABCC_SPI_ANALYZER_LOOKUP_H_ */

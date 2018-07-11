@@ -222,7 +222,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	std::random_device rd;
 	std::mt19937 prng(rd());
 
-	std::uniform_int_distribution<> fragmentSize(1, sizeof(tAbccMosiPacket) - 1);
+	std::uniform_int_distribution<> fragmentSize(1, sizeof(AbccMosiPacket_t) - 1);
 
 	// Create a set of random bernoulli random
 	// sequences to control random events in the simulation
@@ -249,8 +249,8 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	bool outOfBandClocking = generateOutOfBandClocking(prng);
 	bool errorPresent = false;
 
-	U8 *pMosiData = (U8 *)&mMosiMsgData;
-	U8 *pMisoData = (U8 *)&mMisoMsgData;
+	U8* pMosiData = (U8*)&mMosiMsgData;
+	U8* pMisoData = (U8*)&mMisoMsgData;
 
 	if (fragmentError || misoCrcError || mosiCrcError)
 	{
@@ -333,8 +333,8 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 	mosiChecksum.Init();
 	misoChecksum.Init();
 
-	mosiChecksum.Update(&((U8*)&mMosiPacket)[0], sizeof(tAbccMosiPacket) - 6);
-	misoChecksum.Update(&((U8*)&mMisoPacket)[0], sizeof(tAbccMisoPacket) - 4);
+	mosiChecksum.Update(&((U8*)&mMosiPacket)[0], sizeof(AbccMosiPacket_t) - 6);
+	misoChecksum.Update(&((U8*)&mMisoPacket)[0], sizeof(AbccMisoPacket_t) - 4);
 	mMosiPacket.crc32_lo = mosiChecksum.Crc32() & 0xFFFF;
 	mMosiPacket.crc32_hi = (mosiChecksum.Crc32() >> 16) & 0xFFFF;
 	mMisoPacket.crc32_lo = misoChecksum.Crc32() & 0xFFFF;
@@ -367,12 +367,12 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		else
 		{
 			// Produce the SPI packet
-			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
+			SendPacketData(clockIdleHigh, sizeof(AbccMosiPacket_t));
 
 			if (clockingError)
 			{
 				// Send an additional SPI packet before enable goes high (causes clocking errors)
-				SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
+				SendPacketData(clockIdleHigh, sizeof(AbccMosiPacket_t));
 			}
 		}
 
@@ -419,7 +419,7 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 		else
 		{
 			// Produce the SPI packet
-			SendPacketData(clockIdleHigh, sizeof(tAbccMosiPacket));
+			SendPacketData(clockIdleHigh, sizeof(AbccMosiPacket_t));
 
 			if (clockingError)
 			{
@@ -455,9 +455,9 @@ void SpiSimulationDataGenerator::CreateSpiTransaction()
 
 void SpiSimulationDataGenerator::SendPacketData(ClockIdleLevel clock_idle_level, U32 length)
 {
-	if (length > sizeof(tAbccMosiPacket))
+	if (length > sizeof(AbccMosiPacket_t))
 	{
-		length = sizeof(tAbccMosiPacket);
+		length = sizeof(AbccMosiPacket_t);
 	}
 
 	for (U16 i = 0; i < length; i++)
