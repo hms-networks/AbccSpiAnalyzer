@@ -44,6 +44,29 @@ typedef struct CmdLookupTable_t
 	const NotifEvent_t notification;
 } CmdLookupTable_t;
 
+inline bool IsAttributeCmd(U8 cmd)
+{
+	return (
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR));
+}
+
+inline bool IsIndexedAttributeCmd(U8 cmd)
+{
+	return (
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR));
+}
+
+inline bool IsNonIndexedAttributeCmd(U8 cmd)
+{
+	return (
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR));
+}
+
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
@@ -77,6 +100,10 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, AttributeAccessMode_t access_mode, NotifEvent_t* notif_ptr, DisplayBase display_base);
 
 void GetNumberString(U64 number, DisplayBase display_base, U32 num_data_bits, char* result_string, U32 result_string_max_length, BaseType base_type);
+
+bool GetExceptionTableIndex(bool nw_object, U8 nw_type_idx, const MsgHeaderInfo_t* msg_header, U16* table_index);
+
+NotifEvent_t GetExceptionString(bool nw_object, U16 table_index, U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 BaseType GetAttrBaseType(U8 obj, U16 inst, U8 attr);
 

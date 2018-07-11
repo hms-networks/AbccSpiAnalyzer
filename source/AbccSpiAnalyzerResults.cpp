@@ -729,11 +729,12 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				else
 				{
 					BaseType type;
+					bool exception = false;
+					bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+					bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+					bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
 
-					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+					if (attribute)
 					{
 						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 					}
@@ -742,19 +743,46 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 						type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 					}
 
-					GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type);
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
-
-					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
+					if (firstAttributeByte)
 					{
-						/* Conditionally trim the leading 0x specifier */
-						U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
-						StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], str, notification, DisplayPriority::Value);
+						U16 tableIndex;
+
+						if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+						{
+							notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, str, sizeof(str), display_base);
+							exception = true;
+						}
+					}
+
+					GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type);
+
+					if (exception)
+					{
+						if (nwObject)
+						{
+							StringBuilder("EXC_INFO", numberStr, str, notification);
+						}
+						else
+						{
+							StringBuilder("EXC_CODE", numberStr, str, notification);
+						}
 					}
 					else
 					{
-						StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
+						SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
+
+						if (mSettings->mMsgDataPriority == DisplayPriority::Value)
+						{
+							/* Conditionally trim the leading 0x specifier */
+							U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
+							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], str, notification, DisplayPriority::Value);
+						}
+						else
+						{
+							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
+						}
 					}
+
 				}
 
 				break;
@@ -1535,11 +1563,12 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						else
 						{
 							BaseType type;
+							bool exception = false;
+							bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+							bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+							bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
 
-							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+							if (attribute)
 							{
 								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 							}
@@ -1548,7 +1577,25 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 								type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 							}
 
-							GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+							if (firstAttributeByte)
+							{
+								U16 tableIndex;
+
+								if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+								{
+									GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+
+									// Explicitly set display_base to ASCII to ensure proper escaping
+									// is performed when calling AppendCsvSafeString().
+									display_base = DisplayBase::ASCII;
+									exception = true;
+								}
+							}
+
+							if (!exception)
+							{
+								GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+							}
 						}
 
 						if (addLastMisoMsgHeader)
@@ -2390,6 +2437,40 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 
 						TableBuilder(SpiChannel::MISO, errorStr, notification);
+					}
+				}
+				else
+				{
+					bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+					bool exception = false;
+					bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+					bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
+
+					if (firstAttributeByte)
+					{
+						U16 tableIndex;
+
+						if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+						{
+							notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, str, sizeof(str), display_base);
+							exception = true;
+						}
+					}
+
+					if (exception)
+					{
+						char excepStr[FORMATTED_STRING_BUFFER_SIZE];
+
+						if (nwObject)
+						{
+							SNPRINTF(excepStr, sizeof(excepStr), "Exception Info: %s", str);
+							TableBuilder(SpiChannel::MISO, excepStr, notification);
+						}
+						else
+						{
+							SNPRINTF(excepStr, sizeof(excepStr), "Exception Code: %s", str);
+							TableBuilder(SpiChannel::MISO, excepStr, notification);
+						}
 					}
 				}
 

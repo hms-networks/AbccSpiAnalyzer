@@ -110,6 +110,15 @@ typedef struct NcInstNameTable
 	const LookupTable_t* inst_names;
 } NcInstNameTable_t;
 
+typedef struct ExceptionNameTable
+{
+	const S16 ref_id;
+	const U16 inst;
+	const U8 attribute;
+	const U8 num_excep_names;
+	const LookupTable_t* excep_names;
+} ExceptionNameTable_t;
+
 
 /*******************************************************************************
 **
@@ -1858,6 +1867,198 @@ ErrorNameTable_t asErrorNameTables[] =
 	{ ABP_OBJ_NUM_EIP,		NUM_ENTRIES(asEipErrNames),		asEipErrNames }
 };
 
+
+/*******************************************************************************
+**
+** Network Object's exception error code lookup tables
+**
+*******************************************************************************/
+
+static const LookupTable_t asNwExcptNames[] =
+{
+	{ ABP_NW_EXCPT_INFO_NONE,	"No exception",	NotifEvent::None }
+};
+
+static const LookupTable_t asNwBacExcptNames[] =
+{
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_AV,		"Could not read object instance AV",		NotifEvent::Alert },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BV,		"Could not read object instance BV",		NotifEvent::Alert },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_MSV,		"Could not read object instance MSV",		NotifEvent::Alert },
+	{ ABP_BAC_EXCPT_INFO_COULD_NOT_READ_OBJ_INST_BY_ADI,	"Could not read object instance by ADI",	NotifEvent::Alert }
+};
+
+/* Unused Lookup Tables
+static const LookupTable_t asNwCntExcptNames[] =
+{
+	{ ABP_CNT_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY instance",	NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwCpnExcptNames[] =
+{
+	{ ABP_CPN_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY instance",	NotifEvent::Alert }
+};
+*/
+
+static const LookupTable_t asNwDevExcptNames[] =
+{
+	{ ABP_DEV_NW_EXCPT_INFO_INVALID_SY_INST,	"Invalid SY instance",	NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwDpv1ExcptNames[] =
+{
+	{ ABP_NW_EXCPT_DPV1_TOO_MUCH_DEFAULT_CFG_DATA,			"Too much default config data",					NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_CFG_DATA_ATTR_TOO_BIG,				"Data attribute too big",						NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_CFG_DATA_MISMATCH_ADI_MAP,			"Data mismatch ADI map",						NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_TOO_MUCH_PROCESS_DATA,				"Too much process data",						NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_CFG_DATA_AND_ADI_MAP_SPEC,			"Data and ADI map spec",						NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_SSA_DISABLED,						"SSA disabled",									NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_INV_BUFFER_MODE_ATTR,				"Invalid buffer mode attribute",				NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_CFG_DATA_ATTR_INVALID,				"Config data attribute invalid",				NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_CFG_DATA_ATTR_TOO_MUCH_IO_DATA,		"Config data attribute too much IO data",		NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_UNABLE_TO_GET_ABCCDP_PARAM_LIST,	"Unable to get ABCC DP param list",				NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_INVALID_APPL_REMAP_CMD_RSP,			"Invalid application remap command response",	NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_INVALID_MAP_SLOT_0,					"Invalid map slot 0",							NotifEvent::Alert },
+	{ ABP_NW_EXCPT_DPV1_INVALID_MAP_EMPTY_SLOT,				"Invalid map empty slot",						NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwEctExcptNames[] =
+{
+	{ ABP_ECT_NW_EXCPT_ILLEGAL_DATA_TYPE,								"Illegal data type",								NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_INSTANCE_BY_ORDER_ERROR,							"Instance by order error",							NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_HIGHEST_INSTANCE_ERROR,							"Highest instance error",							NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_NUMBER_OF_INSTANCES_ERROR,						"Number of instances error",						NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_HIGHEST_INSTANCE_LOWER_THAN_NUMBER_OF_INSTANCES,	"Highest instance lower than number of instances",	NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_ASM_MAP_ERROR,									"Assembly map error",								NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_GET_INST_NUMBERS_ERROR,							"Get instance numbers error",						NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_MDD_ERROR,										"MDD error",										NotifEvent::Alert },
+	{ ABP_ECT_NW_EXCPT_NO_MAC_ADDR,										"No MAC address",									NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwEipExcptNames[] =
+{
+	{ ABP_EIP_NW_EXCPT_INFO_INVALID_SY_INST,		"Invalid SY Instance",			NotifEvent::Alert },
+	{ ABP_EIP_NW_EXCPT_INFO_INVALID_PROD_MAP_SIZE,	"Invalid producing map size",	NotifEvent::Alert },
+	{ ABP_EIP_NW_EXCPT_INFO_INVALID_CONS_MAP_SIZE,	"Invalid consuming map size",	NotifEvent::Alert },
+	{ ABP_EIP_NW_EXCPT_INFO_MISSING_MAC_ADDRESS,	"Missing MAC address",			NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwEplExcptNames[] =
+{
+	{ ABP_EPL_NW_EXCPT_GET_INST_NUMBERS_ERROR,		"Get instance numbers error",			NotifEvent::Alert },
+	{ ABP_EPL_NW_EXCPT_NO_MAC_ADDR,					"No MAC Address",						NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwModExcptNames[] =
+{
+	{ ABP_MOD_NW_EXCPT_MISSING_MAC_ADDRESS,	"Missing MAC address",	NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwCopExcptNames[] =
+{
+	{ ABP_COP_NW_EXCPT_ILLEGAL_DATA_TYPE,	"Illegal Data Type",	NotifEvent::Alert }
+};
+
+static const LookupTable_t asNwPnioExcptNames[] =
+{
+	{ ABP_PNIO_NW_EXCPT_ILLEGAL_VALUE,			"Illegal value",			NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_WRONG_DATA_SIZE,		"Wrong data size",			NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_ILLEGAL_RSP,			"Illegal response",			NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_MISSING_MAC_ADDRESS,	"Missing MAC address",		NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_CMD_TIMEOUT,			"Command timeout",			NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_MDD_ERR,				"MDD error",				NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_PE_WRONG_VERSION,		"PE wrong version",			NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_PE_INST_OUT_OF_RANGE,	"PE instance out of range",	NotifEvent::Alert },
+	{ ABP_PNIO_NW_EXCPT_INVALID_MAX_AR,			"Invalid Max AR",			NotifEvent::Alert }
+};
+
+/*******************************************************************************
+**
+** Anybus Object's exception error code lookup table
+**
+*******************************************************************************/
+
+static const LookupTable_t asAnbExcptNames[] =
+{
+	{ ABP_ANB_EXCPT_NONE,					"No exception",						NotifEvent::None },
+	{ ABP_ANB_EXCPT_APP_TO,					"Application timeout",				NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_DEV_ADDR,			"Invalid device address",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_COM_SETTINGS,		"Invalid communication settings",	NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_MAJ_UNREC_APP_EVNT,		"Major unrecoverable app event",	NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_WAIT_APP_RESET,			"Waiting for application reset",	NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_PRD_CFG,			"Invalid process data config",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_APP_RESPONSE,		"Invalid application response",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_NVS_CHECKSUM_ERROR,		"NVS memory checksum error",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_FUSM_ERROR,				"Functional Safety Module error",	NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INSUFF_APPL_IMPL,		"Insufficient application impl.",	NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_MISSING_SERIAL_NUM,		"Missing serial number",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_CORRUPT_FILE_SYSTEM,	"File system is corrupt",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_SECURITY_ERROR,			"Security Error",					NotifEvent::Alert }
+};
+
+/*******************************************************************************
+**
+** FUSM Object's exception error code lookup table
+**
+*******************************************************************************/
+
+static const LookupTable_t asFusmExcptNames[] =
+{
+	{ ABP_FUSM_EXCPT_INFO_NONE,					"None",									NotifEvent::None },
+	{ ABP_FUSM_EXCPT_INFO_BAUDRATE_NOT_SUPP,	"Baudrate not supported",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_NO_START_MSG,			"No start message",						NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_UNEXP_MSG_LENGTH,		"Unexpected message length",			NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_UNEXP_CMD_IN_RSP,		"Unexpected command in response",		NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_UNEXP_ERR_CODE,		"Unexpected error code",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_APPL_NOT_FOUND,		"Application not found",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INV_APPL_CRC,			"Invalid application CRC",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_NO_FLASH_ACCESS,		"No flash access",						NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_WRONG_UC_IN_RSP,		"Wrong UC in response",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_BL_TIMEOUT,			"BL timeout",							NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_NW_SPEC_PRM_ERR,		"Network specific parameter error",		NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INV_CFG_STRING,		"Invalid configuration string",			NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_UC_RSP_DIFFERS,		"UC response differs",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INCOMPAT_MODULE,		"Incompatible module",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_MAX_RETRANSMISSIONS,	"Max retransmissions",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_FW_FILE_ERROR,		"Firmware file error",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INV_CYCLE_TIME,		"Invalid cycle time",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INV_SPDU_IN_SIZE,		"Invalid SPDU input size",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_INV_SPDU_OUT_SIZE,	"Invalid SPDU output size",				NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_BAD_FORMAT_IN_SPDU,	"Bad format in SPDU",					NotifEvent::Alert },
+	{ ABP_FUSM_EXCPT_INFO_SAFE_MOD_INIT_FAIL,	"Safety module initialzation failed",	NotifEvent::Alert }
+};
+
+ExceptionNameTable asExceptionNameTables[] =
+{
+	/* Negative reference IDs are associated with Anybus objects other than the Network object. */
+	{ -ABP_OBJ_NUM_FUSM,			1,	ABP_FUSM_IA_EXCPT_INFO,		NUM_ENTRIES(asFusmExcptNames),		asFusmExcptNames }, /* Special case for addressing FUSM Object exceptions. */
+	{ -ABP_OBJ_NUM_ANB,				1,	ABP_ANB_IA_EXCEPTION,		NUM_ENTRIES(asAnbExcptNames),		asAnbExcptNames }, /* Special case for addressing Anybus Object exceptions. */
+
+	/* Positive reference IDs are associated with Network objects */
+	//{ ABP_NW_TYPE_CNT,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwCntExcptNames),		asNwCntExcptNames },
+	//{ ABP_NW_TYPE_CPN,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwCpnExcptNames),		asNwCpnExcptNames },
+	//{ ABP_NW_TYPE_CCL,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(),	 },
+	//{ ABP_NW_TYPE_CIET,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(),	 },
+	//{ ABP_NW_TYPE_CET,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(),	 },
+	//{ ABP_NW_TYPE_CET_IIOT,		1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(),	 },
+
+	{ ABP_NW_TYPE_BIP,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwBacExcptNames),		asNwBacExcptNames },
+	{ ABP_NW_TYPE_COP,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwCopExcptNames),		asNwCopExcptNames },
+	{ ABP_NW_TYPE_DEV,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwDevExcptNames),		asNwDevExcptNames },
+	{ ABP_NW_TYPE_ECT,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEctExcptNames),		asNwEctExcptNames },
+	{ ABP_NW_TYPE_EIP_1P,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEipExcptNames),		asNwEipExcptNames },
+	{ ABP_NW_TYPE_EIP_2P,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEipExcptNames),		asNwEipExcptNames },
+	{ ABP_NW_TYPE_EIP_2P_BB,		1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEipExcptNames),		asNwEipExcptNames },
+	{ ABP_NW_TYPE_EIP_2P_BB_IIOT,	1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEipExcptNames),		asNwEipExcptNames },
+	{ ABP_NW_TYPE_EPL,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwEplExcptNames),		asNwEplExcptNames },
+	{ ABP_NW_TYPE_ETN_1P,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwModExcptNames),		asNwModExcptNames },
+	{ ABP_NW_TYPE_ETN_2P,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwModExcptNames),		asNwModExcptNames },
+	{ ABP_NW_TYPE_PDPV1,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwDpv1ExcptNames),	asNwDpv1ExcptNames },
+	{ ABP_NW_TYPE_PIR,				1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwPnioExcptNames),	asNwPnioExcptNames },
+	{ ABP_NW_TYPE_PIR_FO,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwPnioExcptNames),	asNwPnioExcptNames },
+	{ ABP_NW_TYPE_PIR_FO_IIOT,		1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwPnioExcptNames),	asNwPnioExcptNames },
+	{ ABP_NW_TYPE_PIR_IIOT,			1,	ABP_NW_IA_EXCEPTION_INFO,	NUM_ENTRIES(asNwPnioExcptNames),	asNwPnioExcptNames }
+};
+
 static const CmdLookupTable_t* FindCmdEntryInTable(U8 cmd,
 	const CmdLookupTable_t* command_names, U8 num_commands);
 
@@ -1867,6 +2068,110 @@ static const AttrLookupTable_t* FindAttrEntryInTable(U16 inst, U8 attr,
 
 static const CmdLookupTable_t* LookupCmdEntry(U8 obj, U8 cmd);
 static const AttrLookupTable_t* LookupAttrEntry(U8 obj, U16 inst, U8 attr);
+
+
+bool GetExceptionTableIndex(bool nw_object, U8 nw_type_idx, const MsgHeaderInfo_t* msg_header, U16* table_index)
+{
+	const U16 unspecifiedNetworkTypeTableIndex = 0xFFFF;
+	bool foundTableEntry = false;
+	const U16 numEntries = sizeof(asExceptionNameTables) / sizeof(ExceptionNameTable_t);
+
+	if (nw_object && nw_type_idx == 0)
+	{
+		// Network type is unspecified. Return now, and let GetExceptionString() handle this special case.
+		*table_index = unspecifiedNetworkTypeTableIndex;
+		return true;
+	}
+
+	// Attempt to find matching "exception names" table.
+	for (*table_index = 0; *table_index < numEntries; (*table_index)++)
+	{
+		U8 attribute = static_cast<U8>(msg_header->cmdExt & 0x00FF);
+
+		if (nw_object && (asExceptionNameTables[*table_index].ref_id > 0))
+		{
+			// ref_id represents a network type.
+			if ((abNetworkTypeValue[nw_type_idx] == asExceptionNameTables[*table_index].ref_id) &&
+				(msg_header->inst == asExceptionNameTables[*table_index].inst) &&
+				(attribute == asExceptionNameTables[*table_index].attribute))
+			{
+				foundTableEntry = true;
+				break;
+			}
+		}
+		else if (!nw_object && (asExceptionNameTables[*table_index].ref_id < 0))
+		{
+			// ref_id represents an object number (in 2's complement).
+			U8 objNum = (U8)(~asExceptionNameTables[*table_index].ref_id + 1);
+
+			if ((objNum == msg_header->obj) &&
+				(msg_header->inst == asExceptionNameTables[*table_index].inst) &&
+				(attribute == asExceptionNameTables[*table_index].attribute))
+			{
+				foundTableEntry = true;
+				break;
+			}
+		}
+	}
+
+	return foundTableEntry;
+}
+
+NotifEvent_t GetExceptionString(bool nw_object, U16 table_index, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
+{
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	NotifEvent_t notification = NotifEvent::None;
+	bool found = false;
+	U8 exceptionEntry;
+
+	if (nw_object)
+	{
+		const U16 unspecifiedNetworkTypeTableIndex = 0xFFFF;
+
+		if (table_index == unspecifiedNetworkTypeTableIndex)
+		{
+			GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr), BaseType::Numeric);
+			SNPRINTF(str, max_str_len, "Unspecified network type, set in settings to enumerate: %s", numberStr);
+			return NotifEvent::None;
+		}
+
+		// Search for the "common" network object exception table.
+		for (exceptionEntry = 0; exceptionEntry < NUM_ENTRIES(asNwExcptNames); exceptionEntry++)
+		{
+			if (asNwExcptNames[exceptionEntry].value == val)
+			{
+				SNPRINTF(str, max_str_len, "%s", asNwExcptNames[exceptionEntry].name);
+				notification = asNwExcptNames[exceptionEntry].notification;
+				found = true;
+				break;
+			}
+		}
+	}
+
+	if (!found)
+	{
+		// Attempt to find the exception value in the "exception names" object-specific/network-specific table.
+		for (exceptionEntry = 0; exceptionEntry < asExceptionNameTables[table_index].num_excep_names; exceptionEntry++)
+		{
+			if (asExceptionNameTables[table_index].excep_names[exceptionEntry].value == val)
+			{
+				SNPRINTF(str, max_str_len, "%s", asExceptionNameTables[table_index].excep_names[exceptionEntry].name);
+				notification = asExceptionNameTables[table_index].excep_names[exceptionEntry].notification;
+				found = true;
+				break;
+			}
+		}
+	}
+
+	if (!found)
+	{
+		GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr), BaseType::Numeric);
+		SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
+		notification = NotifEvent::Alert;
+	}
+
+	return notification;
+}
 
 void GetNumberString(U64 number, DisplayBase display_base, U32 num_data_bits, char* result_string, U32 result_string_max_length, BaseType base_type )
 {
