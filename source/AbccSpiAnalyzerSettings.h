@@ -143,7 +143,7 @@ protected: /* Methods */
 
 #if ENABLE_ADVANCED_SETTINGS
 	std::unique_ptr< AnalyzerSettingInterfaceText >			mAdvancedSettingsInterface;
-	bool ParseAdavancedSettingsFile( void );
+	bool ParseAdvancedSettingsFile(void);
 #endif
 
 	U8 SaveSettingChangeID();

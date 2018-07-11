@@ -220,7 +220,7 @@ SpiAnalyzerSettings::~SpiAnalyzerSettings()
 {
 }
 
-bool SpiAnalyzerSettings::ParseAdavancedSettingsFile(void)
+bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 {
 	rapidxml::xml_document<> doc;
 	rapidxml::xml_node<> * rootNode;
@@ -370,7 +370,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
 #if ENABLE_ADVANCED_SETTINGS
 	mAdvSettingsPath = mAdvancedSettingsInterface->GetText();
-	if (!ParseAdavancedSettingsFile())
+	if (!ParseAdvancedSettingsFile())
 	{
 		return false;
 	}
