@@ -220,7 +220,11 @@ static const LookupTable_t asLedStsNames[] =
 	{ 0x0020, "LED3B",		NotifEvent::None },
 	{ 0x0040, "LED4A",		NotifEvent::None },
 	{ 0x0080, "LED4B",		NotifEvent::None },
-	{ 0xFF00, "RESERVED",	NotifEvent::Alert }
+	{ 0x0100, "LED5A",		NotifEvent::None },
+	{ 0x0200, "LED5B",		NotifEvent::None },
+	{ 0x0400, "LED6A",		NotifEvent::None },
+	{ 0x0800, "LED6B",		NotifEvent::None },
+	{ 0xF000, "RESERVED",	NotifEvent::Alert }
 };
 
 /*******************************************************************************
