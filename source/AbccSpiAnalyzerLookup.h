@@ -23,7 +23,7 @@ bool GetAbccStatusString(U8 val, char *str, U16 max_str_len, DisplayBase display
 
 bool GetErrorRspString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
 
-bool GetErrorRspString(U8 obj, U8 val, char *str, U16 max_str_len, DisplayBase display_base);
+bool GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char *str, U16 max_str_len, DisplayBase display_base);
 
 bool GetIntMaskString(U8 val, char *str, U16 max_str_len, DisplayBase display_base);
 

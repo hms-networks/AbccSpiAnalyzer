@@ -357,13 +357,20 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
 	StringBuilder("ERR_CODE", numberStr, str, alert);
 }
 
-void SpiAnalyzerResults::BuildErrorRsp(U8 obj, U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildErrorRsp(U8 nw_type_idx, U8 obj, U8 val, DisplayBase display_base)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	bool alert = GetErrorRspString(obj, val, &str[0], sizeof(str), display_base);
+	bool alert = GetErrorRspString(nw_type_idx, obj, val, &str[0], sizeof(str), display_base);
 	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
-	StringBuilder("OBJ_ERR", numberStr, str, alert);
+	if( nw_type_idx == 0 )
+	{
+		StringBuilder("OBJ_ERR", numberStr, str, alert);
+	}
+	else
+	{
+		StringBuilder("NW_ERR", numberStr, str, alert);
+	}
 }
 
 void SpiAnalyzerResults::BuildIntMask(U8 val, DisplayBase display_base)
@@ -461,14 +468,24 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				case e_ABCC_MOSI_WR_MSG_SUBFIELD_data:
 					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 					{
-						if ((U32)frame.mData2 == 0)
+						if (((U8)frame.mData2) == 0)
 						{
 							BuildErrorRsp((U8)frame.mData1, display_base);
 						}
 						else
 						{
+							U8 nw_type_idx = 0;
 							U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-							BuildErrorRsp(obj, (U8)frame.mData1, display_base);
+
+							/* Bytes 1 and onward are always understood as object-specific
+							** or network-specific error codes. The current implementation
+							** supports only one extra byte in the error response message
+							** data past the object specific or network-specific error */
+							if (((U8)frame.mData2) == 2)
+							{
+								nw_type_idx = (U8)mSettings->mNetworkType;
+							}
+							BuildErrorRsp(nw_type_idx, obj, (U8)frame.mData1, display_base);
 						}
 					}
 					else
@@ -620,14 +637,24 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, D
 				case e_ABCC_MISO_RD_MSG_SUBFIELD_data:
 					if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 					{
-						if ((U32)frame.mData2 == 0)
+						if (((U8)frame.mData2) == 0)
 						{
 							BuildErrorRsp((U8)frame.mData1, display_base);
 						}
 						else
 						{
+							U8 nw_type_idx = 0;
 							U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-							BuildErrorRsp(obj, (U8)frame.mData1, display_base);
+
+							/* Bytes 1 and onward are always understood as object-specific
+							** or network-specific error codes. The current implementation
+							** supports only one extra byte in the error response message
+							** data past the object specific or network-specific error */
+							if (((U8)frame.mData2) == 2)
+							{
+								nw_type_idx = (U8)mSettings->mNetworkType;
+							}
+							BuildErrorRsp(nw_type_idx, obj, (U8)frame.mData1, display_base);
 						}
 					}
 					else
@@ -1123,7 +1150,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 							else
 							{
 								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-								GetErrorRspString(obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)mSettings->mNetworkType, obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 						}
 						else
@@ -1308,7 +1335,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 							else
 							{
 								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-								GetErrorRspString(obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)mSettings->mNetworkType, obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 						}
 						else

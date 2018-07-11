@@ -1486,6 +1486,26 @@ static const tValueName asDiErrNames[] =
 	{ ABP_DI_ERR_NW_SPECIFIC,		"Network specific error",			true }
 };
 
+static const tValueName asPirDiErrNames[] =
+{
+	{ 0x03,	"API does not exist",								true },
+	{ 0x04,	"No module inserted in the specified slot",			true },
+	{ 0x05,	"No submodule inserted in the specified subslot",	true },
+	{ 0x06,	"Slot number specified is out-of-range",			true },
+	{ 0x07,	"Subslot number specified is out-of-range",			true },
+	{ 0x08,	"Failed to add the channel diagnostic entry",		true },
+	{ 0x09,	"Failed to send the channel diagnostic alarm",		true },
+	{ 0x0A,	"Channel number out-of-range",						true },
+	{ 0x0B,	"ChannelPropType out-of-range",						true },
+	{ 0x0C,	"ChannelPropDir out-of-range",						true },
+	{ 0x0D,	"ChannelPropAcc out-of-range",						true },
+	{ 0x0E,	"ChannelPropMaintReq out-of-range",					true },
+	{ 0x0F,	"ChannelPropMaintDem out-of-range",					true },
+	{ 0x10,	"UserStructIdent out-of-range",						true },
+	{ 0x11,	"ChannelErrType out-of-range",						true },
+	{ 0xFF,	"Unknown error",									true }
+};
+
 static const tValueName asEipErrNames[] =
 {
 	{ ABP_EIP_ERR_OWNERSHIP_CONFLICT,	"Ownership conflict",		true },
@@ -1825,7 +1845,7 @@ bool GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const tValueNam
 	return true;
 }
 
-bool GetErrorRspString(U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
+bool GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
@@ -1849,8 +1869,33 @@ bool GetErrorRspString(U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase d
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
-		GetObjSpecificErrString(val, str, max_str_len, &asDiErrNames[0],
-			NUM_ENTRIES(asDiErrNames), display_base);
+		if( nw_type_idx == 0 )
+		{
+			/* Use object-specific lookup table */
+			GetObjSpecificErrString(val, str, max_str_len, &asDiErrNames[0],
+				NUM_ENTRIES(asDiErrNames), display_base);
+		}
+		else
+		{
+			/* Use network-specific lookup table */
+			switch (abNetworkTypeValue[nw_type_idx])
+			{
+			case ABP_NW_TYPE_PRT:
+			case ABP_NW_TYPE_PRT_2P:
+			case ABP_NW_TYPE_PIR:
+			case ABP_NW_TYPE_PIR_FO:
+			case ABP_NW_TYPE_PIR_FO_IIOT:
+			case ABP_NW_TYPE_PIR_IIOT:
+				/* Profinet */
+				GetObjSpecificErrString(val, str, max_str_len, &asPirDiErrNames[0],
+					NUM_ENTRIES(asPirDiErrNames), display_base);
+				break;
+			default:
+				AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len);
+				SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
+				break;
+			}
+		}
 		break;
 	case ABP_OBJ_NUM_MOD:
 		/* Modbus Object */

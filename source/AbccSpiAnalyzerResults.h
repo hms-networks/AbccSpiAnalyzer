@@ -76,7 +76,7 @@ protected: /* functions */
 	virtual void BuildSpiStsString(U8 val, DisplayBase display_base);
 	virtual bool BuildCmdString(U8 val, U8 obj, DisplayBase display_base);
 	virtual void BuildErrorRsp(U8 val, DisplayBase display_base);
-	virtual void BuildErrorRsp(U8 val, U8 obj, DisplayBase display_base);
+	virtual void BuildErrorRsp(U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
 	virtual void BuildAbccStatus(U8 val, DisplayBase display_base);
 	virtual void BuildApplStatus(U8 val, DisplayBase display_base);
 	virtual void BuildIntMask(U8 val, DisplayBase display_base);
