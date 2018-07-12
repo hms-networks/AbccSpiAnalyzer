@@ -303,7 +303,7 @@ void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 val, Displa
 	}
 	else
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, NULL, NotifEvent::None);
+		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, nullptr, NotifEvent::None);
 	}
 }
 
@@ -324,7 +324,7 @@ void SpiAnalyzerResults::BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAcc
 	}
 	else
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, NULL, NotifEvent::None);
+		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, nullptr, NotifEvent::None);
 	}
 }
 
@@ -428,16 +428,16 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			if ((IS_MISO_FRAME(frame) && (channel == mSettings->mMisoChannel)) ||
 				(IS_MOSI_FRAME(frame) && (channel == mSettings->mMosiChannel)))
 			{
-				StringBuilder("FRAGMENT", NULL, "Fragmented ABCC SPI Packet.", notification);
+				StringBuilder("FRAGMENT", nullptr, "Fragmented ABCC SPI Packet.", notification);
 			}
 
 			break;
 		case AbccSpiError::EndOfTransfer:
-			StringBuilder("CLOCKING", NULL, "ABCC SPI Clocking. The analyzer expects one transaction per 'Active Enable' phase.", notification);
+			StringBuilder("CLOCKING", nullptr, "ABCC SPI Clocking. The analyzer expects one transaction per 'Active Enable' phase.", notification);
 			break;
 		case AbccSpiError::Generic:
 		default:
-			StringBuilder("ERROR", NULL, "ABCC SPI Error.", notification);
+			StringBuilder("ERROR", nullptr, "ABCC SPI Error.", notification);
 			break;
 		}
 	}
@@ -523,7 +523,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMosiStates::MessageField_DataNotValid:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, NULL, notification, DisplayPriority::Tag);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification, DisplayPriority::Tag);
 				break;
 			case AbccMosiStates::MessageField_Size:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
@@ -552,7 +552,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMosiStates::MessageField_SourceId:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, NULL, notification);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				break;
 			case AbccMosiStates::MessageField_Object:
 				BuildObjectString((U8)frame.mData1, display_base);
@@ -589,7 +589,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, NULL, notification);
+					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				}
 
 				break;
@@ -632,7 +632,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 					notification = NotifEvent::Alert;
 				}
 
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, NULL, notification);
+				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				break;
 			default:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr));
@@ -674,7 +674,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMisoStates::NetworkTime:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, NULL, notification);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				break;
 			case AbccMisoStates::MessageField:
 			case AbccMisoStates::MessageField_Data:
@@ -721,7 +721,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMisoStates::MessageField_DataNotValid:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::MessageField_Data), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, NULL, notification, DisplayPriority::Tag);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification, DisplayPriority::Tag);
 				break;
 			case AbccMisoStates::MessageField_Size:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
@@ -750,7 +750,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMisoStates::MessageField_SourceId:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, NULL, notification);
+				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				break;
 			case AbccMisoStates::MessageField_Object:
 				BuildObjectString((U8)frame.mData1, display_base);
@@ -787,7 +787,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				else
 				{
 					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, NULL, notification);
+					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				}
 
 				break;

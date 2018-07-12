@@ -19,8 +19,8 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define IS_3WIRE_MODE() (((mEnable == NULL) && (mSettings->m4WireOn3Channels == false)) || (mSettings->m3WireOn4Channels == true))
-#define IS_PURE_4WIRE_MODE() ((mEnable != NULL) && (mSettings->m3WireOn4Channels == false))
+#define IS_3WIRE_MODE() (((mEnable == nullptr) && (mSettings->m4WireOn3Channels == false)) || (mSettings->m3WireOn4Channels == true))
+#define IS_PURE_4WIRE_MODE() ((mEnable != nullptr) && (mSettings->m3WireOn4Channels == false))
 
 inline void SpiAnalyzer::ProcessSample(AnalyzerChannelData* chn_data, DataBuilder& data, Channel& chn)
 {
@@ -44,10 +44,10 @@ SpiAnalyzer::SpiAnalyzer()
 	: Analyzer2(),
 	mSettings(new SpiAnalyzerSettings()),
 	mSimulationInitialized(false),
-	mMosi(NULL),
-	mMiso(NULL),
-	mClock(NULL),
-	mEnable(NULL)
+	mMosi(nullptr),
+	mMiso(nullptr),
+	mClock(nullptr),
+	mEnable(nullptr)
 {
 	SetAnalyzerSettings(mSettings.get());
 
@@ -140,7 +140,7 @@ void SpiAnalyzer::WorkerThread()
 	Setup();
 
 	/* Check that all required channels are valid */
-	if ( (mMiso != NULL) && (mMosi != NULL) && (mClock != NULL) )
+	if ( (mMiso != nullptr) && (mMosi != nullptr) && (mClock != nullptr) )
 	{
 		mMisoVars.oChecksum = AbccCrc();
 		mMosiVars.oChecksum = AbccCrc();
@@ -153,8 +153,8 @@ void SpiAnalyzer::WorkerThread()
 		mMisoVars.bLastAnbSts = 0xFF;
 		mMosiVars.bLastApplSts = 0xFF;
 
-		RunAbccMosiMsgSubStateMachine(StateOperation::Reset, NULL, NULL);
-		RunAbccMisoMsgSubStateMachine(StateOperation::Reset, NULL, NULL);
+		RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
+		RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
 
 		for (;;)
 		{
@@ -221,7 +221,7 @@ void SpiAnalyzer::WorkerThread()
 				SignalReadyForNewPacket(SpiChannel::MOSI);
 
 				/* Advance to the next enabled (or idle) state */
-				if (mEnable != NULL)
+				if (mEnable != nullptr)
 				{
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				}
@@ -281,7 +281,7 @@ void SpiAnalyzer::Setup()
 	}
 	else
 	{
-		mMosi = NULL;
+		mMosi = nullptr;
 	}
 
 	if (mSettings->mMisoChannel != UNDEFINED_CHANNEL)
@@ -290,7 +290,7 @@ void SpiAnalyzer::Setup()
 	}
 	else
 	{
-		mMiso = NULL;
+		mMiso = nullptr;
 	}
 
 	if (mSettings->mMisoChannel != UNDEFINED_CHANNEL)
@@ -299,7 +299,7 @@ void SpiAnalyzer::Setup()
 	}
 	else
 	{
-		mClock = NULL;
+		mClock = nullptr;
 	}
 
 	if (mSettings->mEnableChannel != UNDEFINED_CHANNEL)
@@ -308,7 +308,7 @@ void SpiAnalyzer::Setup()
 	}
 	else
 	{
-		mEnable = NULL;
+		mEnable = nullptr;
 	}
 }
 
@@ -359,7 +359,7 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
 		return false;
 	}
 
-	if (mEnable != NULL)
+	if (mEnable != nullptr)
 	{
 		if (mClock->DoMoreTransitionsExistInCurrentData())
 		{
@@ -712,7 +712,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(SpiChannel_t e_channel)
 	{
 		fStartNewPacket = true;
 		mResults->CancelPacketAndStartNewPacket();
-		if (mEnable != NULL)
+		if (mEnable != nullptr)
 		{
 			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorX, mSettings->mEnableChannel);
 		}
@@ -723,14 +723,14 @@ void SpiAnalyzer::SignalReadyForNewPacket(SpiChannel_t e_channel)
 		fStartNewPacket = true;
 		if (packetId == INVALID_RESULT_INDEX)
 		{
-			if (mEnable != NULL)
+			if (mEnable != nullptr)
 			{
 				mResults->AddMarker(mCurrentSample, AnalyzerResults::Zero, mSettings->mEnableChannel);
 			}
 		}
 		else
 		{
-			if (mEnable != NULL)
+			if (mEnable != nullptr)
 			{
 				AnalyzerResults::MarkerType eMarkerType = GetPacketMarkerType();
 
@@ -825,7 +825,7 @@ void SpiAnalyzer::AddFragFrame(SpiChannel_t e_channel, U64 first_sample, U64 las
 
 		/* Only apply marker from MOSI, this prevents multiple markers at the same spot
 		** in such instances draw distance is reduced significantly. */
-		if (mEnable != NULL)
+		if (mEnable != nullptr)
 		{
 			mResults->AddMarker(last_sample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
 		}
@@ -1350,7 +1350,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 		{
 			mMisoVars.lFramesFirstSample = first_sample;
 		}
-		if (mEnable != NULL)
+		if (mEnable != nullptr)
 		{
 			AddFragFrame(SpiChannel::MISO, mMisoVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
@@ -1476,7 +1476,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 				mMisoVars.eState = AbccMisoStates::MessageField;
 				if (mMisoVars.fNewMsg)
 				{
-					RunAbccMisoMsgSubStateMachine(StateOperation::Reset, NULL, &eMsgSubState);
+					RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, &eMsgSubState);
 				}
 			}
 			else if (mMisoVars.dwPdLen != 0)
@@ -1557,7 +1557,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 		if (mMisoVars.eState != AbccMisoStates::Idle)
 		{
 			/* We have a fragmented message */
-			if (mEnable != NULL)
+			if (mEnable != nullptr)
 			{
 				AddFragFrame(SpiChannel::MISO, mMisoVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 			}
@@ -1623,7 +1623,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			mMosiVars.lFramesFirstSample = first_sample;
 		}
 		mMosiVars.eState = AbccMosiStates::Idle;
-		if (mEnable != NULL)
+		if (mEnable != nullptr)
 		{
 			AddFragFrame(SpiChannel::MOSI, mMosiVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 		}
@@ -1756,7 +1756,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 				mMosiVars.eState = AbccMosiStates::MessageField;
 				if (mMosiVars.fNewMsg)
 				{
-					RunAbccMosiMsgSubStateMachine(StateOperation::Reset, NULL, &eMsgSubState);
+					RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, &eMsgSubState);
 				}
 			}
 			else if (mMosiVars.dwPdLen != 0)
@@ -1843,7 +1843,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 		if (mMosiVars.eState != AbccMosiStates::Idle)
 		{
 			/* We have a fragmented message */
-			if (mEnable != NULL)
+			if (mEnable != nullptr)
 			{
 				AddFragFrame(SpiChannel::MOSI, mMosiVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
 			}

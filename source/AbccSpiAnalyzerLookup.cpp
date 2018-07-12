@@ -2075,7 +2075,7 @@ NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 								const LookupTable_t* inst_names, U8 num_inst_names)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	const LookupTable_t* attrNames = NULL;
+	const LookupTable_t* attrNames = nullptr;
 	U8 numAttrs = 0;
 	NotifEvent_t notification = NotifEvent::None;
 	bool found = false;
@@ -2089,7 +2089,7 @@ NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 		}
 		else
 		{
-			if (obj_names != NULL)
+			if (obj_names != nullptr)
 			{
 				attrNames = obj_names;
 				numAttrs = num_obj_names;
@@ -2102,7 +2102,7 @@ NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 	}
 	else
 	{
-		if (num_inst_names != NULL)
+		if (num_inst_names != 0)
 		{
 			attrNames = inst_names;
 			numAttrs = num_inst_names;
@@ -2451,42 +2451,42 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_ANB:
 		/* Anybus Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asAnbInstAttrNames[0], NUM_ENTRIES(asAnbInstAttrNames));
+										  nullptr, 0, &asAnbInstAttrNames[0], NUM_ENTRIES(asAnbInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_BAC:
 		/* BacNet Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asBacInstAttrNames[0], NUM_ENTRIES(asBacInstAttrNames));
+										  nullptr, 0, &asBacInstAttrNames[0], NUM_ENTRIES(asBacInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CCL:
 		/* CC-Link Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCclInstAttrNames[0], NUM_ENTRIES(asCclInstAttrNames));
+										  nullptr, 0, &asCclInstAttrNames[0], NUM_ENTRIES(asCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CFN:
 		/* CFN Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCfnInstAttrNames[0], NUM_ENTRIES(asCfnInstAttrNames));
+										  nullptr, 0, &asCfnInstAttrNames[0], NUM_ENTRIES(asCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CNT:
 		/* ControlNet Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCntInstAttrNames[0], NUM_ENTRIES(asCntInstAttrNames));
+										  nullptr, 0, &asCntInstAttrNames[0], NUM_ENTRIES(asCntInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_COP:
 		/* CANopen Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCopInstAttrNames[0], NUM_ENTRIES(asCopInstAttrNames));
+										  nullptr, 0, &asCopInstAttrNames[0], NUM_ENTRIES(asCopInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPN:
 		/* CompoNet Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCpnInstAttrNames[0], NUM_ENTRIES(asCpnInstAttrNames));
+										  nullptr, 0, &asCpnInstAttrNames[0], NUM_ENTRIES(asCpnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DEV:
 		/* DeviceNet Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asDevInstAttrNames[0], NUM_ENTRIES(asDevInstAttrNames));
+										  nullptr, 0, &asDevInstAttrNames[0], NUM_ENTRIES(asDevInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_DI:
 		/* Diagnostic Object */
@@ -2497,7 +2497,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_DPV1:
 		/* DPV1 Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asDpv1InstAttrNames[0], NUM_ENTRIES(asDpv1InstAttrNames));
+										  nullptr, 0, &asDpv1InstAttrNames[0], NUM_ENTRIES(asDpv1InstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECO:
 		/* Energy Control Object */
@@ -2508,22 +2508,22 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_ER:
 		/* Energy Reporting Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asErInstAttrNames[0], NUM_ENTRIES(asErInstAttrNames));
+										  nullptr, 0, &asErInstAttrNames[0], NUM_ENTRIES(asErInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MOD:
 		/* Modbus Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asModInstAttrNames[0], NUM_ENTRIES(asModInstAttrNames));
+										  nullptr, 0, &asModInstAttrNames[0], NUM_ENTRIES(asModInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NW:
 		/* Network Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwInstAttrNames[0], NUM_ENTRIES(asNwInstAttrNames));
+										  nullptr, 0, &asNwInstAttrNames[0], NUM_ENTRIES(asNwInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NC:
 		/* Network Configuration Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNcInstAttrNames[0], NUM_ENTRIES(asNcInstAttrNames));
+										  nullptr, 0, &asNcInstAttrNames[0], NUM_ENTRIES(asNcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SOC:
 		/* Socket Interface Object */
@@ -2547,37 +2547,37 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_FUSM:
 		/* Functional Safety Module Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asFusmInstAttrNames[0], NUM_ENTRIES(asFusmInstAttrNames));
+										  nullptr, 0, &asFusmInstAttrNames[0], NUM_ENTRIES(asFusmInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWETN:
 		/* Network Ethernet Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
+										  nullptr, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCCL:
 		/* Network CCL Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwCclInstAttrNames[0], NUM_ENTRIES(asNwCclInstAttrNames));
+										  nullptr, 0, &asNwCclInstAttrNames[0], NUM_ENTRIES(asNwCclInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWCFN:
 		/* Network CFN Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwCfnInstAttrNames[0], NUM_ENTRIES(asNwCfnInstAttrNames));
+										  nullptr, 0, &asNwCfnInstAttrNames[0], NUM_ENTRIES(asNwCfnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWPNIO:
 		/* Network PNIO Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwPnioInstAttrNames[0], NUM_ENTRIES(asNwPnioInstAttrNames));
+										  nullptr, 0, &asNwPnioInstAttrNames[0], NUM_ENTRIES(asNwPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_NWDPV1:
 		/* Network DPV1 Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
+										  nullptr, 0, &asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ETN:
 		/* Ethernet Host Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asEtnInstAttrNames[0], NUM_ENTRIES(asEtnInstAttrNames));
+										  nullptr, 0, &asEtnInstAttrNames[0], NUM_ENTRIES(asEtnInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_CPC:
 		/* CIP Port Configuration Object */
@@ -2588,12 +2588,12 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_SAFE:
 		/* Functional Safety Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asSafeInstAttrNames[0], NUM_ENTRIES(asSafeInstAttrNames));
+										  nullptr, 0, &asSafeInstAttrNames[0], NUM_ENTRIES(asSafeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EPL:
 		/* Ethernet POWERLINK Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asEplInstAttrNames[0], NUM_ENTRIES(asEplInstAttrNames));
+										  nullptr, 0, &asEplInstAttrNames[0], NUM_ENTRIES(asEplInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ASM:
 		/* Assembly Mapping Object */
@@ -2605,32 +2605,32 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 		/* Modular Device Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
 										  &asMddObjAttrNames[0], NUM_ENTRIES(asMddObjAttrNames),
-										  NULL, 0);
+										  nullptr, 0);
 		break;
 	case ABP_OBJ_NUM_CIPID:
 		/* CIP Identity Host Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asCipIdInstAttrNames[0], NUM_ENTRIES(asCipIdInstAttrNames));
+										  nullptr, 0, &asCipIdInstAttrNames[0], NUM_ENTRIES(asCipIdInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SYNC:
 		/* Sync Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asSyncInstAttrNames[0], NUM_ENTRIES(asSyncInstAttrNames));
+										  nullptr, 0, &asSyncInstAttrNames[0], NUM_ENTRIES(asSyncInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_ECT:
 		/* EtherCAT Host Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asEtcInstAttrNames[0], NUM_ENTRIES(asEtcInstAttrNames));
+										  nullptr, 0, &asEtcInstAttrNames[0], NUM_ENTRIES(asEtcInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNIO:
 		/* PROFINET IO Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asPnioInstAttrNames[0], NUM_ENTRIES(asPnioInstAttrNames));
+										  nullptr, 0, &asPnioInstAttrNames[0], NUM_ENTRIES(asPnioInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EIP:
 		/* EtherNet/IP Host Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asEipInstAttrNames[0], NUM_ENTRIES(asEipInstAttrNames));
+										  nullptr, 0, &asEipInstAttrNames[0], NUM_ENTRIES(asEipInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_APPD:
 		/* Application Data Object */
@@ -2641,32 +2641,32 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	case ABP_OBJ_NUM_APP:
 		/* Application Object */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asAppInstAttrNames[0], NUM_ENTRIES(asAppInstAttrNames));
+										  nullptr, 0, &asAppInstAttrNames[0], NUM_ENTRIES(asAppInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_PNAM:
 		/* PROFINET Asset Management */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asPnamInstAttrNames[0], NUM_ENTRIES(asPnamInstAttrNames));
+										  nullptr, 0, &asPnamInstAttrNames[0], NUM_ENTRIES(asPnamInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_EME:
 		/* Energy Measurement */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asEmeInstAttrNames[0], NUM_ENTRIES(asEmeInstAttrNames));
+										  nullptr, 0, &asEmeInstAttrNames[0], NUM_ENTRIES(asEmeInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_OPCUA:
 		/* OPC Unified Architecture */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
+										  nullptr, 0, &asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_MQTT:
 		/* MQTT */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asMqttInstAttrNames[0], NUM_ENTRIES(asMqttInstAttrNames));
+										  nullptr, 0, &asMqttInstAttrNames[0], NUM_ENTRIES(asMqttInstAttrNames));
 		break;
 	case ABP_OBJ_NUM_SRC3:
 		/* SERCOS III */
 		*notif_ptr = GetNamedAttrString(inst, (U8)val, &str[offset], max_str_len, display_base,
-										  NULL, 0, &asSrc3InstAttrNames[0], NUM_ENTRIES(asSrc3InstAttrNames));
+										  nullptr, 0, &asSrc3InstAttrNames[0], NUM_ENTRIES(asSrc3InstAttrNames));
 		break;
 	default:
 		objFound = false;
