@@ -103,7 +103,9 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 
 
 	mNetworkTypeInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mNetworkTypeInterface->SetTitleAndTooltip("Network Type :", "Used to process network specific details such as the network configuration object's instance names.\nCan be set to \"Unspecified\", if unsure or if such details are not important.");
+	mNetworkTypeInterface->SetTitleAndTooltip("Network Type :",
+		"Used to process network specific details such as the network configuration object's instance names.\n"
+		"Can be set to \"Unspecified\", if unsure or if such details are not important.");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,		"Unspecified","");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,			"PROFIBUS DP-V0", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,			"PROFIBUS DP-V1", "");
@@ -139,48 +141,78 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mIndexErrorsInterface->SetValue(mErrorIndexing);
 
 	mIndexAnybusStatusInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexAnybusStatusInterface->SetTitleAndTooltip("Index - Anybus Status :", "Enable indexed searching of Anybus status.\nEntries are added on status change events.\nFirst valid packet in capture will always trigger this event.");
+	mIndexAnybusStatusInterface->SetTitleAndTooltip("Index - Anybus Status :",
+		"Enable indexed searching of Anybus status.\n"
+		"Entries are added on status change events.\n"
+		"First valid packet in capture will always trigger this event.");
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 
 	mIndexApplStatusInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexApplStatusInterface->SetTitleAndTooltip("Index - Application Status :", "Enable indexed searching of application status.\nEntries are added on status change events.\nFirst valid packet in capture will always trigger this event.");
+	mIndexApplStatusInterface->SetTitleAndTooltip("Index - Application Status :",
+		"Enable indexed searching of application status.\n"
+		"Entries are added on status change events.\n"
+		"First valid packet in capture will always trigger this event.");
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
 
 	mIndexTimestampsInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mIndexTimestampsInterface->SetTitleAndTooltip("Index - Network Timestamp :", "Enable indexed searching of ABCC network timestamps.\nUseful for benchmarking; otherwise it is recommended to keep this option disabled.");
-	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::Disabled),  "Disabled", "No network timestamps will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::AllPackets),  "All Packets", "The timestamp from every ABCC SPI packet will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::WriteProcessDataValid), "Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
-	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::NewReadProcessData), "New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
+	mIndexTimestampsInterface->SetTitleAndTooltip("Index - Network Timestamp :",
+		"Enable indexed searching of ABCC network timestamps.\n"
+		"Useful for benchmarking; otherwise it is recommended to keep this option disabled.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::Disabled),
+		"Disabled", "No network timestamps will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::AllPackets),
+		"All Packets", "The timestamp from every ABCC SPI packet will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::WriteProcessDataValid),
+		"Write Process Data Valid", "The timestamp from ABCC SPI packets containing \"valid\" write process data will be added to tabular results.");
+	mIndexTimestampsInterface->AddNumber(static_cast<double>(TimestampIndexing::NewReadProcessData),
+		"New Read Process Data", "The timestamp from ABCC SPI packets containing \"new\" read process data will be added to tabular results.");
 	mIndexTimestampsInterface->SetNumber(static_cast<double>(mTimestampIndexing));
 
 	mIndexMessageSrcIdInterface.reset(new AnalyzerSettingInterfaceBool());
-	mIndexMessageSrcIdInterface->SetTitleAndTooltip("Index - Message 'Source ID' :", "Enable indexed searching of the source ID associated with an ABCC transaction.");
+	mIndexMessageSrcIdInterface->SetTitleAndTooltip("Index - Message 'Source ID' :",
+		"Enable indexed searching of the source ID associated with an ABCC transaction.");
 	mIndexMessageSrcIdInterface->SetValue(mMessageSrcIdIndexing);
 
 	mMessageIndexingVerbosityLevelInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :", "Specifies how detailed the decoded protcols entries are.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Disabled),  "Disabled", "Messages will not be indexed in searchable results.\nUse when object messaging is of no interest.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Compact),  "Compact Results", "Message header information is added to a single tabular result.\nThis option is useful when looking for very specific messages.");
-	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Detailed), "Verbose Results", "Message header information is added to tabular results individually.\nRecommended setting for general use.");
+	mMessageIndexingVerbosityLevelInterface->SetTitleAndTooltip("Index - Message :",
+		"Specifies how detailed the decoded protcols entries are.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Disabled),
+		"Disabled", "Messages will not be indexed in searchable results.\n"
+		"Use when object messaging is of no interest.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Compact),
+		"Compact Results", "Message header information is added to a single tabular result.\n"
+		"This option is useful when looking for very specific messages.");
+	mMessageIndexingVerbosityLevelInterface->AddNumber(static_cast<double>(MessageIndexing::Detailed),
+		"Verbose Results", "Message header information is added to tabular results individually.\n"
+		"Recommended setting for general use.");
 	mMessageIndexingVerbosityLevelInterface->SetNumber(static_cast<double>(mMessageIndexingVerbosityLevel));
 
 	mMsgDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Priority :", "Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
-	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value), "Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
-	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag), "Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->SetTitleAndTooltip("Message Data Priority :",
+		"Specifies if the Message Data or Tag information is given priority in the display of multi-layered bubble-text.");
+	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value),
+		"Prioritize Data", "Message Data will be displayed as first layer of bubble text in analyzer results.");
+	mMsgDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag),
+		"Prioritize Tag", "Message Data will be displayed as second layer of bubble text in analyzer results.");
 	mMsgDataPriorityInterface->SetNumber(static_cast<double>(mMsgDataPriority));
 
 	mProcessDataPriorityInterface.reset(new AnalyzerSettingInterfaceNumberList());
-	mProcessDataPriorityInterface->SetTitleAndTooltip("Process Data Priority :", "Specifies if the Process Data or Tag information is given priority in the display of multi-layered bubble-text.");
-	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value), "Prioritize Data", "Process Data will be displayed as first layer of bubble text in analyzer results.");
-	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag), "Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->SetTitleAndTooltip("Process Data Priority :",
+		"Specifies if the Process Data or Tag information is given priority in the display of multi-layered bubble-text.");
+	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Value),
+		"Prioritize Data", "Process Data will be displayed as first layer of bubble text in analyzer results.");
+	mProcessDataPriorityInterface->AddNumber(static_cast<double>(DisplayPriority::Tag),
+		"Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
 	mProcessDataPriorityInterface->SetNumber(static_cast<double>(mProcessDataPriority));
 
 #if ENABLE_ADVANCED_SETTINGS
 	mAdvancedSettingsInterface.reset(new AnalyzerSettingInterfaceText());
 	mAdvancedSettingsInterface->SetTextType(AnalyzerSettingInterfaceText::FilePath);
-	mAdvancedSettingsInterface->SetTitleAndTooltip("Advanced Settings :", "Specifies external settings file to control special (advanced) settings of the plugin.\nPlease refer to plugin documentation for more details.\nIf left empty plugin defaults will be used which are suitable for most situations.");
+	mAdvancedSettingsInterface->SetTitleAndTooltip("Advanced Settings :",
+		"Specifies external settings file to control special (advanced) settings of the plugin.\n"
+		"Please refer to plugin documentation for more details.\n"
+		"If left empty plugin defaults will be used which are suitable for most situations.\n"
+		"NOTE: Relative paths are respective to where Logic.exe resides.");
 	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
 #endif
 
