@@ -26,8 +26,8 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 ## [Description](#table-of-contents)
 
 This plugin in conjunction with the Saleae 'Logic' hardware and software provides
-an easy-to-use interface for analyzing bi-directional (full-duplex) Anybus
-CompactCom (ABCC) SPI protocol communication.
+an easy-to-use interface for analyzing bi-directional (full-duplex) [Anybus
+CompactCom (ABCC)](https://www.anybus.com/products/embedded-index) SPI protocol communication.
 
 Each field within an SPI packet is added as a multi-layered bubble-text
 within the Logic software. Basic markup is displayed when zoomed-out, while
@@ -69,7 +69,7 @@ process data data field with accurate local timestamp information and
 
 ## [Compile & Install](#table-of-contents)
 
-While tagged releaves are provided which contain precompiled libraries and
+While tagged releases are provided which contain precompiled libraries and
 associated documentation, you may still opt to compile the libraries yourself.
 
 ### [Windows](#table-of-contents)
