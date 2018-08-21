@@ -121,6 +121,7 @@ public: /* Members */
 	const char* mAdvSettingsPath;
 	bool m3WireOn4Channels;
 	bool m4WireOn3Channels;
+	std::string mExportDelimiter;
 #endif
 
 protected: /* Members */

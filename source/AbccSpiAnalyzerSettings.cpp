@@ -81,6 +81,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mAdvSettingsPath(""),
 	m3WireOn4Channels(false),
 	m4WireOn3Channels(false),
+	mExportDelimiter(","),
 #endif
 	mChangeID(0)
 {
@@ -321,6 +322,21 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 							else
 							{
 								m4WireOn3Channels = false;
+							}
+						}
+						else if (nodeName.compare( "export-delimiter" ) == 0)
+						{
+							nodeValue = settings_node->value();
+							if (nodeValue.length() == 1)
+							{
+								mExportDelimiter = nodeValue.at(0);
+							}
+							else if (nodeValue.length() == 2)
+							{
+								if ((nodeValue.at(0) == '\\') && (nodeValue.at(1) == 't'))
+								{
+									mExportDelimiter = '\t';
+								}
 							}
 						}
 					}

@@ -13,4 +13,10 @@
 	to the SPI Enable channel. -->
 	<Setting type="3-wire-on-4-channels">0</Setting>
 
+	<!-- "export-delimiter" allows the user to define a delimiter to use when
+	using one of the plugin's supported export options. Any single (visible)
+	character is accepted as a delimiter. A tab-delimiter can be specified
+	by using "\t" without the quotes. -->
+	<Setting type="export-delimiter">\t</Setting>
+
 </AdvancedSettings>
