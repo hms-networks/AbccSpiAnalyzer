@@ -486,7 +486,7 @@ void SpiSimulationDataGenerator::OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_
 		return;
 	}
 
-	for (U32 i = 0; i < bitsPerTransfer; i++)
+	for (auto i = 0; i < bitsPerTransfer; i++)
 	{
 		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
 		mMiso->TransitionIfNeeded(miso_bits.GetNextBit());
@@ -517,7 +517,7 @@ void SpiSimulationDataGenerator::OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_
 		return;
 	}
 
-	for (U32 i = 0; i < bitsPerTransfer; i++)
+	for (auto i = 0; i < bitsPerTransfer; i++)
 	{
 		mClock->Transition();
 		mMosi->TransitionIfNeeded(mosi_bits.GetNextBit());
