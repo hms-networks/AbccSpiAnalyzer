@@ -301,10 +301,11 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 					if (ptr != nullptr)
 					{
 						nodeName = ptr->value();
+						nodeValue = settings_node->value();
+						TrimString(nodeValue);
 
 						if (nodeName.compare("3-wire-on-4-channels") == 0)
 						{
-							nodeValue = settings_node->value();
 							if (nodeValue.compare("1") == 0)
 							{
 								m3WireOn4Channels = true;
@@ -316,7 +317,6 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 						}
 						else if (nodeName.compare("4-wire-on-3-channels") == 0)
 						{
-							nodeValue = settings_node->value();
 							if (nodeValue.compare("1") == 0)
 							{
 								m4WireOn3Channels = true;
@@ -328,7 +328,6 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 						}
 						else if (nodeName.compare( "export-delimiter" ) == 0)
 						{
-							nodeValue = settings_node->value();
 							if (nodeValue.length() == 1)
 							{
 								mExportDelimiter = nodeValue.at(0);
