@@ -907,7 +907,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		if (mMisoVars.fErrorRsp)
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
-			/* Check if data is 0xFF, if so delay de-assertion of fMisoErrorRsp
+			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
 			** so that the object specific error response can be detected */
 			if ((((U8)frame_data != (U8)0xFF) && (mMisoVars.dwMdCnt == 0)) ||
 				(mMisoVars.dwMdCnt > 1))
@@ -1116,7 +1116,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		if (mMosiVars.fErrorRsp)
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
-			/* Check if data is 0xFF, if so delay de-assertion of fMosiErrorRsp
+			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
 			** so that the object specific error response can be detected */
 			if ((((U8)frame_data != (U8)0xFF) && (mMosiVars.dwMdCnt == 0)) ||
 				(mMosiVars.dwMdCnt > 1))
