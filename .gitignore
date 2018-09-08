@@ -17,6 +17,7 @@ xcuserdata/
 release/
 Debug/
 plugins/
+build/
 
 # Ignore pycache
 __pycache__/
