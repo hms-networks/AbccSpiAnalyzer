@@ -25,7 +25,7 @@
 #include "AbccSpiAnalyzerTypes.h"
 
 /* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION_STRING "REVISION_00000004"
+#define SETTINGS_REVISION_STRING "REVISION_00000005"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -108,26 +108,26 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 		"Used to process network specific details such as the network configuration object's instance names.\n"
 		"Can be set to \"Unspecified\", if unsure or if such details are not important.");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,		"Unspecified","");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,			"PROFIBUS DP-V0", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,			"PROFIBUS DP-V0", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,			"PROFIBUS DP-V1", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_COP,				"CANopen", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_DEV,				"DeviceNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,				"Modbus-RTU", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,				"ControlNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,			"Modbus-TCP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,				"PROFINET RT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,			"EtherNet/IP", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,			"Modbus-RTU", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,			"ControlNet", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,		"Modbus-TCP", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,			"PROFINET RT", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,		"EtherNet/IP", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ECT,				"EtherCAT", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR,				"PROFINET IRT", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CCL,				"CC-Link", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_2P,			"Modbus-TCP 2-Port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,				"CompoNet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,			"PROFINET RT 2-port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,			"SERCOS III", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,				"BACnet MS/TP", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,			"CompoNet", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,		"PROFINET RT 2-port", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,			"SERCOS III", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,			"BACnet MS/TP", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BIP,				"BACnet/IP", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB,		"EtherNet/IP 2-Port BB DLR", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,			"EtherNet/IP 2-Port", "");
+	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,		"EtherNet/IP 2-Port", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO,			"PROFINET IRT FO", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EPL,				"POWERLINK", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CFN,				"CC-Link IE Field Network", "");

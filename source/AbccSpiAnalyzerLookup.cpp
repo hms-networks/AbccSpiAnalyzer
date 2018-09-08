@@ -298,26 +298,26 @@ static const LookupTable_t asObjectNames[] =
 const U8 abNetworkTypeValue[] =
 {
 	0x00,						/* Unspecified */
-	ABP_NW_TYPE_PDPV0,			/* PROFIBUS DP-V0 */
+	//ABP_NW_TYPE_PDPV0,		/* PROFIBUS DP-V0 */
 	ABP_NW_TYPE_PDPV1,			/* PROFIBUS DP-V1 */
 	ABP_NW_TYPE_COP,			/* CANopen */
 	ABP_NW_TYPE_DEV,			/* DeviceNet */
-	ABP_NW_TYPE_RTU,			/* Modbus-RTU */
-	ABP_NW_TYPE_CNT,			/* ControlNet */
-	ABP_NW_TYPE_ETN_1P,			/* Modbus-TCP */
-	ABP_NW_TYPE_PRT,			/* PROFINET RT */
-	ABP_NW_TYPE_EIP_1P,			/* EtherNet/IP */
+	//ABP_NW_TYPE_RTU,			/* Modbus-RTU */
+	//ABP_NW_TYPE_CNT,			/* ControlNet */
+	//ABP_NW_TYPE_ETN_1P,		/* Modbus-TCP */
+	//ABP_NW_TYPE_PRT,			/* PROFINET RT */
+	//ABP_NW_TYPE_EIP_1P,		/* EtherNet/IP */
 	ABP_NW_TYPE_ECT,			/* EtherCAT */
 	ABP_NW_TYPE_PIR,			/* PROFINET IRT */
 	ABP_NW_TYPE_CCL,			/* CC-Link */
 	ABP_NW_TYPE_ETN_2P,			/* Modbus-TCP 2-Port */
-	ABP_NW_TYPE_CPN,			/* CompoNet */
-	ABP_NW_TYPE_PRT_2P,			/* PROFINET RT 2-port */
-	ABP_NW_TYPE_SRC3,			/* SERCOS III */
-	ABP_NW_TYPE_BMP,			/* BACnet MS/TP */
+	//ABP_NW_TYPE_CPN,			/* CompoNet */
+	//ABP_NW_TYPE_PRT_2P,		/* PROFINET RT 2-port */
+	//ABP_NW_TYPE_SRC3,			/* SERCOS III */
+	//ABP_NW_TYPE_BMP,			/* BACnet MS/TP */
 	ABP_NW_TYPE_BIP,			/* BACnet/IP */
 	ABP_NW_TYPE_EIP_2P_BB,		/* EtherNet/IP 2-Port BB DLR */
-	ABP_NW_TYPE_EIP_2P,			/* EtherNet/IP 2-Port */
+	//ABP_NW_TYPE_EIP_2P,		/* EtherNet/IP 2-Port */
 	ABP_NW_TYPE_PIR_FO,			/* PROFINET IRT FO */
 	ABP_NW_TYPE_EPL,			/* POWERLINK */
 	ABP_NW_TYPE_CFN,			/* CC-Link IE Field Network */

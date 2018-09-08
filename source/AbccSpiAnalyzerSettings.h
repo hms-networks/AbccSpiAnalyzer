@@ -54,26 +54,26 @@ enum class ExportType : U32
 typedef enum NetworkType
 {
 	e_NW_TYPE_UNSPECIFIED,
-	e_NW_TYPE_PDPV0,			/* PROFIBUS DP-V0 */
+	//e_NW_TYPE_PDPV0,			/* PROFIBUS DP-V0 */
 	e_NW_TYPE_PDPV1,			/* PROFIBUS DP-V1 */
 	e_NW_TYPE_COP,				/* CANopen */
 	e_NW_TYPE_DEV,				/* DeviceNet */
-	e_NW_TYPE_RTU,				/* Modbus-RTU */
-	e_NW_TYPE_CNT,				/* ControlNet */
-	e_NW_TYPE_ETN_1P,			/* Modbus-TCP */
-	e_NW_TYPE_PRT,				/* PROFINET RT */
-	e_NW_TYPE_EIP_1P,			/* EtherNet/IP */
+	//e_NW_TYPE_RTU,			/* Modbus-RTU */
+	//e_NW_TYPE_CNT,			/* ControlNet */
+	//e_NW_TYPE_ETN_1P,			/* Modbus-TCP */
+	//e_NW_TYPE_PRT,			/* PROFINET RT */
+	//e_NW_TYPE_EIP_1P,			/* EtherNet/IP */
 	e_NW_TYPE_ECT,				/* EtherCAT */
 	e_NW_TYPE_PIR,				/* PROFINET IRT */
 	e_NW_TYPE_CCL,				/* CC-Link */
 	e_NW_TYPE_ETN_2P,			/* Modbus-TCP 2-Port */
-	e_NW_TYPE_CPN,				/* CompoNet */
-	e_NW_TYPE_PRT_2P,			/* PROFINET RT 2-port */
-	e_NW_TYPE_SRC3,				/* SERCOS III */
-	e_NW_TYPE_BMP,				/* BACnet MS/TP */
+	//e_NW_TYPE_CPN,			/* CompoNet */
+	//e_NW_TYPE_PRT_2P,			/* PROFINET RT 2-port */
+	//e_NW_TYPE_SRC3,			/* SERCOS III */
+	//e_NW_TYPE_BMP,			/* BACnet MS/TP */
 	e_NW_TYPE_BIP,				/* BACnet/IP */
 	e_NW_TYPE_EIP_2P_BB,		/* EtherNet/IP 2-Port BB DLR */
-	e_NW_TYPE_EIP_2P,			/* EtherNet/IP 2-Port */
+	//e_NW_TYPE_EIP_2P,			/* EtherNet/IP 2-Port */
 	e_NW_TYPE_PIR_FO,			/* PROFINET IRT FO */
 	e_NW_TYPE_EPL,				/* POWERLINK */
 	e_NW_TYPE_CFN,				/* CC-Link IE Field Network */
