@@ -54,8 +54,8 @@ NotifEvent_t GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase
 NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 								char* str, U16 max_str_len,
 								DisplayBase display_base,
-								LookupTable_t* pasObjNames, U8 NoObjNames,
-								LookupTable_t* pasInstNames, U8 NoInstNames);
+								const AttrLookupTable_t* obj_names, U8 num_obj_names,
+								const AttrLookupTable_t* inst_names, U8 num_inst_names);
 
 NotifEvent_t GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
@@ -68,5 +68,7 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, AttributeAccessMode_t access_mode, NotifEvent_t* notif_ptr, DisplayBase display_base);
 
 void GetNumberString(U64 number, DisplayBase display_base, U32 num_data_bits, char* result_string, U32 result_string_max_length, BaseType base_type);
+
+BaseType GetAttrBaseType(U8 obj, U16 inst, U8 attr);
 
 #endif /* ABCC_SPI_ANALYZER_LOOKUP_H_ */
