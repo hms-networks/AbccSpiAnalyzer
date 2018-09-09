@@ -119,7 +119,7 @@ protected: /* Enums, Classes, Types */
 		U32 dwMsgLenCnt;
 		U32 dwByteCnt;
 		U8 bByteCnt2;
-		U32 dwMdCnt;
+		U16 wMdCnt;
 		U16 wMdSize;
 		U8 bLastToggleState;
 		U8 bLastApplSts;
@@ -148,7 +148,7 @@ protected: /* Enums, Classes, Types */
 		U32 dwMsgLenCnt;
 		U32 dwByteCnt;
 		U8 bByteCnt2;
-		U32 dwMdCnt;
+		U16 wMdCnt;
 		U16 wMdSize;
 		U8 bLastAnbSts;
 		bool fNewMsg;

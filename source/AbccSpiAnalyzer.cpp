@@ -83,12 +83,12 @@ SpiAnalyzer::SpiAnalyzer()
 
 	memset(&mMisoVars.sMsgHeader, 0, sizeof(mMisoVars.sMsgHeader));
 	mMisoVars.dwPdCnt = 0;
-	mMisoVars.dwMdCnt = 0;
+	mMisoVars.wMdCnt = 0;
 	mMisoVars.wMdSize = 0;
 
 	memset(&mMosiVars.sMsgHeader, 0, sizeof(mMosiVars.sMsgHeader));
 	mMosiVars.dwPdCnt = 0;
-	mMosiVars.dwMdCnt = 0;
+	mMosiVars.wMdCnt = 0;
 	mMosiVars.wMdSize = 0;
 
 	mMisoVars.dwLastTimestamp = 0;
@@ -855,7 +855,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	if (e_state == AbccMisoStates::MessageField_Object)
 	{
 		mMisoVars.sMsgHeader.obj = (U8)frame_data;
-		mMisoVars.dwMdCnt = 0;
+		mMisoVars.wMdCnt = 0;
 	}
 	else if (e_state == AbccMisoStates::MessageField_Instance)
 	{
@@ -909,8 +909,8 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
 			** so that the object specific error response can be detected */
-			if ((((U8)frame_data != (U8)0xFF) && (mMisoVars.dwMdCnt == 0)) ||
-				(mMisoVars.dwMdCnt > 1))
+			if ((((U8)frame_data != (U8)0xFF) && (mMisoVars.wMdCnt == 0)) ||
+				(mMisoVars.wMdCnt > 1))
 			{
 				mMisoVars.fErrorRsp = false;
 			}
@@ -920,10 +920,10 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		resultFrame.mData2 |= (U64)mMisoVars.dwMdCnt;
-		mMisoVars.dwMdCnt++;
+		resultFrame.mData2 |= (U64)mMisoVars.wMdCnt;
+		mMisoVars.wMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
-		if (mMisoVars.dwMdCnt > mMisoVars.wMdSize)
+		if (mMisoVars.wMdCnt > mMisoVars.wMdSize)
 		{
 			/* Override frame type */
 			resultFrame.mType = (U8)AbccMisoStates::MessageField_DataNotValid;
@@ -1064,7 +1064,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	if (e_state == AbccMosiStates::MessageField_Object)
 	{
 		mMosiVars.sMsgHeader.obj = (U8)frame_data;
-		mMosiVars.dwMdCnt = 0;
+		mMosiVars.wMdCnt = 0;
 	}
 	else if (e_state == AbccMosiStates::MessageField_Instance)
 	{
@@ -1118,8 +1118,8 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
 			** so that the object specific error response can be detected */
-			if ((((U8)frame_data != (U8)0xFF) && (mMosiVars.dwMdCnt == 0)) ||
-				(mMosiVars.dwMdCnt > 1))
+			if ((((U8)frame_data != (U8)0xFF) && (mMosiVars.wMdCnt == 0)) ||
+				(mMosiVars.wMdCnt > 1))
 			{
 				mMosiVars.fErrorRsp = false;
 			}
@@ -1129,10 +1129,10 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		resultFrame.mData2 |= (U64)mMosiVars.dwMdCnt;
-		mMosiVars.dwMdCnt++;
+		resultFrame.mData2 |= (U64)mMosiVars.wMdCnt;
+		mMosiVars.wMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
-		if (mMosiVars.dwMdCnt > mMosiVars.wMdSize)
+		if (mMosiVars.wMdCnt > mMosiVars.wMdSize)
 		{
 			/* Override frame type */
 			resultFrame.mType = (U8)AbccMosiStates::MessageField_DataNotValid;
@@ -1460,7 +1460,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 				/* No new message */
 				mMisoVars.fNewMsg = false;
 				mMisoVars.eMsgSubState = AbccMisoStates::MessageField_DataNotValid;
-				mMisoVars.dwMdCnt = 0;
+				mMisoVars.wMdCnt = 0;
 				mMisoVars.wMdSize = 0;
 			}
 			fAddFrame = true;
@@ -1706,7 +1706,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 				/* No new message */
 				mMosiVars.fNewMsg = false;
 				mMosiVars.eMsgSubState = AbccMosiStates::MessageField_DataNotValid;
-				mMosiVars.dwMdCnt = 0;
+				mMosiVars.wMdCnt = 0;
 				mMosiVars.wMdSize = 0;
 			}
 			fAddFrame = true;
@@ -2113,12 +2113,12 @@ void SpiAnalyzer::RestorePreviousStateVars()
 	/* In the event of an error packet that would otherwise result in a
 	** 'retransmit' event, this routine must be called to put the revelant
 	** state variable back to the last known 'good state' */
-	mMisoVars.dwMdCnt = mPreviousMisoVars.dwMdCnt;
+	mMisoVars.wMdCnt = mPreviousMisoVars.wMdCnt;
 	mMisoVars.fFirstFrag = mPreviousMisoVars.fFirstFrag;
 	mMisoVars.fLastFrag = mPreviousMisoVars.fLastFrag;
 	mMisoVars.fFragmentation = mPreviousMisoVars.fFragmentation;
 
-	mMosiVars.dwMdCnt = mPreviousMosiVars.dwMdCnt;
+	mMosiVars.wMdCnt = mPreviousMosiVars.wMdCnt;
 	mMosiVars.fFirstFrag = mPreviousMosiVars.fFirstFrag;
 	mMosiVars.fLastFrag = mPreviousMosiVars.fLastFrag;
 	mMosiVars.fFragmentation = mPreviousMosiVars.fFragmentation;
