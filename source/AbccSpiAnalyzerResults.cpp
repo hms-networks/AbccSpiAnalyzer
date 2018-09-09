@@ -263,7 +263,7 @@ bool SpiAnalyzerResults::BuildCmdString(U8 val, U8 obj, DisplayBase display_base
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetCmdString(val, obj, &str[0], sizeof(str), display_base);
 
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Command), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Command), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 	if ((val & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 	{
@@ -295,7 +295,7 @@ void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 val, Displa
 
 	objFound = GetInstString(nw_type_idx, obj, val, verbose_str, sizeof(verbose_str), &notification, display_base);
 
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 	if (objFound)
 	{
@@ -316,7 +316,7 @@ void SpiAnalyzerResults::BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAcc
 
 	objFound = GetAttrString(obj, inst, val, verbose_str, sizeof(verbose_str), access_mode, &notification, display_base);
 
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 	if (objFound)
 	{
@@ -333,7 +333,7 @@ void SpiAnalyzerResults::BuildObjectString(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetObjectString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Object), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Object), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Object), numberStr, str, notification);
 }
 
@@ -342,7 +342,7 @@ void SpiAnalyzerResults::BuildSpiCtrlString(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetSpiCtrlString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::SpiControl), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::SpiControl), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::SpiControl), numberStr, str, notification);
 }
 
@@ -351,7 +351,7 @@ void SpiAnalyzerResults::BuildSpiStsString(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetSpiStsString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::SpiStatus), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::SpiStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::SpiStatus), numberStr, str, notification);
 }
 
@@ -360,7 +360,7 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetErrorRspString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder("ERR_CODE", numberStr, str, notification);
 }
 
@@ -369,7 +369,7 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 nw_type_idx, U8 obj, U8 val, DisplayBa
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetErrorRspString(nw_type_idx, obj, val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 	if (nw_type_idx == 0)
 	{
@@ -386,7 +386,7 @@ void SpiAnalyzerResults::BuildIntMask(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetIntMaskString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::InterruptMask), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::InterruptMask), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::InterruptMask), numberStr, str, notification);
 }
 
@@ -395,7 +395,7 @@ void SpiAnalyzerResults::BuildAbccStatus(U8 val, DisplayBase display_base)
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetAbccStatusString(val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::AnybusStatus), numberStr, str, notification);
 }
 
@@ -405,7 +405,7 @@ void SpiAnalyzerResults::BuildApplStatus(U8 val, DisplayBase display_base)
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	/* Note ABCC documentation shows U16 datatype for status code, but SPI telegram is U8 */
 	NotifEvent_t notification = GetApplStsString((U8)val, &str[0], sizeof(str), display_base);
-	AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
 	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::ApplicationStatus), numberStr, str, notification);
 }
 
@@ -453,7 +453,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				BuildSpiCtrlString((U8)frame.mData1, display_base);
 				break;
 			case AbccMosiStates::Reserved1:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -463,12 +463,12 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
 				break;
 			case AbccMosiStates::MessageLength:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
 				break;
 			case AbccMosiStates::ProcessDataLength:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
 				break;
@@ -526,7 +526,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification, DisplayPriority::Tag);
 				break;
 			case AbccMosiStates::MessageField_Size:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 				{
@@ -541,7 +541,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
 				break;
 			case AbccMosiStates::MessageField_Reserved1:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -551,7 +551,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
 				break;
 			case AbccMosiStates::MessageField_SourceId:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				break;
 			case AbccMosiStates::MessageField_Object:
@@ -564,7 +564,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
 				break;
 			case AbccMosiStates::MessageField_Reserved2:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -588,13 +588,13 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 				else
 				{
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+					GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				}
 
 				break;
 			case AbccMosiStates::WriteProcessData:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
 
 				if ((mSettings->mProcessDataPriority == DisplayPriority::Value))
@@ -610,7 +610,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
 				break;
 			case AbccMosiStates::Crc32:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
@@ -625,7 +625,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
 				break;
 			case AbccMosiStates::Pad:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -635,7 +635,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
 				break;
 			default:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
 				notification = NotifEvent::Alert;
 				StringBuilder("UNKOWN", numberStr, "Internal Error: Unknown State", notification);
 				break;
@@ -648,7 +648,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			case AbccMisoStates::Idle:
 				break;
 			case AbccMisoStates::Reserved1:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -658,11 +658,11 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
 				break;
 			case AbccMisoStates::Reserved2:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
 				break;
 			case AbccMisoStates::LedStatus:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				notification = GetLedStatusString((U16)frame.mData1, str, sizeof(str), display_base);
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
 				break;
@@ -673,7 +673,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				BuildSpiStsString((U8)frame.mData1, display_base);
 				break;
 			case AbccMisoStates::NetworkTime:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				break;
 			case AbccMisoStates::MessageField:
@@ -724,7 +724,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification, DisplayPriority::Tag);
 				break;
 			case AbccMisoStates::MessageField_Size:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
 				{
@@ -739,7 +739,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
 				break;
 			case AbccMisoStates::MessageField_Reserved1:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -749,7 +749,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
 				break;
 			case AbccMisoStates::MessageField_SourceId:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				break;
 			case AbccMisoStates::MessageField_Object:
@@ -762,7 +762,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
 				break;
 			case AbccMisoStates::MessageField_Reserved2:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if (frame.mData1 != 0)
 				{
@@ -786,13 +786,13 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 				else
 				{
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+					GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
 				}
 
 				break;
 			case AbccMisoStates::ReadProcessData:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
 
 				if ((mSettings->mProcessDataPriority == DisplayPriority::Value))
@@ -809,7 +809,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMisoStates::Crc32:
 			{
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
 				{
@@ -825,7 +825,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			}
 			default:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr));
+				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
 				notification = NotifEvent::Alert;
 				StringBuilder("UNKOWN", numberStr, "Internal Error: Unknown State", notification);
 				break;
@@ -1138,7 +1138,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMosiStates::MessageField_Size:
 					case AbccMosiStates::MessageField_SourceId:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						ssMosiTail << CSV_DELIMITER << dataStr;
 						addLastMosiMsgHeader = false;
 						break;
@@ -1206,7 +1206,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						}
 						else
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, displayBase, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							GetNumberString(frame.mData1, displayBase, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						}
 
 						ssMosiTail << CSV_DELIMITER << dataStr;
@@ -1323,7 +1323,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMisoStates::MessageField_Size:
 					case AbccMisoStates::MessageField_SourceId:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						ssMisoTail << CSV_DELIMITER << dataStr;
 						addLastMisoMsgHeader = false;
 						break;
@@ -1391,7 +1391,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						}
 						else
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							GetNumberString(frame.mData1, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						}
 
 						ssMisoTail << CSV_DELIMITER << dataStr;
@@ -1611,7 +1611,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					}
 					case AbccMosiStates::WriteProcessData:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						ssMosiTail << CSV_DELIMITER << dataStr;
 						break;
 					}
@@ -1659,14 +1659,14 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					case AbccMisoStates::NetworkTime:
 					{
 						/* Append network time stamp to both string streams */
-						AnalyzerHelpers::GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						ssMisoTail << CSV_DELIMITER << dataStr;
 						ssMosiTail << CSV_DELIMITER << dataStr;
 						break;
 					}
 					case AbccMisoStates::ReadProcessData:
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+						GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 						ssMisoTail << CSV_DELIMITER << dataStr;
 						break;
 					}

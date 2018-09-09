@@ -1650,6 +1650,19 @@ static const LookupTable_t asSocErrNames[] =
 	{ SOC_ERR_DNS_CMD_FAILED,	"DNS_CMD_FAILED",	NotifEvent::Alert }
 };
 
+void GetNumberString(U64 number, DisplayBase display_base, U32 num_data_bits, char* result_string, U32 result_string_max_length, BaseType base_type )
+{
+	if (base_type == BaseType::Numeric)
+	{
+		if ((display_base == DisplayBase::ASCII) || (display_base == DisplayBase::AsciiHex))
+		{
+			display_base = DisplayBase::Hexadecimal;
+		}
+	}
+
+	AnalyzerHelpers::GetNumberString(number, display_base, num_data_bits, result_string, result_string_max_length);
+}
+
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
 	bool firstFlag = true;
@@ -1758,7 +1771,7 @@ NotifEvent_t GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase di
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr));
+		GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
 		SNPRINTF(str, max_str_len, "Reserved: %s", numberStr);
 		notification = NotifEvent::Alert;
 	}
@@ -1786,7 +1799,7 @@ NotifEvent_t GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr));
+		GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
 		SNPRINTF(tmpstr, sizeof(tmpstr), "Reserved: %s", numberStr);
 		notification = NotifEvent::Alert;
 	}
@@ -1816,7 +1829,7 @@ NotifEvent_t GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase d
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 	SNPRINTF(str, max_str_len, "Reserved: %s", numberStr);
 
 	return NotifEvent::Alert;
@@ -1835,7 +1848,7 @@ NotifEvent_t GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const L
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 
 	return NotifEvent::Alert;
@@ -1887,7 +1900,7 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 										NUM_ENTRIES(asPirDiErrNames), display_base);
 				break;
 			default:
-				AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len);
+				GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
 				SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 				break;
 			}
@@ -1953,7 +1966,7 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 	case ABP_OBJ_NUM_DEV:
 		/* DeviceNet Object */
 	default:
-		AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len);
+		GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
 		SNPRINTF(str, max_str_len, "Unknown: 0x%02X, %s", obj, numberStr);
 		break;
 	}
@@ -2128,7 +2141,7 @@ NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 
 	if (!found)
 	{
-		AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+		GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 		SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 		notification = NotifEvent::Alert;
 	}
@@ -2150,7 +2163,7 @@ NotifEvent_t GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 
 	return NotifEvent::Alert;
@@ -2170,7 +2183,7 @@ NotifEvent_t GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const L
 		}
 	}
 
-	AnalyzerHelpers::GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr));
+	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 	SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
 
 	return NotifEvent::Alert;
@@ -2335,7 +2348,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 											&asSrc3CmdNames[0], NUM_ENTRIES(asSrc3CmdNames), display_base);
 			break;
 		default:
-			AnalyzerHelpers::GetNumberString(cmd, display_base, SIZE_IN_BITS(val), strBuffer, sizeof(strBuffer));
+			GetNumberString(cmd, display_base, SIZE_IN_BITS(val), strBuffer, sizeof(strBuffer), BaseType::Numeric);
 			notification = NotifEvent::Alert;
 			break;
 		}
@@ -2343,7 +2356,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 	}
 	else
 	{
-		AnalyzerHelpers::GetNumberString(cmd, display_base, SIZE_IN_BITS(val), strBuffer, sizeof(strBuffer));
+		GetNumberString(cmd, display_base, SIZE_IN_BITS(val), strBuffer, sizeof(strBuffer), BaseType::Numeric);
 		SNPRINTF(str, max_str_len, "Reserved: %s", strBuffer);
 		notification = NotifEvent::Alert;
 	}
@@ -2675,3 +2688,4 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 
 	return objFound;
 }
+

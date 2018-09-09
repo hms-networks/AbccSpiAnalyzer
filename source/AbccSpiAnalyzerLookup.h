@@ -14,6 +14,12 @@
 #include "Analyzer.h"
 #include "AbccSpiAnalyzerTypes.h"
 
+enum class BaseType : U8
+{
+	Character,
+	Numeric
+};
+
 typedef struct LookupTable_t
 {
 	U16	value;
@@ -52,5 +58,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base);
 
 bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, AttributeAccessMode_t access_mode, NotifEvent_t* notif_ptr, DisplayBase display_base);
+
+void GetNumberString(U64 number, DisplayBase display_base, U32 num_data_bits, char* result_string, U32 result_string_max_length, BaseType base_type);
 
 #endif /* ABCC_SPI_ANALYZER_LOOKUP_H_ */
