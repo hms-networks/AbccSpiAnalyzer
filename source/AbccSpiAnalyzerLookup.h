@@ -27,6 +27,14 @@ typedef struct LookupTable_t
 	NotifEvent_t notification;
 } LookupTable_t;
 
+typedef struct AttrLookupTable_t
+{
+	U16	value;
+	char* name;
+	BaseType msgDataType;
+	NotifEvent_t notification;
+} AttrLookupTable_t;
+
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);

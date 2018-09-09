@@ -494,12 +494,12 @@ static const LookupTable_t asPirNcInstNames[] =
 **
 *******************************************************************************/
 
-static const LookupTable_t asObjAttrNames[] =
+static const AttrLookupTable_t asObjAttrNames[] =
 {
-	{ ABP_OA_NAME,			"Name",						NotifEvent::None },
-	{ ABP_OA_REV,			"Revision",					NotifEvent::None },
-	{ ABP_OA_NUM_INST,		"Number of Instances",		NotifEvent::None },
-	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	NotifEvent::None }
+	{ ABP_OA_NAME,			"Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_OA_REV,			"Revision",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_OA_NUM_INST,		"Number of Instances",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_OA_HIGHEST_INST,	"Highest Instance Number",	BaseType::NUMERIC,		NotifEvent::None }
 };
 
 /*******************************************************************************
@@ -508,698 +508,698 @@ static const LookupTable_t asObjAttrNames[] =
 **
 *******************************************************************************/
 
-static const LookupTable_t asAddObjAttrNames[] =
+static const AttrLookupTable_t asAddObjAttrNames[] =
 {
-	{ ABP_ADD_OA_MAX_INST,			"Max Instance",			NotifEvent::None },
-	{ ABP_ADD_OA_EXT_DIAG_OVERFLOW,	"Ext Diag Overflow",	NotifEvent::None },
-	{ ABP_ADD_OA_STATIC_DIAG,		"Static Diag",			NotifEvent::None }
+	{ ABP_ADD_OA_MAX_INST,			"Max Instance",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_OA_EXT_DIAG_OVERFLOW,	"Ext Diag Overflow",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_OA_STATIC_DIAG,		"Static Diag",			BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAddInstAttrNames[] =
+static const AttrLookupTable_t asAddInstAttrNames[] =
 {
-	{ ABP_ADD_IA_MODULE_NUMBER,		"Module Number",	NotifEvent::None },
-	{ ABP_ADD_IA_IO_TYPE,			"IO Type",			NotifEvent::None },
-	{ ABP_ADD_IA_CHANNEL_NUMBER,	"Channel Number",	NotifEvent::None },
-	{ ABP_ADD_IA_CHANNEL_TYPE,		"Channel Type",		NotifEvent::None },
-	{ ABP_ADD_IA_ERROR_TYPE,		"Error Type",		NotifEvent::None }
+	{ ABP_ADD_IA_MODULE_NUMBER,		"Module Number",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_IA_IO_TYPE,			"IO Type",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_IA_CHANNEL_NUMBER,	"Channel Number",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_IA_CHANNEL_TYPE,		"Channel Type",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ADD_IA_ERROR_TYPE,		"Error Type",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAnbInstAttrNames[] =
+static const AttrLookupTable_t asAnbInstAttrNames[] =
 {
-	{ ABP_ANB_IA_MODULE_TYPE,		"Module Type",				NotifEvent::None },
-	{ ABP_ANB_IA_FW_VERSION,		"Firmware Version",			NotifEvent::None },
-	{ ABP_ANB_IA_SERIAL_NUM,		"Serial Number",			NotifEvent::None },
-	{ ABP_ANB_IA_WD_TIMEOUT,		"Watchdog Timeout",			NotifEvent::None },
-	{ ABP_ANB_IA_SETUP_COMPLETE,	"Setup Complete",			NotifEvent::None },
-	{ ABP_ANB_IA_EXCEPTION,			"Exception",				NotifEvent::None },
-	{ ABP_ANB_IA_FATAL_EVENT,		"Fatal Event",				NotifEvent::None },
-	{ ABP_ANB_IA_ERROR_CNTRS,		"Error Counters",			NotifEvent::None },
-	{ ABP_ANB_IA_LANG,				"Language",					NotifEvent::None },
-	{ ABP_ANB_IA_PROVIDER_ID,		"Provider ID",				NotifEvent::None },
-	{ ABP_ANB_IA_PROVIDER_INFO,		"Provider Info",			NotifEvent::None },
-	{ ABP_ANB_IA_LED_COLOURS,		"LED Colors",				NotifEvent::None },
-	{ ABP_ANB_IA_LED_STATUS,		"LED Status",				NotifEvent::None },
-	{ ABP_ANB_IA_SWITCH_STATUS,		"Switch Status",			NotifEvent::None },
-	{ ABP_ANB_IA_AUX_BIT_FUNC,		"Auxilary Bit Function",	NotifEvent::None },
-	{ ABP_ANB_IA_GPIO_CONFIG,		"GPIO Configuration",		NotifEvent::None },
-	{ ABP_ANB_IA_VIRTUAL_ATTRS,		"Virtual Attributes",		NotifEvent::None },
-	{ ABP_ANB_IA_BLACK_WHITE_LIST,	"Black/White List",			NotifEvent::None },
-	{ ABP_ANB_IA_NETWORK_TIME,		"Network Time",				NotifEvent::None },
-	{ ABP_ANB_IA_FW_CUST_VERSION,	"FW Custom Version",		NotifEvent::None },
-	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		NotifEvent::None }
+	{ ABP_ANB_IA_MODULE_TYPE,		"Module Type",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_FW_VERSION,		"Firmware Version",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_SERIAL_NUM,		"Serial Number",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_WD_TIMEOUT,		"Watchdog Timeout",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_SETUP_COMPLETE,	"Setup Complete",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_EXCEPTION,			"Exception",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_FATAL_EVENT,		"Fatal Event",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_ERROR_CNTRS,		"Error Counters",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_LANG,				"Language",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_PROVIDER_ID,		"Provider ID",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_PROVIDER_INFO,		"Provider Info",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_LED_COLOURS,		"LED Colors",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_LED_STATUS,		"LED Status",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_SWITCH_STATUS,		"Switch Status",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_AUX_BIT_FUNC,		"Auxilary Bit Function",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_GPIO_CONFIG,		"GPIO Configuration",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_VIRTUAL_ATTRS,		"Virtual Attributes",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_BLACK_WHITE_LIST,	"Black/White List",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_NETWORK_TIME,		"Network Time",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_FW_CUST_VERSION,	"FW Custom Version",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ANB_IA_ABIP_LICENSE,		"Anybus IP License",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAppInstAttrNames[] =
+static const AttrLookupTable_t asAppInstAttrNames[] =
 {
-	{ ABP_APP_IA_CONFIGURED,	"Configured",						NotifEvent::None },
-	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				NotifEvent::None },
-	{ ABP_APP_IA_SER_NUM,		"Serial Number",					NotifEvent::None },
-	{ ABP_APP_IA_PAR_CRTL_SUM,	"Parameter Control Sum",			NotifEvent::None },
-	{ ABP_APP_IA_FW_AVAILABLE,	"Candidate Firmware Available",		NotifEvent::None },
-	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	NotifEvent::None },
-	{ ABP_APP_IA_MODE,			"Mode",								NotifEvent::None },
-	{ ABP_APP_IA_VENDOR_NAME,	"Vendor Name",						NotifEvent::None },
-	{ ABP_APP_IA_PRODUCT_NAME,	"Product Name",						NotifEvent::None },
-	{ ABP_APP_IA_FW_VERSION,	"FW Version",						NotifEvent::None },
-	{ ABP_APP_IA_HW_VERSION,	"HW Version",						NotifEvent::None },
+	{ ABP_APP_IA_CONFIGURED,	"Configured",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_SUP_LANG,		"Supported Languages",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_SER_NUM,		"Serial Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_PAR_CRTL_SUM,	"Parameter Control Sum",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_FW_AVAILABLE,	"Candidate Firmware Available",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_HW_CONF_ADDR,	"Hardware Configurable Address",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_MODE,			"Mode",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_VENDOR_NAME,	"Vendor Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_APP_IA_PRODUCT_NAME,	"Product Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_APP_IA_FW_VERSION,	"FW Version",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APP_IA_HW_VERSION,	"HW Version",						BaseType::NUMERIC,		NotifEvent::None },
 };
 
-static const LookupTable_t asAppdObjAttrNames[] =
+static const AttrLookupTable_t asAppdObjAttrNames[] =
 {
-	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	NotifEvent::None },
-	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	NotifEvent::None },
-	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	NotifEvent::None }
+	{ ABP_APPD_OA_NR_READ_PD_MAPPABLE_INSTANCES,	"No. of RD PD Mappable Instances",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_OA_NR_WRITE_PD_MAPPABLE_INSTANCES,	"No. of WR PD Mappable Instances",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_OA_NR_NV_INSTANCES,					"No. of Non-Volatile Instances",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAppdInstAttrNames[] =
+static const AttrLookupTable_t asAppdInstAttrNames[] =
 {
-	{ ABP_APPD_IA_NAME,			"Name",						NotifEvent::None },
-	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				NotifEvent::None },
-	{ ABP_APPD_IA_NUM_ELEM,		"Number of Elements",		NotifEvent::None },
-	{ ABP_APPD_IA_DESCRIPTOR,	"Descriptor",				NotifEvent::None },
-	{ ABP_APPD_IA_VALUE,		"Value(s)",					NotifEvent::None },
-	{ ABP_APPD_IA_MAX_VALUE,	"Max Value",				NotifEvent::None },
-	{ ABP_APPD_IA_MIN_VALUE,	"Min Value",				NotifEvent::None },
-	{ ABP_APPD_IA_DFLT_VALUE,	"Default Value",			NotifEvent::None },
-	{ ABP_APPD_IA_NUM_SUB_ELEM,	"Number of SubElements",	NotifEvent::None },
-	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				NotifEvent::None }
+	{ ABP_APPD_IA_NAME,			"Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_APPD_IA_DATA_TYPE,	"Data Type",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_NUM_ELEM,		"Number of Elements",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_DESCRIPTOR,	"Descriptor",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_VALUE,		"Value(s)",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_MAX_VALUE,	"Max Value",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_MIN_VALUE,	"Min Value",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_DFLT_VALUE,	"Default Value",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_NUM_SUB_ELEM,	"Number of SubElements",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_APPD_IA_ELEM_NAME,	"Element Name",				BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asAsmObjAttrNames[] =
+static const AttrLookupTable_t asAsmObjAttrNames[] =
 {
-	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	NotifEvent::None },
-	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	NotifEvent::None }
+	{ ABP_ASM_OA_WRITE_PD_INST_LIST,	"Write PD Instance List",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ASM_OA_READ_PD_INST_LIST,		"Read PD Instance List",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAsmInstAttrNames[] =
+static const AttrLookupTable_t asAsmInstAttrNames[] =
 {
-	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			NotifEvent::None },
-	{ ABP_ASM_IA_NAME,				"Assembly Name",		NotifEvent::None }
+	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ASM_IA_NAME,				"Assembly Name",		BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asBacInstAttrNames[] =
+static const AttrLookupTable_t asBacInstAttrNames[] =
 {
-	{ ABP_BAC_IA_OBJECT_NAME,			"Object Name",				NotifEvent::None },
-	{ ABP_BAC_IA_VENDOR_NAME,			"Vendor Name",				NotifEvent::None },
-	{ ABP_BAC_IA_VENDOR_IDENTIFIER,		"Vendor Identifier",		NotifEvent::None },
-	{ ABP_BAC_IA_MODEL_NAME,			"Model Name",				NotifEvent::None },
-	{ ABP_BAC_IA_FIRMWARE_REVISION,		"Firmware Revision",		NotifEvent::None },
-	{ ABP_BAC_IA_APP_SOFTWARE_VERSION,	"Software Revision",		NotifEvent::None },
-	{ ABP_BAC_IA_SUPPORT_ADV_MAPPING,	"Support Advanced Mapping",	NotifEvent::None },
-	{ ABP_BAC_IA_CURRENT_DATE_AND_TIME,	"Current Date and Time",	NotifEvent::None },
-	{ ABP_BAC_IA_PASSWORD,				"Password",					NotifEvent::None }
+	{ ABP_BAC_IA_OBJECT_NAME,			"Object Name",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_BAC_IA_VENDOR_NAME,			"Vendor Name",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_BAC_IA_VENDOR_IDENTIFIER,		"Vendor Identifier",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_BAC_IA_MODEL_NAME,			"Model Name",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_BAC_IA_FIRMWARE_REVISION,		"Firmware Revision",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_BAC_IA_APP_SOFTWARE_VERSION,	"Software Revision",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_BAC_IA_SUPPORT_ADV_MAPPING,	"Support Advanced Mapping",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_BAC_IA_CURRENT_DATE_AND_TIME,	"Current Date and Time",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_BAC_IA_PASSWORD,				"Password",					BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asCclInstAttrNames[] =
+static const AttrLookupTable_t asCclInstAttrNames[] =
 {
-	{ ABP_CCL_IA_VENDOR_CODE,			"Vendor Code",			NotifEvent::None },
-	{ ABP_CCL_IA_SOFTWARE_VERSION,		"Software Version",		NotifEvent::None },
-	{ ABP_CCL_IA_MODEL_CODE,			"Model Code",			NotifEvent::None },
-	{ ABP_CCL_IA_NETWORK_SETTINGS,		"Network Settings",		NotifEvent::None },
-	{ ABP_CCL_IA_SYS_AREA_HANDLER,		"System Area Handler",	NotifEvent::None },
-	{ ABP_CCL_IA_HOLD_CLEAR_SETTING,	"Hold Clear Setting",	NotifEvent::None }
+	{ ABP_CCL_IA_VENDOR_CODE,			"Vendor Code",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_IA_SOFTWARE_VERSION,		"Software Version",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_IA_MODEL_CODE,			"Model Code",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_IA_NETWORK_SETTINGS,		"Network Settings",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_IA_SYS_AREA_HANDLER,		"System Area Handler",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_IA_HOLD_CLEAR_SETTING,	"Hold Clear Setting",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCfnInstAttrNames[] =
+static const AttrLookupTable_t asCfnInstAttrNames[] =
 {
-	{ ABP_CFN_IA_VENDOR_CODE,		"Vendor Code",			NotifEvent::None },
-	{ ABP_CFN_IA_VENDOR_NAME,		"Vendor Name",			NotifEvent::None },
-	{ ABP_CFN_IA_MODEL_TYPE,		"Model Type",			NotifEvent::None },
-	{ ABP_CFN_IA_MODEL_NAME,		"Model Name",			NotifEvent::None },
-	{ ABP_CFN_IA_MODEL_CODE,		"Model Code",			NotifEvent::None },
-	{ ABP_CFN_IA_SW_VERSION,		"SW Version",			NotifEvent::None },
-	{ ABP_CFN_IA_ENABLE_SLMP,		"Enable SLMP",			NotifEvent::None },
-	{ ABP_CFN_IA_ENA_SLMP_FORWARD,	"Enable SLMP Forward",	NotifEvent::None }
+	{ ABP_CFN_IA_VENDOR_CODE,		"Vendor Code",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CFN_IA_VENDOR_NAME,		"Vendor Name",			BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CFN_IA_MODEL_TYPE,		"Model Type",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CFN_IA_MODEL_NAME,		"Model Name",			BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CFN_IA_MODEL_CODE,		"Model Code",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CFN_IA_SW_VERSION,		"SW Version",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CFN_IA_ENABLE_SLMP,		"Enable SLMP",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CFN_IA_ENA_SLMP_FORWARD,	"Enable SLMP Forward",	BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asCipIdInstAttrNames[] =
+static const AttrLookupTable_t asCipIdInstAttrNames[] =
 {
-	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		NotifEvent::None },
-	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		NotifEvent::None },
-	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		NotifEvent::None },
-	{ ABP_CIPID_IA_REVISION,		"Revision",			NotifEvent::None },
-	{ ABP_CIPID_IA_STATUS,			"Status",			NotifEvent::None },
-	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	NotifEvent::None },
-	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		NotifEvent::None }
+	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_REVISION,		"Revision",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_STATUS,			"Status",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCntInstAttrNames[] =
+static const AttrLookupTable_t asCntInstAttrNames[] =
 {
-	{ ABP_CNT_IA_VENDOR_ID,					"Vendor ID",						NotifEvent::None },
-	{ ABP_CNT_IA_DEVICE_TYPE,				"Device Type",						NotifEvent::None },
-	{ ABP_CNT_IA_PRODUCT_CODE,				"Product Code",						NotifEvent::None },
-	{ ABP_CNT_IA_REVISION,					"Revision",							NotifEvent::None },
-	{ ABP_CNT_IA_SERIAL_NUMBER,				"Serial Number",					NotifEvent::None },
-	{ ABP_CNT_IA_PRODUCT_NAME,				"Product Name",						NotifEvent::None },
-	{ ABP_CNT_IA_PROD_INSTANCE,				"Producing Instance",				NotifEvent::None },
-	{ ABP_CNT_IA_CONS_INSTANCE,				"Consuming Instance",				NotifEvent::None },
-	{ ABP_CNT_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	NotifEvent::None },
-	{ ABP_CNT_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			NotifEvent::None },
-	{ ABP_CNT_IA_CONFIG_INSTANCE,			"Configuration Instance",			NotifEvent::None }
+	{ ABP_CNT_IA_VENDOR_ID,					"Vendor ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_DEVICE_TYPE,				"Device Type",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_PRODUCT_CODE,				"Product Code",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_REVISION,					"Revision",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_SERIAL_NUMBER,				"Serial Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_PRODUCT_NAME,				"Product Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CNT_IA_PROD_INSTANCE,				"Producing Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_CONS_INSTANCE,				"Consuming Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CNT_IA_CONFIG_INSTANCE,			"Configuration Instance",			BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asCopInstAttrNames[] =
+static const AttrLookupTable_t asCopInstAttrNames[] =
 {
-	{ ABP_COP_IA_VENDOR_ID,			"Vendor ID",				NotifEvent::None },
-	{ ABP_COP_IA_PRODUCT_CODE,		"Product Code",				NotifEvent::None },
-	{ ABP_COP_IA_MAJOR_REV,			"Major Revision",			NotifEvent::None },
-	{ ABP_COP_IA_MINOR_REV,			"Minor Revision",			NotifEvent::None },
-	{ ABP_COP_IA_SERIAL_NUMBER,		"Serial Number",			NotifEvent::None },
-	{ ABP_COP_IA_MANF_DEV_NAME,		"Manufacturer Device Name",	NotifEvent::None },
-	{ ABP_COP_IA_MANF_HW_VER,		"Manufacturer HW Version",	NotifEvent::None },
-	{ ABP_COP_IA_MANF_SW_VER,		"Manufacturer SW Version",	NotifEvent::None }
+	{ ABP_COP_IA_VENDOR_ID,			"Vendor ID",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_COP_IA_PRODUCT_CODE,		"Product Code",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_COP_IA_MAJOR_REV,			"Major Revision",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_COP_IA_MINOR_REV,			"Minor Revision",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_COP_IA_SERIAL_NUMBER,		"Serial Number",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_COP_IA_MANF_DEV_NAME,		"Manufacturer Device Name",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_COP_IA_MANF_HW_VER,		"Manufacturer HW Version",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_COP_IA_MANF_SW_VER,		"Manufacturer SW Version",	BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asCpcObjAttrNames[] =
+static const AttrLookupTable_t asCpcObjAttrNames[] =
 {
-	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	NotifEvent::None }
+	{ ABP_CPC_OA_MAX_INST, "Maximum Number of Instances",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCpcInstAttrNames[] =
+static const AttrLookupTable_t asCpcInstAttrNames[] =
 {
-	{ ABP_CPC_IA_PORT_TYPE,					"Port Type",					NotifEvent::None },
-	{ ABP_CPC_IA_PORT_NUMBER,				"Port Number",					NotifEvent::None },
-	{ ABP_CPC_IA_LINK_PATH,					"Link Path",					NotifEvent::None },
-	{ ABP_CPC_IA_PORT_NAME,					"Port Name",					NotifEvent::None },
-	{ ABP_CPC_IA_NODE_ADDRESS,				"Node Address",					NotifEvent::None },
-	{ ABP_CPC_IA_PORT_NODE_RANGE,			"Port Node Range",				NotifEvent::None },
-	{ ABP_CPC_IA_PORT_ROUTING_CAPABILITIES,	"Port Routing Capabilities",	NotifEvent::None }
+	{ ABP_CPC_IA_PORT_TYPE,					"Port Type",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPC_IA_PORT_NUMBER,				"Port Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPC_IA_LINK_PATH,					"Link Path",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPC_IA_PORT_NAME,					"Port Name",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CPC_IA_NODE_ADDRESS,				"Node Address",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPC_IA_PORT_NODE_RANGE,			"Port Node Range",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPC_IA_PORT_ROUTING_CAPABILITIES,	"Port Routing Capabilities",	BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asCpnInstAttrNames[] =
+static const AttrLookupTable_t asCpnInstAttrNames[] =
 {
-	{ ABP_CPN_IA_VENDOR_ID,					"Vendor ID",						NotifEvent::None },
-	{ ABP_CPN_IA_DEVICE_TYPE,				"Device Type",						NotifEvent::None },
-	{ ABP_CPN_IA_PRODUCT_CODE,				"Product Code",						NotifEvent::None },
-	{ ABP_CPN_IA_REVISION,					"Revision",							NotifEvent::None },
-	{ ABP_CPN_IA_SERIAL_NUMBER,				"Serial Number",					NotifEvent::None },
-	{ ABP_CPN_IA_PRODUCT_NAME,				"Product Name",						NotifEvent::None },
-	{ ABP_CPN_IA_PROD_INSTANCE,				"Producing Instance",				NotifEvent::None },
-	{ ABP_CPN_IA_CONS_INSTANCE,				"Consuming Instance",				NotifEvent::None },
-	{ ABP_CPN_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	NotifEvent::None },
-	{ ABP_CPN_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			NotifEvent::None },
-	{ ABP_CPN_IA_BIT_SLAVE,					"Bit Slave",						NotifEvent::None }
+	{ ABP_CPN_IA_VENDOR_ID,					"Vendor ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_DEVICE_TYPE,				"Device Type",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_PRODUCT_CODE,				"Product Code",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_REVISION,					"Revision",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_SERIAL_NUMBER,				"Serial Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_PRODUCT_NAME,				"Product Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CPN_IA_PROD_INSTANCE,				"Producing Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_CONS_INSTANCE,				"Consuming Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CPN_IA_BIT_SLAVE,					"Bit Slave",						BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asDevInstAttrNames[] =
+static const AttrLookupTable_t asDevInstAttrNames[] =
 {
-	{ ABP_DEV_IA_VENDOR_ID,					"Vendor ID",						NotifEvent::None },
-	{ ABP_DEV_IA_DEVICE_TYPE,				"Device Type",						NotifEvent::None },
-	{ ABP_DEV_IA_PRODUCT_CODE,				"Product Code",						NotifEvent::None },
-	{ ABP_DEV_IA_REVISION,					"Revision",							NotifEvent::None },
-	{ ABP_DEV_IA_SERIAL_NUMBER,				"Serial Number",					NotifEvent::None },
-	{ ABP_DEV_IA_PRODUCT_NAME,				"Product Name",						NotifEvent::None },
-	{ ABP_DEV_IA_PROD_INSTANCE,				"Producing Instance",				NotifEvent::None },
-	{ ABP_DEV_IA_CONS_INSTANCE,				"Consuming Instance",				NotifEvent::None },
-	{ ABP_DEV_IA_ADDRESS_FROM_NET,			"Address From Network",				NotifEvent::None },
-	{ ABP_DEV_IA_BAUD_RATE_FROM_NET,		"Baud Rate From Network",			NotifEvent::None },
-	{ ABP_DEV_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	NotifEvent::None },
-	{ ABP_DEV_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			NotifEvent::None },
-	{ ABP_DEV_IA_ENABLE_QUICK_CONNECT,		"Enable QuickConnect",				NotifEvent::None },
-	{ ABP_DEV_IA_PREPEND_PRODUCING,			"Prepend Producing",				NotifEvent::None },
-	{ ABP_DEV_IA_PREPEND_CONSUMING,			"Prepend Consuming",				NotifEvent::None },
-	{ ABP_DEV_IA_ABCC_ADI_OBJECT,			"ABCC ADI Object",					NotifEvent::None },
-	{ ABP_DEV_IA_PROD_INSTANCE_LIST,		"Producing Instance List",			NotifEvent::None },
-	{ ABP_DEV_IA_CONS_INSTANCE_LIST,		"Consuming Instance List",			NotifEvent::None },
+	{ ABP_DEV_IA_VENDOR_ID,					"Vendor ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_DEVICE_TYPE,				"Device Type",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_PRODUCT_CODE,				"Product Code",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_REVISION,					"Revision",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_SERIAL_NUMBER,				"Serial Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_PRODUCT_NAME,				"Product Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_DEV_IA_PROD_INSTANCE,				"Producing Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_CONS_INSTANCE,				"Consuming Instance",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_ADDRESS_FROM_NET,			"Address From Network",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_BAUD_RATE_FROM_NET,		"Baud Rate From Network",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_ENABLE_APP_CIP_OBJECTS,	"Enable Application CIP Objects",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_ENABLE_PARAM_OBJECT,		"Enable Parameter Object",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_ENABLE_QUICK_CONNECT,		"Enable QuickConnect",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_PREPEND_PRODUCING,			"Prepend Producing",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_PREPEND_CONSUMING,			"Prepend Consuming",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_ABCC_ADI_OBJECT,			"ABCC ADI Object",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_PROD_INSTANCE_LIST,		"Producing Instance List",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DEV_IA_CONS_INSTANCE_LIST,		"Consuming Instance List",			BaseType::NUMERIC,		NotifEvent::None },
 };
 
-static const LookupTable_t asDiObjAttrNames[] =
+static const AttrLookupTable_t asDiObjAttrNames[] =
 {
-	{ ABP_DI_OA_MAX_INST,		"Maximum Number of Instances",	NotifEvent::None },
-	{ ABP_DI_OA_SUPPORT_FUNC,	"Supported Functionality",		NotifEvent::None }
+	{ ABP_DI_OA_MAX_INST,		"Maximum Number of Instances",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_OA_SUPPORT_FUNC,	"Supported Functionality",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asDiInstAttrNames[] =
+static const AttrLookupTable_t asDiInstAttrNames[] =
 {
-	{ ABP_DI_IA_SEVERITY,			"Severity",						NotifEvent::None },
-	{ ABP_DI_IA_EVENT_CODE,			"Event Code",					NotifEvent::None },
-	{ ABP_DI_IA_NW_SPEC_EVENT_INFO,	"Network Specific Event Info",	NotifEvent::None },
-	{ ABP_DI_IA_SLOT,				"Slot",							NotifEvent::None },
-	{ ABP_DI_IA_ADI,				"ADI",							NotifEvent::None },
-	{ ABP_DI_IA_ELEMENT,			"Element",						NotifEvent::None },
-	{ ABP_DI_IA_BIT,				"Bit",							NotifEvent::None }
+	{ ABP_DI_IA_SEVERITY,			"Severity",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_EVENT_CODE,			"Event Code",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_NW_SPEC_EVENT_INFO,	"Network Specific Event Info",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_SLOT,				"Slot",							BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_ADI,				"ADI",							BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_ELEMENT,			"Element",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DI_IA_BIT,				"Bit",							BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asDpv1InstAttrNames[] =
+static const AttrLookupTable_t asDpv1InstAttrNames[] =
 {
-	{ ABP_DPV1_IA_IDENT_NUMBER,			"Identity Number",					NotifEvent::None },
-	{ ABP_DPV1_IA_PRM_DATA,				"Parameter Data",					NotifEvent::None },
-	{ ABP_DPV1_IA_EXPECTED_CFG_DATA,	"Expected Configuration Data",		NotifEvent::None },
-	{ ABP_DPV1_IA_SSA_ENABLED,			"SSA Enabled",						NotifEvent::None },
-	{ ABP_DPV1_IA_SIZEOF_ID_REL_DIAG,	"Size of ID Related Diagnostic",	NotifEvent::None },
-	{ ABP_DPV1_IA_BUFFER_MODE,			"Buffer Mode",						NotifEvent::None },
-	{ ABP_DPV1_IA_ALARM_SETTINGS,		"Alarm Setting",					NotifEvent::None },
-	{ ABP_DPV1_IA_MANUFACTURER_ID,		"Manufacturer ID",					NotifEvent::None },
-	{ ABP_DPV1_IA_ORDER_ID,				"Order ID",							NotifEvent::None },
-	{ ABP_DPV1_IA_SERIAL_NO,			"Serial Number",					NotifEvent::None },
-	{ ABP_DPV1_IA_HW_REV,				"Hardware Revision",				NotifEvent::None },
-	{ ABP_DPV1_IA_SW_REV,				"Software Revision",				NotifEvent::None },
-	{ ABP_DPV1_IA_REV_COUNTER,			"Revision Counter",					NotifEvent::None },
-	{ ABP_DPV1_IA_PROFILE_ID,			"Profile ID",						NotifEvent::None },
-	{ ABP_DPV1_IA_PROFILE_SPEC_TYPE,	"Profile Specific Type",			NotifEvent::None },
-	{ ABP_DPV1_IA_IM_VERSION,			"I&M Version",						NotifEvent::None },
-	{ ABP_DPV1_IA_IM_SUPPORTED,			"I&M Supported",					NotifEvent::None },
-	{ ABP_DPV1_IA_IM_HEADER,			"I&M Header",						NotifEvent::None },
-	{ ABP_DPV1_IA_CHK_CFG_BEHAVIOR,		"Check Configuration Behavior",		NotifEvent::None },
-	{ ABP_DPV1_IA_RESERVED,				"Reserved",							NotifEvent::None }
+	{ ABP_DPV1_IA_IDENT_NUMBER,			"Identity Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_PRM_DATA,				"Parameter Data",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_EXPECTED_CFG_DATA,	"Expected Configuration Data",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_SSA_ENABLED,			"SSA Enabled",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_SIZEOF_ID_REL_DIAG,	"Size of ID Related Diagnostic",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_BUFFER_MODE,			"Buffer Mode",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_ALARM_SETTINGS,		"Alarm Setting",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_MANUFACTURER_ID,		"Manufacturer ID",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_ORDER_ID,				"Order ID",							BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_DPV1_IA_SERIAL_NO,			"Serial Number",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_DPV1_IA_HW_REV,				"Hardware Revision",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_SW_REV,				"Software Revision",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_DPV1_IA_REV_COUNTER,			"Revision Counter",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_PROFILE_ID,			"Profile ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_PROFILE_SPEC_TYPE,	"Profile Specific Type",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_IM_VERSION,			"I&M Version",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_IM_SUPPORTED,			"I&M Supported",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_IM_HEADER,			"I&M Header",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_CHK_CFG_BEHAVIOR,		"Check Configuration Behavior",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_DPV1_IA_RESERVED,				"Reserved",							BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asEcoObjAttrNames[] =
+static const AttrLookupTable_t asEcoObjAttrNames[] =
 {
-	{ ABP_ECO_OA_CURRENT_ENERGY_SAVING_MODE,		"Current Energy Saving Mode",			NotifEvent::None },
-	{ ABP_ECO_OA_REMAINING_TIME_TO_DEST,			"Remaining Time to Destination",		NotifEvent::None },
-	{ ABP_ECO_OA_ENERGY_CONSUMP_TO_DEST,			"Energy Consumption to Destination",	NotifEvent::None },
-	{ ABP_ECO_OA_TRANSITION_TO_POWER_OFF_SUPPORTED,	"Transition To Power Off Supported",	NotifEvent::None },
+	{ ABP_ECO_OA_CURRENT_ENERGY_SAVING_MODE,		"Current Energy Saving Mode",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_OA_REMAINING_TIME_TO_DEST,			"Remaining Time to Destination",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_OA_ENERGY_CONSUMP_TO_DEST,			"Energy Consumption to Destination",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_OA_TRANSITION_TO_POWER_OFF_SUPPORTED,	"Transition To Power Off Supported",	BaseType::NUMERIC,	NotifEvent::None },
 };
 
-static const LookupTable_t asEcoInstAttrNames[] =
+static const AttrLookupTable_t asEcoInstAttrNames[] =
 {
-	{ ABP_ECO_IA_MODE_ATTRIBUTES,			"Mode Attributes",					NotifEvent::None },
-	{ ABP_ECO_IA_TIME_MIN_PAUSE,			"Time Min Pause",					NotifEvent::None },
-	{ ABP_ECO_IA_TIME_TO_PAUSE,				"Time To Pause",					NotifEvent::None },
-	{ ABP_ECO_IA_TIME_TO_OPERATE,			"Time To Operate",					NotifEvent::None },
-	{ ABP_ECO_IA_TIME_MIN_LENGTH_OF_STAY,	"Time Min Length Of Stay",			NotifEvent::None },
-	{ ABP_ECO_IA_TIME_MAX_LENGTH_OF_STAY,	"Time Max Length Of Stay",			NotifEvent::None },
-	{ ABP_ECO_IA_MODE_POWER_CONSUMP,		"Mode Power Consumption",			NotifEvent::None },
-	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_PAUSE,	"Energy Consumption To Pause",		NotifEvent::None },
-	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_OPERATE,	"Energy Consumption To Operate",	NotifEvent::None },
-	{ ABP_ECO_IA_AVAILABILITY,				"Availability",						NotifEvent::None },
-	{ ABP_ECO_IA_POWER_CONSUMPTION,			"Power Consumption",				NotifEvent::None }
+	{ ABP_ECO_IA_MODE_ATTRIBUTES,			"Mode Attributes",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_TIME_MIN_PAUSE,			"Time Min Pause",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_TIME_TO_PAUSE,				"Time To Pause",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_TIME_TO_OPERATE,			"Time To Operate",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_TIME_MIN_LENGTH_OF_STAY,	"Time Min Length Of Stay",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_TIME_MAX_LENGTH_OF_STAY,	"Time Max Length Of Stay",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_MODE_POWER_CONSUMP,		"Mode Power Consumption",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_PAUSE,	"Energy Consumption To Pause",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_ENERGY_CONSUMP_TO_OPERATE,	"Energy Consumption To Operate",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_AVAILABILITY,				"Availability",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_IA_POWER_CONSUMPTION,			"Power Consumption",				BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEipInstAttrNames[] =
+static const AttrLookupTable_t asEipInstAttrNames[] =
 {
-	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										NotifEvent::None },
-	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										NotifEvent::None },
-	{ ABP_EIP_IA_PRODUCT_CODE,					"Product Code",										NotifEvent::None },
-	{ ABP_EIP_IA_REVISION,						"Revision",											NotifEvent::None },
-	{ ABP_EIP_IA_SERIAL_NUMBER,					"Serial Number",									NotifEvent::None },
-	{ ABP_EIP_IA_PRODUCT_NAME,					"Product Name",										NotifEvent::None },
-	{ ABP_EIP_IA_PROD_INSTANCE,					"Producing Instance Number",						NotifEvent::None },
-	{ ABP_EIP_IA_CONS_INSTANCE,					"Consuming Instance Number",						NotifEvent::None },
-	{ ABP_EIP_IA_COMM_SETTINGS_FROM_NET,		"Enable Communication Settings From Net",			NotifEvent::None },
-	{ ABP_EIP_IA_ENABLE_APP_CIP_OBJECTS,		"Enable CIP Forwarding",							NotifEvent::None },
-	{ ABP_EIP_IA_ENABLE_PARAM_OBJECT,			"Enable Parameter Object",							NotifEvent::None },
-	{ ABP_EIP_IA_INPUT_INSTANCE_OBJECT,			"Input-Only Heartbeat Instance Number",				NotifEvent::None },
-	{ ABP_EIP_IA_LISTEN_INSTANCE_OBJECT,		"Listen-Only Heartbeat Instance Number",			NotifEvent::None },
-	{ ABP_EIP_IA_CONFIG_INSTANCE,				"Assembly Object Configuration Instance Number",	NotifEvent::None },
-	{ ABP_EIP_IA_DISABLE_STRICT_IO_MATCH,		"Disable Strict I/O Match",							NotifEvent::None },
-	{ ABP_EIP_IA_ENABLE_UNCONNECTED_SEND,		"Enable Unconnected Routing",						NotifEvent::None },
-	{ ABP_EIP_IA_INPUT_EXT_INSTANCE_OBJECT,		"Input-Only Extended Heartbeat Instance Number",	NotifEvent::None },
-	{ ABP_EIP_IA_LISTEN_EXT_INSTANCE_OBJECT,	"Listen-Only Extended Heartbeat Instance Number",	NotifEvent::None },
-	{ ABP_EIP_IA_IF_LABEL_PORT_1,				"Interface Label Port 1",							NotifEvent::None },
-	{ ABP_EIP_IA_IF_LABEL_PORT_2,				"Interface Label Port 2",							NotifEvent::None },
-	{ ABP_EIP_IA_IF_LABEL_PORT_INT,				"Interface Label Internal Port",					NotifEvent::None },
-	{ ABP_EIP_IA_ENABLE_APP_CIP_OBJECTS_EXT,	"Enable Application CIP Object Extended",			NotifEvent::None },
-	{ ABP_EIP_IA_PREPEND_PRODUCING,				"Prepend Producing",								NotifEvent::None },
-	{ ABP_EIP_IA_PREPEND_CONSUMING,				"Prepend Consuming",								NotifEvent::None },
-	{ ABP_EIP_IA_ENABLE_EIP_QC,					"Enable EtherNet/IP QuickConnect",					NotifEvent::None },
-	{ ABP_EIP_IA_PROD_INSTANCE_MAP,				"Producing Instance Mapping",						NotifEvent::None },
-	{ ABP_EIP_IA_CONS_INSTANCE_MAP,				"Consuming Instance Mapping",						NotifEvent::None },
-	{ ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK,		"Ignore Sequence Count Check",						NotifEvent::None },
-	{ ABP_EIP_IA_ABCC_ADI_OBJECT,				"ABCC ADI Object Number",							NotifEvent::None },
-	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									NotifEvent::None }
+	{ ABP_EIP_IA_VENDOR_ID,						"Vendor ID",										BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_DEVICE_TYPE,					"Device Type",										BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_PRODUCT_CODE,					"Product Code",										BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_REVISION,						"Revision",											BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_SERIAL_NUMBER,					"Serial Number",									BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_PRODUCT_NAME,					"Product Name",										BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_EIP_IA_PROD_INSTANCE,					"Producing Instance Number",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_CONS_INSTANCE,					"Consuming Instance Number",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_COMM_SETTINGS_FROM_NET,		"Enable Communication Settings From Net",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ENABLE_APP_CIP_OBJECTS,		"Enable CIP Forwarding",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ENABLE_PARAM_OBJECT,			"Enable Parameter Object",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_INPUT_INSTANCE_OBJECT,			"Input-Only Heartbeat Instance Number",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_LISTEN_INSTANCE_OBJECT,		"Listen-Only Heartbeat Instance Number",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_CONFIG_INSTANCE,				"Assembly Object Configuration Instance Number",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_DISABLE_STRICT_IO_MATCH,		"Disable Strict I/O Match",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ENABLE_UNCONNECTED_SEND,		"Enable Unconnected Routing",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_INPUT_EXT_INSTANCE_OBJECT,		"Input-Only Extended Heartbeat Instance Number",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_LISTEN_EXT_INSTANCE_OBJECT,	"Listen-Only Extended Heartbeat Instance Number",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_IF_LABEL_PORT_1,				"Interface Label Port 1",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_IF_LABEL_PORT_2,				"Interface Label Port 2",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_IF_LABEL_PORT_INT,				"Interface Label Internal Port",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ENABLE_APP_CIP_OBJECTS_EXT,	"Enable Application CIP Object Extended",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_PREPEND_PRODUCING,				"Prepend Producing",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_PREPEND_CONSUMING,				"Prepend Consuming",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ENABLE_EIP_QC,					"Enable EtherNet/IP QuickConnect",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_PROD_INSTANCE_MAP,				"Producing Instance Mapping",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_CONS_INSTANCE_MAP,				"Consuming Instance Mapping",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK,		"Ignore Sequence Count Check",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ABCC_ADI_OBJECT,				"ABCC ADI Object Number",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asEmeInstAttrNames[] =
+static const AttrLookupTable_t asEmeInstAttrNames[] =
 {
-	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL,			"Voltage Phase Neutral",		NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MIN,		"Voltage Phase Neutral Min",	NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MAX,		"Voltage Phase Neutral Max",	NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE,			"Voltage Phase Phase",			NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MIN,		"Voltage Phase Phase Min",		NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MAX,		"Voltage Phase Phase Max",		NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND,			"Voltage Phase Ground",			NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MIN,		"Voltage Phase Ground Min",		NotifEvent::None },
-	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MAX,		"Voltage Phase Ground Max",		NotifEvent::None },
-	{ ABP_EME_IA_CURRENT,						"Current",						NotifEvent::None },
-	{ ABP_EME_IA_CURRENT_MIN,					"Current Min",					NotifEvent::None },
-	{ ABP_EME_IA_CURRENT_MAX,					"Current Max",					NotifEvent::None },
-	{ ABP_EME_IA_APPARENT_POWER,				"Apparent Power",				NotifEvent::None },
-	{ ABP_EME_IA_APPARENT_POWER_MIN,			"Apparent Power Min",			NotifEvent::None },
-	{ ABP_EME_IA_APPARENT_POWER_MAX,			"Apparent Power Max",			NotifEvent::None },
-	{ ABP_EME_IA_ACTIVE_POWER,					"Active Power",					NotifEvent::None },
-	{ ABP_EME_IA_ACTIVE_POWER_MIN,				"Active Power Min",				NotifEvent::None },
-	{ ABP_EME_IA_ACTIVE_POWER_MAX,				"Active Power Max",				NotifEvent::None },
-	{ ABP_EME_IA_REACTIVE_POWER,				"Reactive Power",				NotifEvent::None },
-	{ ABP_EME_IA_REACTIVE_POWER_MIN,			"Reactive Power Min",			NotifEvent::None },
-	{ ABP_EME_IA_REACTIVE_POWER_MAX,			"Reactive Power Max",			NotifEvent::None },
-	{ ABP_EME_IA_POWER_FACTOR,					"Power Factor",					NotifEvent::None },
-	{ ABP_EME_IA_POWER_FACTOR_MIN,				"Power Factor Min",				NotifEvent::None },
-	{ ABP_EME_IA_POWER_FACTOR_MAX,				"Power Factor Max",				NotifEvent::None },
-	{ ABP_EME_IA_FREQUENCY,						"Frequency",					NotifEvent::None },
-	{ ABP_EME_IA_FREQUENCY_MIN,					"Frequency Min",				NotifEvent::None },
-	{ ABP_EME_IA_FREQUENCY_MAX,					"Frequency Max",				NotifEvent::None },
-	{ ABP_EME_IA_FIELD_ROTATION,				"Field Rotation",				NotifEvent::None },
-	{ ABP_EME_IA_TOTAL_ACTIVE_ENERGY,			"Total Active Energy",			NotifEvent::None },
-	{ ABP_EME_IA_TOTAL_REACTIVE_ENERGY,			"Total Reactive Engery",		NotifEvent::None },
-	{ ABP_EME_IA_TOTAL_APPARENT_ENERGY,			"Total Apparent Energy",		NotifEvent::None }
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL,			"Voltage Phase Neutral",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MIN,		"Voltage Phase Neutral Min",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_NEUTRAL_MAX,		"Voltage Phase Neutral Max",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE,			"Voltage Phase Phase",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MIN,		"Voltage Phase Phase Min",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_PHASE_MAX,		"Voltage Phase Phase Max",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND,			"Voltage Phase Ground",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MIN,		"Voltage Phase Ground Min",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_VOLTAGE_PHASE_GROUND_MAX,		"Voltage Phase Ground Max",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_CURRENT,						"Current",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_CURRENT_MIN,					"Current Min",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_CURRENT_MAX,					"Current Max",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_APPARENT_POWER,				"Apparent Power",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_APPARENT_POWER_MIN,			"Apparent Power Min",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_APPARENT_POWER_MAX,			"Apparent Power Max",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_ACTIVE_POWER,					"Active Power",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_ACTIVE_POWER_MIN,				"Active Power Min",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_ACTIVE_POWER_MAX,				"Active Power Max",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_REACTIVE_POWER,				"Reactive Power",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_REACTIVE_POWER_MIN,			"Reactive Power Min",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_REACTIVE_POWER_MAX,			"Reactive Power Max",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_POWER_FACTOR,					"Power Factor",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_POWER_FACTOR_MIN,				"Power Factor Min",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_POWER_FACTOR_MAX,				"Power Factor Max",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_FREQUENCY,						"Frequency",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_FREQUENCY_MIN,					"Frequency Min",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_FREQUENCY_MAX,					"Frequency Max",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_FIELD_ROTATION,				"Field Rotation",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_TOTAL_ACTIVE_ENERGY,			"Total Active Energy",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_TOTAL_REACTIVE_ENERGY,			"Total Reactive Engery",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EME_IA_TOTAL_APPARENT_ENERGY,			"Total Apparent Energy",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEplInstAttrNames[] =
+static const AttrLookupTable_t asEplInstAttrNames[] =
 {
-	{ ABP_EPL_IA_VENDOR_ID,			"Vendor ID",						NotifEvent::None },
-	{ ABP_EPL_IA_PRODUCT_CODE,		"Product Code",						NotifEvent::None },
-	{ ABP_EPL_IA_MAJOR_REV,			"Revision High Word",				NotifEvent::None },
-	{ ABP_EPL_IA_MINOR_REV,			"Revision Low Word",				NotifEvent::None },
-	{ ABP_EPL_IA_SERIAL_NUMBER,		"Serial Number",					NotifEvent::None },
-	{ ABP_EPL_IA_MANF_DEV_NAME,		"Manufacturer Device Name",			NotifEvent::None },
-	{ ABP_EPL_IA_MANF_HW_VER,		"Manufacturer Hardware Version",	NotifEvent::None },
-	{ ABP_EPL_IA_MANF_SW_VER,		"Manufacturer Software Version",	NotifEvent::None },
-	{ ABP_EPL_IA_DEVICE_TYPE,		"Device Type",						NotifEvent::None },
-	{ ABP_EPL_IA_MANF_NAME,			"Manufacturer Name",				NotifEvent::None },
-	{ ABP_EPL_ENABLE_IT_FUNC,		"Enable IT Functionality",			NotifEvent::None },
-	{ ABP_EPL_SDO_IT_FRAME_RATIO,	"SDO IT Frame Ratio",				NotifEvent::None },
+	{ ABP_EPL_IA_VENDOR_ID,			"Vendor ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_PRODUCT_CODE,		"Product Code",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_MAJOR_REV,			"Revision High Word",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_MINOR_REV,			"Revision Low Word",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_SERIAL_NUMBER,		"Serial Number",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_MANF_DEV_NAME,		"Manufacturer Device Name",			BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_EPL_IA_MANF_HW_VER,		"Manufacturer Hardware Version",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_EPL_IA_MANF_SW_VER,		"Manufacturer Software Version",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_EPL_IA_DEVICE_TYPE,		"Device Type",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_IA_MANF_NAME,			"Manufacturer Name",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_EPL_ENABLE_IT_FUNC,		"Enable IT Functionality",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_EPL_SDO_IT_FRAME_RATIO,	"SDO IT Frame Ratio",				BaseType::NUMERIC,		NotifEvent::None },
 };
 
-static const LookupTable_t asErInstAttrNames[] =
+static const AttrLookupTable_t asErInstAttrNames[] =
 {
-	{ ABP_ER_IA_ENERGY_READING,				"Energy Reading",				NotifEvent::None },
-	{ ABP_ER_IA_DIRECTION,					"Direction",					NotifEvent::None },
-	{ ABP_ER_IA_ACCURACY,					"Accuracy",						NotifEvent::None },
-	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	NotifEvent::None },
-	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	NotifEvent::None },
+	{ ABP_ER_IA_ENERGY_READING,				"Energy Reading",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ER_IA_DIRECTION,					"Direction",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ER_IA_ACCURACY,					"Accuracy",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	BaseType::NUMERIC,	NotifEvent::None },
 };
 
-static const LookupTable_t asEtcInstAttrNames[] =
+static const AttrLookupTable_t asEtcInstAttrNames[] =
 {
-	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								NotifEvent::None },
-	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								NotifEvent::None },
-	{ ABP_ECT_IA_MAJOR_REV,				"Major Revision",							NotifEvent::None },
-	{ ABP_ECT_IA_MINOR_REV,				"Minor Revision",							NotifEvent::None },
-	{ ABP_ECT_IA_SERIAL_NUMBER,			"Serial Number",							NotifEvent::None },
-	{ ABP_ECT_IA_MANF_DEV_NAME,			"Manufacturer Device Name",					NotifEvent::None },
-	{ ABP_ECT_IA_MANF_HW_VER,			"Manufacturer Hardware Version",			NotifEvent::None },
-	{ ABP_ECT_IA_MANF_SW_VER,			"Manufacturer Software Version",			NotifEvent::None },
-	{ ABP_ECT_IA_ENUM_ADIS,				"ENUM ADIs",								NotifEvent::None },
-	{ ABP_ECT_IA_DEVICE_TYPE,			"Device Type",								NotifEvent::None },
-	{ ABP_ECT_IA_WR_PD_ASSY_INST_TRANS,	"Write PD Assembly Instance Translation",	NotifEvent::None },
-	{ ABP_ECT_IA_RD_PD_ASSY_INST_TRANS,	"Read PD Assembly Instance Translation",	NotifEvent::None },
-	{ ABP_ECT_IA_ADI_TRANS,				"ADI Translation",							NotifEvent::None },
-	{ ABP_ECT_IA_OBJ_SUB_TRANS,			"Object SubIndex Translation",				NotifEvent::None },
-	{ ABP_ECT_IA_ENABLE_FOE,			"Enable FoE",								NotifEvent::None },
-	{ ABP_ECT_IA_ENABLE_EOE,			"Enable EoE",								NotifEvent::None },
-	{ ABP_ECT_IA_CHANGE_SR_SWITCH,		"Change Shift Register Switch",				NotifEvent::None },
-	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",NotifEvent::None },
-	{ ABP_ECT_IA_ETHERCAT_STATE,		"EtherCAT State",							NotifEvent::None },
-	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							NotifEvent::None },
-	{ ABP_ECT_IA_COMP_IDENT_LISTS,		"Compare Identity Lists",					NotifEvent::None },
-	{ ABP_ECT_IA_FSOE_STATUS_IND,		"FSoE Status Indication",					NotifEvent::None },
-	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					NotifEvent::None },
-	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							NotifEvent::None },
-	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							NotifEvent::None }
+	{ ABP_ECT_IA_VENDOR_ID,				"Vendor ID",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_PRODUCT_CODE,			"Product Code",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_MAJOR_REV,				"Major Revision",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_MINOR_REV,				"Minor Revision",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_SERIAL_NUMBER,			"Serial Number",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_MANF_DEV_NAME,			"Manufacturer Device Name",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ECT_IA_MANF_HW_VER,			"Manufacturer Hardware Version",			BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ECT_IA_MANF_SW_VER,			"Manufacturer Software Version",			BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ECT_IA_ENUM_ADIS,				"ENUM ADIs",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_DEVICE_TYPE,			"Device Type",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_WR_PD_ASSY_INST_TRANS,	"Write PD Assembly Instance Translation",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_RD_PD_ASSY_INST_TRANS,	"Read PD Assembly Instance Translation",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_ADI_TRANS,				"ADI Translation",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_OBJ_SUB_TRANS,			"Object SubIndex Translation",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_ENABLE_FOE,			"Enable FoE",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_ENABLE_EOE,			"Enable EoE",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_CHANGE_SR_SWITCH,		"Change Shift Register Switch",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_SET_DEV_ID_AS_CSA,		"Set Device ID as Configured Station Alias",BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_ETHERCAT_STATE,		"EtherCAT State",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_STATE_TIMEOUTS,		"State Timeouts",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_COMP_IDENT_LISTS,		"Compare Identity Lists",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_FSOE_STATUS_IND,		"FSoE Status Indication",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asEtnInstAttrNames[] =
+static const AttrLookupTable_t asEtnInstAttrNames[] =
 {
-	{ ABP_ETN_IA_MAC_ADDRESS,					"MAC Address",						NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_HICP,					"Enable HICP",						NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_WEB,					"Enable Web Server",				NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_MOD_TCP ,				"Enable Modbus TCP",				NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,			"Enable Web ADI Access",			NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_FTP,					"Enable FTP Server",				NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,				"Enable Admin Mode",				NotifEvent::None },
-	{ ABP_ETN_IA_NETWORK_STATUS,				"Network Status",					NotifEvent::None },
-	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,				"Port 1 MAC Address",				NotifEvent::None },
-	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,				"Port 2 MAC Address",				NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_ACD,					"Enable ACD",						NotifEvent::None },
-	{ ABP_ETN_IA_PORT1_STATE,					"Port 1 State",						NotifEvent::None },
-	{ ABP_ETN_IA_PORT2_STATE,					"Port 2 State",						NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,				"Enable Web Update",				NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_HICP_RESET,				"Enable Reset From HICP",			NotifEvent::None },
-	{ ABP_ETN_IA_IP_CONFIGURATION,				"IP Configuration",					NotifEvent::None },
-	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,			"IP Address Byte 0-2",				NotifEvent::None },
-	{ ABP_ETN_IA_ETH_PHY_CONFIG,				"PHY Duplex Fallback Config",		NotifEvent::None },
-	{ ABP_ETN_IA_SNMP_READ_ONLY,				"SNMP Read-Only",					NotifEvent::None },
-	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					NotifEvent::None },
-	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			NotifEvent::None },
-	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				NotifEvent::None }
+	{ ABP_ETN_IA_MAC_ADDRESS,					"MAC Address",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_HICP,					"Enable HICP",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_WEB,					"Enable Web Server",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_MOD_TCP ,				"Enable Modbus TCP",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_WEB_ADI_ACCESS,			"Enable Web ADI Access",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_FTP,					"Enable FTP Server",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_ADMIN_MODE,				"Enable Admin Mode",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_NETWORK_STATUS,				"Network Status",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_PORT1_MAC_ADDRESS,				"Port 1 MAC Address",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_PORT2_MAC_ADDRESS,				"Port 2 MAC Address",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_ACD,					"Enable ACD",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_PORT1_STATE,					"Port 1 State",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_PORT2_STATE,					"Port 2 State",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_WEB_UPDATE,				"Enable Web Update",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_HICP_RESET,				"Enable Reset From HICP",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_IP_CONFIGURATION,				"IP Configuration",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_IP_ADDRESS_BYTE_0_2,			"IP Address Byte 0-2",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ETH_PHY_CONFIG,				"PHY Duplex Fallback Config",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_SNMP_READ_ONLY,				"SNMP Read-Only",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asFsiObjAttrNames[] =
+static const AttrLookupTable_t asFsiObjAttrNames[] =
 {
-	{ ABP_FSI_OA_MAX_INST,						"Max Number of Instances",		NotifEvent::None },
-	{ ABP_FSI_OA_DISABLE_VFS,					"Disable Virtual File System",	NotifEvent::None },
-	{ ABP_FSI_OA_TOTAL_DISC_SIZE,				"Total Disc Size",				NotifEvent::None },
-	{ ABP_FSI_OA_FREE_DISC_SIZE,				"Free Disc Size",				NotifEvent::None },
-	{ ABP_FSI_OA_DISC_CRC,						"Disc CRC",						NotifEvent::None },
-	{ ABP_FSI_OA_DISC_TYPE,						"Disc Type",					NotifEvent::None },
-	{ ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL,	"Disc Fault Tolerance Level",	NotifEvent::None }
+	{ ABP_FSI_OA_MAX_INST,						"Max Number of Instances",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_DISABLE_VFS,					"Disable Virtual File System",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_TOTAL_DISC_SIZE,				"Total Disc Size",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_FREE_DISC_SIZE,				"Free Disc Size",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_DISC_CRC,						"Disc CRC",						BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_DISC_TYPE,						"Disc Type",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL,	"Disc Fault Tolerance Level",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asFsiInstAttrNames[] =
+static const AttrLookupTable_t asFsiInstAttrNames[] =
 {
-	{ ABP_FSI_IA_TYPE,		"Instance Type",			NotifEvent::None },
-	{ ABP_FSI_IA_FILE_SIZE,	"File Size",				NotifEvent::None },
-	{ ABP_FSI_IA_PATH,		"Current Instance Path",	NotifEvent::None }
+	{ ABP_FSI_IA_TYPE,		"Instance Type",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_IA_FILE_SIZE,	"File Size",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_IA_PATH,		"Current Instance Path",	BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asFusmInstAttrNames[] =
+static const AttrLookupTable_t asFusmInstAttrNames[] =
 {
-	{ ABP_FUSM_IA_STATE,		"State",					NotifEvent::None },
-	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				NotifEvent::None },
-	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			NotifEvent::None },
-	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			NotifEvent::None },
-	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			NotifEvent::None },
-	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				NotifEvent::None },
-	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				NotifEvent::None },
-	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			NotifEvent::None },
-	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				NotifEvent::None },
-	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	NotifEvent::None },
-	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		NotifEvent::None }
+	{ ABP_FUSM_IA_STATE,		"State",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asMddObjAttrNames[] =
+static const AttrLookupTable_t asMddObjAttrNames[] =
 {
-	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			NotifEvent::None },
-	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	NotifEvent::None }
+	{ ABP_MDD_OA_NUM_SLOTS,			"Number of Slots",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_MDD_OA_NUM_ADIS_PER_SLOT,	"Number of ADIs Per Slot",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asModInstAttrNames[] =
+static const AttrLookupTable_t asModInstAttrNames[] =
 {
-	{ ABP_MOD_IA_VENDOR_NAME,			"Vendor Name",									NotifEvent::None },
-	{ ABP_MOD_IA_PRODUCT_CODE,			"Product Code",									NotifEvent::None },
-	{ ABP_MOD_IA_REVISION,				"Major Minor Revision",							NotifEvent::None },
-	{ ABP_MOD_IA_VENDOR_URL,			"Vendor URL",									NotifEvent::None },
-	{ ABP_MOD_IA_PRODUCT_NAME,			"Product Name",									NotifEvent::None },
-	{ ABP_MOD_IA_MODEL_NAME,			"Model Name",									NotifEvent::None },
-	{ ABP_MOD_IA_USER_APP_NAME,			"User Application Name",						NotifEvent::None },
-	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									NotifEvent::None },
-	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						NotifEvent::None },
-	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				NotifEvent::None },
-	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	NotifEvent::None },
-	{ ABP_MOD_IA_DISABLE_DEVICE_ID_FC,	"Disable Device ID Function Code",				NotifEvent::None }
+	{ ABP_MOD_IA_VENDOR_NAME,			"Vendor Name",									BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_PRODUCT_CODE,			"Product Code",									BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_REVISION,				"Major Minor Revision",							BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_VENDOR_URL,			"Vendor URL",									BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_PRODUCT_NAME,			"Product Name",									BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_MODEL_NAME,			"Model Name",									BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_USER_APP_NAME,			"User Application Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_MOD_IA_DEVICE_ID,				"Device ID",									BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_MOD_IA_ADI_INDEXING_BITS,		"No. of ADI indexing bits",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_MOD_IA_MESSAGE_FORWARDING,	"Enable Modbus message forwarding",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_MOD_IA_RW_OFFSET,				"Modbus read/write registers command offset",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_MOD_IA_DISABLE_DEVICE_ID_FC,	"Disable Device ID Function Code",				BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asNcInstAttrNames[] =
+static const AttrLookupTable_t asNcInstAttrNames[] =
 {
-	{ ABP_NC_VAR_IA_NAME,			"Name",					NotifEvent::None },
-	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			NotifEvent::None },
-	{ ABP_NC_VAR_IA_NUM_ELEM,		"Number of Elements",	NotifEvent::None },
-	{ ABP_NC_VAR_IA_DESCRIPTOR,		"Descriptor",			NotifEvent::None },
-	{ ABP_NC_VAR_IA_VALUE,			"Value",				NotifEvent::None },
-	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		NotifEvent::None }
+	{ ABP_NC_VAR_IA_NAME,			"Name",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_NC_VAR_IA_DATA_TYPE,		"Data Type",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NC_VAR_IA_NUM_ELEM,		"Number of Elements",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NC_VAR_IA_DESCRIPTOR,		"Descriptor",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NC_VAR_IA_VALUE,			"Value",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NC_VAR_IA_CONFIG_VALUE,	"Configured Value",		BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asNwInstAttrNames[] =
+static const AttrLookupTable_t asNwInstAttrNames[] =
 {
-	{ ABP_NW_IA_NW_TYPE,		"Network Type",				NotifEvent::None },
-	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		NotifEvent::None },
-	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",				NotifEvent::None },
-	{ ABP_NW_IA_PARAM_SUPPORT,	"Parameter Support",		NotifEvent::None },
-	{ ABP_NW_IA_WRITE_PD_SIZE,	"Write Process Data Size",	NotifEvent::None },
-	{ ABP_NW_IA_READ_PD_SIZE,	"Read Process Data Size",	NotifEvent::None },
-	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	NotifEvent::None }
+	{ ABP_NW_IA_NW_TYPE,		"Network Type",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NW_IA_NW_TYPE_STR,	"Network Type String",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_NW_IA_DATA_FORMAT,	"Data Format",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NW_IA_PARAM_SUPPORT,	"Parameter Support",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NW_IA_WRITE_PD_SIZE,	"Write Process Data Size",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NW_IA_READ_PD_SIZE,	"Read Process Data Size",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_NW_IA_EXCEPTION_INFO,	"Exception Information",	BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asNwCclInstAttrNames[] =
+static const AttrLookupTable_t asNwCclInstAttrNames[] =
 {
-	{ ABP_NWCCL_IA_NETWORK_SETTINGS,	"Network Settings",				NotifEvent::None },
-	{ ABP_NWCCL_IA_SYSTEM_AREA_HANDLER,	"System Area Handler",			NotifEvent::None },
-	{ ABP_NWCCL_IA_ERROR_CODE_POSITION,	"Error Code Position",			NotifEvent::None },
-	{ ABP_NWCCL_IA_LAST_MAPPING_INFO,	"Last Mapping Info",			NotifEvent::None },
-	{ ABP_NWCCL_IA_CCL_CONF_TEST_MODE,	"CCL Conformance Test Mode",	NotifEvent::None },
-	{ ABP_NWCCL_IA_ERROR_INFO,			"Error Information",			NotifEvent::None }
+	{ ABP_NWCCL_IA_NETWORK_SETTINGS,	"Network Settings",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_IA_SYSTEM_AREA_HANDLER,	"System Area Handler",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_IA_ERROR_CODE_POSITION,	"Error Code Position",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_IA_LAST_MAPPING_INFO,	"Last Mapping Info",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_IA_CCL_CONF_TEST_MODE,	"CCL Conformance Test Mode",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_IA_ERROR_INFO,			"Error Information",			BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwCfnInstAttrNames[] =
+static const AttrLookupTable_t asNwCfnInstAttrNames[] =
 {
-	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",			NotifEvent::None },
-	{ ABP_NWCFN_IA_APP_OP_STATUS,	"Application OP Status",	NotifEvent::None },
-	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		NotifEvent::None }
+	{ ABP_NWCFN_IA_IO_DATA_SIZES,	"IO Data Sizes",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCFN_IA_APP_OP_STATUS,	"Application OP Status",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwEtnInstAttrNames[] =
+static const AttrLookupTable_t asNwEtnInstAttrNames[] =
 {
-	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			NotifEvent::None },
-	{ ABP_NWETN_IA_PORT1_MAC_ID,		"Port 1 MAC Address",	NotifEvent::None },
-	{ ABP_NWETN_IA_PORT2_MAC_ID,		"Port 2 MAC Address",	NotifEvent::None },
-	{ ABP_NWETN_IA_MAC_ADDRESS,			"MAC Address",			NotifEvent::None },
-	{ ABP_NWETN_IA_INTERFACE_COUNTERS,	"Interface Counters",	NotifEvent::None },
-	{ ABP_NWETN_IA_MEDIA_COUNTERS,		"Media Counters",		NotifEvent::None }
+	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWETN_IA_PORT1_MAC_ID,		"Port 1 MAC Address",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWETN_IA_PORT2_MAC_ID,		"Port 2 MAC Address",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWETN_IA_MAC_ADDRESS,			"MAC Address",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWETN_IA_INTERFACE_COUNTERS,	"Interface Counters",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWETN_IA_MEDIA_COUNTERS,		"Media Counters",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwPnioInstAttrNames[] =
+static const AttrLookupTable_t asNwPnioInstAttrNames[] =
 {
-	{ ABP_NWPNIO_IA_ONLINE_TRANS,			"Number of on-line transitions",		NotifEvent::None },
-	{ ABP_NWPNIO_IA_OFFLINE_TRANS,			"Number of off-line transitions",		NotifEvent::None },
-	{ ABP_NWPNIO_IA_OFFLINE_REASON_CODE,	"Reason code of last off-line",			NotifEvent::None },
-	{ ABP_NWPNIO_IA_ABORT_REASON_CODE,		"Last abort reason code",				NotifEvent::None },
-	{ ABP_NWPNIO_IA_ADDED_APIS,				"Number of added APIs",					NotifEvent::None },
-	{ ABP_NWPNIO_IA_API_LIST,				"List of the added APIs",				NotifEvent::None },
-	{ ABP_NWPNIO_IA_EST_ARS,				"Number of established ARs",			NotifEvent::None },
-	{ ABP_NWPNIO_IA_AR_LIST,				"List of established ARs (handles)",	NotifEvent::None },
-	{ ABP_NWPNIO_IA_PNIO_INIT_ERR_CODE,		"Error code PROFINET IO stack init",	NotifEvent::None },
-	{ ABP_NWPNIO_IA_PORT1_MAC_ADDRESS,		"PROFINET IO port 1 MAC address",		NotifEvent::None },
-	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		NotifEvent::None }
+	{ ABP_NWPNIO_IA_ONLINE_TRANS,			"Number of on-line transitions",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_OFFLINE_TRANS,			"Number of off-line transitions",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_OFFLINE_REASON_CODE,	"Reason code of last off-line",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_ABORT_REASON_CODE,		"Last abort reason code",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_ADDED_APIS,				"Number of added APIs",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_API_LIST,				"List of the added APIs",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_EST_ARS,				"Number of established ARs",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_AR_LIST,				"List of established ARs (handles)",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_PNIO_INIT_ERR_CODE,		"Error code PROFINET IO stack init",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_PORT1_MAC_ADDRESS,		"PROFINET IO port 1 MAC address",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_IA_PORT2_MAC_ADDRESS,		"PROFINET IO port 2 MAC address",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asMqttInstAttrNames[] =
+static const AttrLookupTable_t asMqttInstAttrNames[] =
 {
-	{ ABP_MQTT_IA_MODE,			"Mode",				NotifEvent::None },
-	{ APB_MQTT_IA_LAST_WILL,	"Last Will",		NotifEvent::None }
+	{ ABP_MQTT_IA_MODE,			"Mode",				BaseType::NUMERIC,	NotifEvent::None },
+	{ APB_MQTT_IA_LAST_WILL,	"Last Will",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asOpcuaInstAttrNames[] =
+static const AttrLookupTable_t asOpcuaInstAttrNames[] =
 {
-	{ ABP_OPCUA_IA_MODEL,					"Model",				NotifEvent::None },
-	{ ABP_OPCUA_IA_APPLICATION_URI,			"Application URI",		NotifEvent::None },
-	{ ABP_OPCUA_IA_VENDOR_NAMESPACE_URI,	"Vendor Namespace URI",	NotifEvent::None },
-	{ ABP_OPCUA_IA_DEVICE_TYPE_NAME,		"Device Type Name",		NotifEvent::None },
-	{ ABP_OPCUA_IA_DEVICE_INST_NAME,		"Device Instance Name",	NotifEvent::None },
-	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			NotifEvent::None }
+	{ ABP_OPCUA_IA_MODEL,					"Model",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_OPCUA_IA_APPLICATION_URI,			"Application URI",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_OPCUA_IA_VENDOR_NAMESPACE_URI,	"Vendor Namespace URI",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_OPCUA_IA_DEVICE_TYPE_NAME,		"Device Type Name",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_OPCUA_IA_DEVICE_INST_NAME,		"Device Instance Name",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asPnamInstAttrNames[] =
+static const AttrLookupTable_t asPnamInstAttrNames[] =
 {
-	{ ABP_PNAM_IA_INFO_TYPE,		"Info Type",							NotifEvent::None },
-	{ ABP_PNAM_IA_UNIQUE_ID,		"Unique ID",							NotifEvent::None },
-	{ ABP_PNAM_IA_LOCATION_TYPE,	"Location Type",						NotifEvent::None },
-	{ ABP_PNAM_IA_LOCATION_LT,		"Location Level Tree",					NotifEvent::None },
-	{ ABP_PNAM_IA_LOCATION_SS,		"Location Slot Subslot",				NotifEvent::None },
-	{ ABP_PNAM_IA_ANNOTATION,		"Annotation",							NotifEvent::None },
-	{ ABP_PNAM_IA_ORDER_ID,			"Order ID",								NotifEvent::None },
-	{ ABP_PNAM_IA_SERIAL,			"Serial",								NotifEvent::None },
-	{ ABP_PNAM_IA_DEVICE_ID,		"Device ID",							NotifEvent::None },
-	{ ABP_PNAM_IA_TYPE_ID,			"Type ID",								NotifEvent::None },
-	{ ABP_PNAM_IA_AM_SW_REV,		"Asset Management Software Revision",	NotifEvent::None },
-	{ ABP_PNAM_IA_IM_SW_REV,		"I&M Software Revision",				NotifEvent::None },
-	{ ABP_PNAM_IA_AM_HW_REV,		"Asset Management Hardware Revision",	NotifEvent::None },
-	{ ABP_PNAM_IA_IM_HW_REV,		"I&M Hardware Revision",				NotifEvent::None }
+	{ ABP_PNAM_IA_INFO_TYPE,		"Info Type",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_UNIQUE_ID,		"Unique ID",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_LOCATION_TYPE,	"Location Type",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_LOCATION_LT,		"Location Level Tree",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_LOCATION_SS,		"Location Slot Subslot",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_ANNOTATION,		"Annotation",							BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_ORDER_ID,			"Order ID",								BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_SERIAL,			"Serial",								BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_DEVICE_ID,		"Device ID",							BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_TYPE_ID,			"Type ID",								BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNAM_IA_AM_SW_REV,		"Asset Management Software Revision",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_IM_SW_REV,		"I&M Software Revision",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_AM_HW_REV,		"Asset Management Hardware Revision",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNAM_IA_IM_HW_REV,		"I&M Hardware Revision",				BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asPnioInstAttrNames[] =
+static const AttrLookupTable_t asPnioInstAttrNames[] =
 {
-	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						NotifEvent::None },
-	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	NotifEvent::None },
-	{ ABP_PNIO_IA_STATION_TYPE,				"Station Type",						NotifEvent::None },
-	{ ABP_PNIO_IA_MAX_AR,					"MaxAr",							NotifEvent::None },
-	{ 0x05,									"Reserved",							NotifEvent::Alert },
-	{ 0x06,									"Reserved",							NotifEvent::Alert },
-	{ ABP_PNIO_IA_RTM,						"Record Data Mode",					NotifEvent::None },
-	{ ABP_PNIO_IA_IM_ORDER_ID,				"I&M Order ID",						NotifEvent::None },
-	{ ABP_PNIO_IA_IM_SERIAL_NBR,			"I&M Serial Number",				NotifEvent::None },
-	{ ABP_PNIO_IA_IM_HW_REV,				"I&M Hardware Revision",			NotifEvent::None },
-	{ ABP_PNIO_IA_IM_SW_REV,				"I&M Software Revision",			NotifEvent::None },
-	{ ABP_PNIO_IA_IM_REV_CNT,				"I&M Revision Counter",				NotifEvent::None },
-	{ ABP_PNIO_IA_IM_PROFILE_ID,			"I&M Profile ID",					NotifEvent::None },
-	{ ABP_PNIO_IA_IM_PROFILE_SPEC_TYPE,		"I&M Profile Specific Type",		NotifEvent::None },
-	{ ABP_PNIO_IA_IM_VER,					"I&M Version",						NotifEvent::None },
-	{ ABP_PNIO_IA_IM_SUPPORTED,				"I&M Supported",					NotifEvent::None },
-	{ ABP_PNIO_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",				NotifEvent::None },
-	{ ABP_PNIO_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",				NotifEvent::None },
-	{ ABP_PNIO_IA_SYSTEM_DESCRIPTION,		"System Description",				NotifEvent::None },
-	{ ABP_PNIO_IA_INTERFACE_DESCRIPTION,	"Interface Description",			NotifEvent::None },
-	{ ABP_PNIO_IA_MOD_ID_ASSIGN_MODE,		"Module Id Assignment Mode",		NotifEvent::None },
-	{ ABP_PNIO_IA_SYSTEM_CONTACT,			"System Contact",					NotifEvent::None },
-	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		NotifEvent::None },
-	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				NotifEvent::None },
-	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				NotifEvent::None },
-	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					NotifEvent::None },
-	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						NotifEvent::None }
+	{ ABP_PNIO_IA_DEVICE_ID,				"Device ID",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_VENDOR_ID,				"Vendor ID (I&M Manufacturer ID)",	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_STATION_TYPE,				"Station Type",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_MAX_AR,					"MaxAr",							BaseType::NUMERIC,		NotifEvent::None },
+	{ 0x05,									"Reserved",							BaseType::NUMERIC,		NotifEvent::Alert },
+	{ 0x06,									"Reserved",							BaseType::NUMERIC,		NotifEvent::Alert },
+	{ ABP_PNIO_IA_RTM,						"Record Data Mode",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_ORDER_ID,				"I&M Order ID",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_IM_SERIAL_NBR,			"I&M Serial Number",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_IM_HW_REV,				"I&M Hardware Revision",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_SW_REV,				"I&M Software Revision",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_REV_CNT,				"I&M Revision Counter",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_PROFILE_ID,			"I&M Profile ID",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_PROFILE_SPEC_TYPE,		"I&M Profile Specific Type",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_VER,					"I&M Version",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_IM_SUPPORTED,				"I&M Supported",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_PORT1_MAC_ADDRESS,		"Port 1 MAC Address",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_PORT2_MAC_ADDRESS,		"Port 2 MAC Address",				BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_SYSTEM_DESCRIPTION,		"System Description",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_INTERFACE_DESCRIPTION,	"Interface Description",			BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_MOD_ID_ASSIGN_MODE,		"Module Id Assignment Mode",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_SYSTEM_CONTACT,			"System Contact",					BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_PROFIENERGY_FUNC,			"PROFIenergy Functionality",		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asSafeInstAttrNames[] =
+static const AttrLookupTable_t asSafeInstAttrNames[] =
 {
-	{ ABP_SAFE_IA_SAFETY_ENABLED,			"Safety Enabled",			NotifEvent::None },
-	{ ABP_SAFE_IA_BAUD_RATE,				"Baud Rate",				NotifEvent::None },
-	{ ABP_SAFE_IA_IO_CONFIG,				"I/O Configuration",		NotifEvent::None },
-	{ ABP_SAFE_IA_CYCLE_TIME,				"Cycle Time",				NotifEvent::None },
-	{ ABP_SAFE_IA_FW_UPGRADE_IN_PROGRESS,	"FW Upgrade In Progress",	NotifEvent::None }
+	{ ABP_SAFE_IA_SAFETY_ENABLED,			"Safety Enabled",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SAFE_IA_BAUD_RATE,				"Baud Rate",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SAFE_IA_IO_CONFIG,				"I/O Configuration",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SAFE_IA_CYCLE_TIME,				"Cycle Time",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SAFE_IA_FW_UPGRADE_IN_PROGRESS,	"FW Upgrade In Progress",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asSmtpObjAttrNames[] =
+static const AttrLookupTable_t asSmtpObjAttrNames[] =
 {
-	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	NotifEvent::None },
-	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					NotifEvent::None },
-	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		NotifEvent::None }
+	{ ABP_SMTP_OA_MAX_INST,		"Maximum Number of Instances",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SMTP_OA_EMAILS_SENT,	"Emails Sent",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SMTP_OA_EMAIL_FAILED,	"Emails Failed to Send",		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asSmtpInstAttrNames[] =
+static const AttrLookupTable_t asSmtpInstAttrNames[] =
 {
-	{ ABP_SMTP_IA_FROM,		"From Address",		NotifEvent::None },
-	{ ABP_SMTP_IA_TO,		"To Address",		NotifEvent::None },
-	{ ABP_SMTP_IA_SUBJECT,	"Message Subject",	NotifEvent::None },
-	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		NotifEvent::None }
+	{ ABP_SMTP_IA_FROM,		"From Address",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SMTP_IA_TO,		"To Address",		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SMTP_IA_SUBJECT,	"Message Subject",	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SMTP_IA_MESSAGE,	"Message Body",		BaseType::CHARACTER,	NotifEvent::None }
 };
 
-static const LookupTable_t asSocObjAttrNames[] =
+static const AttrLookupTable_t asSocObjAttrNames[] =
 {
-	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	NotifEvent::None }
+	{ ABP_SOC_OA_MAX_INST, "Maximum Number of Instances",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asSocInstAttrNames[] =
+static const AttrLookupTable_t asSocInstAttrNames[] =
 {
-	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			NotifEvent::None },
-	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			NotifEvent::None },
-	{ ABP_SOC_IA_HOST_IP,			"Host IP Address",		NotifEvent::None },
-	{ ABP_SOC_IA_HOST_PORT,			"Host Port",			NotifEvent::None },
-	{ ABP_SOC_IA_TCP_STATE,			"TCP State",			NotifEvent::None },
-	{ ABP_SOC_IA_RX_BYTES,			"Bytes in RX Buffer",	NotifEvent::None },
-	{ ABP_SOC_IA_TX_BYTES,			"Bytes in TX Buffer",	NotifEvent::None },
-	{ ABP_SOC_IA_SO_REUSE_ADDR,		"Reuse Address Option",	NotifEvent::None },
-	{ ABP_SOC_IA_SO_KEEP_ALIVE,		"Keep Alive Option",	NotifEvent::None },
-	{ ABP_SOC_IA_IP_MULT_TTL,		"IP Multicast TTL",		NotifEvent::None },
-	{ ABP_SOC_IA_IP_MULT_LOOP,		"IP Multicast Loop",	NotifEvent::None },
-	{ ABP_SOC_IA_TCP_ACKDELAYTIME,	"TCP Ack Delay Time",	NotifEvent::None },
-	{ ABP_SOC_IA_TCP_NODELAY,		"TCP No Delay",			NotifEvent::None },
-	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	NotifEvent::None }
+	{ ABP_SOC_IA_SOCK_TYPE,			"Socket Type",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_LOCAL_PORT,		"Local Port",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_HOST_IP,			"Host IP Address",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_HOST_PORT,			"Host Port",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_TCP_STATE,			"TCP State",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_RX_BYTES,			"Bytes in RX Buffer",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_TX_BYTES,			"Bytes in TX Buffer",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_SO_REUSE_ADDR,		"Reuse Address Option",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_SO_KEEP_ALIVE,		"Keep Alive Option",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_IP_MULT_TTL,		"IP Multicast TTL",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_IP_MULT_LOOP,		"IP Multicast Loop",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_TCP_ACKDELAYTIME,	"TCP Ack Delay Time",	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_TCP_NODELAY,		"TCP No Delay",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SOC_IA_TCP_CONNTIMEO,		"TCP Connect Timeout",	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asSrc3InstAttrNames[] =
+static const AttrLookupTable_t asSrc3InstAttrNames[] =
 {
-	{ ABP_SRC3_IA_COMPONENT_NAME,		"Component Name",					NotifEvent::None },
-	{ ABP_SRC3_IA_VENDOR_CODE,			"Vendor Code",						NotifEvent::None },
-	{ ABP_SRC3_IA_DEVICE_NAME,			"Device Name",						NotifEvent::None },
-	{ ABP_SRC3_IA_VENDOR_DEVICE_ID,		"Vendor Device ID",					NotifEvent::None },
-	{ ABP_SRC3_IA_SOFTWARE_REVISION,	"Software Revision",				NotifEvent::None },
-	{ ABP_SRC3_IA_SERIAL_NUMBER,		"Serial Number",					NotifEvent::None },
-	{ ABP_SRC3_IA_MAJOR_EVT_LATCHING,	"Major Diagnostic Event Latching",	NotifEvent::None }
+	{ ABP_SRC3_IA_COMPONENT_NAME,		"Component Name",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SRC3_IA_VENDOR_CODE,			"Vendor Code",						BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_SRC3_IA_DEVICE_NAME,			"Device Name",						BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SRC3_IA_VENDOR_DEVICE_ID,		"Vendor Device ID",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SRC3_IA_SOFTWARE_REVISION,	"Software Revision",				BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SRC3_IA_SERIAL_NUMBER,		"Serial Number",					BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_SRC3_IA_MAJOR_EVT_LATCHING,	"Major Diagnostic Event Latching",	BaseType::NUMERIC,		NotifEvent::None }
 };
 
-static const LookupTable_t asSyncInstAttrNames[] =
+static const AttrLookupTable_t asSyncInstAttrNames[] =
 {
-	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",					NotifEvent::None },
-	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",					NotifEvent::None },
-	{ ABP_SYNC_IA_INPUT_CAPTURE,		"Input Capture",				NotifEvent::None },
-	{ ABP_SYNC_IA_OUTPUT_PROCESSING,	"Output Processing Time",		NotifEvent::None },
-	{ ABP_SYNC_IA_INPUT_PROCESSING,		"Input Processing Time",		NotifEvent::None },
-	{ ABP_SYNC_IA_MIN_CYCLE_TIME,		"Minimum Cycle Time",			NotifEvent::None },
-	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",					NotifEvent::None },
-	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",			NotifEvent::None },
-	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	NotifEvent::None },
+	{ ABP_SYNC_IA_CYCLE_TIME,			"Cycle Time",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_OUTPUT_VALID,			"Output Valid",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_INPUT_CAPTURE,		"Input Capture",				BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_OUTPUT_PROCESSING,	"Output Processing Time",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_INPUT_PROCESSING,		"Input Processing Time",		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_MIN_CYCLE_TIME,		"Minimum Cycle Time",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",					BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",			BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	BaseType::NUMERIC,	NotifEvent::None },
 };
 
 /*******************************************************************************
@@ -2084,11 +2084,11 @@ NotifEvent_t GetNamedInstString(U16 val,
 NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
 								char* str, U16 max_str_len,
 								DisplayBase display_base,
-								const LookupTable_t* obj_names, U8 num_obj_names,
-								const LookupTable_t* inst_names, U8 num_inst_names)
+								const AttrLookupTable_t* obj_names, U8 num_obj_names,
+								const AttrLookupTable_t* inst_names, U8 num_inst_names)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	const LookupTable_t* attrNames = nullptr;
+	const AttrLookupTable_t* attrNames = nullptr;
 	U8 numAttrs = 0;
 	NotifEvent_t notification = NotifEvent::None;
 	bool found = false;
