@@ -185,4 +185,10 @@ typedef struct NetworkTimeInfo
 	bool wrPdValid;
 } NetworkTimeInfo_t;
 
+typedef struct MsgDataFrameData2
+{
+	U16 msgDataCnt;
+	MsgHeaderInfo_t msgHeader;
+} MsgDataFrameData2_t;
+
 #endif /* ABCC_SPI_ANALYZER_TYPES_H */

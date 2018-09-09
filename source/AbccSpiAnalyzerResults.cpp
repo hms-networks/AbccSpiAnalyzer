@@ -480,33 +480,47 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMosiStates::MessageField:
 			case AbccMosiStates::MessageField_Data:
+			{
+				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
 				if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 				{
-					if (((U8)frame.mData2) == 0)
+					if (info->msgDataCnt == 0)
 					{
 						BuildErrorRsp((U8)frame.mData1, display_base);
 					}
 					else
 					{
 						U8 nw_type_idx = 0;
-						U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
 
 						/* Bytes 1 and onward are always understood as object-specific
-							** or network-specific error codes. The current implementation
-							** supports only one extra byte in the error response message
-							** data past the object specific or network-specific error */
-						if (((U8)frame.mData2) == 2)
+						** or network-specific error codes. The current implementation
+						** supports only one extra byte in the error response message
+						** data past the object specific or network-specific error */
+						if (info->msgDataCnt == 2)
 						{
 							nw_type_idx = (U8)mSettings->mNetworkType;
 						}
 
-						BuildErrorRsp(nw_type_idx, obj, (U8)frame.mData1, display_base);
+						BuildErrorRsp(nw_type_idx, info->msgHeader.obj, (U8)frame.mData1, display_base);
 					}
 				}
 				else
 				{
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, (U32)frame.mData2);
+					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+					{
+						BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+						GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), type );
+					}
+					else
+					{
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+					}
+
+					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
 
 					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
 					{
@@ -521,6 +535,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 
 				break;
+			}
 			case AbccMosiStates::MessageField_DataNotValid:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr));
 				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification, DisplayPriority::Tag);
@@ -678,33 +693,47 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				break;
 			case AbccMisoStates::MessageField:
 			case AbccMisoStates::MessageField_Data:
+			{
+				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
 				if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 				{
-					if (((U8)frame.mData2) == 0)
+					if (info->msgDataCnt == 0)
 					{
 						BuildErrorRsp((U8)frame.mData1, display_base);
 					}
 					else
 					{
 						U8 nw_type_idx = 0;
-						U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
 
 						/* Bytes 1 and onward are always understood as object-specific
-							** or network-specific error codes. The current implementation
-							** supports only one extra byte in the error response message
-							** data past the object specific or network-specific error */
-						if (((U8)frame.mData2) == 2)
+						** or network-specific error codes. The current implementation
+						** supports only one extra byte in the error response message
+						** data past the object specific or network-specific error */
+						if (info->msgDataCnt == 2)
 						{
 							nw_type_idx = (U8)mSettings->mNetworkType;
 						}
 
-						BuildErrorRsp(nw_type_idx, obj, (U8)frame.mData1, display_base);
+						BuildErrorRsp(nw_type_idx, info->msgHeader.obj, (U8)frame.mData1, display_base);
 					}
 				}
 				else
 				{
-					AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, (U32)frame.mData2);
+					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+					{
+						BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+						GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type );
+					}
+					else
+					{
+						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+					}
+
+					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
 
 					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
 					{
@@ -719,6 +748,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 
 				break;
+			}
 			case AbccMisoStates::MessageField_DataNotValid:
 				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::MessageField_Data), numberStr, sizeof(numberStr));
 				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification, DisplayPriority::Tag);
@@ -1216,21 +1246,33 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMosiStates::MessageField_Data:
 					case AbccMosiStates::MessageField:
 					{
+						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
 						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 						{
-							if ((U32)frame.mData2 == 0)
+							if (info->msgDataCnt == 0)
 							{
 								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 							else
 							{
-								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-								GetErrorRspString((U8)mSettings->mNetworkType, obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)mSettings->mNetworkType, info->msgHeader.obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 						}
 						else
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+							{
+								BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+								GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+							}
+							else
+							{
+								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							}
 						}
 
 						if (addLastMosiMsgHeader)
@@ -1401,21 +1443,33 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMisoStates::MessageField_Data:
 					case AbccMisoStates::MessageField:
 					{
+						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
 						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
 						{
-							if ((U32)frame.mData2 == 0)
+							if (info->msgDataCnt == 0)
 							{
 								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 							else
 							{
-								U8 obj = (U8)(frame.mData2 >> (8 * sizeof(U32)));
-								GetErrorRspString((U8)mSettings->mNetworkType, obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)mSettings->mNetworkType, info->msgHeader.obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
 						}
 						else
 						{
-							AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
+								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+							{
+								BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+								GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+							}
+							else
+							{
+								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+							}
 						}
 
 						if (addLastMisoMsgHeader)

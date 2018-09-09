@@ -885,6 +885,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
 		memcpy(&resultFrame.mData2, &mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
+		mMisoVars.sMsgHeader.cmdExt = (U16)frame_data;
 	}
 	else if (e_state == AbccMisoStates::MessageField_Size)
 	{
@@ -915,8 +916,11 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 				mMisoVars.fErrorRsp = false;
 			}
 		}
-		/* Store the object code in frame data to handle object specific data */
-		resultFrame.mData2 = ((U64)mMisoVars.sMsgHeader.obj) << (8 * sizeof(U32));
+
+		/* Copy message header info to frame data so that the display of the
+		** data can be adapted based on the provided information. */
+		memcpy(&((MsgDataFrameData2_t*)&resultFrame.mData2)->msgHeader,
+			&mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
@@ -1094,6 +1098,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		/* To better analyze the data in bubbletext
 		** store the object code, instance, and command */
 		memcpy(&resultFrame.mData2, &mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
+		mMosiVars.sMsgHeader.cmdExt = (U16)frame_data;
 	}
 	else if (e_state == AbccMosiStates::MessageField_Size)
 	{
@@ -1124,8 +1129,11 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 				mMosiVars.fErrorRsp = false;
 			}
 		}
-		/* Store the object code in frame data to handle object specific data */
-		resultFrame.mData2 = ((U64)mMosiVars.sMsgHeader.obj) << (8 * sizeof(U32));
+
+		/* Copy message header info to frame data so that the display of the
+		** data can be adapted based on the provided information. */
+		memcpy(&((MsgDataFrameData2_t*)&resultFrame.mData2)->msgHeader,
+			&mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
