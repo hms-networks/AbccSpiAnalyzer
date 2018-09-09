@@ -507,19 +507,21 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 				else
 				{
+					BaseType type;
+
 					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 					{
-						BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-						GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), type );
+						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 					}
 					else
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr));
+						type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 					}
 
+					GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), type);
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
 
 					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
@@ -720,19 +722,21 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				}
 				else
 				{
+					BaseType type;
+
 					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 					{
-						BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-						GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type );
+						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 					}
 					else
 					{
-						AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr));
+						type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 					}
 
+					GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type);
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
 
 					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
@@ -1261,18 +1265,21 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						}
 						else
 						{
+							BaseType type;
+
 							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 							{
-								BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-								GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 							}
 							else
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+								type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 							}
+
+							GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
 						}
 
 						if (addLastMosiMsgHeader)
@@ -1458,18 +1465,21 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						}
 						else
 						{
+							BaseType type;
+
 							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
 								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
 							{
-								BaseType type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-								GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 							}
 							else
 							{
-								AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr));
+								type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
 							}
+
+							GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
 						}
 
 						if (addLastMisoMsgHeader)
