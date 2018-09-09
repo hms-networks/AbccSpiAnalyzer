@@ -35,6 +35,15 @@ typedef struct AttrLookupTable_t
 	NotifEvent_t notification;
 } AttrLookupTable_t;
 
+typedef struct CmdLookupTable_t
+{
+	U16	value;
+	char* name;
+	BaseType commandType;
+	BaseType responseType;
+	NotifEvent_t notification;
+} CmdLookupTable_t;
+
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);

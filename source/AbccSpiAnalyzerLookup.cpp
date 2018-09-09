@@ -1208,16 +1208,16 @@ static const AttrLookupTable_t asSyncInstAttrNames[] =
 **
 *******************************************************************************/
 
-static const LookupTable_t asCmdNames[] =
+static const CmdLookupTable_t asCmdNames[] =
 {
-	{ ABP_CMD_GET_ATTR,			"Get_Attribute",			NotifEvent::None },
-	{ ABP_CMD_SET_ATTR,			"Set_Attribute",			NotifEvent::None },
-	{ ABP_CMD_CREATE,			"Create",					NotifEvent::None },
-	{ ABP_CMD_DELETE,			"Delete",					NotifEvent::None },
-	{ ABP_CMD_RESET,			"Reset",					NotifEvent::None },
-	{ ABP_CMD_GET_ENUM_STR,		"Get_Enum_String",			NotifEvent::None },
-	{ ABP_CMD_GET_INDEXED_ATTR,	"Get_Indexed_Attribute",	NotifEvent::None },
-	{ ABP_CMD_SET_INDEXED_ATTR,	"Set_Indexed_Attribute",	NotifEvent::None }
+	{ ABP_CMD_GET_ATTR,			"Get_Attribute",			BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None }, /* NOTE: BaseType values here are not used by plugin */
+	{ ABP_CMD_SET_ATTR,			"Set_Attribute",			BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None }, /* NOTE: BaseType values here are not used by plugin */
+	{ ABP_CMD_CREATE,			"Create",					BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CMD_DELETE,			"Delete",					BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CMD_RESET,			"Reset",					BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_CMD_GET_ENUM_STR,		"Get_Enum_String",			BaseType::NUMERIC,	BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_CMD_GET_INDEXED_ATTR,	"Get_Indexed_Attribute",	BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None }, /* NOTE: BaseType values here are not used by plugin */
+	{ ABP_CMD_SET_INDEXED_ATTR,	"Set_Indexed_Attribute",	BaseType::NUMERIC,	BaseType::NUMERIC,		NotifEvent::None } /* NOTE: BaseType values here are not used by plugin */
 };
 
 /*******************************************************************************
@@ -1226,210 +1226,210 @@ static const LookupTable_t asCmdNames[] =
 **
 *******************************************************************************/
 
-static const LookupTable_t asAddCmdNames[] =
+static const CmdLookupTable_t asAddCmdNames[] =
 {
-	{ ABP_ADD_CMD_ALARM_NOTIFICATION,	"Alarm_Notification",	NotifEvent::Alert }
+	{ ABP_ADD_CMD_ALARM_NOTIFICATION,	"Alarm_Notification",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert }
 };
 
-static const LookupTable_t asAppCmdNames[] =
+static const CmdLookupTable_t asAppCmdNames[] =
 {
-	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			NotifEvent::None },
-	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	NotifEvent::None },
-	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			NotifEvent::None },
-	{ ABP_APP_CMD_GET_DATA_NOTIF,		"Get_Data_Notification",	NotifEvent::None }
+	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APP_CMD_GET_DATA_NOTIF,		"Get_Data_Notification",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAppdCmdNames[] =
+static const CmdLookupTable_t asAppdCmdNames[] =
 {
-	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	NotifEvent::None },
-	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		NotifEvent::None },
-	{ ABP_APPD_GET_ADI_INFO,				"Get_ADI_Info (Deprecated)",	NotifEvent::Alert }, /* ABCC40 deprecated shall not be used */
-	{ ABP_APPD_REMAP_ADI_WRITE_AREA,		"Remap_ADI_Write_Area",			NotifEvent::None },
-	{ ABP_APPD_REMAP_ADI_READ_AREA,			"Remap_Adi_Read_Area",			NotifEvent::None },
-	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			NotifEvent::None }
+	{ ABP_APPD_CMD_GET_INST_BY_ORDER,		"Get_Instance_Number_By_Order",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_GET_PROFILE_INST_NUMBERS,	"Get_Profile_Inst_Numbers",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_GET_ADI_INFO,				"Get_ADI_Info (Deprecated)",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert }, /* ABCC40 deprecated shall not be used */
+	{ ABP_APPD_REMAP_ADI_WRITE_AREA,		"Remap_ADI_Write_Area",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_REMAP_ADI_READ_AREA,			"Remap_Adi_Read_Area",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_APPD_GET_INSTANCE_NUMBERS,		"Get_Instance_Numbers",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asAsmCmdNames[] =
+static const CmdLookupTable_t asAsmCmdNames[] =
 {
-	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	NotifEvent::None },
-	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	NotifEvent::None }
+	{ ABP_ASM_CMD_WRITE_ASSEMBLY_DATA,	"Write_Assembly_Data",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ASM_CMD_READ_ASSEMBLY_DATA,	"Read_Assembly_Data",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asBacCmdNames[] =
+static const CmdLookupTable_t asBacCmdNames[] =
 {
-	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST,		"Get_ADI_By_BacNet_Obj_Inst",		NotifEvent::None },
-	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST_NAME,	"Get_ADI_By_BacNet_Obj_Inst_Name",	NotifEvent::None },
-	{ ABP_BAC_CMD_GET_ALL_BACNET_OBJ_INSTANCES,		"Get_All_BacNet_Obj_Instances",		NotifEvent::None },
-	{ ABP_BAC_CMD_GET_BACNET_OBJ_INST_BY_ADI,		"Get_BacNet_Obj_Inst_By_ADI",		NotifEvent::None }
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST,		"Get_ADI_By_BacNet_Obj_Inst",		BaseType::NUMERIC,		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_BAC_CMD_GET_ADI_BY_BACNET_OBJ_INST_NAME,	"Get_ADI_By_BacNet_Obj_Inst_Name",	BaseType::CHARACTER,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_BAC_CMD_GET_ALL_BACNET_OBJ_INSTANCES,		"Get_All_BacNet_Obj_Instances",		BaseType::NUMERIC,		BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_BAC_CMD_GET_BACNET_OBJ_INST_BY_ADI,		"Get_BacNet_Obj_Inst_By_ADI",		BaseType::NUMERIC,		BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCclCmdNames[] =
+static const CmdLookupTable_t asCclCmdNames[] =
 {
-	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notification",				NotifEvent::None },
-	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notification",	NotifEvent::None }
+	{ ABP_CCL_CMD_INITIAL_DATA_SETTING_NOTIFICATION,				"Initial_Data_Setting_Notification",				BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CCL_CMD_INITIAL_DATA_PROCESSING_COMPLETED_NOTIFICATION,	"Initial_Data_Processing_Completed_Notification",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCfnCmdNames[] =
+static const CmdLookupTable_t asCfnCmdNames[] =
 {
-	{ ABP_CFN_CMD_BUF_SIZE_NOTIF,	"Buf_Size_Notif",	NotifEvent::None },
-	{ ABP_CFN_CMD_SLMP_SERVER_REQ,	"SLMP_Server_Req",	NotifEvent::None }
+	{ ABP_CFN_CMD_BUF_SIZE_NOTIF,	"Buf_Size_Notif",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CFN_CMD_SLMP_SERVER_REQ,	"SLMP_Server_Req",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asCntCmdNames[] =
+static const CmdLookupTable_t asCntCmdNames[] =
 {
-	{ ABP_CNT_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	NotifEvent::None },
-	{ ABP_CNT_CMD_SET_CONFIG_DATA,			"Set_Config_Data",			NotifEvent::None },
-	{ ABP_CNT_CMD_GET_CONFIG_DATA,			"Get_Config_Data",			NotifEvent::None },
+	{ ABP_CNT_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CNT_CMD_SET_CONFIG_DATA,			"Set_Config_Data",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_CNT_CMD_GET_CONFIG_DATA,			"Get_Config_Data",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
 };
 
-static const LookupTable_t asCpnCmdNames[] =
+static const CmdLookupTable_t asCpnCmdNames[] =
 {
-	{ ABP_CPN_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	NotifEvent::None }
+	{ ABP_CPN_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asDevCmdNames[] =
+static const CmdLookupTable_t asDevCmdNames[] =
 {
-	{ ABP_DEV_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	NotifEvent::None }
+	{ ABP_DEV_CMD_PROCESS_CIP_OBJ_REQUEST,	"Process_CIP_Obj_Request",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asDpv1CmdNames[] =
+static const CmdLookupTable_t asDpv1CmdNames[] =
 {
-	{ ABP_DPV1_CMD_GET_IM_RECORD,	"Get_IM_Record",	NotifEvent::None },
-	{ ABP_DPV1_CMD_SET_IM_RECORD,	"Set_IM_Record",	NotifEvent::None },
-	{ ABP_DPV1_CMD_ALARM_ACK,		"Alarm_Ack",		NotifEvent::None },
-	{ ABP_DPV1_CMD_GET_RECORD,		"Get_Record",		NotifEvent::None },
-	{ ABP_DPV1_CMD_SET_RECORD,		"Set_Record",		NotifEvent::None }
+	{ ABP_DPV1_CMD_GET_IM_RECORD,	"Get_IM_Record",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DPV1_CMD_SET_IM_RECORD,	"Set_IM_Record",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DPV1_CMD_ALARM_ACK,		"Alarm_Ack",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DPV1_CMD_GET_RECORD,		"Get_Record",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_DPV1_CMD_SET_RECORD,		"Set_Record",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEcoCmdNames[] =
+static const CmdLookupTable_t asEcoCmdNames[] =
 {
-	{ ABP_ECO_CMD_START_PAUSE,			"Start_Pause",			NotifEvent::None },
-	{ ABP_ECO_CMD_END_PAUSE,			"End_Pause",			NotifEvent::None },
-	{ ABP_ECO_CMD_PREVIEW_PAUSE_TIME,	"Preview_Pause_Time",	NotifEvent::None }
+	{ ABP_ECO_CMD_START_PAUSE,			"Start_Pause",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_CMD_END_PAUSE,			"End_Pause",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_ECO_CMD_PREVIEW_PAUSE_TIME,	"Preview_Pause_Time",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEctCmdNames[] =
+static const CmdLookupTable_t asEctCmdNames[] =
 {
-	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	NotifEvent::None }
+	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEipCmdNames[] =
+static const CmdLookupTable_t asEipCmdNames[] =
 {
-	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		NotifEvent::None },
-	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				NotifEvent::None },
-	{ ABP_EIP_CMD_PROCESS_CIP_ROUTING_REQUEST,	"Process_CIP_Routing_Request",	NotifEvent::None },
-	{ ABP_EIP_CMD_GET_CONFIG_DATA,				"Get_Config_Data",				NotifEvent::None },
-	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	NotifEvent::None }
+	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST,		"Process_CIP_Obj_Request",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EIP_CMD_SET_CONFIG_DATA,				"Set_Config_Data",				BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EIP_CMD_PROCESS_CIP_ROUTING_REQUEST,	"Process_CIP_Routing_Request",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EIP_CMD_GET_CONFIG_DATA,				"Get_Config_Data",				BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_EIP_CMD_PROCESS_CIP_OBJ_REQUEST_EXT,	"Process_CIP_Obj_Request_Ext",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asEmeCmdNames[] =
+static const CmdLookupTable_t asEmeCmdNames[] =
 {
-	{ ABP_EME_CMD_GET_ATTRIBUTE_MEASUREMENT_LIST,	"Get_Attribute_Measurement_List",	NotifEvent::None }
+	{ ABP_EME_CMD_GET_ATTRIBUTE_MEASUREMENT_LIST,	"Get_Attribute_Measurement_List",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asFsiCmdNames[] =
+static const CmdLookupTable_t asFsiCmdNames[] =
 {
-	{ ABP_FSI_CMD_FILE_OPEN,			"File_Open",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_CLOSE,			"File_Close",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_DELETE,			"File_Delete",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_COPY,			"File_Copy",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_RENAME,			"File_Rename",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_READ,			"File_Read",		NotifEvent::None },
-	{ ABP_FSI_CMD_FILE_WRITE,			"File_Write",		NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_OPEN,		"Directory_Open",	NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_CLOSE,		"Directory_Close",	NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_DELETE,		"Directory_Delete",	NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_READ,		"Directory_Read",	NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_CREATE,		"Directory_Create",	NotifEvent::None },
-	{ ABP_FSI_CMD_DIRECTORY_CHANGE,		"Directory_Change",	NotifEvent::None },
-	{ ABP_FSI_CMD_FORMAT_DISC,			"Format_Disc",		NotifEvent::None }
+	{ ABP_FSI_CMD_FILE_OPEN,			"File_Open",				BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_CLOSE,			"File_Close",				BaseType::NUMERIC,		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_DELETE,			"File_Delete",				BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_COPY,			"File_Copy",				BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_RENAME,			"File_Rename",				BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_READ,			"File_Read",				BaseType::NUMERIC,		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_FSI_CMD_FILE_WRITE,			"File_Write",				BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_OPEN,		"Directory_Open",			BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_CLOSE,		"Directory_Close",			BaseType::NUMERIC,		BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_DELETE,		"Directory_Delete",			BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_READ,		"Directory_Read",			BaseType::NUMERIC,		BaseType::CHARACTER,	NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_CREATE,		"Directory_Create",			BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_DIRECTORY_CHANGE,		"Directory_Change",			BaseType::CHARACTER,	BaseType::NUMERIC,		NotifEvent::None },
+	{ ABP_FSI_CMD_FORMAT_DISC,			"Format_Disc (deprecated)",	BaseType::NUMERIC,		BaseType::NUMERIC,		NotifEvent::Alert }
 };
 
-static const LookupTable_t asFusmCmdNames[] =
+static const CmdLookupTable_t asFusmCmdNames[] =
 {
-	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,		"Error_Confirmation",		NotifEvent::Alert },
-	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,		"Set_IO_Cfg_String",		NotifEvent::None },
-	{ ABP_FUSM_CMD_GET_SAFETY_OUTPUT_PDU,	"Get_Safety_Output_PDU",	NotifEvent::None },
-	{ ABP_FUSM_CMD_GET_SAFETY_INPUT_PDU,	"Get_Safety_Input_PDU",		NotifEvent::None }
+	{ ABP_FUSM_CMD_ERROR_CONFIRMATION,		"Error_Confirmation",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert },
+	{ ABP_FUSM_CMD_SET_IO_CFG_STRING,		"Set_IO_Cfg_String",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_CMD_GET_SAFETY_OUTPUT_PDU,	"Get_Safety_Output_PDU",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_FUSM_CMD_GET_SAFETY_INPUT_PDU,	"Get_Safety_Input_PDU",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asMddCmdNames[] =
+static const CmdLookupTable_t asMddCmdNames[] =
 {
-	{ ABP_MDD_CMD_GET_LIST, "Get_List",	NotifEvent::None }
+	{ ABP_MDD_CMD_GET_LIST, "Get_List",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asModCmdNames[] =
+static const CmdLookupTable_t asModCmdNames[] =
 {
-	{ ABP_MOD_CMD_PROCESS_MODBUS_MESSAGE,	"Process_Modbus_Message",	NotifEvent::None }
+	{ ABP_MOD_CMD_PROCESS_MODBUS_MESSAGE,	"Process_Modbus_Message",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asMqttCmdNames[] =
+static const CmdLookupTable_t asMqttCmdNames[] =
 {
-	{ ABP_MQTT_CMD_GET_PUBLISH_CONFIGURATION,	"Get_Publish_Configuration",	NotifEvent::None }
+	{ ABP_MQTT_CMD_GET_PUBLISH_CONFIGURATION,	"Get_Publish_Configuration",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwCmdNames[] =
+static const CmdLookupTable_t asNwCmdNames[] =
 {
-	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		NotifEvent::None },
-	{ ABP_NW_CMD_MAP_ADI_READ_AREA,			"Map_ADI_Read_Area",		NotifEvent::None },
-	{ ABP_NW_CMD_MAP_ADI_WRITE_EXT_AREA,	"Map_ADI_Write_Ext_Area",	NotifEvent::None },
-	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	NotifEvent::None }
+	{ ABP_NW_CMD_MAP_ADI_WRITE_AREA,		"Map_ADI_Write_Area",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NW_CMD_MAP_ADI_READ_AREA,			"Map_ADI_Read_Area",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NW_CMD_MAP_ADI_WRITE_EXT_AREA,	"Map_ADI_Write_Ext_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NW_CMD_MAP_ADI_READ_EXT_AREA,		"Map_ADI_Read_Ext_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwCclCmdNames[] =
+static const CmdLookupTable_t asNwCclCmdNames[] =
 {
-	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_WRITE_AREA,	"Map_ADI_Spec_Write_Area",	NotifEvent::None },
-	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_READ_AREA,		"Map_ADI_Spec_Read_Area",	NotifEvent::None },
-	{ ABP_NWCCL_CMD_CCL_CONF_TEST_MODE,			"CCL_Conf_Test_Mode",		NotifEvent::None }
+	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_WRITE_AREA,	"Map_ADI_Spec_Write_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_CMD_MAP_ADI_SPEC_READ_AREA,		"Map_ADI_Spec_Read_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWCCL_CMD_CCL_CONF_TEST_MODE,			"CCL_Conf_Test_Mode",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwCfnCmdNames[] =
+static const CmdLookupTable_t asNwCfnCmdNames[] =
 {
-	{ ABP_NWCFN_CMD_EXT_LOOPBACK,	"Ext_Loopback",	NotifEvent::None }
+	{ ABP_NWCFN_CMD_EXT_LOOPBACK,	"Ext_Loopback",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwDpv1CmdNames[] =
+static const CmdLookupTable_t asNwDpv1CmdNames[] =
 {
-	{ ABP_NWDPV1_CMD_MAP_ADI_WRITE_AREA,	"Map_ADI_Write_Area",	NotifEvent::None },
-	{ ABP_NWDPV1_CMD_MAP_ADI_READ_AREA,		"Map_ADI_Read_Area",	NotifEvent::None }
+	{ ABP_NWDPV1_CMD_MAP_ADI_WRITE_AREA,	"Map_ADI_Write_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWDPV1_CMD_MAP_ADI_READ_AREA,		"Map_ADI_Read_Area",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asNwPnioCmdNames[] =
+static const CmdLookupTable_t asNwPnioCmdNames[] =
 {
-	{ ABP_NWPNIO_CMD_PLUG_MODULE,			"Plug_Module",			NotifEvent::None },
-	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE,		"Plug_Submodule",		NotifEvent::None },
-	{ ABP_NWPNIO_CMD_PULL_MODULE,			"Pull_Module",			NotifEvent::None },
-	{ ABP_NWPNIO_CMD_PULL_SUB_MODULE,		"Pull_Submodule",		NotifEvent::None },
-	{ ABP_NWPNIO_CMD_API_ADD,				"API_Add",				NotifEvent::None },
-	{ ABP_NWPNIO_CMD_APPL_STATE_READY,		"Appl_State_Ready",		NotifEvent::None },
-	{ ABP_NWPNIO_CMD_AR_ABORT,				"AR_Abort",				NotifEvent::Alert },
-	{ ABP_NWPNIO_CMD_ADD_SAFETY_MODULE,		"Add_Safety_Module",	NotifEvent::None },
-	{ ABP_NWPNIO_CMD_IM_OPTIONS,			"IM_Options",			NotifEvent::None },
-	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE_EXT,	"Plug_Submodule_Ext",	NotifEvent::None },
-	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	NotifEvent::None }
+	{ ABP_NWPNIO_CMD_PLUG_MODULE,			"Plug_Module",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE,		"Plug_Submodule",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_PULL_MODULE,			"Pull_Module",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_PULL_SUB_MODULE,		"Pull_Submodule",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_API_ADD,				"API_Add",				BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_APPL_STATE_READY,		"Appl_State_Ready",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_AR_ABORT,				"AR_Abort",				BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert },
+	{ ABP_NWPNIO_CMD_ADD_SAFETY_MODULE,		"Add_Safety_Module",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_IM_OPTIONS,			"IM_Options",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_PLUG_SUB_MODULE_EXT,	"Plug_Submodule_Ext",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asPnioCmdNames[] =
+static const CmdLookupTable_t asPnioCmdNames[] =
 {
-	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			NotifEvent::None },
-	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			NotifEvent::None },
-	{ ABP_PNIO_CMD_GET_IM_RECORD,		"Get_IM_Record",		NotifEvent::None },
-	{ ABP_PNIO_CMD_SET_IM_RECORD,		"Set_IM_Record",		NotifEvent::None },
-	{ ABP_PNIO_CMD_AR_CHECK_IND,		"AR_Check_Ind",			NotifEvent::None },
-	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		NotifEvent::Alert }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_AR_INFO_IND,			"AR_Info_Ind",			NotifEvent::None },
-	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		NotifEvent::None },
-	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			NotifEvent::Alert }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_PLUG_SUB_FAILED,		"Plug_Sub_Failed",		NotifEvent::Alert }, //TODO check if alert is appropriate here
-	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	NotifEvent::None },
-	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		NotifEvent::None },
-	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	NotifEvent::None },
-	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		NotifEvent::None }
+	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_SET_RECORD,			"Set_Record",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_GET_IM_RECORD,		"Get_IM_Record",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_SET_IM_RECORD,		"Set_IM_Record",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_AR_CHECK_IND,		"AR_Check_Ind",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_AR_INFO_IND,			"AR_Info_Ind",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_PLUG_SUB_FAILED,		"Plug_Sub_Failed",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::Alert }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None },
+	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
-static const LookupTable_t asSrc3CmdNames[] =
+static const CmdLookupTable_t asSrc3CmdNames[] =
 {
-	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnostic",	NotifEvent::None }
+	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnostic",	BaseType::NUMERIC,	BaseType::NUMERIC,	NotifEvent::None }
 };
 
 /*******************************************************************************
@@ -2166,7 +2166,7 @@ NotifEvent_t GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 	return NotifEvent::Alert;
 }
 
-NotifEvent_t GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const LookupTable_t* command_names, U8 num_commands, DisplayBase display_base)
+NotifEvent_t GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const CmdLookupTable_t* command_names, U8 num_commands, DisplayBase display_base)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
