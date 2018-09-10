@@ -2079,6 +2079,7 @@ NotifEvent_t GetNamedInstString(U16 val,
 			SNPRINTF(str, max_str_len, inst_names[i].name);
 			notification = inst_names[i].notification;
 			found = true;
+			break;
 		}
 	}
 
