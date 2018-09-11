@@ -2070,23 +2070,31 @@ NotifEvent_t GetNamedInstString(U16 val,
 								const LookupTable_t* inst_names, U8 num_inst_names)
 {
 	NotifEvent_t notification = NotifEvent::None;
-	bool found = false;
 
-	for (U8 i = 0; i < num_inst_names; i++)
+	if (val == 0)
 	{
-		if (inst_names[i].value == val)
-		{
-			SNPRINTF(str, max_str_len, inst_names[i].name);
-			notification = inst_names[i].notification;
-			found = true;
-			break;
-		}
+		SNPRINTF(str, max_str_len, "Object");
 	}
-
-	if (!found)
+	else
 	{
-		SNPRINTF(str, max_str_len, "Unknown: %d (0x%04X)", val, val);
-		notification = NotifEvent::Alert;
+		bool found = false;
+
+		for (U8 i = 0; i < num_inst_names; i++)
+		{
+			if (inst_names[i].value == val)
+			{
+				SNPRINTF(str, max_str_len, inst_names[i].name);
+				notification = inst_names[i].notification;
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			SNPRINTF(str, max_str_len, "Unknown: %d (0x%04X)", val, val);
+			notification = NotifEvent::Alert;
+		}
 	}
 
 	return notification;
