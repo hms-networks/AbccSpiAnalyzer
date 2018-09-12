@@ -2512,7 +2512,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 						if (mMsgErrorRspFlag[SpiChannel::MOSI])
 						{
-							AddTabularText(MISO_TAG_STR, "!",
+							AddTabularText(MOSI_TAG_STR, "!",
 										mMsgObjStr[SpiChannel::MOSI],
 										mMsgInstStr[SpiChannel::MOSI],
 										mMsgCmdStr[SpiChannel::MOSI],
@@ -2522,7 +2522,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						{
 							if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
 							{
-								AddTabularText(MISO_TAG_STR,
+								AddTabularText(MOSI_TAG_STR,
 											mMsgObjStr[SpiChannel::MOSI],
 											mMsgInstStr[SpiChannel::MOSI],
 											mMsgCmdStr[SpiChannel::MOSI],
@@ -2531,7 +2531,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 							}
 							else
 							{
-								AddTabularText(MISO_TAG_STR,
+								AddTabularText(MOSI_TAG_STR,
 											mMsgObjStr[SpiChannel::MOSI],
 											mMsgInstStr[SpiChannel::MOSI],
 											mMsgCmdStr[SpiChannel::MOSI],
