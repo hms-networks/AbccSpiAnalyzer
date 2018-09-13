@@ -740,6 +740,8 @@ void SpiAnalyzer::SignalReadyForNewPacket(SpiChannel_t e_channel)
 				}
 			}
 		}
+
+		mResults->CommitResults();
 		/* check if the source id is new */
 		/* if new source id, allocate a new transaction id */
 		/* if not a new source id, check that the header information matches the one in progress */
