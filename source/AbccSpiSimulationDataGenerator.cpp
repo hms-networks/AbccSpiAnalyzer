@@ -86,6 +86,7 @@ SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 	mMsgCmdRespState = (U16)SimulationState::SizeOfEnum;
 	mPacketOffset = 0;
 
+	mToggleBit = 0;
 	mSourceId = 0;
 	mNetTime = 0x00000001;
 
