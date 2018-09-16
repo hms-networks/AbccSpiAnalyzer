@@ -213,7 +213,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 		"Specifies external settings file to control special (advanced) settings of the plugin.\n"
 		"Please refer to plugin documentation for more details.\n"
 		"If left empty plugin defaults will be used which are suitable for most situations.\n"
-		"NOTE: Relative paths are respective to where Logic.exe resides.");
+		"NOTE: Relative paths are respective to where Logic executable resides.");
 	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
 #endif
 
