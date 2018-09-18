@@ -1858,7 +1858,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	Frame frame = GetFrame(frame_index);
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 
-	if (mSettings->mErrorIndexing == true)
+	if (mSettings->mErrorIndexing)
 	{
 		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
 		{
@@ -1903,7 +1903,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					}
 					else
 					{
-						if (mSettings->mApplStatusIndexing == true)
+						if (mSettings->mApplStatusIndexing)
 						{
 							AddTabularText("Application Status: ", str);
 							return;
@@ -1932,7 +1932,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						notification = NotifEvent::Alert;
 					}
 
-					if ((notification == NotifEvent::Alert) || (mSettings->mAnybusStatusIndexing == true))
+					if ((notification == NotifEvent::Alert) || (mSettings->mAnybusStatusIndexing))
 					{
 						SNPRINTF(tabText, sizeof(tabText), "Anybus Status: (%s)", str);
 						TableBuilder(SpiChannel::MISO, tabText, notification);
@@ -1986,7 +1986,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		return;
 	}
 
-	if (mSettings->mApplStatusIndexing == true)
+	if (mSettings->mApplStatusIndexing)
 	{
 		if ((frame.mType == AbccMosiStates::ApplicationStatus) && IS_MOSI_FRAME(frame))
 		{
@@ -2006,7 +2006,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		}
 	}
 
-	if (mSettings->mAnybusStatusIndexing == true)
+	if (mSettings->mAnybusStatusIndexing)
 	{
 		if ((frame.mType == AbccMisoStates::AnybusStatus) && IS_MISO_FRAME(frame))
 		{
@@ -2184,12 +2184,13 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			case AbccMisoStates::MessageField_CommandExtension:
 				if (mMsgValidFlag[SpiChannel::MISO])
 				{
-					if ((mSettings->mMessageSrcIdIndexing == true) || (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
+					if ((mSettings->mMessageSrcIdIndexing) ||
+						(mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
 					{
 						AddTabularText("-----MISO MESSAGE-----");
 					}
 
-					if (mSettings->mMessageSrcIdIndexing == true)
+					if (mSettings->mMessageSrcIdIndexing)
 					{
 						TableBuilder(SpiChannel::MISO, mMsgSrcStr[SpiChannel::MISO], NotifEvent::None);
 					}
@@ -2445,12 +2446,13 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			case AbccMosiStates::MessageField_CommandExtension:
 				if (mMsgValidFlag[SpiChannel::MOSI])
 				{
-					if ((mSettings->mMessageSrcIdIndexing == true) || (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
+					if ((mSettings->mMessageSrcIdIndexing) ||
+						(mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
 					{
 						AddTabularText("-----MOSI MESSAGE-----");
 					}
 
-					if (mSettings->mMessageSrcIdIndexing == true)
+					if (mSettings->mMessageSrcIdIndexing)
 					{
 						TableBuilder(SpiChannel::MOSI, mMsgSrcStr[SpiChannel::MOSI], NotifEvent::None);
 					}
