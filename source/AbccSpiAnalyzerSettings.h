@@ -27,13 +27,6 @@ enum class MessageIndexing : U32
 	SizeOfEnum
 };
 
-enum class SourceIdIndexing : U32 //TODO joca: use this or remove it
-{
-	Disabled,
-	Enabled,
-	SizeOfEnum
-};
-
 enum class TimestampIndexing : U32
 {
 	Disabled,
