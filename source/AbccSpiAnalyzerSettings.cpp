@@ -49,7 +49,7 @@ bool operator>> (SimpleArchive &archive, T &custom_enum_class)
 
 /*
 ** This routine is just here to provide some symmetry with accessing
-** the SimpleArchine with enum classes
+** the SimpleArchive with enum classes
 */
 template <class T>
 bool operator<< (SimpleArchive &archive, T custom_enum_class)
