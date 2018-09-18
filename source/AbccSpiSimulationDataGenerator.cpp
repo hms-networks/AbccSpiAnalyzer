@@ -32,11 +32,6 @@
 
 #define MSG_HEADER_SIZE			12
 
-#define SET_MOSI_OBJECT_SPECIFIC_ERROR(err) \
-	mMosiMsgData.sHeader.iDataSize = 2;     \
-	mMosiMsgData.abData[0] = 0xFF;          \
-	mMosiMsgData.abData[1] = err
-
 /*------------------------------------------------------------------------
 ** Enums, Types, and Classes
 **------------------------------------------------------------------------
@@ -80,6 +75,13 @@ static const CHAR fileData[] = "{\n"
 ** Methods/Routines
 **------------------------------------------------------------------------
 */
+
+inline void SpiSimulationDataGenerator::SetMosiObjectSpecificError(U8 error_code)
+{
+	mMosiMsgData.sHeader.iDataSize = 2;
+	mMosiMsgData.abData[0] = 0xFF;
+	mMosiMsgData.abData[1] = error_code;
+}
 
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
@@ -781,7 +783,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 		case SimulationState::FileOpenResponse:
 			// Transition to the end of 'file close', to enter 'delete instance'
 			mMsgCmdRespState = (U16)SimulationState::FileCloseResponse;
-			SET_MOSI_OBJECT_SPECIFIC_ERROR(ABP_FSI_ERR_FILE_OPEN_FAILED);
+			SetMosiObjectSpecificError(ABP_FSI_ERR_FILE_OPEN_FAILED);
 			break;
 		case SimulationState::GetFileSizeResponse:
 			// Transition to the end of 'file read', to enter 'file close'
@@ -793,13 +795,13 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 			// Abort remaining 'file read' and continue with closing down the file.
 			mAbortTransfer = true;
 			mPacketOffset = 0;
-			SET_MOSI_OBJECT_SPECIFIC_ERROR(ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED);
+			SetMosiObjectSpecificError(ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED);
 			break;
 		case SimulationState::FileCloseResponse:
-			SET_MOSI_OBJECT_SPECIFIC_ERROR(ABP_FSI_ERR_FILE_CLOSE_FAILED);
+			SetMosiObjectSpecificError(ABP_FSI_ERR_FILE_CLOSE_FAILED);
 			break;
 		case SimulationState::DeleteInstanceResponse:
-			SET_MOSI_OBJECT_SPECIFIC_ERROR(ABP_FSI_ERR_FILE_DELETE_FAILED);
+			SetMosiObjectSpecificError(ABP_FSI_ERR_FILE_DELETE_FAILED);
 			break;
 		default:
 			// Remaining cases are treated no different than normal responses.
