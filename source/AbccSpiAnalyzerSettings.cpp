@@ -412,11 +412,11 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mMessageIndexingVerbosityLevel = static_cast<MessageIndexing>(U32(mMessageIndexingVerbosityLevelInterface->GetNumber()));
 	mMsgDataPriority               = static_cast<DisplayPriority>(U32(mMsgDataPriorityInterface->GetNumber()));
 	mProcessDataPriority           = static_cast<DisplayPriority>(U32(mProcessDataPriorityInterface->GetNumber()));
-	mMessageSrcIdIndexing          = bool(mIndexMessageSrcIdInterface->GetValue());
-	mErrorIndexing                 = bool(mIndexErrorsInterface->GetValue());
+	mMessageSrcIdIndexing          = mIndexMessageSrcIdInterface->GetValue();
+	mErrorIndexing                 = mIndexErrorsInterface->GetValue();
 	mTimestampIndexing             = static_cast<TimestampIndexing>(U32(mIndexTimestampsInterface->GetNumber()));
-	mAnybusStatusIndexing          = bool(mIndexAnybusStatusInterface->GetValue());
-	mApplStatusIndexing            = bool(mIndexApplStatusInterface->GetValue());
+	mAnybusStatusIndexing          = mIndexAnybusStatusInterface->GetValue();
+	mApplStatusIndexing            = mIndexApplStatusInterface->GetValue();
 	#if ENABLE_ADVANCED_SETTINGS
 	mAdvSettingsPath               = mAdvancedSettingsInterface->GetText();
 	#endif
