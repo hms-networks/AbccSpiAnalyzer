@@ -14,6 +14,7 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 1. [Description](#description)
 2. [System Requirements](#system-requirements)
 3. [Compile & Install](#compile-&-install)
+   * [Initial Steps](#initial-steps)
    * [Windows](#windows)
    * [GNU/Linux](#gnulinux)
    * [macOS](#macos)
@@ -71,6 +72,17 @@ process data data field with accurate local timestamp information and
 
 While tagged releases are provided which contain precompiled libraries and
 associated documentation, you may still opt to compile the libraries yourself.
+
+### [Initial Steps](#table-of-contents)
+
+After checking out this git repository, the user will need to issue the
+following command in order to fetch the submodule git repos containing the
+Logic Anaalyzer SDK. Two copies are used of the same repo, one pointed at the
+release/master branch and another pointing at the legacy SDK to support debugging.
+
+```bash
+git submodules --init --recursive
+```
 
 ### [Windows](#table-of-contents)
 
