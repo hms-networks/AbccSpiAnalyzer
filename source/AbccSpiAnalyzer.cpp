@@ -777,11 +777,24 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 
 		if (mClock->WouldAdvancingToAbsPositionCauseTransition(lNextSample))
 		{
-			chn = mSettings->mEnableChannel;
+			U32 maxAllowedTransitions = 0;
+			U32 transitionCount;
+
+			if(mClock->GetBitState() == BitState::BIT_HIGH)
+			{
+				maxAllowedTransitions = 1;
+			}
+
 			errorFrame.mStartingSampleInclusive = mClock->GetSampleOfNextEdge();
-			errorFrame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
-			markerSample = errorFrame.mEndingSampleInclusive;
-			fAddError = true;
+			transitionCount = mClock->AdvanceToAbsPosition(lNextSample);
+
+			if (transitionCount > maxAllowedTransitions)
+			{
+				chn = mSettings->mEnableChannel;
+				errorFrame.mEndingSampleInclusive = mEnable->GetSampleOfNextEdge();
+				markerSample = errorFrame.mEndingSampleInclusive;
+				fAddError = true;
+			}
 		}
 		AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 	}
