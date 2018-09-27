@@ -115,6 +115,7 @@ public: /* Members */
 	bool m3WireOn4Channels;
 	bool m4WireOn3Channels;
 	std::string mExportDelimiter;
+	S32 mClockingAlertLimit;
 #endif
 
 protected: /* Members */

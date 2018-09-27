@@ -310,6 +310,8 @@ void SpiAnalyzer::Setup()
 	{
 		mEnable = nullptr;
 	}
+
+	mClockingErrorCount = 0;
 }
 
 void SpiAnalyzer::AdvanceToActiveEnableEdge()
@@ -818,10 +820,15 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 
 	if (fAddError)
 	{
-		errorFrame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
-		errorFrame.mType = AbccSpiError::EndOfTransfer;
-		mResults->AddFrame(errorFrame);
-		mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, chn);
+		if ((mSettings->mClockingAlertLimit < 0) ||
+			(mClockingErrorCount < mSettings->mClockingAlertLimit))
+		{
+			mClockingErrorCount++;
+			errorFrame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
+			errorFrame.mType = AbccSpiError::EndOfTransfer;
+			mResults->AddFrame(errorFrame);
+			mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, chn);
+		}
 	}
 }
 

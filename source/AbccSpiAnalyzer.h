@@ -176,6 +176,7 @@ protected: /* Members */
 	AnalyzerChannelData* mEnable;
 
 	U64 mCurrentSample;
+	S32 mClockingErrorCount;
 	std::vector<U64> mArrowLocations;
 	U8 mSettingsChangeID;
 

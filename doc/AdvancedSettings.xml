@@ -19,4 +19,18 @@
 	by using "\t" without the quotes. -->
 	<Setting name="export-delimiter">,</Setting>
 
+	<!-- "clocking-alert-limit" provides the user with a way restrict how many
+	times a "clocking alert" event will be reported by the plugin. This can be
+	useful in cases were a device's SPI chipselect line may "appear" to toggle
+	at the same time the SPI clock transitions high after receiving the last
+	bit in the SPI transaction. This event results in a "clocking alert"
+	notification. This type of event is more of an informational warning/error
+	event, and as long as the user understands condition and has a reason for
+	why this is OK, then they may opt to set this setting to a value >=0.
+	Setting the value to 0 disables the notifcation entirely. While any value
+	above (datatype is S32) zero will set a maximum count for producing the
+	notification in the processed results. An invalid value or value <0 results
+	indicates that there is no limit.-->
+	<Setting name="clocking-alert-limit">-1</Setting>
+
 </AdvancedSettings>

@@ -28,7 +28,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000006"
+#define SETTINGS_REVISION_STRING "REVISION_00000007"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -268,6 +268,7 @@ void SpiAnalyzerSettings::SetDefaultAdvancedSettings()
 	m3WireOn4Channels = false;
 	m4WireOn3Channels = false;
 	mExportDelimiter.assign(",");
+	mClockingAlertLimit = -1;
 }
 
 bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
@@ -357,6 +358,18 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 								{
 									mExportDelimiter.assign("\t");
 								}
+							}
+						}
+						else if (nodeName.compare( "clocking-alert-limit" ) == 0)
+						{
+							try
+							{
+								mClockingAlertLimit = (S32)std::stol(nodeValue, nullptr, 10);
+							}
+							catch (const std::invalid_argument& ia)
+							{
+								(void)ia;
+								mClockingAlertLimit = -1;
 							}
 						}
 					}
@@ -492,6 +505,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> m3WireOn4Channels;
 		textArchive >> m4WireOn3Channels;
 		textArchive >> mExportDelimiter;
+		textArchive >> mClockingAlertLimit;
 		textArchive >> &mAdvSettingsPath;
 #endif
 	}
@@ -529,6 +543,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << m3WireOn4Channels;
 	textArchive << m4WireOn3Channels;
 	textArchive << mExportDelimiter.c_str();
+	textArchive << mClockingAlertLimit;
 	textArchive << mAdvSettingsPath;
 #endif
 
