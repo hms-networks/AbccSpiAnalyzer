@@ -137,7 +137,8 @@ protected: /* Methods */
 
 #if ENABLE_ADVANCED_SETTINGS
 	std::unique_ptr< AnalyzerSettingInterfaceText >			mAdvancedSettingsInterface;
-	bool ParseAdvancedSettingsFile(void);
+	bool ParseAdvancedSettingsFile();
+	void SetDefaultAdvancedSettings();
 #endif
 
 	void SetSettingError( const std::string& setting_name, const std::string& error_text );

@@ -24,8 +24,11 @@
 #include "AnalyzerHelpers.h"
 #include "AbccSpiAnalyzerTypes.h"
 
-/* Anytime behavior or definition of settings change, increment this counter. */
-#define SETTINGS_REVISION_STRING "REVISION_00000005"
+/* Anytime behavior or definition of settings change where some level of
+** incompatibility is introduced, increment this counter. This should be
+** maintained at the commit level to improve reliability of custom builds
+** at any point in the commit history. */
+#define SETTINGS_REVISION_STRING "REVISION_00000006"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -38,9 +41,9 @@ bool operator>> (SimpleArchive &archive, T &custom_enum_class)
 	U32 temp;
 	archive >> temp;
 
-	if( temp >= static_cast<U32>(T::SizeOfEnum) )
+	if (temp >= static_cast<U32>(T::SizeOfEnum))
 	{
-		custom_enum_class = T::SizeOfEnum ;
+		custom_enum_class = T::SizeOfEnum;
 	}
 
 	custom_enum_class = static_cast<T>(temp);
@@ -55,6 +58,14 @@ template <class T>
 bool operator<< (SimpleArchive &archive, T custom_enum_class)
 {
 	archive << static_cast<U32>(custom_enum_class);
+	return true;
+}
+
+bool operator>> (SimpleArchive &archive, std::string &value)
+{
+	const char* temp;
+	archive >> &temp;
+	value.assign(temp);
 	return true;
 }
 
@@ -79,12 +90,11 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mApplStatusIndexing(true),
 #if ENABLE_ADVANCED_SETTINGS
 	mAdvSettingsPath(""),
-	m3WireOn4Channels(false),
-	m4WireOn3Channels(false),
-	mExportDelimiter(","),
 #endif
 	mChangeID(0)
 {
+	SetDefaultAdvancedSettings();
+
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
 	mMosiChannelInterface->SetTitleAndTooltip("SPI Channel - MOSI :", "Master Out, Slave In (Host to Module)");
 	mMosiChannelInterface->SetChannel(mMosiChannel);
@@ -253,6 +263,13 @@ SpiAnalyzerSettings::~SpiAnalyzerSettings()
 {
 }
 
+void SpiAnalyzerSettings::SetDefaultAdvancedSettings()
+{
+	m3WireOn4Channels = false;
+	m4WireOn3Channels = false;
+	mExportDelimiter.assign(",");
+}
+
 bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 {
 	rapidxml::xml_document<> doc;
@@ -262,6 +279,8 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 	std::string nodeValue;
 	const std::string settingName = "Advanced settings";
 	bool settingsValid = true;
+
+	SetDefaultAdvancedSettings();
 
 	/*
 	** Trim the file path so that an entry with nothing
@@ -336,7 +355,7 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 							{
 								if ((nodeValue.at(0) == '\\') && (nodeValue.at(1) == 't'))
 								{
-									mExportDelimiter = '\t';
+									mExportDelimiter.assign("\t");
 								}
 							}
 						}
@@ -469,9 +488,12 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> mTimestampIndexing;
 		textArchive >> mAnybusStatusIndexing;
 		textArchive >> mApplStatusIndexing;
-		#if ENABLE_ADVANCED_SETTINGS
+#if ENABLE_ADVANCED_SETTINGS
+		textArchive >> m3WireOn4Channels;
+		textArchive >> m4WireOn3Channels;
+		textArchive >> mExportDelimiter;
 		textArchive >> &mAdvSettingsPath;
-		#endif
+#endif
 	}
 
 	ClearChannels();
@@ -503,9 +525,12 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << mTimestampIndexing;
 	textArchive << mAnybusStatusIndexing;
 	textArchive << mApplStatusIndexing;
-	#if ENABLE_ADVANCED_SETTINGS
+#if ENABLE_ADVANCED_SETTINGS
+	textArchive << m3WireOn4Channels;
+	textArchive << m4WireOn3Channels;
+	textArchive << mExportDelimiter.c_str();
 	textArchive << mAdvSettingsPath;
-	#endif
+#endif
 
 	SaveSettingChangeID();
 
