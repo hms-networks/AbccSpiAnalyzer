@@ -17,6 +17,6 @@
 	using one of the plugin's supported export options. Any single (visible)
 	character is accepted as a delimiter. A tab-delimiter can be specified
 	by using "\t" without the quotes. -->
-	<Setting name="export-delimiter">\t</Setting>
+	<Setting name="export-delimiter">,</Setting>
 
 </AdvancedSettings>
