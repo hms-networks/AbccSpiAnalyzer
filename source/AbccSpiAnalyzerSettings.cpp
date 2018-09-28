@@ -451,7 +451,6 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
 
-	mAdvSettingsPath = mAdvancedSettingsInterface->GetText();
 	if (!ParseAdvancedSettingsFile())
 	{
 		return false;
