@@ -129,7 +129,7 @@ protected: /* Members */
 
 protected: /* Methods */
 
-	inline void SpiSimulationDataGenerator::SetMosiObjectSpecificError(U8 error_code);
+	inline void SetMosiObjectSpecificError(U8 error_code);
 
 	void RunFileTransferStateMachine(MessageResponseType msg_response_type);
 	void UpdateFileTransferStateMachine(void);
