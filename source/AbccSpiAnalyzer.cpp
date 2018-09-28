@@ -52,57 +52,6 @@ SpiAnalyzer::SpiAnalyzer()
 	SetAnalyzerSettings(mSettings.get());
 
 	mSettingsChangeID   = mSettings->mChangeID;
-
-	mMosiVars.eState              = AbccMosiStates::Idle;
-	mMisoVars.eState              = AbccMisoStates::Idle;
-	mMisoVars.bLastAnbSts         = 0xFF;
-	mMosiVars.bLastApplSts        = 0xFF;
-	mMosiVars.bLastToggleState    = 0xFF;
-	mMosiVars.dwMsgLen            = 0;
-	mMosiVars.dwMsgLenCnt         = 0;
-	mMosiVars.dwPdLen             = 0;
-	mMisoVars.dwMsgLen            = 0;
-	mMisoVars.dwMsgLenCnt         = 0;
-	mMisoVars.dwPdLen             = 0;
-
-	mMisoVars.fNewMsg             = false;
-	mMisoVars.fErrorRsp           = true;
-	mMisoVars.fFragmentation      = false;
-	mMisoVars.fFirstFrag          = false;
-	mMisoVars.fLastFrag           = false;
-	mMisoVars.fNewRdPd            = false;
-	mMosiVars.fNewMsg             = false;
-	mMosiVars.fErrorRsp           = true;
-	mMosiVars.fFragmentation      = false;
-	mMosiVars.fFirstFrag          = false;
-	mMosiVars.fLastFrag           = false;
-	mMosiVars.fWrPdValid          = false;
-
-	mMisoVars.fReadyForNewPacket  = false;
-	mMosiVars.fReadyForNewPacket  = false;
-
-	memset(&mMisoVars.sMsgHeader, 0, sizeof(mMisoVars.sMsgHeader));
-	mMisoVars.dwPdCnt = 0;
-	mMisoVars.wMdCnt = 0;
-	mMisoVars.wMdSize = 0;
-
-	memset(&mMosiVars.sMsgHeader, 0, sizeof(mMosiVars.sMsgHeader));
-	mMosiVars.dwPdCnt = 0;
-	mMosiVars.wMdCnt = 0;
-	mMosiVars.wMdSize = 0;
-
-	mMisoVars.dwLastTimestamp = 0;
-
-	mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
-	mMisoVars.dwByteCnt    = 0;
-	mMisoVars.lFrameData   = 0;
-
-	mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
-	mMosiVars.dwByteCnt    = 0;
-	mMosiVars.lFrameData   = 0;
-
-	mMosiVars.bByteCnt2 = 0;
-	mMisoVars.bByteCnt2 = 0;
 }
 
 SpiAnalyzer::~SpiAnalyzer()
@@ -310,6 +259,57 @@ void SpiAnalyzer::Setup()
 	{
 		mEnable = nullptr;
 	}
+
+	mMosiVars.eState              = AbccMosiStates::Idle;
+	mMisoVars.eState              = AbccMisoStates::Idle;
+	mMisoVars.bLastAnbSts         = 0xFF;
+	mMosiVars.bLastApplSts        = 0xFF;
+	mMosiVars.bLastToggleState    = 0xFF;
+	mMosiVars.dwMsgLen            = 0;
+	mMosiVars.dwMsgLenCnt         = 0;
+	mMosiVars.dwPdLen             = 0;
+	mMisoVars.dwMsgLen            = 0;
+	mMisoVars.dwMsgLenCnt         = 0;
+	mMisoVars.dwPdLen             = 0;
+
+	mMisoVars.fNewMsg             = false;
+	mMisoVars.fErrorRsp           = true;
+	mMisoVars.fFragmentation      = false;
+	mMisoVars.fFirstFrag          = false;
+	mMisoVars.fLastFrag           = false;
+	mMisoVars.fNewRdPd            = false;
+	mMosiVars.fNewMsg             = false;
+	mMosiVars.fErrorRsp           = true;
+	mMosiVars.fFragmentation      = false;
+	mMosiVars.fFirstFrag          = false;
+	mMosiVars.fLastFrag           = false;
+	mMosiVars.fWrPdValid          = false;
+
+	mMisoVars.fReadyForNewPacket  = false;
+	mMosiVars.fReadyForNewPacket  = false;
+
+	memset(&mMisoVars.sMsgHeader, 0, sizeof(mMisoVars.sMsgHeader));
+	mMisoVars.dwPdCnt = 0;
+	mMisoVars.wMdCnt = 0;
+	mMisoVars.wMdSize = 0;
+
+	memset(&mMosiVars.sMsgHeader, 0, sizeof(mMosiVars.sMsgHeader));
+	mMosiVars.dwPdCnt = 0;
+	mMosiVars.wMdCnt = 0;
+	mMosiVars.wMdSize = 0;
+
+	mMisoVars.dwLastTimestamp = 0;
+
+	mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
+	mMisoVars.dwByteCnt    = 0;
+	mMisoVars.lFrameData   = 0;
+
+	mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
+	mMosiVars.dwByteCnt    = 0;
+	mMosiVars.lFrameData   = 0;
+
+	mMosiVars.bByteCnt2 = 0;
+	mMisoVars.bByteCnt2 = 0;
 
 	mClockingErrorCount = 0;
 }
