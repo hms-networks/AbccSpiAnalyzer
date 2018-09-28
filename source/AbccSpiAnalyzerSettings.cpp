@@ -88,9 +88,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mErrorIndexing(true),
 	mAnybusStatusIndexing(true),
 	mApplStatusIndexing(true),
-#if ENABLE_ADVANCED_SETTINGS
 	mAdvSettingsPath(""),
-#endif
 	mChangeID(0)
 {
 	SetDefaultAdvancedSettings();
@@ -216,7 +214,6 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 		"Prioritize Tag", "Process Data will be displayed as second layer of bubble text in analyzer results.");
 	mProcessDataPriorityInterface->SetNumber(static_cast<double>(mProcessDataPriority));
 
-#if ENABLE_ADVANCED_SETTINGS
 	mAdvancedSettingsInterface.reset(new AnalyzerSettingInterfaceText());
 	mAdvancedSettingsInterface->SetTextType(AnalyzerSettingInterfaceText::FilePath);
 	mAdvancedSettingsInterface->SetTitleAndTooltip("Advanced Settings :",
@@ -225,7 +222,6 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 		"If left empty plugin defaults will be used which are suitable for most situations.\n"
 		"NOTE: Relative paths are respective to where Logic executable resides.");
 	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
-#endif
 
 	AddInterface(mMosiChannelInterface.get());
 	AddInterface(mMisoChannelInterface.get());
@@ -241,9 +237,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface(mMessageIndexingVerbosityLevelInterface.get());
 	AddInterface(mMsgDataPriorityInterface.get());
 	AddInterface(mProcessDataPriorityInterface.get());
-#if ENABLE_ADVANCED_SETTINGS
 	AddInterface(mAdvancedSettingsInterface.get());
-#endif
 
 	AddExportOption(static_cast<U32>(ExportType::Frames), "Export All Frame Data");
 	AddExportExtension(static_cast<U32>(ExportType::Frames), "All Frame Data", "csv");
@@ -449,22 +443,20 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mTimestampIndexing             = static_cast<TimestampIndexing>(U32(mIndexTimestampsInterface->GetNumber()));
 	mAnybusStatusIndexing          = mIndexAnybusStatusInterface->GetValue();
 	mApplStatusIndexing            = mIndexApplStatusInterface->GetValue();
-	#if ENABLE_ADVANCED_SETTINGS
 	mAdvSettingsPath               = mAdvancedSettingsInterface->GetText();
-	#endif
 
 	ClearChannels();
 	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
 	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
-#if ENABLE_ADVANCED_SETTINGS
+
 	mAdvSettingsPath = mAdvancedSettingsInterface->GetText();
 	if (!ParseAdvancedSettingsFile())
 	{
 		return false;
 	}
-#endif
+
 	return true;
 }
 
@@ -501,13 +493,11 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> mTimestampIndexing;
 		textArchive >> mAnybusStatusIndexing;
 		textArchive >> mApplStatusIndexing;
-#if ENABLE_ADVANCED_SETTINGS
 		textArchive >> m3WireOn4Channels;
 		textArchive >> m4WireOn3Channels;
 		textArchive >> mExportDelimiter;
 		textArchive >> mClockingAlertLimit;
 		textArchive >> &mAdvSettingsPath;
-#endif
 	}
 
 	ClearChannels();
@@ -539,13 +529,11 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << mTimestampIndexing;
 	textArchive << mAnybusStatusIndexing;
 	textArchive << mApplStatusIndexing;
-#if ENABLE_ADVANCED_SETTINGS
 	textArchive << m3WireOn4Channels;
 	textArchive << m4WireOn3Channels;
 	textArchive << mExportDelimiter.c_str();
 	textArchive << mClockingAlertLimit;
 	textArchive << mAdvSettingsPath;
-#endif
 
 	SaveSettingChangeID();
 
@@ -568,9 +556,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mIndexTimestampsInterface->SetNumber(static_cast<double>(mTimestampIndexing));
 	mIndexAnybusStatusInterface->SetValue(mAnybusStatusIndexing);
 	mIndexApplStatusInterface->SetValue(mApplStatusIndexing);
-	#if ENABLE_ADVANCED_SETTINGS
 	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
-	#endif
 }
 
 U8 SpiAnalyzerSettings::SaveSettingChangeID( void )

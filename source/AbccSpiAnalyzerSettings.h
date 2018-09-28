@@ -17,8 +17,6 @@
 
 #include "AbccSpiAnalyzerTypes.h"
 
-#define ENABLE_ADVANCED_SETTINGS 1
-
 enum class MessageIndexing : U32
 {
 	Disabled,
@@ -110,13 +108,11 @@ public: /* Members */
 	bool mAnybusStatusIndexing;
 	bool mApplStatusIndexing;
 
-#if ENABLE_ADVANCED_SETTINGS
 	const char* mAdvSettingsPath;
 	bool m3WireOn4Channels;
 	bool m4WireOn3Channels;
 	std::string mExportDelimiter;
 	S32 mClockingAlertLimit;
-#endif
 
 protected: /* Members */
 
@@ -136,11 +132,9 @@ protected: /* Members */
 
 protected: /* Methods */
 
-#if ENABLE_ADVANCED_SETTINGS
 	std::unique_ptr< AnalyzerSettingInterfaceText >			mAdvancedSettingsInterface;
 	bool ParseAdvancedSettingsFile();
 	void SetDefaultAdvancedSettings();
-#endif
 
 	void SetSettingError( const std::string& setting_name, const std::string& error_text );
 	U8 SaveSettingChangeID();
