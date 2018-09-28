@@ -2657,62 +2657,6 @@ static const AttrLookupTable_t* LookupAttrEntry(U8 obj, U16 inst, U8 attr)
 	return entryPtr;
 }
 
-static BaseType LookupAttrBaseType(U16 inst, U8 attr,
-								   const AttrLookupTable_t* obj_names, U8 num_obj_names,
-								   const AttrLookupTable_t* inst_names, U8 num_inst_names)
-{
-	const AttrLookupTable_t* attrTable = nullptr;
-	U8 numAttrs = 0;
-	BaseType type = BaseType::Numeric;
-	bool error = false;
-
-	if (inst == ABP_INST_OBJ)
-	{
-		if (attr <= asObjAttrNames[NUM_ENTRIES(asObjAttrNames) - 1].value)
-		{
-			attrTable = &asObjAttrNames[0];
-			numAttrs = NUM_ENTRIES(asObjAttrNames);
-		}
-		else
-		{
-			if (obj_names != nullptr)
-			{
-				attrTable = obj_names;
-				numAttrs = num_obj_names;
-			}
-			else
-			{
-				error = true;
-			}
-		}
-	}
-	else
-	{
-		if (num_inst_names != 0)
-		{
-			attrTable = inst_names;
-			numAttrs = num_inst_names;
-		}
-		else
-		{
-			error = true;
-		}
-	}
-
-	if (!error)
-	{
-		for (U8 i = 0; i < numAttrs; i++)
-		{
-			if (attrTable[i].value == attr)
-			{
-				type = attrTable[i].msgDataType;
-			}
-		}
-	}
-
-	return type;
-}
-
 static const CmdLookupTable_t* FindCmdEntryInTable(U8 cmd, const CmdLookupTable_t* command_names, U8 num_commands)
 {
 	const CmdLookupTable_t* entryPtr = nullptr;
