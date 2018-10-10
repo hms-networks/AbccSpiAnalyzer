@@ -308,8 +308,8 @@ void SpiAnalyzer::Setup()
 	mMosiVars.dwByteCnt    = 0;
 	mMosiVars.lFrameData   = 0;
 
-	mMosiVars.bByteCnt2 = 0;
-	mMisoVars.bByteCnt2 = 0;
+	mMosiVars.bFrameSizeCnt = 0;
+	mMisoVars.bFrameSizeCnt = 0;
 
 	mClockingErrorCount = 0;
 }
@@ -1933,7 +1933,7 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* 
 		** number of bytes seen in this state matched the header's msg len specifier
 		** In such cases a "framing error" should be signaled */
 		mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
-		mMisoVars.bByteCnt2 = 0;
+		mMisoVars.bFrameSizeCnt = 0;
 		return true;
 	}
 
@@ -1943,61 +1943,61 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* 
 	}
 
 	*e_substate_ptr = mMisoVars.eMsgSubState;
-	mMisoVars.bByteCnt2++;
+	mMisoVars.bFrameSizeCnt++;
 
 	switch (mMisoVars.eMsgSubState)
 	{
 	case AbccMisoStates::MessageField_Size:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Reserved1;
 		}
 		break;
 	case AbccMisoStates::MessageField_Reserved1:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_SourceId;
 		}
 		break;
 	case AbccMisoStates::MessageField_SourceId:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Object;
 		}
 		break;
 	case AbccMisoStates::MessageField_Object:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Instance;
 		}
 		break;
 	case AbccMisoStates::MessageField_Instance:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Command;
 		}
 		break;
 	case AbccMisoStates::MessageField_Command:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Reserved2;
 		}
 		break;
 	case AbccMisoStates::MessageField_Reserved2:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_CommandExtension;
 		}
 		break;
 	case AbccMisoStates::MessageField_CommandExtension:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Data;
@@ -2005,7 +2005,7 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* 
 		break;
 	case AbccMisoStates::MessageField_Data:
 	case AbccMisoStates::MessageField_DataNotValid:
-		if (mMisoVars.bByteCnt2 >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
+		if (mMisoVars.bFrameSizeCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 		}
@@ -2027,7 +2027,7 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* 
 
 	if (*add_frame_ptr == true)
 	{
-		mMisoVars.bByteCnt2 = 0;
+		mMisoVars.bFrameSizeCnt = 0;
 	}
 
 	return true;
@@ -2041,7 +2041,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 		** number of bytes seen in this state matched the header's msg len specifier
 		** In such cases a "framing error" should be signaled */
 		mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
-		mMosiVars.bByteCnt2 = 0;
+		mMosiVars.bFrameSizeCnt = 0;
 		return true;
 	}
 
@@ -2051,61 +2051,61 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 	}
 
 	*e_substate_ptr = mMosiVars.eMsgSubState;
-	mMosiVars.bByteCnt2++;
+	mMosiVars.bFrameSizeCnt++;
 
 	switch (mMosiVars.eMsgSubState)
 	{
 	case AbccMosiStates::MessageField_Size:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Reserved1;
 		}
 		break;
 	case AbccMosiStates::MessageField_Reserved1:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_SourceId;
 		}
 		break;
 	case AbccMosiStates::MessageField_SourceId:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Object;
 		}
 		break;
 	case AbccMisoStates::MessageField_Object:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Instance;
 		}
 		break;
 	case AbccMosiStates::MessageField_Instance:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Command;
 		}
 		break;
 	case AbccMosiStates::MessageField_Command:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Reserved2;
 		}
 		break;
 	case AbccMosiStates::MessageField_Reserved2:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_CommandExtension;
 		}
 		break;
 	case AbccMosiStates::MessageField_CommandExtension:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Data;
@@ -2113,7 +2113,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 		break;
 	case AbccMosiStates::MessageField_Data:
 	case AbccMosiStates::MessageField_DataNotValid:
-		if (mMosiVars.bByteCnt2 >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
+		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
 		}
@@ -2136,7 +2136,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 
 	if (*add_frame_ptr == true)
 	{
-		mMosiVars.bByteCnt2 = 0;
+		mMosiVars.bFrameSizeCnt = 0;
 	}
 
 	return true;

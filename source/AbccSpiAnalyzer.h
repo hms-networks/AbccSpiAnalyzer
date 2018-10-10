@@ -118,7 +118,7 @@ protected: /* Enums, Classes, Types */
 		U32 dwMsgLen;
 		U32 dwMsgLenCnt;
 		U32 dwByteCnt;
-		U8 bByteCnt2;
+		U8 bFrameSizeCnt;
 		U16 wMdCnt;
 		U16 wMdSize;
 		U8 bLastToggleState;
@@ -147,7 +147,7 @@ protected: /* Enums, Classes, Types */
 		U32 dwMsgLen;
 		U32 dwMsgLenCnt;
 		U32 dwByteCnt;
-		U8 bByteCnt2;
+		U8 bFrameSizeCnt;
 		U16 wMdCnt;
 		U16 wMdSize;
 		U8 bLastAnbSts;
