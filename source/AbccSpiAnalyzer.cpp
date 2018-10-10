@@ -927,6 +927,8 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMisoStates::MessageField_Data)
 	{
+		MsgDataFrameData2_t* psFrameData2 = (MsgDataFrameData2_t*)&resultFrame.mData2;
+
 		if (mMisoVars.fErrorRsp)
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
@@ -941,12 +943,12 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 
 		/* Copy message header info to frame data so that the display of the
 		** data can be adapted based on the provided information. */
-		memcpy(&((MsgDataFrameData2_t*)&resultFrame.mData2)->msgHeader,
+		memcpy(&psFrameData2->msgHeader,
 			&mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		resultFrame.mData2 |= (U64)mMisoVars.wMdCnt;
+		psFrameData2->msgDataCnt = mMisoVars.wMdCnt;
 		mMisoVars.wMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
 		if (mMisoVars.wMdCnt > mMisoVars.wMdSize)
@@ -1140,6 +1142,8 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMosiStates::MessageField_Data)
 	{
+		MsgDataFrameData2_t* psFrameData2 = (MsgDataFrameData2_t*)&resultFrame.mData2;
+
 		if (mMosiVars.fErrorRsp)
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
@@ -1154,12 +1158,12 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 
 		/* Copy message header info to frame data so that the display of the
 		** data can be adapted based on the provided information. */
-		memcpy(&((MsgDataFrameData2_t*)&resultFrame.mData2)->msgHeader,
+		memcpy(&psFrameData2->msgHeader,
 			&mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
 
 		/* Add a byte counter that can be displayed
 		** in the results for easy tracking of specific values */
-		resultFrame.mData2 |= (U64)mMosiVars.wMdCnt;
+		psFrameData2->msgDataCnt = mMosiVars.wMdCnt;
 		mMosiVars.wMdCnt++;
 		/* Check if the message data counter has reached the end of valid data */
 		if (mMosiVars.wMdCnt > mMosiVars.wMdSize)
