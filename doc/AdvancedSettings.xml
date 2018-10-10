@@ -25,12 +25,12 @@
 	at the same time the SPI clock transitions high after receiving the last
 	bit in the SPI transaction. This event results in a "clocking alert"
 	notification. This type of event is more of an informational warning/error
-	event, and as long as the user understands condition and has a reason for
-	why this is OK, then they may opt to set this setting to a value >=0.
-	Setting the value to 0 disables the notifcation entirely. While any value
-	above (datatype is S32) zero will set a maximum count for producing the
-	notification in the processed results. An invalid value or value <0 results
-	indicates that there is no limit.-->
+	event, and as long as the user understands the reason and deems the behavior
+	acceptable, then this setting may be to set a value >=0. Setting the value
+	to 0 disables the notification entirely. While any value	above
+	(datatype is S32) zero will set a maximum count for producing the
+	notification in the processed results. An invalid value or value <0 indicates
+	that there is no limit.-->
 	<Setting name="clocking-alert-limit">-1</Setting>
 
 </AdvancedSettings>
