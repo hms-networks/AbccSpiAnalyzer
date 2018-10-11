@@ -1,21 +1,59 @@
 # Changelog
 
+## Version 2018.9.27.1
+
+### Changes
+
+* Significant internal code refactoring
+* Updated lookup tables to contain latest ABP header information
+* Added support for network specific error codes for Profinet Diagnostic object
+* Significant rework of the plugin's simulation was done to improve highlighting
+  the functionality of the plugin. The simulation now performs a more complex
+  request-response messaging sequence that targets reading file information from
+  the plugin's metadata for the compiled DLL. This doubles to provide built-in
+  version information into the plugin for operating systems that do not contain
+  such metadata for library objects.
+* Significant rework of the CSV file exporting options for ABCC message data and
+  process data. These exported files now include state information of the network
+  and application. The CSV for message data now provides enumerated results
+  making it much more human readable. Error event indicators are also now included
+  to help point out CRC error, fragmented SPI packets, and retransmitted packets.
+* Changed how the "display base" is used in the plugin. Now, only fields that are
+  known to be of a 'character' base-type will be permitted to be displayed as
+  "ASCII" or "ASCII & HEX". Frames that are not a "CHAR" base-type will be
+  displayed in HEX for both of these options. In general, this means the ASCII
+  display options will only apply to the "Message Data" field. This should provide
+  a more intuitive user-experience in interpreting the information contained in
+  the packet as a whole. Both attribute and command message data have been
+  updated to follow these rules. For instance, the File System Interface's
+  File_Open message data contains a filename that is naturally understood as a
+  string which is classified as a 'character' base-type; whereas the "File Size"
+  attribute is naturally understood as a 'numeric' data field. For any field,
+  where it may be desireable to permit display in ASCII the BaseType::Character
+  should be used. Future adjustments may be made to a particular command or
+  attribute BaseType.
+* Removed network types from settings that are ABCC 30-series only.
+* This changelog has been modified to remove the "known issues" section. These
+  are likely to remain as limitations of the software for some time and a separate
+  document has been added to track these.
+* Added option to limit the number of "clocking alerts" to report to the UI.
+  This can be accessed from the advanced settings XML file.
+
+### Fixes
+
+* Fixed lookup logic for the "Object" instance name. Previously, instance 0 was
+  being reported as "Unknown" instead of "Object".
+* Fixed "compact" indexing MOSI tag. The MOSI channels indexed results were
+  mistakenly using the MISO_TAG_STR instead of MOSI_TAG_STR.
+* Fixed issue with last packet not being committed. The last packet in a capture
+  was not be correctly committed meaning there would be missing information in
+  the results. This would affect results observed from both the "chipselect
+  marker" behavior along with the exported CSV files.
+* Fixed an issue with how extra "clocked data" is detected at the end of an
+  SPI transaction.
+* Fixed various issues with how advanced settings were being handled.
+
 ## Version 2018.1.9.1
-
-### Known Issues
-
-* A capture that starts in the middle of message fragmentation may result in a
-  series of packets being incorrectly interpreted and possibly marked as invalid.
-  To workaround this, the user can place a marker past this fragmentation and
-  instruct the plugin to start analysis after this point.
-* Due to a bug in the Saleae Logic software, the decoded results that indicate
-  the packet ID may occasionally display an invalid value of 0xFFFFFFFFFFFFFFFF
-  instead of the packet's actual ID.
-* Settings window's "Advanced Settings" option is suppose to have a browse
-  filesystem button. Saleae has acknowledged that this interface was never
-  fully developed and should be resolved in a future release.
-* Error markers are not given display priority. This is a limitation of the
-  Logic software itself.
 
 ### Changes
 
@@ -47,23 +85,6 @@
 * Resolved various cases where the plugin would crash the software.
 
 ## Revision 1.0.0.0 (RC1)
-
-### Known Issues
-
-* Last packet in capture may be missing a frame that will result in an
-  uncommitted packet. This means that when exporting messages to a CSV, the last
-  packet may be lost.
-* A message's Source ID and Instance tabular text entries do not respect display
-  format settings while command extension does. A change should be made to improve
-  consistency.
-* Opening multiple saved captures will often lead to the currently opened Logic
-  windows to crash.
-* Assigning severely misbehaving logic signals to the analyzer plugin may result
-  in an application crash.
-* A capture that starts in the middle of message fragmentation may result in a
-  series of packets being incorrectly interpreted and possibly marked as invalid.
-  To workaround this, the user can place a marker past this fragmentation and
-  instruct the plugin to start analysis after this point.
 
 ### Changes
 
