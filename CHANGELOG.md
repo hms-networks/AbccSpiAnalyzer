@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 2018.9.27.1
+## Version 2018.10.10.1
 
 ### Changes
 
@@ -29,7 +29,7 @@
   File_Open message data contains a filename that is naturally understood as a
   string which is classified as a 'character' base-type; whereas the "File Size"
   attribute is naturally understood as a 'numeric' data field. For any field,
-  where it may be desireable to permit display in ASCII the BaseType::Character
+  where it may be desirable to permit display in ASCII the BaseType::Character
   should be used. Future adjustments may be made to a particular command or
   attribute BaseType.
 * Removed network types from settings that are ABCC 30-series only.
