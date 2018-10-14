@@ -136,6 +136,8 @@ other protocol analyzers are added to the Logic software.
   compile the appropriate shared object library based on the host system.
 > DEPENDENCIES: **Python**, **G++**
 
+> ADDITIONAL DEPENDENCY: Depending on the system it may also be required to install `g++-multilib` in order for the python build script to complete without error. This is so a 64-bit system can cross-compile for 32-bit machines.
+
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`
 will reside in the either `./plugins/Linux/` or `./plugins/Linux64` folder,
 respectively. Copy this shared object to your Saleae Logic software
