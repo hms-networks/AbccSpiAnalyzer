@@ -136,7 +136,9 @@ other protocol analyzers are added to the Logic software.
   compile the appropriate shared object library based on the host system.
 > DEPENDENCIES: **Python**, **G++**
 
-> ADDITIONAL DEPENDENCY: Depending on the system it may also be required to install `g++-multilib` in order for the python build script to complete without error. This is so a 64-bit system can cross-compile for 32-bit machines.
+> ADDITIONAL DEPENDENCY: Depending on the system it may also be required to
+install `g++-multilib` in order for the python build script to complete without
+error. This is so a 64-bit system can cross-compile for 32-bit machines.
 
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`
 will reside in the either `./plugins/Linux/` or `./plugins/Linux64` folder,
@@ -155,9 +157,16 @@ software installation in the "Analyzers" folder.
 ## [Documentation](#table-of-contents)
 
 For complete details regarding this plugin's functionality please consult the
-[Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_QSG.pdf) included in this repository's documentation folder.
+[Wiki](https://github.com/HMSAB/AbccSpiAnalyzer/wiki) found within this repository
+or [Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_Quick_Start_Guide.pdf.pdf)
+included in this repository's documentation folder. The Wiki is expected to
+contain more up-to-date details on the plugin's functionality in reference to
+the master branch whereas the PDF document will typically be updated when a new
+tagged release is made and is provided as part of the tagged release's
+downloadable assets.
 
-For details on the Logic SDK's API please refer to the Saleae's [Protocol Analyzer SDK](https://support.saleae.com/hc/en-us/articles/115005987726-Protocol-Analyzer-SDK) page.
+For details on the Logic SDK's API please refer to the Saleae's
+[Protocol Analyzer SDK](https://support.saleae.com/saleae-api-and-sdk/protocol-analyzer-sdk) page.
 
 ## [Changelog](#table-of-contents)
 
@@ -166,4 +175,3 @@ Please see [CHANGELOG.md](CHANGELOG.md) provided within this repository for deta
 ## [Licenses](#table-of-contents)
 
 Please see [LICENSE.md](LICENSE.md) provided within this repository for details on the software licensing.
-
