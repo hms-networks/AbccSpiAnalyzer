@@ -77,11 +77,11 @@ associated documentation, you may still opt to compile the libraries yourself.
 
 After checking out this git repository, the user will need to issue the
 following command in order to fetch the submodule git repos containing the
-Logic Anaalyzer SDK. Two copies are used of the same repo, one pointed at the
+Logic Analyzer SDK. Two copies are used of the same repo, one pointed at the
 release/master branch and another pointing at the legacy SDK to support debugging.
 
 ```bash
-git submodules --init --recursive
+git submodule update --init --recursive
 ```
 
 ### [Windows](#table-of-contents)
