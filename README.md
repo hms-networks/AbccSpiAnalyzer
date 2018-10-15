@@ -158,7 +158,7 @@ software installation in the "Analyzers" folder.
 
 For complete details regarding this plugin's functionality please consult the
 [Wiki](https://github.com/HMSAB/AbccSpiAnalyzer/wiki) found within this repository
-or [Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_Quick_Start_Guide.pdf.pdf)
+or [Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_Quick_Start_Guide.pdf)
 included in this repository's documentation folder. The Wiki is expected to
 contain more up-to-date details on the plugin's functionality in reference to
 the master branch whereas the PDF document will typically be updated when a new
