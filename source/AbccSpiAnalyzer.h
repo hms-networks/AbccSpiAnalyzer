@@ -43,6 +43,7 @@ enum class GetByteStatus : U32
 	OK,		/* BYTE was successfully read */
 	Error,	/* Reading BYTE resulted in a logical error (requires statemachine reset) */
 	Reset,	/* Reading BYTE resulted in a event that requires state machine reset */
+	Skip,	/* Enable line was toggle with no data clocked. It is an empty packet and can be skipped. */
 	SizeOfEnum
 };
 
