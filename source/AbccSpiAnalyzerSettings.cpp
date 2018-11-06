@@ -321,25 +321,11 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 
 						if (nodeName.compare("3-wire-on-4-channels") == 0)
 						{
-							if (nodeValue.compare("1") == 0)
-							{
-								m3WireOn4Channels = true;
-							}
-							else
-							{
-								m3WireOn4Channels = false;
-							}
+							m3WireOn4Channels = (nodeValue.compare("1") == 0);
 						}
 						else if (nodeName.compare("4-wire-on-3-channels") == 0)
 						{
-							if (nodeValue.compare("1") == 0)
-							{
-								m4WireOn3Channels = true;
-							}
-							else
-							{
-								m4WireOn3Channels = false;
-							}
+							m4WireOn3Channels = (nodeValue.compare("1") == 0);
 						}
 						else if (nodeName.compare( "export-delimiter" ) == 0)
 						{
@@ -359,7 +345,7 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 						{
 							try
 							{
-								mClockingAlertLimit = (S32)std::stol(nodeValue, nullptr, 10);
+								mClockingAlertLimit = (S32)std::stol(nodeValue, nullptr);
 							}
 							catch (const std::invalid_argument& ia)
 							{
@@ -390,7 +376,6 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
 			}
 		}
 	}
-
 
 	return settingsValid;
 }
