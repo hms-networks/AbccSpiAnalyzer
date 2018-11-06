@@ -172,7 +172,7 @@ void SpiAnalyzer::WorkerThread()
 					SetMosiPacketType(PacketType::Cancel);
 					SignalReadyForNewPacket(SpiChannel::MOSI);
 
-				}
+					}
 
 				mResults->CommitResults();
 			}
@@ -419,8 +419,8 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 				byteStatus = GetByteStatus::Reset;
 			}
 
-			break;
-		}
+				break;
+			}
 
 		if (bitIndex == 0)
 		{
@@ -491,8 +491,8 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			}
 			else
 			{
-				/* Error: reset everything and return. */
-				byteStatus = GetByteStatus::Error;
+			/* Error: reset everything and return. */
+			byteStatus = GetByteStatus::Error;
 			}
 
 			break;
@@ -656,6 +656,11 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 				 (mMisoVars.ePacketType == PacketType::ProtocolError))
 		{
 			eMarkerType = AnalyzerResults::ErrorSquare;
+		}
+		else if ((mMosiVars.ePacketType == PacketType::ProtocolEvent) ||
+				 (mMisoVars.ePacketType == PacketType::ProtocolEvent))
+		{
+			eMarkerType = AnalyzerResults::X;
 		}
 		else if ((mMosiVars.ePacketType == PacketType::ChecksumError) ||
 				 (mMisoVars.ePacketType == PacketType::ChecksumError))
@@ -970,6 +975,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 			/* Anybus status change event */
 			mMisoVars.bLastAnbSts = (U8)frame_data;
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
+			SetMisoPacketType(PacketType::ProtocolEvent);
 		}
 	}
 	else if (e_state == AbccMisoStates::NetworkTime)
@@ -988,6 +994,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		{
 			/* Write message buffer is full, possible overrun */
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_WARNING_FLAG);
+			SetMisoPacketType(PacketType::ProtocolEvent);
 		}
 	}
 	else if (e_state == AbccMisoStates::Crc32)
@@ -1185,6 +1192,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 			/* Application status change event */
 			mMosiVars.bLastApplSts = (U8)frame_data;
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
+			SetMosiPacketType(PacketType::ProtocolEvent);
 		}
 	}
 	else if (e_state == AbccMosiStates::SpiControl)
@@ -1193,6 +1201,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		{
 			/* Retransmit event */
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
+			SetMosiPacketType(PacketType::ProtocolEvent);
 		}
 		else
 		{
@@ -1247,7 +1256,11 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		{
 			SetMosiPacketType(PacketType::ChecksumError);
 		}
+		else
+		{
+			SetMosiPacketType(PacketType::ProtocolError);
 		}
+	}
 
 	if (e_state == AbccMosiStates::Pad)
 	{
@@ -1309,6 +1322,7 @@ void SpiAnalyzer::SetMosiPacketType(PacketType packet_type)
 	case PacketType::Response:
 	case PacketType::Command:
 	case PacketType::MessageFragment:
+	case PacketType::ProtocolEvent:
 		if (mMosiVars.ePacketType == PacketType::Empty)
 		{
 			mMosiVars.ePacketType = packet_type;
@@ -1352,6 +1366,7 @@ void SpiAnalyzer::SetMisoPacketType(PacketType packet_type)
 	case PacketType::Response:
 	case PacketType::Command:
 	case PacketType::MessageFragment:
+	case PacketType::ProtocolEvent:
 		if (mMisoVars.ePacketType == PacketType::Empty)
 		{
 			mMisoVars.ePacketType = packet_type;

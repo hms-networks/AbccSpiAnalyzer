@@ -72,6 +72,7 @@ enum class PacketType : U32
 	MessageFragment,
 	ErrorResponse,
 	ProtocolError,
+	ProtocolEvent,
 	ChecksumError,
 	MultiEvent,
 	MultiEventWithError,
