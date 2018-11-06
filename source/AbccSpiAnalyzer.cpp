@@ -51,7 +51,7 @@ SpiAnalyzer::SpiAnalyzer()
 {
 	SetAnalyzerSettings(mSettings.get());
 
-	mSettingsChangeID   = mSettings->mChangeID;
+	mSettingsChangeID = mSettings->mChangeID;
 }
 
 SpiAnalyzer::~SpiAnalyzer()
@@ -208,7 +208,6 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 				mClock->AdvanceToNextEdge();
 			}
 
-			mCurrentSample = mClock->GetSampleNumber();
 			/* If false, this function moves to the next enable-active edge. */
 			if (IsInitialClockPolarityCorrect())
 			{
@@ -219,6 +218,8 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 				mClock->AdvanceToNextEdge();
 			}
 		}
+
+		mCurrentSample = mClock->GetSampleNumber();
 	}
 }
 
@@ -318,7 +319,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 {
 	if (IS_PURE_4WIRE_MODE())
 	{
-		if (mEnable->GetBitState() != BitState::BIT_LOW)
+		if (mEnable->GetBitState() == BitState::BIT_HIGH)
 		{
 			mEnable->AdvanceToNextEdge();
 		}
@@ -328,13 +329,10 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 			mEnable->AdvanceToNextEdge();
 		}
 
-		mCurrentSample = mEnable->GetSampleNumber();
-		mClock->AdvanceToAbsPosition(mCurrentSample);
+		mClock->AdvanceToAbsPosition(mEnable->GetSampleNumber());
 	}
-	else
-	{
-		mCurrentSample = mClock->GetSampleNumber();
-	}
+
+	mCurrentSample = mClock->GetSampleNumber();
 }
 
 bool SpiAnalyzer::IsInitialClockPolarityCorrect()
@@ -397,7 +395,6 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 {
 	/* We're assuming we come into this function with the clock in the idle state */
 	const U32 dwBitsPerTransfer = 8;
-	const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
 	DataBuilder mosiResult;
 	DataBuilder misoResult;
 	GetByteStatus byteStatus = GetByteStatus::OK;
@@ -409,14 +406,14 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 	*first_sample_ptr = mClock->GetSampleNumber();
 
-	for (U32 i = 0; i < dwBitsPerTransfer; i++)
+	for (auto bitIndex = 0; bitIndex < dwBitsPerTransfer; bitIndex++)
 	{
 		/* On every single edge, we need to check that "enable" doesn't toggle. */
 		/* Note that we can't just advance the enable line to the next edge, because there may not be another edge */
 
 		if (WouldAdvancingTheClockToggleEnable())
 		{
-			if (i == 0)
+			if (bitIndex == 0)
 			{
 				/* Simply advance forward to next transaction */
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
@@ -430,7 +427,7 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			}
 		}
 
-		if (i == 0)
+		if (bitIndex == 0)
 		{
 			if (mClock->GetBitState() == BitState::BIT_HIGH)
 			{
@@ -446,7 +443,7 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			** If detected, a reset of the statemachines are need to re-sync */
 			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
-				if (i == 0)
+				if (bitIndex == 0)
 				{
 					/* Simply advance forward to next transaction */
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
@@ -471,7 +468,7 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			ProcessSample(mMiso, misoResult, mSettings->mMisoChannel);
 		}
 
-		if (i == 0)
+		if (bitIndex == 0)
 		{
 			/* Latch the first sample point in the byte */
 			*first_sample_ptr = mClock->GetSampleNumber();
@@ -513,10 +510,11 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 	if (byteStatus == GetByteStatus::OK)
 	{
 		/* Add sample markers to the results */
+		const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
 		U32 count = (U32)mArrowLocations.size();
-		for (U32 i = 0; i < count; i++)
+		for (U32 bitIndex = 0; bitIndex < count; bitIndex++)
 		{
-			mResults->AddMarker(mArrowLocations[i], mArrowMarker, mSettings->mClockChannel);
+			mResults->AddMarker(mArrowLocations[bitIndex], mArrowMarker, mSettings->mClockChannel);
 		}
 	}
 
@@ -643,7 +641,7 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	}
 	else
 	{
-		/* Only one event */
+		/* Only one channel contains an event(s) */
 		if ((mMosiVars.ePacketType == PacketType::MultiEventWithError) ||
 			(mMisoVars.ePacketType == PacketType::MultiEventWithError))
 		{
@@ -1642,7 +1640,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 mosi_data, S64 first_sample)
 {
 	AbccMosiStates::Enum eMsgSubState = AbccMosiStates::MessageField_Size;
-	AbccMosiStates::Enum eMosiState_Current = AbccMosiStates::Idle;
+	AbccMosiStates::Enum eMosiState_Current;
 	bool fAddFrame = false;
 
 	eMosiState_Current = mMosiVars.eState;
