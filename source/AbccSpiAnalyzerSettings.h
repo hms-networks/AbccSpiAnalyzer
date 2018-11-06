@@ -71,7 +71,8 @@ typedef enum NetworkType
 	e_NW_TYPE_CET,				/* Common Ethernet */
 	e_NW_TYPE_EIP_2P_BB_IIOT,	/* EtherNet/IP IIoT */
 	e_NW_TYPE_PIR_IIOT,			/* PROFINET IRT IIoT */
-	e_NW_TYPE_PIR_FO_IIOT		/* PROFINET IRT FO IIoT */
+	e_NW_TYPE_PIR_FO_IIOT,		/* PROFINET IRT FO IIoT */
+	e_NW_TYPE_CET_IIOT			/* Common Ethernet IIoT */
 } NetworkType_t;
 
 class SpiAnalyzerSettings : public AnalyzerSettings

@@ -324,7 +324,8 @@ const U8 abNetworkTypeValue[] =
 	ABP_NW_TYPE_CET,			/* Common Ethernet */
 	ABP_NW_TYPE_EIP_2P_BB_IIOT,	/* EtherNet/IP IIoT */
 	ABP_NW_TYPE_PIR_IIOT,		/* PROFINET IRT IIoT */
-	ABP_NW_TYPE_PIR_FO_IIOT		/* PROFINET IRT FO IIoT */
+	ABP_NW_TYPE_PIR_FO_IIOT,	/* PROFINET IRT FO IIoT */
+	ABP_NW_TYPE_CET_IIOT		/* Common Ethernet IIoT */
 };
 
 /*******************************************************************************
@@ -918,7 +919,8 @@ static const AttrLookupTable_t asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_FSOE_STATUS_IND,		"FSoE Status Indication",					BaseType::Numeric,		NotifEvent::None },
 	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					BaseType::Numeric,		NotifEvent::None },
 	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							BaseType::Character,	NotifEvent::None },
-	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							BaseType::Character,	NotifEvent::None }
+	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							BaseType::Character,	NotifEvent::None },
+	{ ABP_ECT_IA_FOEDATA_ACK_DELAY,		"FoE Data ACK Delay",						BaseType::Numeric,		NotifEvent::None },
 };
 
 static const AttrLookupTable_t asEtnInstAttrNames[] =
@@ -954,7 +956,7 @@ static const AttrLookupTable_t asFsiObjAttrNames[] =
 	{ ABP_FSI_OA_DISABLE_VFS,					"Disable Virtual File System",	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_FSI_OA_TOTAL_DISC_SIZE,				"Total Disc Size",				BaseType::Numeric,	NotifEvent::None },
 	{ ABP_FSI_OA_FREE_DISC_SIZE,				"Free Disc Size",				BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FSI_OA_DISC_CRC,						"Disc CRC",						BaseType::Numeric,	NotifEvent::None },
+	{ 15,										"Disc CRC",						BaseType::Numeric,	NotifEvent::None },
 	{ ABP_FSI_OA_DISC_TYPE,						"Disc Type",					BaseType::Numeric,	NotifEvent::None },
 	{ ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL,	"Disc Fault Tolerance Level",	BaseType::Numeric,	NotifEvent::None }
 };
@@ -2240,6 +2242,7 @@ bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, 
 											  &asCclNcInstNames[0], NUM_ENTRIES(asCclNcInstNames));
 			break;
 		case ABP_NW_TYPE_CET:
+		case ABP_NW_TYPE_CET_IIOT:
 			/* Common Ethernet */
 			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
 											  &asCetNcInstNames[0], NUM_ENTRIES(asCetNcInstNames));

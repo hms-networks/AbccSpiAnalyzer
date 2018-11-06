@@ -28,7 +28,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000007"
+#define SETTINGS_REVISION_STRING "REVISION_00000008"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -143,6 +143,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB_IIOT,	"EtherNet/IP IIoT", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_IIOT,		"PROFINET IRT IIoT", "");
 	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO_IIOT,		"PROFINET IRT FO IIoT", "");
+	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET_IIOT,		"Common Ethernet IIoT", "");
 	mNetworkTypeInterface->SetNumber(mNetworkType);
 
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());

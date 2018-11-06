@@ -61,7 +61,6 @@
 #define ABP_FSI_OA_DISABLE_VFS                12 /* Disables VFS               */
 #define ABP_FSI_OA_TOTAL_DISC_SIZE            13 /* Total size for discs       */
 #define ABP_FSI_OA_FREE_DISC_SIZE             14 /* Free size for discs        */
-#define ABP_FSI_OA_DISC_CRC                   15 /* CRC of disc content        */
 #define ABP_FSI_OA_DISC_TYPE                  16 /* Disc type identifier       */
 #define ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL 17 /* Disc fault tolerance level */
 
@@ -78,7 +77,6 @@
 #define ABP_FSI_OA_DISABLE_VFS_DS                  ABP_BOOL_SIZEOF
 #define ABP_FSI_OA_TOTAL_DISC_SIZE_DS              ABP_UINT32_SIZEOF
 #define ABP_FSI_OA_FREE_DISC_SIZE_DS               ABP_UINT32_SIZEOF
-#define ABP_FSI_OA_DISC_CRC_SIZE_DS                ABP_UINT32_SIZEOF
 #define ABP_FSI_OA_DISC_TYPE_DS                    ABP_UINT8_SIZEOF
 #define ABP_FSI_OA_DISC_FAULT_TOLERANCE_LEVEL_DS   ABP_UINT8_SIZEOF
 
