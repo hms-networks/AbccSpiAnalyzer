@@ -96,12 +96,6 @@ void SpiAnalyzer::WorkerThread()
 
 		AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 
-		/* Reset persistent state logic between captures */
-		mMosiVars.eState = AbccMosiStates::Idle;
-		mMisoVars.eState = AbccMisoStates::Idle;
-		mMisoVars.bLastAnbSts = 0xFF;
-		mMosiVars.bLastApplSts = 0xFF;
-
 		RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
 		RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
 
