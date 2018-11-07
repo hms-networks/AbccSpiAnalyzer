@@ -266,7 +266,7 @@ void SpiAnalyzerSettings::SetDefaultAdvancedSettings()
 	mClockingAlertLimit = -1;
 }
 
-bool SpiAnalyzerSettings::ParseAdvancedSettingsFile(void)
+bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 {
 	rapidxml::xml_document<> doc;
 	rapidxml::xml_node<> * rootNode;
@@ -544,7 +544,7 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mAdvancedSettingsInterface->SetText(mAdvSettingsPath);
 }
 
-U8 SpiAnalyzerSettings::SaveSettingChangeID( void )
+U8 SpiAnalyzerSettings::SaveSettingChangeID()
 {
 	mChangeID++;
 	return mChangeID;

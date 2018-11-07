@@ -587,7 +587,7 @@ void DestroyAnalyzer(Analyzer* analyzer)
 	delete analyzer;
 }
 
-bool SpiAnalyzer::IsEnableActive(void)
+bool SpiAnalyzer::IsEnableActive()
 {
 	if (IS_PURE_4WIRE_MODE())
 	{
@@ -614,7 +614,7 @@ static bool IsErrorPacketType(PacketType packet_type)
 	return false;
 }
 
-AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
+AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType()
 {
 	AnalyzerResults::MarkerType eMarkerType;
 
@@ -772,7 +772,7 @@ void SpiAnalyzer::SignalReadyForNewPacket(SpiChannel_t e_channel)
 	}
 }
 
-void SpiAnalyzer::CheckForIdleAfterPacket(void)
+void SpiAnalyzer::CheckForIdleAfterPacket()
 {
 	Frame errorFrame;
 	U64 markerSample = 0;

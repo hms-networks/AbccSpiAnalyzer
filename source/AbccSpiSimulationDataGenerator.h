@@ -132,7 +132,7 @@ protected: /* Methods */
 	inline void SetMosiObjectSpecificError(U8 error_code);
 
 	void RunFileTransferStateMachine(MessageResponseType msg_response_type);
-	void UpdateFileTransferStateMachine(void);
+	void UpdateFileTransferStateMachine();
 
 	void CreateFileInstance(ABP_MsgType* msg_ptr, MessageType message_type);
 	void FileOpen(ABP_MsgType* msg_ptr, MessageType message_type, CHAR* file_name, UINT8 file_name_length);

@@ -817,7 +817,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 	}
 }
 
-void SpiSimulationDataGenerator::UpdateFileTransferStateMachine(void)
+void SpiSimulationDataGenerator::UpdateFileTransferStateMachine()
 {
 	const U8 idleGapCount = 20;
 

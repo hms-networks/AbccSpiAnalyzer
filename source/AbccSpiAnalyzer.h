@@ -202,20 +202,20 @@ protected: // Methods
 	void AdvanceToActiveEnableEdge();
 	void AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 
-	bool IsEnableActive(void);
+	bool IsEnableActive();
 	bool IsInitialClockPolarityCorrect();
 
 	bool WouldAdvancingTheClockToggleEnable();
 
 	GetByteStatus GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr);
 
-	void CheckForIdleAfterPacket(void);
+	void CheckForIdleAfterPacket();
 	void AddFragFrame(SpiChannel_t e_channel, U64 first_sample, U64 last_sample);
 	void SignalReadyForNewPacket(SpiChannel_t e_channel);
 
 	void SetMosiPacketType(PacketType packet_type);
 	void SetMisoPacketType(PacketType packet_type);
-	AnalyzerResults::MarkerType GetPacketMarkerType(void);
+	AnalyzerResults::MarkerType GetPacketMarkerType();
 
 	void ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
 	void ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
