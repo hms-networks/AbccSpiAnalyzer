@@ -40,14 +40,14 @@
 
 enum class GetByteStatus : U32
 {
-	OK,		/* BYTE was successfully read */
-	Error,	/* Reading BYTE resulted in a logical error (requires statemachine reset) */
-	Reset,	/* Reading BYTE resulted in a event that requires state machine reset */
-	Skip,	/* Enable line was toggle with no data clocked. It is an empty packet and can be skipped. */
+	OK,		// BYTE was successfully read
+	Error,	// Reading BYTE resulted in a logical error (requires statemachine reset)
+	Reset,	// Reading BYTE resulted in a event that requires state machine reset
+	Skip,	// Enable line was toggle with no data clocked. It is an empty packet and can be skipped.
 	SizeOfEnum
 };
 
-/* Enum for indicating when to reset a statemachine */
+// Enum for indicating when to reset a statemachine
 enum class StateOperation : U32
 {
 	Run,
@@ -55,7 +55,7 @@ enum class StateOperation : U32
 	SizeOfEnum
 };
 
-/* Enum for indicating whether or not the analyzer succeeded in acquiring an SPI byte */
+// Enum for indicating whether or not the analyzer succeeded in acquiring an SPI byte
 enum class AcquisitionStatus : U32
 {
 	OK,
@@ -165,7 +165,7 @@ protected: /* Enums, Classes, Types */
 #pragma warning( push )
 #pragma warning( disable : 4251 ) //warning C4251: 'SpiAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
 
-protected: /* Members */
+protected: // Members
 
 	std::unique_ptr<SpiAnalyzerSettings> mSettings;
 	std::unique_ptr<SpiAnalyzerResults> mResults;
@@ -185,8 +185,8 @@ protected: /* Members */
 	MosiVars_t mMosiVars;
 	MisoVars_t mMisoVars;
 
-	/* Backup variables to recover from error cases
-	** that require knowledge of the last valid state */
+	// Backup variables to recover from error cases
+	// that require knowledge of the last valid state
 	MosiVars_t mPreviousMosiVars;
 	MisoVars_t mPreviousMisoVars;
 
@@ -194,7 +194,7 @@ protected: /* Members */
 
 #pragma warning( pop )
 
-protected: /* Methods */
+protected: // Methods
 
 	inline void ProcessSample(AnalyzerChannelData* chn_data, DataBuilder& data, Channel& chn);
 

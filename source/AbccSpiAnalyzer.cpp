@@ -88,7 +88,7 @@ void SpiAnalyzer::WorkerThread()
 
 	Setup();
 
-	/* Check that all required channels are valid */
+	// Check that all required channels are valid
 	if ( (mMiso != nullptr) && (mMosi != nullptr) && (mClock != nullptr) )
 	{
 		mMisoVars.oChecksum = AbccCrc();
@@ -101,7 +101,7 @@ void SpiAnalyzer::WorkerThread()
 
 		for (;;)
 		{
-			/* The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines */
+			// The SPI word length is 8-bits. Read 1 byte at a time and run the statemachines
 			byteStatus = GetByte(&mosiData, &misoData, &firstSample);
 
 			switch (byteStatus)
@@ -163,7 +163,7 @@ void SpiAnalyzer::WorkerThread()
 
 				if (acquisitionStatus == AcquisitionStatus::Error)
 				{
-					/* Signal error, do not commit packet */
+					// Signal error, do not commit packet
 					SetMosiPacketType(PacketType::Cancel);
 					SignalReadyForNewPacket(SpiChannel::MOSI);
 
@@ -180,23 +180,23 @@ void SpiAnalyzer::WorkerThread()
 
 void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
 {
-	/* NOTE: 3-wire requires correct clock polarity (IDLE HI),
-	** in 4-wire mode, the polarity does not matter. */
+	// NOTE: 3-wire requires correct clock polarity (IDLE HI),
+	// in 4-wire mode, the polarity does not matter.
 
 	AdvanceToActiveEnableEdge();
 
 	if (IS_3WIRE_MODE())
 	{
-		/* With no enable line an idle gap of at least >=10us is required */
+		// With no enable line an idle gap of at least >=10us is required
 		for (;;)
 		{
-			/* First find idle gap */
+			// First find idle gap
 			while (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
 			{
 				mClock->AdvanceToNextEdge();
 			}
 
-			/* If false, this function moves to the next enable-active edge. */
+			// If false, this function moves to the next enable-active edge.
 			if (IsInitialClockPolarityCorrect())
 			{
 				break;
@@ -329,7 +329,7 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
 
 	if (IS_3WIRE_MODE())
 	{
-		/* In 3-wire clock must idle HIGH */
+		// In 3-wire, clock must idle HIGH
 		if (mClock->GetBitState() == BitState::BIT_LOW)
 		{
 			mResults->AddMarker(mCurrentSample, AnalyzerResults::ErrorSquare, mSettings->mClockChannel);
@@ -381,7 +381,7 @@ bool SpiAnalyzer::Is3WireIdleCondition(float idle_time_condition)
 
 GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr)
 {
-	/* We're assuming we come into this function with the clock in the idle state */
+	// We're assuming we come into this function with the clock in the idle state
 	const U32 bitsPerTransfer = 8;
 	DataBuilder mosiResult;
 	DataBuilder misoResult;
@@ -396,26 +396,26 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 	for (auto bitIndex = 0; bitIndex < bitsPerTransfer; bitIndex++)
 	{
-		/* On every single edge, we need to check that "enable" doesn't toggle. */
-		/* Note that we can't just advance the enable line to the next edge, because there may not be another edge */
+		// On every single edge, we need to check that "enable" doesn't toggle.
+		// Note that we can't just advance the enable line to the next edge, because there may not be another edge
 
 		if (WouldAdvancingTheClockToggleEnable())
 		{
 			if (bitIndex == 0)
 			{
-				/* Simply advance forward to next transaction */
+				// Simply advance forward to next transaction
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				byteStatus = GetByteStatus::Skip;
 			}
 			else
 			{
-				/* The enable state changed in the middle of acquiring a byte.
-				** Suggests we are not byte-synchronized. */
+				// The enable state changed in the middle of acquiring a byte.
+				// Suggests we are not byte-synchronized.
 				byteStatus = GetByteStatus::Reset;
 			}
 
-				break;
-			}
+			break;
+		}
 
 		if (bitIndex == 0)
 		{
@@ -425,34 +425,34 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			}
 		}
 
-		/* For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit. */
+		// For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit.
 		if (IS_3WIRE_MODE())
 		{
-			/* In 3-wire mode, idle condition is >=5us (during a transaction).
-			** On every advancement on clock, check for idle condition.
-			** If detected, a reset of the statemachines are need to re-sync */
+			// In 3-wire mode, idle condition is >=5us (during a transaction).
+			// On every advancement on clock, check for idle condition.
+			// If detected, a reset of the statemachines are need to re-sync
 			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
 				if (bitIndex == 0)
 				{
-					/* Simply advance forward to next transaction */
+					// Simply advance forward to next transaction
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				}
 				else
 				{
-					/* Reset everything and return. */
+					// Reset everything and return.
 					byteStatus = GetByteStatus::Error;
 					break;
 				}
 			}
 		}
 
-		/* Jump to the next clock phase */
+		// Jump to the next clock phase
 		mClock->AdvanceToNextEdge();
 
 		if (!clkIdleHigh)
 		{
-			/* Sample on leading edge */
+			// Sample on leading edge
 			mCurrentSample = mClock->GetSampleNumber();
 			ProcessSample(mMosi, mosiResult, mSettings->mMosiChannel);
 			ProcessSample(mMiso, misoResult, mSettings->mMisoChannel);
@@ -460,18 +460,18 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 		if (bitIndex == 0)
 		{
-			/* Latch the first sample point in the byte */
+			// Latch the first sample point in the byte
 			*first_sample_ptr = mClock->GetSampleNumber();
 		}
 
 		if (IS_3WIRE_MODE())
 		{
-			/* In 3-wire mode idle condition is >=5us (during a transaction).
-			** On every advancement on clock, check for idle condition.
-			** If detected, a reset of the statemachines are need to re-sync */
+			// In 3-wire mode idle condition is >=5us (during a transaction).
+			// On every advancement on clock, check for idle condition.
+			// If detected, a reset of the statemachines are need to re-sync
 			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
-				/* Error: reset everything and return. */
+				// Error: reset everything and return.
 				byteStatus = GetByteStatus::Error;
 				break;
 			}
@@ -480,25 +480,25 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 		{
 			if (clkIdleHigh && (bitIndex == 0))
 			{
-				/* Simply advance forward to next transaction */
+				// Simply advance forward to next transaction
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				byteStatus = GetByteStatus::Skip;
 			}
 			else
 			{
-			/* Error: reset everything and return. */
-			byteStatus = GetByteStatus::Error;
+				// Error: reset everything and return.
+				byteStatus = GetByteStatus::Error;
 			}
 
 			break;
 		}
 
-		/* Jump to the next clock phase */
+		// Jump to the next clock phase
 		mClock->AdvanceToNextEdge();
 
 		if (clkIdleHigh)
 		{
-			/* Sample on tailing edge */
+			// Sample on tailing edge
 			mCurrentSample = mClock->GetSampleNumber();
 			ProcessSample(mMosi, mosiResult, mSettings->mMosiChannel);
 			ProcessSample(mMiso, misoResult, mSettings->mMisoChannel);
@@ -509,7 +509,7 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 	if (byteStatus == GetByteStatus::OK)
 	{
-		/* Add sample markers to the results */
+		// Add sample markers to the results
 		const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
 		U32 count = (U32)mArrowLocations.size();
 
@@ -553,16 +553,16 @@ U32 SpiAnalyzer::GetMinimumSampleRateHz()
 {
 	if (IS_3WIRE_MODE())
 	{
-		/* In 3-wire mode, there is a requirement for the maximum time the
-		** clock can idle high during a transfer of 5us. This means the
-		** minimum SPI clock frequency supported in 3-wire mode is 100Khz.
-		** Nyquist rate means sampling above 200kHz is required,
-		** use 3x as the minimum supported option. */
+		// In 3-wire mode, there is a requirement for the maximum time the
+		// clock can idle high during a transfer of 5us. This means the
+		// minimum SPI clock frequency supported in 3-wire mode is 100Khz.
+		// Nyquist rate means sampling above 200kHz is required,
+		// use 3x as the minimum supported option.
 		return 300000;
 	}
 	else
 	{
-		/* In 4-wire mode, use Logic's lowest supported sample rate. */
+		// In 4-wire mode, use Logic's lowest supported sample rate.
 		return 10000;
 	}
 }
@@ -618,18 +618,17 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 {
 	AnalyzerResults::MarkerType eMarkerType;
 
-	/* Determine marker type based on packet types:
-	** Dot - Message Fragment
-	** Start - Message Command
-	** Stop - Message Response
-	** Square - Multiple Events (no errors)
-	** ErrorDot - Error Response
-	** ErrorX - Checksum Error
-	** ErrorSquare - Protocol Error or Multiple Events with at least one error
-	*/
+	// Determine marker type based on packet types:
+	// Dot - Message Fragment
+	// Start - Message Command
+	// Stop - Message Response
+	// Square - Multiple Events (no errors)
+	// ErrorDot - Error Response
+	// ErrorX - Checksum Error
+	// ErrorSquare - Protocol Error or Multiple Events with at least one error
 	if ((mMosiVars.ePacketType != PacketType::Empty) && (mMisoVars.ePacketType != PacketType::Empty))
 	{
-		/* Multiple events (at least one on each channel, or multiple events on one channel) */
+		// Multiple events (at least one on each channel, or multiple events on one channel)
 		if (IsErrorPacketType(mMosiVars.ePacketType) ||
 			IsErrorPacketType(mMisoVars.ePacketType))
 		{
@@ -642,7 +641,7 @@ AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType(void)
 	}
 	else
 	{
-		/* Only one channel contains an event(s) */
+		// Only one channel contains an event(s)
 		if ((mMosiVars.ePacketType == PacketType::MultiEventWithError) ||
 			(mMisoVars.ePacketType == PacketType::MultiEventWithError))
 		{
@@ -751,10 +750,11 @@ void SpiAnalyzer::SignalReadyForNewPacket(SpiChannel_t e_channel)
 		}
 
 		mResults->CommitResults();
-		/* check if the source id is new */
-		/* if new source id, allocate a new transaction id */
-		/* if not a new source id, check that the header information matches the one in progress */
-		/* if header information does not match, flag an error in the current frame */
+		// TODO:
+		// check if the source id is new
+		// if new source id, allocate a new transaction id
+		// if not a new source id, check that the header information matches the one in progress
+		// if header information does not match, flag an error in the current frame
 	}
 
 	if (startNewPacket)
@@ -815,8 +815,8 @@ void SpiAnalyzer::CheckForIdleAfterPacket(void)
 	}
 	else
 	{
-		/* Skip idle check when m4WireOn3Channels is being used, since it is
-		** impossible to infer if the enable line had toggled or not */
+		// Skip idle check when m4WireOn3Channels is being used, since it is
+		// impossible to infer if the enable line had toggled or not
 		if( mSettings->m4WireOn3Channels == false )
 		{
 			if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
@@ -859,8 +859,8 @@ void SpiAnalyzer::AddFragFrame(SpiChannel_t e_channel, U64 first_sample, U64 las
 	{
 		errorFrame.mFlags |= SPI_MOSI_FLAG;
 
-		/* Only apply marker from MOSI, this prevents multiple markers at the same spot
-		** in such instances draw distance is reduced significantly. */
+		// Only apply marker from MOSI, this prevents multiple markers at the same spot
+		// in such instances draw distance is reduced significantly.
 		if (mEnable != nullptr)
 		{
 			mResults->AddMarker(last_sample, AnalyzerResults::ErrorSquare, mSettings->mEnableChannel);
@@ -898,14 +898,14 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	{
 		mMisoVars.sMsgHeader.inst = (U16)frame_data;
 
-		/* Store the object code in frame data to handle object specific data */
+		// Store the object code in frame data to handle object specific data
 		resultFrame.mData2 = mMisoVars.sMsgHeader.obj;
 	}
 	else if (e_state == AbccMisoStates::MessageField_Command)
 	{
 		mMisoVars.sMsgHeader.cmd = (U8)frame_data;
 
-		/* Store the object code in frame data to handle object specific data */
+		// Store the object code in frame data to handle object specific data
 		resultFrame.mData2 = mMisoVars.sMsgHeader.obj;
 
 		if ((frame_data & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
@@ -919,8 +919,8 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMisoStates::MessageField_CommandExtension)
 	{
-		/* To better analyze the data in bubbletext
-		** store the object code, instance, and command */
+		// To better analyze the data in bubbletext
+		// store the object code, instance, and command
 		memcpy(&resultFrame.mData2, &mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
 		mMisoVars.sMsgHeader.cmdExt = (U16)frame_data;
 	}
@@ -928,7 +928,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	{
 		if ((U16)frame_data > ABP_MAX_MSG_DATA_BYTES)
 		{
-			/* Max message data size exceeded */
+			// Max message data size exceeded
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			mMisoVars.wMdSize = 0;
 			mMisoVars.fFirstFrag = false;
@@ -947,8 +947,8 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		if (mMisoVars.fErrorRsp)
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
-			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
-			** so that the object specific error response can be detected */
+			// Check if data is 0xFF, if so delay de-assertion of fErrorRsp
+			// so that the object specific error response can be detected
 			if ((((U8)frame_data != (U8)0xFF) && (mMisoVars.wMdCnt == 0)) ||
 				(mMisoVars.wMdCnt > 1))
 			{
@@ -956,20 +956,20 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 			}
 		}
 
-		/* Copy message header info to frame data so that the display of the
-		** data can be adapted based on the provided information. */
+		// Copy message header info to frame data so that the display of the
+		// data can be adapted based on the provided information.
 		memcpy(&psFrameData2->msgHeader,
 			&mMisoVars.sMsgHeader, sizeof(mMisoVars.sMsgHeader));
 
-		/* Add a byte counter that can be displayed
-		** in the results for easy tracking of specific values */
+		// Add a byte counter that can be displayed
+		// in the results for easy tracking of specific values
 		psFrameData2->msgDataCnt = mMisoVars.wMdCnt;
 		mMisoVars.wMdCnt++;
 
-		/* Check if the message data counter has reached the end of valid data */
+		// Check if the message data counter has reached the end of valid data
 		if (mMisoVars.wMdCnt > mMisoVars.wMdSize)
 		{
-			/* Override frame type */
+			// Override frame type
 			resultFrame.mType = (U8)AbccMisoStates::MessageField_DataNotValid;
 		}
 	}
@@ -977,7 +977,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	{
 		if (mMisoVars.bLastAnbSts != (U8)frame_data)
 		{
-			/* Anybus status change event */
+			// Anybus status change event
 			mMisoVars.bLastAnbSts = (U8)frame_data;
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 			SetMisoPacketType(PacketType::ProtocolEvent);
@@ -985,7 +985,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMisoStates::NetworkTime)
 	{
-		/* Compute delta from last timestamp and save it */
+		// Compute delta from last timestamp and save it
 		((NetworkTimeInfo_t*)&resultFrame.mData2)->deltaTime = (U32)resultFrame.mData1 - mMisoVars.dwLastTimestamp;
 		((NetworkTimeInfo_t*)&resultFrame.mData2)->newRdPd = mMisoVars.fNewRdPd;
 		((NetworkTimeInfo_t*)&resultFrame.mData2)->wrPdValid = mMosiVars.fWrPdValid;
@@ -997,25 +997,25 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	{
 		if ((U8)(frame_data & ABP_SPI_STATUS_WRMSG_FULL))
 		{
-			/* Write message buffer is full, possible overrun */
+			// Write message buffer is full, possible overrun
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_WARNING_FLAG);
 			SetMisoPacketType(PacketType::ProtocolEvent);
 		}
 	}
 	else if (e_state == AbccMisoStates::Crc32)
 	{
-		/* Save the computed CRC32 to the unused frame data */
+		// Save the computed CRC32 to the unused frame data
 		resultFrame.mData2 = mMisoVars.oChecksum.Crc32();
 
 		if (resultFrame.mData2 != resultFrame.mData1)
 		{
-			/* CRC Error */
+			// CRC Error
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 		}
 	}
 
-	/* Add a byte counter that can be displayed
-	** in the results for easy tracking of specific values */
+	// Add a byte counter that can be displayed
+	// in the results for easy tracking of specific values
 	if (e_state == AbccMisoStates::ReadProcessData)
 	{
 		resultFrame.mData2 = (U64)mMisoVars.dwPdCnt;
@@ -1026,7 +1026,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		mMisoVars.dwPdCnt = 0;
 	}
 
-	/* Handle indication of the SPI message fragmentation protocol */
+	// Handle indication of the SPI message fragmentation protocol
 	if (mMisoVars.fFragmentation)
 	{
 		resultFrame.mFlags |= (SPI_MSG_FRAG_FLAG);
@@ -1057,7 +1057,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		}
 		else
 		{
-			/* Backup state variables for both MOSI and MISO */
+			// Backup state variables for both MOSI and MISO
 			memcpy(&mPreviousMisoVars, &mMisoVars, sizeof(MisoVars_t));
 			memcpy(&mPreviousMosiVars, &mMosiVars, sizeof(MosiVars_t));
 		}
@@ -1091,7 +1091,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 		SetMisoPacketType(PacketType::ProtocolError);
 	}
 
-	/* Commit the processed frame */
+	// Commit the processed frame
 	mResults->AddFrame(resultFrame);
 	mResults->CommitResults();
 
@@ -1121,14 +1121,14 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	{
 		mMosiVars.sMsgHeader.inst = (U16)frame_data;
 
-		/* Store the object code in frame data to handle object specific data */
+		// Store the object code in frame data to handle object specific data
 		resultFrame.mData2 = mMosiVars.sMsgHeader.obj;
 	}
 	else if (e_state == AbccMosiStates::MessageField_Command)
 	{
 		mMosiVars.sMsgHeader.cmd = (U8)frame_data;
 
-		/* Store the object code in frame data to handle object specific data */
+		// Store the object code in frame data to handle object specific data
 		resultFrame.mData2 = mMosiVars.sMsgHeader.obj;
 
 		if ((frame_data & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
@@ -1142,8 +1142,8 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMosiStates::MessageField_CommandExtension)
 	{
-		/* To better analyze the data in bubbletext
-		** store the object code, instance, and command */
+		// To better analyze the data in bubbletext
+		// store the object code, instance, and command
 		memcpy(&resultFrame.mData2, &mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
 		mMosiVars.sMsgHeader.cmdExt = (U16)frame_data;
 	}
@@ -1151,7 +1151,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	{
 		if ((U16)frame_data > ABP_MAX_MSG_DATA_BYTES)
 		{
-			/* Max message data size exceeded */
+			// Max message data size exceeded
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 			mMosiVars.wMdSize = 0;
 			mMosiVars.fFirstFrag = false;
@@ -1171,8 +1171,8 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		{
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 
-			/* Check if data is 0xFF, if so delay de-assertion of fErrorRsp
-			** so that the object specific error response can be detected */
+			// Check if data is 0xFF, if so delay de-assertion of fErrorRsp
+			// so that the object specific error response can be detected
 			if ((((U8)frame_data != (U8)0xFF) && (mMosiVars.wMdCnt == 0)) ||
 				(mMosiVars.wMdCnt > 1))
 			{
@@ -1180,20 +1180,20 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 			}
 		}
 
-		/* Copy message header info to frame data so that the display of the
-		** data can be adapted based on the provided information. */
+		// Copy message header info to frame data so that the display of the
+		// data can be adapted based on the provided information.
 		memcpy(&psFrameData2->msgHeader,
 			&mMosiVars.sMsgHeader, sizeof(mMosiVars.sMsgHeader));
 
-		/* Add a byte counter that can be displayed
-		** in the results for easy tracking of specific values */
+		// Add a byte counter that can be displayed
+		// in the results for easy tracking of specific values
 		psFrameData2->msgDataCnt = mMosiVars.wMdCnt;
 		mMosiVars.wMdCnt++;
 
-		/* Check if the message data counter has reached the end of valid data */
+		// Check if the message data counter has reached the end of valid data
 		if (mMosiVars.wMdCnt > mMosiVars.wMdSize)
 		{
-			/* Override frame type */
+			// Override frame type
 			resultFrame.mType = (U8)AbccMosiStates::MessageField_DataNotValid;
 		}
 	}
@@ -1201,7 +1201,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	{
 		if (mMosiVars.bLastApplSts != (U8)frame_data)
 		{
-			/* Application status change event */
+			// Application status change event
 			mMosiVars.bLastApplSts = (U8)frame_data;
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 			SetMosiPacketType(PacketType::ProtocolEvent);
@@ -1211,7 +1211,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	{
 		if (mMosiVars.bLastToggleState == (U8)(frame_data & ABP_SPI_CTRL_T))
 		{
-			/* Retransmit event */
+			// Retransmit event
 			resultFrame.mFlags |= SPI_PROTO_EVENT_FLAG;
 			SetMosiPacketType(PacketType::ProtocolEvent);
 		}
@@ -1222,18 +1222,18 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMosiStates::Crc32)
 	{
-		/* Save the computed CRC32 to the unused frame data */
+		// Save the computed CRC32 to the unused frame data
 		resultFrame.mData2 = mMosiVars.oChecksum.Crc32();
 
 		if (resultFrame.mData2 != resultFrame.mData1)
 		{
-			/* CRC Error */
+			// CRC Error
 			resultFrame.mFlags |= (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG);
 		}
 	}
 
-	/* Add a byte counter that can be displayed
-	** in the results for easy tracking of specific values */
+	// Add a byte counter that can be displayed
+	// in the results for easy tracking of specific values
 	if (e_state == AbccMosiStates::WriteProcessData)
 	{
 		resultFrame.mData2 = (U64)mMosiVars.dwPdCnt;
@@ -1244,7 +1244,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		mMosiVars.dwPdCnt = 0;
 	}
 
-	/* Handle indication of the SPI message fragmentation protocol */
+	// Handle indication of the SPI message fragmentation protocol
 	if (mMosiVars.fFragmentation)
 	{
 		resultFrame.mFlags |= (SPI_MSG_FRAG_FLAG);
@@ -1304,7 +1304,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		}
 	}
 
-	/* Commit the processed frame */
+	// Commit the processed frame
 	mResults->AddFrame(resultFrame);
 	mResults->CommitResults();
 
@@ -1410,10 +1410,10 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 
 	eMisoState_Current = mMisoVars.eState;
 
-	/* If an error is signaled we jump into IDLE and wait to be reset.
-	** A reset should be logically signaled when CS# is brought HIGH.
-	** This would essentially indicate the begining of a new transaction. */
-	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
+	// If an error is signaled we jump into IDLE and wait to be reset.
+	// A reset should be logically signaled when CS# is brought HIGH.
+	// This would essentially indicate the begining of a new transaction.
+	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())
 	{
 		mMisoVars.eState = AbccMisoStates::Idle;
 
@@ -1428,7 +1428,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 		}
 		else
 		{
-			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
+			// 3-wire mode fragments exist only when idle gaps are detected too soon.
 			AddFragFrame(SpiChannel::MISO, mMisoVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 		}
 
@@ -1465,7 +1465,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 	switch (mMisoVars.eState)
 	{
 	case AbccMisoStates::Idle:
-		/* We wait here until a reset is signaled */
+		// We wait here until a reset is signaled
 		break;
 	case AbccMisoStates::Reserved1:
 		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
@@ -1509,12 +1509,12 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 
 			if ((mMisoVars.lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == ABP_SPI_STATUS_M)
 			{
-				/* New message but not the last */
+				// New message but not the last
 				mMisoVars.fNewMsg = true;
 
 				if (!mMisoVars.fFragmentation)
 				{
-					/* Message fragmentation starts */
+					// Message fragmentation starts
 					mMisoVars.fFragmentation = true;
 					mMisoVars.fFirstFrag = true;
 					mMisoVars.fLastFrag = false;
@@ -1522,19 +1522,19 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 			}
 			else if ((mMisoVars.lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M))
 			{
-				/* New message and last */
+				// New message and last
 				mMisoVars.fNewMsg = true;
 
 				if (mMisoVars.fFragmentation)
 				{
-					/* Message fragmentation ends */
+					// Message fragmentation ends
 					mMisoVars.fFirstFrag = false;
 					mMisoVars.fLastFrag = true;
 				}
 			}
 			else
 			{
-				/* No new message */
+				// No new message
 				mMisoVars.fNewMsg = false;
 				mMisoVars.eMsgSubState = AbccMisoStates::MessageField_DataNotValid;
 				mMisoVars.wMdCnt = 0;
@@ -1581,7 +1581,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 			{
 				if (!RunAbccMisoMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 				{
-					/* Error */
+					// Error, transition to ilde and wait for reset
 					mMisoVars.eState = AbccMisoStates::Idle;
 				}
 			}
@@ -1638,7 +1638,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 	{
 		if (mMisoVars.eState != AbccMisoStates::Idle)
 		{
-			/* We have a fragmented message */
+			// We have a fragmented message
 			if (mEnable != nullptr)
 			{
 				AddFragFrame(SpiChannel::MISO, mMisoVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
@@ -1666,7 +1666,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 			ProcessMisoFrame(eMisoState_Current, mMisoVars.lFrameData, mMisoVars.lFramesFirstSample);
 		}
 
-		/* Reset the state variables */
+		// Reset the state variables
 		mMisoVars.lFrameData = 0;
 		mMisoVars.dwByteCnt = 0;
 	}
@@ -1696,10 +1696,10 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 
 	eMosiState_Current = mMosiVars.eState;
 
-	/* If an error is signaled we jump into IDLE and wait to be reset.
-	** A reset should be logically signaled when CS# is brought HIGH.
-	** This would essentially indicate the begining of a new transaction. */
-	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())// || WouldAdvancingTheClockToggleEnable())
+	// If an error is signaled we jump into IDLE and wait to be reset.
+	// A reset should be logically signaled when CS# is brought HIGH.
+	// This would essentially indicate the begining of a new transaction.
+	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())
 	{
 		if (mMosiVars.dwByteCnt == 0)
 		{
@@ -1714,7 +1714,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 		}
 		else
 		{
-			/* 3-wire mode fragments exist only when idle gaps are detected too soon. */
+			// 3-wire mode fragments exist only when idle gaps are detected too soon.
 			AddFragFrame(SpiChannel::MOSI, mMosiVars.lFramesFirstSample, mClock->GetSampleOfNextEdge());
 		}
 
@@ -1751,7 +1751,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	switch (mMosiVars.eState)
 	{
 	case AbccMosiStates::Idle:
-		/* We wait here until a reset is signaled */
+		// We wait here until a reset is signaled
 		break;
 	case AbccMosiStates::SpiControl:
 		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
@@ -1767,12 +1767,12 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 
 			if ((mMosiVars.lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == ABP_SPI_CTRL_M)
 			{
-				/* New message but not the last */
+				// New message but not the last
 				mMosiVars.fNewMsg = true;
 
 				if (!mMosiVars.fFragmentation)
 				{
-					/* Message fragmentation starts */
+					// Message fragmentation starts
 					mMosiVars.fFragmentation = true;
 					mMosiVars.fFirstFrag = true;
 					mMosiVars.fLastFrag = false;
@@ -1780,19 +1780,19 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			}
 			else if ((mMosiVars.lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M))
 			{
-				/* New message and last */
+				// New message and last
 				mMosiVars.fNewMsg = true;
 
 				if (mMosiVars.fFragmentation)
 				{
-					/* Message fragmentation ends */
+					// Message fragmentation ends
 					mMosiVars.fFirstFrag = false;
 					mMosiVars.fLastFrag = true;
 				}
 			}
 			else
 			{
-				/* No new message */
+				// No new message
 				mMosiVars.fNewMsg = false;
 				mMosiVars.eMsgSubState = AbccMosiStates::MessageField_DataNotValid;
 				mMosiVars.wMdCnt = 0;
@@ -1873,7 +1873,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			{
 				if (!RunAbccMosiMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 				{
-					/* Error */
+					// Error, transition to ilde and wait for reset
 					mMosiVars.eState = AbccMosiStates::Idle;
 				}
 			}
@@ -1937,7 +1937,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	{
 		if (mMosiVars.eState != AbccMosiStates::Idle)
 		{
-			/* We have a fragmented message */
+			// We have a fragmented message
 			if (mEnable != nullptr)
 			{
 				AddFragFrame(SpiChannel::MOSI, mMosiVars.lFramesFirstSample, mEnable->GetSampleOfNextEdge());
@@ -1965,7 +1965,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			ProcessMosiFrame(eMosiState_Current, mMosiVars.lFrameData, mMosiVars.lFramesFirstSample);
 		}
 
-		/* Reset the state variables */
+		// Reset the state variables
 		mMosiVars.lFrameData = 0;
 		mMosiVars.dwByteCnt = 0;
 	}
@@ -1991,9 +1991,9 @@ bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* 
 {
 	if (operation == StateOperation::Reset)
 	{
-		/* Perform checks here that we were in the last state and that the
-		** number of bytes seen in this state matched the header's msg len specifier
-		** In such cases a "framing error" should be signaled */
+		// Perform checks here that we were in the last state and that the
+		// number of bytes seen in this state matched the header's msg len specifier
+		// In such cases a "framing error" should be signaled
 		mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
 		mMisoVars.bFrameSizeCnt = 0;
 		return true;
@@ -2099,9 +2099,9 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 {
 	if (operation == StateOperation::Reset)
 	{
-		/* Perform checks here that we were in the last state and that the
-		** number of bytes seen in this state matched the header's msg len specifier
-		** In such cases a "framing error" should be signaled */
+		// Perform checks here that we were in the last state and that the
+		// number of bytes seen in this state matched the header's msg len specifier
+		// In such cases a "framing error" should be signaled
 		mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
 		mMosiVars.bFrameSizeCnt = 0;
 		return true;
@@ -2206,9 +2206,9 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 
 void SpiAnalyzer::RestorePreviousStateVars()
 {
-	/* In the event of an error packet that would otherwise result in a
-	** 'retransmit' event, this routine must be called to put the revelant
-	** state variable back to the last known 'good state' */
+	// In the event of an error packet that would otherwise result in a
+	// 'retransmit' event, this routine must be called to put the revelant
+	// state variable back to the last known 'good state'
 	mMisoVars.wMdCnt = mPreviousMisoVars.wMdCnt;
 	mMisoVars.fFirstFrag = mPreviousMisoVars.fFirstFrag;
 	mMisoVars.fLastFrag = mPreviousMisoVars.fLastFrag;

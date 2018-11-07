@@ -105,10 +105,10 @@ U32 AbccCrc::CRC_Crc32(U32 iInitCrc, U8* pbBufferStart, U16 iLength)
 	U32 lCrc = iInitCrc;
 	for (i = 0; i < iLength; i++)
 	{
-		/* Process upper-nibble */
+		// Process upper-nibble
 		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 4) & 0x0F]);
 		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
-		/* Process lower-nibble */
+		// Process lower-nibble
 		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 0) & 0x0F]);
 		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
 		pbBufferStart++;
@@ -120,11 +120,11 @@ U16 AbccCrc::CRC_Crc16(U16 iInitCrc, U8* pbBufferStart, U16 iLength)
 {
 	U8 bIndex, bCrcLo, bCrcHi;
 
-	/* Init crc */
+	// Init crc
 	bCrcLo = (U8)((iInitCrc >> 8) & 0xFF);
 	bCrcHi = (U8)((iInitCrc >> 0) & 0xFF);
 
-	/* Do the crc calculation */
+	// Do the crc calculation
 	while (iLength > 0)
 	{
 		bIndex = bCrcLo ^ *pbBufferStart++;
