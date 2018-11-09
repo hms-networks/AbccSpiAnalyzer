@@ -1235,10 +1235,10 @@ static const CmdLookupTable_t asAddCmdNames[] =
 
 static const CmdLookupTable_t asAppCmdNames[] =
 {
-	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_APP_CMD_GET_DATA_NOTIF,		"Get_Data_Notification",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
+	{ ABP_APP_CMD_RESET_REQUEST,		"Reset_Request",			BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_APP_CMD_CHANGE_LANG_REQUEST,	"Change_Language_Request",	BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_APP_CMD_RESET_DIAGNOSTIC,		"Reset_Diagnostic",			BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_APP_CMD_GET_DATA_NOTIF,		"Get_Data_Notification",	BaseType::Numeric,	BaseType::Character,	NotifEvent::None }
 };
 
 static const CmdLookupTable_t asAppdCmdNames[] =
