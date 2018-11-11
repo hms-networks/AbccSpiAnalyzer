@@ -212,7 +212,17 @@ if dylib_ext != ".dylib":
     if arch == "64":
         print( release_command32 )
         os.system( release_command32 )
-print( debug_command )
-os.system( debug_command )
+    print( debug_command )
+    os.system( debug_command )
+else:
+    # Only build 32-bit debug library on versions prior to 10.14,
+    # newer versions of XCode do not support compiling for 32-bit.
+    ver, _, _ = platform.mac_ver()
+    ver = float('.'.join(ver.split('.')[:2]))
+    if ver < 10.14:
+        print( debug_command )
+        os.system( debug_command )
+
+
 
 
