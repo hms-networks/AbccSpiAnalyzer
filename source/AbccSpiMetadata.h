@@ -13,15 +13,15 @@
 #define ABCC_SPI_METADATA_H_
 
 #ifndef FILEVERSION_YEAR
-#define FILEVERSION_YEAR					2018
+#define FILEVERSION_YEAR					2019
 #endif
 
 #ifndef FILEVERSION_MONTH
-#define FILEVERSION_MONTH					10
+#define FILEVERSION_MONTH					07
 #endif
 
 #ifndef FILEVERSION_DAY
-#define FILEVERSION_DAY						10
+#define FILEVERSION_DAY						17
 #endif
 
 #ifndef FILEVERSION_BUILD
@@ -39,7 +39,7 @@
 #define ABCC_SPI_METADATA_COMPANYNAME		"HMS Industrial Networks, Inc."
 #define ABCC_SPI_METADATA_FILEDESCRIPTION	"Anybus CompactCom SPI Protocol Analyzer for Saleae Logic"
 #define ABCC_SPI_METADATA_INTERNALNAME		"AbccSpiAnalyzer"
-#define ABCC_SPI_METADATA_LEGALCOPYRIGHT	"(C) 2015-2018 HMS Industrial Networks"
+#define ABCC_SPI_METADATA_LEGALCOPYRIGHT	"(C) 2015-2019 HMS Networks"
 #define ABCC_SPI_METADATA_LEGALTRADEMARKS	"Anybus CompactCom"
 #define ABCC_SPI_METADATA_ORIGINALFILENAME	"AbccSpiAnalyzer.dll"
 #define ABCC_SPI_METADATA_PRODUCTNAME		"ABCC SPI Protocol Analyzer"

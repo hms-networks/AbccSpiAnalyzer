@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 2019.07.17.1
+
+### Changes
+
+* Updated lookup tables to contain latest ABP header information
+* Migrated from VS2017 to VS2019
+* Other minor changes & refactoring
+
+### Fixes
+
+* (Issue #23) Fixed the state logic when the enable-signal toggles and there is
+  no clocked data.
+* (Issue #24) Fixed the logic behind multi-event markers.
+* Fixed build issue for macOS Mojave.
+
 ## Version 2018.10.10.1
 
 ### Changes
