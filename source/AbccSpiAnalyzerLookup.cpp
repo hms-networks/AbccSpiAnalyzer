@@ -2310,7 +2310,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 
 	if (access_mode == AttributeAccessMode::Indexed)
 	{
-		SNPRINTF(str, max_str_len, "Index %d, ", (U8)(val >> 8));
+		SNPRINTF(str, max_str_len, "Element %d, ", (U8)(val >> 8));
 		offset = (U8)strlen(str);
 		max_str_len -= offset;
 	}
