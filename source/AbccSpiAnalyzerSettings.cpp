@@ -79,7 +79,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mMisoChannel(UNDEFINED_CHANNEL),
 	mClockChannel(UNDEFINED_CHANNEL),
 	mEnableChannel(UNDEFINED_CHANNEL),
-	mNetworkType(e_NW_TYPE_UNSPECIFIED),
+	mNetworkType(NetworkTypeIndex::Unspecified),
 	mMessageIndexingVerbosityLevel(MessageIndexing::Detailed),
 	mMsgDataPriority(DisplayPriority::Tag),
 	mProcessDataPriority(DisplayPriority::Tag),
@@ -115,35 +115,35 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mNetworkTypeInterface->SetTitleAndTooltip("Network Type :",
 		"Used to process network specific details such as the network configuration object's instance names.\n"
 		"Can be set to \"Unspecified\", if unsure or if such details are not important.");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_UNSPECIFIED,		"Unspecified","");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV0,			"PROFIBUS DP-V0", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PDPV1,			"PROFIBUS DP-V1", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_COP,				"CANopen", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_DEV,				"DeviceNet", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_RTU,			"Modbus-RTU", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_CNT,			"ControlNet", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_1P,		"Modbus-TCP", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT,			"PROFINET RT", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_1P,		"EtherNet/IP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ECT,				"EtherCAT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR,				"PROFINET IRT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CCL,				"CC-Link", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_ETN_2P,			"Modbus-TCP 2-Port", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_CPN,			"CompoNet", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_PRT_2P,		"PROFINET RT 2-port", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_SRC3,			"SERCOS III", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_BMP,			"BACnet MS/TP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_BIP,				"BACnet/IP", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB,		"EtherNet/IP 2-Port BB DLR", "");
-	//mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P,		"EtherNet/IP 2-Port", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO,			"PROFINET IRT FO", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EPL,				"POWERLINK", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CFN,				"CC-Link IE Field Network", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET,				"Common Ethernet", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_EIP_2P_BB_IIOT,	"EtherNet/IP IIoT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_IIOT,		"PROFINET IRT IIoT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_PIR_FO_IIOT,		"PROFINET IRT FO IIoT", "");
-	mNetworkTypeInterface->AddNumber(e_NW_TYPE_CET_IIOT,		"Common Ethernet IIoT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::Unspecified,		"Unspecified","Use this option if you dont want to associate the capture with a specific network type.");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PDPV0,			"PROFIBUS DP-V0", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PDPV1,			"PROFIBUS DP-V1", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::COP,				"CANopen", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::DEV,				"DeviceNet", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::RTU,			"Modbus-RTU", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CNT,			"ControlNet", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::ETN_1P,		"Modbus-TCP", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PRT,			"PROFINET RT", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::EIP_1P,		"EtherNet/IP", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::ECT,				"EtherCAT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR,				"PROFINET IRT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CCL,				"CC-Link", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::ETN_2P,			"Modbus-TCP 2-Port", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CPN,			"CompoNet", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PRT_2P,		"PROFINET RT 2-port", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::SRC3,			"SERCOS III", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::BMP,			"BACnet MS/TP", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::BIP,				"BACnet/IP", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::EIP_2P_BB,		"EtherNet/IP 2-Port BB DLR", "");
+	//mNetworkTypeInterface->AddNumber(NetworkTypeIndex::EIP_2P,		"EtherNet/IP 2-Port", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR_FO,			"PROFINET IRT FO", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::EPL,				"POWERLINK", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CFN,				"CC-Link IE Field Network", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CET,				"Common Ethernet", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::EIP_2P_BB_IIOT,	"EtherNet/IP IIoT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR_IIOT,		"PROFINET IRT IIoT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR_FO_IIOT,		"PROFINET IRT FO IIoT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CET_IIOT,		"Common Ethernet IIoT", "");
 	mNetworkTypeInterface->SetNumber(mNetworkType);
 
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());
