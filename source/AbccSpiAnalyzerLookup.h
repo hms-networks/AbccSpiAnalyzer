@@ -20,6 +20,13 @@ enum class BaseType : U8
 	Numeric
 };
 
+enum class SegmentationType : U8
+{
+	None,
+	Command,
+	Response
+};
+
 typedef struct LookupTable_t
 {
 	const U16 value;
@@ -67,6 +74,18 @@ inline bool IsNonIndexedAttributeCmd(U8 cmd)
 		(static_cast<ABP_MsgCmdType>(cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR));
 }
 
+inline bool IsCommandMessage(const MsgHeaderInfo_t* msg_header)
+{
+	return (msg_header->cmd & ABP_MSG_HEADER_C_BIT);
+}
+
+inline bool IsSegmentedMessage(bool cmd_message, SegmentationType segmentation_type)
+{
+	return (
+		(cmd_message && (segmentation_type == SegmentationType::Command)) ||
+		(!cmd_message && (segmentation_type == SegmentationType::Response)));
+}
+
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
@@ -108,5 +127,7 @@ NotifEvent_t GetExceptionString(bool nw_object, U16 table_index, U8 val, char* s
 BaseType GetAttrBaseType(U8 obj, U16 inst, U8 attr);
 
 BaseType GetCmdBaseType(U8 obj, U8 cmd);
+
+SegmentationType GetMessageSegmentationType(const MsgHeaderInfo_t* msg_header);
 
 #endif /* ABCC_SPI_ANALYZER_LOOKUP_H_ */

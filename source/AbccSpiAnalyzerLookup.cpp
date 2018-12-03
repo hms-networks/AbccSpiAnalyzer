@@ -2907,3 +2907,62 @@ static const CmdLookupTable_t* LookupCmdEntry(U8 obj, U8 cmd)
 
 	return entryPtr;
 }
+
+SegmentationType GetMessageSegmentationType(const MsgHeaderInfo_t* msg_header)
+{
+	SegmentationType segmentation = SegmentationType::None;
+	U8 cmd = msg_header->cmd & ABP_MSG_HEADER_CMD_BITS;
+
+	if ((msg_header->cmd & ABP_MSG_HEADER_E_BIT) == 0)
+	{
+		switch (msg_header->obj)
+		{
+		case ABP_OBJ_NUM_APP:
+			if (cmd == ABP_APP_CMD_GET_DATA_NOTIF)
+			{
+				segmentation = SegmentationType::Response;
+			}
+
+			break;
+
+		case ABP_OBJ_NUM_SOC:
+			if ((cmd == ABP_SOC_CMD_RECEIVE) ||
+				(cmd == ABP_SOC_CMD_RECEIVE_FROM))
+			{
+				segmentation = SegmentationType::Response;
+			}
+			else if ((cmd == ABP_SOC_CMD_SEND) ||
+					(cmd == ABP_SOC_CMD_SEND_TO))
+			{
+				segmentation = SegmentationType::Command;
+			}
+
+			break;
+
+		case ABP_OBJ_NUM_PNIO:
+			if (cmd == ABP_PNIO_CMD_EXPECTED_IDENT_IND)
+			{
+				segmentation = SegmentationType::Command;
+			}
+
+			break;
+
+		case ABP_OBJ_NUM_EIP:
+			if (cmd == ABP_EIP_CMD_SET_CONFIG_DATA)
+			{
+				segmentation = SegmentationType::Command;
+			}
+			else if (cmd == ABP_EIP_CMD_GET_CONFIG_DATA)
+			{
+				segmentation = SegmentationType::Response;
+			}
+
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return segmentation;
+}
