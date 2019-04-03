@@ -87,6 +87,7 @@
 #define ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK     29
 #define ABP_EIP_IA_ABCC_ADI_OBJECT            30
 #define ABP_EIP_IA_ABCC_ENABLE_DLR            31
+#define ABP_EIP_IA_ABCC_ENABLE_CIP_SYNC       32
 
 
 /*------------------------------------------------------------------------------
@@ -127,6 +128,7 @@
 #define ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK_DS       ABP_BOOL_SIZEOF
 #define ABP_EIP_IA_ABCC_ADI_OBJECT_DS              ABP_UINT16_SIZEOF
 #define ABP_EIP_IA_ABCC_ENABLE_DLR_DS              ABP_BOOL_SIZEOF
+#define ABP_EIP_IA_ABCC_ENABLE_CIP_SYNC_DS         ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------

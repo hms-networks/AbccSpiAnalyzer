@@ -140,7 +140,7 @@
 **       In case the values of these instances originate from input devices
 **       controlled by the end user (DIP switches or similar), the application
 **       shall keep these instances updated at all times because some networks
-**       require that a changed switch is indicated by the LED’s.
+**       require that a changed switch is indicated by the LEDs.
 **
 **------------------------------------------------------------------------------
 */

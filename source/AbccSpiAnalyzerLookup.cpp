@@ -672,14 +672,17 @@ static const AttrLookupTable_t asCntInstAttrNames[] =
 
 static const AttrLookupTable_t asCopInstAttrNames[] =
 {
-	{ ABP_COP_IA_VENDOR_ID,			"Vendor ID",				BaseType::Numeric,		NotifEvent::None },
-	{ ABP_COP_IA_PRODUCT_CODE,		"Product Code",				BaseType::Numeric,		NotifEvent::None },
-	{ ABP_COP_IA_MAJOR_REV,			"Major Revision",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_COP_IA_MINOR_REV,			"Minor Revision",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_COP_IA_SERIAL_NUMBER,		"Serial Number",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_COP_IA_MANF_DEV_NAME,		"Manufacturer Device Name",	BaseType::Character,	NotifEvent::None },
-	{ ABP_COP_IA_MANF_HW_VER,		"Manufacturer HW Version",	BaseType::Character,	NotifEvent::None },
-	{ ABP_COP_IA_MANF_SW_VER,		"Manufacturer SW Version",	BaseType::Character,	NotifEvent::None }
+	{ ABP_COP_IA_VENDOR_ID,				"Vendor ID",							BaseType::Numeric,		NotifEvent::None },
+	{ ABP_COP_IA_PRODUCT_CODE,			"Product Code",							BaseType::Numeric,		NotifEvent::None },
+	{ ABP_COP_IA_MAJOR_REV,				"Major Revision",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_COP_IA_MINOR_REV,				"Minor Revision",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_COP_IA_SERIAL_NUMBER,			"Serial Number",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_COP_IA_MANF_DEV_NAME,			"Manufacturer Device Name",				BaseType::Character,	NotifEvent::None },
+	{ ABP_COP_IA_MANF_HW_VER,			"Manufacturer HW Version",				BaseType::Character,	NotifEvent::None },
+	{ ABP_COP_IA_MANF_SW_VER,			"Manufacturer SW Version",				BaseType::Character,	NotifEvent::None },
+	{ ABP_COP_IA_DEVICE_TYPE,			"Device Type",							BaseType::Character,	NotifEvent::None },
+	{ ABP_COP_IA_DEF_PDO_MAP_CONF,		"Default PDO Mapping Configuration",	BaseType::Character,	NotifEvent::None },
+	{ ABP_COP_IA_READ_PD_BUF_INIT_VAL,	"Read PD Buffer Init Value",			BaseType::Character,	NotifEvent::None }
 };
 
 static const AttrLookupTable_t asCpcObjAttrNames[] =
@@ -830,7 +833,8 @@ static const AttrLookupTable_t asEipInstAttrNames[] =
 	{ ABP_EIP_IA_CONS_INSTANCE_MAP,				"Consuming Instance Mapping",						BaseType::Numeric,		NotifEvent::None },
 	{ ABP_EIP_IA_IGNORE_SEQ_COUNT_CHECK,		"Ignore Sequence Count Check",						BaseType::Numeric,		NotifEvent::None },
 	{ ABP_EIP_IA_ABCC_ADI_OBJECT,				"ABCC ADI Object Number",							BaseType::Numeric,		NotifEvent::None },
-	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									BaseType::Numeric,		NotifEvent::None }
+	{ ABP_EIP_IA_ABCC_ENABLE_DLR,				"ABCC Enable DLR",									BaseType::Numeric,		NotifEvent::None },
+	{ ABP_EIP_IA_ABCC_ENABLE_CIP_SYNC,			"ABCC Enable CIP Sync",								BaseType::Numeric,		NotifEvent::None },
 };
 
 static const AttrLookupTable_t asEmeInstAttrNames[] =
@@ -881,7 +885,8 @@ static const AttrLookupTable_t asEplInstAttrNames[] =
 	{ ABP_EPL_IA_DEVICE_TYPE,		"Device Type",						BaseType::Numeric,		NotifEvent::None },
 	{ ABP_EPL_IA_MANF_NAME,			"Manufacturer Name",				BaseType::Character,	NotifEvent::None },
 	{ ABP_EPL_ENABLE_IT_FUNC,		"Enable IT Functionality",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_EPL_SDO_IT_FRAME_RATIO,	"SDO IT Frame Ratio",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_EPL_SDO_IT_FRAME_RATIO,	"SDO/IT Frame Ratio",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_EPL_APP_SW_DATE_AND_TIME,	"Application SW Date and Time",		BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asErInstAttrNames[] =
@@ -890,7 +895,7 @@ static const AttrLookupTable_t asErInstAttrNames[] =
 	{ ABP_ER_IA_DIRECTION,					"Direction",					BaseType::Numeric,	NotifEvent::None },
 	{ ABP_ER_IA_ACCURACY,					"Accuracy",						BaseType::Numeric,	NotifEvent::None },
 	{ ABP_ER_IA_CURRENT_POWER_CONSUMPTION,	"Current Power Consumption",	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	BaseType::Numeric,	NotifEvent::None },
+	{ ABP_ER_IA_NOMINAL_POWER_CONSUMPTION,	"Nominal Power Consumption",	BaseType::Numeric,	NotifEvent::None }
 };
 
 static const AttrLookupTable_t asEtcInstAttrNames[] =
@@ -920,7 +925,7 @@ static const AttrLookupTable_t asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					BaseType::Numeric,		NotifEvent::None },
 	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							BaseType::Character,	NotifEvent::None },
 	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							BaseType::Character,	NotifEvent::None },
-	{ ABP_ECT_IA_FOEDATA_ACK_DELAY,		"FoE Data ACK Delay",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_IA_FOEDATA_ACK_DELAY,		"FoE Data ACK Delay",						BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asEtnInstAttrNames[] =
@@ -947,7 +952,8 @@ static const AttrLookupTable_t asEtnInstAttrNames[] =
 	{ ABP_ETN_IA_SNMP_READ_WRITE,				"SNMP Read-Write",					BaseType::Character,	NotifEvent::None },
 	{ ABP_ETN_IA_DHCP_OPTION_61_SOURCE,			"DHCP Option 61 Source",			BaseType::Numeric,		NotifEvent::None },
 	{ ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR,	"DHCP Option 61 Generic String",	BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				BaseType::Numeric,		NotifEvent::None }
+	{ ABP_ETN_IA_ENABLE_DHCP_CLIENT,			"Enable DHCP Client",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ETN_IA_ENABLE_WEBDAV,					"Enable WebDAV",					BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asFsiObjAttrNames[] =
@@ -970,17 +976,19 @@ static const AttrLookupTable_t asFsiInstAttrNames[] =
 
 static const AttrLookupTable_t asFusmInstAttrNames[] =
 {
-	{ ABP_FUSM_IA_STATE,		"State",					BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		BaseType::Numeric,	NotifEvent::None }
+	{ ABP_FUSM_IA_STATE,		"State",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_VENDOR_ID,	"Vendor ID",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_MODULE_ID,	"I/O Channel ID",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_FW_VERSION,	"Firmware Version",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_SERIAL_NUM,	"Serial Number",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_DATA_OUT,		"Output Data",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_DATA_IN,		"Input Data",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_ERROR_CNTRS,	"Error Counters",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_FATAL_EVENT,	"Event Log",				BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_EXCPT_INFO,	"Exception Information",	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_BL_VERSION,	"Bootloader Version",		BaseType::Numeric,		NotifEvent::None },
+	{ ABP_FUSM_IA_VENDOR_BLK_1,	"Vendor Block Safe uC1",	BaseType::Character,	NotifEvent::None },
+	{ ABP_FUSM_IA_VENDOR_BLK_2,	"Vendor Block Safe uC2",	BaseType::Character,	NotifEvent::None }
 };
 
 static const AttrLookupTable_t asMddObjAttrNames[] =

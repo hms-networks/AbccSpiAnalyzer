@@ -80,6 +80,7 @@
 #define ABP_ETN_IA_DHCP_OPTION_61_SOURCE       22
 #define ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR  23
 #define ABP_ETN_IA_ENABLE_DHCP_CLIENT          24
+#define ABP_ETN_IA_ENABLE_WEBDAV               25
 
 
 /*------------------------------------------------------------------------------

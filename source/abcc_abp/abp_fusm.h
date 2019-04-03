@@ -61,6 +61,8 @@
 #define ABP_FUSM_IA_FATAL_EVENT           9
 #define ABP_FUSM_IA_EXCPT_INFO            10
 #define ABP_FUSM_IA_BL_VERSION            11
+#define ABP_FUSM_IA_VENDOR_BLK_1          12
+#define ABP_FUSM_IA_VENDOR_BLK_2          13
 
 
 /*------------------------------------------------------------------------------
