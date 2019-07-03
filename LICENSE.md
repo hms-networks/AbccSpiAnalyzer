@@ -13,9 +13,10 @@ This software uses the following 3rd Party software/licenses listed below.
 A copy of this file should be provided in each release of this software DLL.
 
 ### RapidXml (Version: 1.13) License
-  - Website: http://rapidxml.sourceforge.net/
 
-```
+* Website: <http://rapidxml.sourceforge.net/>
+
+```Text
 The MIT License
 ===============================================================================
 
