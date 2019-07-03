@@ -4,8 +4,9 @@ doc/~*
 # Ignore debug version of Logic software
 debug/Logic/
 
-# Ignore Visual Studio Code Artifacts
+# Ignore Visual Studio (Code) Artifacts
 .vscode
+.vs
 
 # Ignore Build Artifacts
 plugins/*/*.lib
@@ -32,6 +33,7 @@ project/*/x64/Debug/
 *.suo
 *.tlog
 *.user
+*.vcxproj.FileListAbsolute.txt
 RCa22188
 
 
