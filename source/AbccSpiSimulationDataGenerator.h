@@ -1,5 +1,5 @@
 /******************************************************************************
-**  Copyright (C) 2015-2018 HMS Industrial Networks Inc, all rights reserved
+**  Copyright (C) 2015-2019 HMS Industrial Networks Inc, all rights reserved
 *******************************************************************************
 **
 **       File: AbccSpiAnalyzerDataGenerator.h
