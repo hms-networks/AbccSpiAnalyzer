@@ -23,8 +23,8 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define IS_MISO_FRAME(frame)	((frame.mFlags & SPI_MOSI_FLAG) != SPI_MOSI_FLAG)
-#define IS_MOSI_FRAME(frame)	((frame.mFlags & SPI_MOSI_FLAG) == SPI_MOSI_FLAG)
+#define IS_MISO_FRAME(frame)	(!frame.HasFlag(SPI_MOSI_FLAG))
+#define IS_MOSI_FRAME(frame)	(frame.HasFlag(SPI_MOSI_FLAG))
 
 #define MOSI_TAG_STR			"MOSI-"
 #define MISO_TAG_STR			"MISO-"
@@ -419,7 +419,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 	AbccSpiStatesUnion_t uState;
 	uState.eMosi = (AbccMosiStates::Enum)frame.mType;
 
-	if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
+	if (frame.HasFlag(SPI_ERROR_FLAG))
 	{
 		notification = NotifEvent::Alert;
 		switch (frame.mType)
@@ -483,7 +483,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			{
 				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
 
-				if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					if (info->msgDataCnt == 0)
 					{
@@ -545,7 +545,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			case AbccMosiStates::MessageField_Size:
 				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
 					notification = NotifEvent::Alert;
@@ -629,7 +629,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			case AbccMosiStates::Crc32:
 				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
 					notification = NotifEvent::Alert;
@@ -698,7 +698,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			{
 				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
 
-				if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					if (info->msgDataCnt == 0)
 					{
@@ -760,7 +760,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			case AbccMisoStates::MessageField_Size:
 				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
 					notification = NotifEvent::Alert;
@@ -845,7 +845,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			{
 				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG)) == (SPI_PROTO_EVENT_FLAG | DISPLAY_AS_ERROR_FLAG))
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
 				{
 					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1), (U32)(frame.mData2));
 					notification = NotifEvent::Alert;
@@ -893,7 +893,7 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 
 		AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timestampStr, sizeof(timestampStr));
 
-		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
+		if (frame.HasFlag(SPI_ERROR_FLAG))
 		{
 			ss << "ERROR";
 		}
@@ -922,7 +922,7 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 			ss << CSV_DELIMITER + CSV_DELIMITER;
 		}
 
-		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
+		if (frame.HasFlag(SPI_ERROR_FLAG))
 		{
 			switch (frame.mType)
 			{
@@ -1128,7 +1128,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 							addMosiEntry = true;
 						}
 
-						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 						{
 							mosiEvent = ErrorEvent::RetransmitWarning;
 							misoEvent = ErrorEvent::RetransmitWarning;
@@ -1252,7 +1252,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					{
 						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
 
-						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 						{
 							if (info->msgDataCnt == 0)
 							{
@@ -1452,7 +1452,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					{
 						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
 
-						if ((frame.mFlags & SPI_PROTO_EVENT_FLAG) == SPI_PROTO_EVENT_FLAG)
+						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 						{
 							if (info->msgDataCnt == 0)
 							{
@@ -1860,7 +1860,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 	if (mSettings->mErrorIndexing)
 	{
-		if ((frame.mFlags & SPI_ERROR_FLAG) == SPI_ERROR_FLAG)
+		if (frame.HasFlag(SPI_ERROR_FLAG))
 		{
 			/* These types of errors effect the bus as a whole and are not
 			** specific to a MISO/MOSI channel. For compatibility, only
@@ -1884,7 +1884,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			return;
 		}
 
-		if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+		if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 		{
 			if (IS_MOSI_FRAME(frame))
 			{
@@ -1932,7 +1932,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						notification = NotifEvent::Alert;
 					}
 
-					if ((notification == NotifEvent::Alert) || (mSettings->mAnybusStatusIndexing))
+					if ((notification == NotifEvent::Alert) || mSettings->mAnybusStatusIndexing)
 					{
 						SNPRINTF(tabText, sizeof(tabText), "Anybus Status: (%s)", str);
 						TableBuilder(SpiChannel::MISO, tabText, notification);
@@ -1990,7 +1990,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	{
 		if ((frame.mType == AbccMosiStates::ApplicationStatus) && IS_MOSI_FRAME(frame))
 		{
-			if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 			{
 				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
@@ -2010,7 +2010,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	{
 		if ((frame.mType == AbccMisoStates::AnybusStatus) && IS_MISO_FRAME(frame))
 		{
-			if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 			{
 				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
 				{
@@ -2044,12 +2044,12 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					mMsgValidFlag[SpiChannel::MISO] = false;
 				}
 
-				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG)) == SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					TableBuilder(SpiChannel::MISO, "{Write Message Buffer Full}", NotifEvent::None);
 					return;
 				}
-				else if ((frame.mFlags & (SPI_MSG_FRAG_FLAG | SPI_MSG_FIRST_FRAG_FLAG)) == SPI_MSG_FRAG_FLAG)
+				else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 				{
 					/* Fragmentation is in progress */
 					if (frame.mData1 & ABP_SPI_STATUS_M)
@@ -2071,7 +2071,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				break;
 			case AbccMisoStates::MessageField_Size:
-				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					SNPRINTF(mMsgSizeStr[SpiChannel::MISO], sizeof(mMsgSizeStr[SpiChannel::MISO]), "!Size: %u Bytes", (U16)frame.mData1);
 				}
@@ -2241,7 +2241,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						TableBuilder(SpiChannel::MISO, mMsgCmdStr[SpiChannel::MISO], NotifEvent::None);
 						TableBuilder(SpiChannel::MISO, mMsgExtStr[SpiChannel::MISO], NotifEvent::None);
 
-						if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
+						if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 						{
 							TableBuilder(SpiChannel::MISO, "First Fragment; More Follow.", NotifEvent::None);
 						}
@@ -2260,7 +2260,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						else
 						{
-							if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
+							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 							{
 								AddTabularText(MISO_TAG_STR,
 											mMsgObjStr[SpiChannel::MISO],
@@ -2303,7 +2303,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 					mMsgValidFlag[SpiChannel::MOSI] = false;
 				}
 
-				if ((frame.mFlags & (SPI_PROTO_EVENT_FLAG)) == SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					if (frame_index != 0)
 					{
@@ -2311,7 +2311,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						return;
 					}
 				}
-				else if ((frame.mFlags & (SPI_MSG_FRAG_FLAG | SPI_MSG_FIRST_FRAG_FLAG)) == SPI_MSG_FRAG_FLAG)
+				else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 				{
 					/* Fragmentation is in progress */
 					if (frame.mData1 & ABP_SPI_CTRL_M)
@@ -2333,7 +2333,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				break;
 			case AbccMisoStates::MessageField_Size:
-				if (frame.mFlags & SPI_PROTO_EVENT_FLAG)
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
 					SNPRINTF(mMsgSizeStr[SpiChannel::MOSI], sizeof(mMsgSizeStr[SpiChannel::MOSI]), "!Size: %u Bytes", (U16)frame.mData1);
 				}
@@ -2503,7 +2503,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						TableBuilder(SpiChannel::MOSI, mMsgCmdStr[SpiChannel::MOSI], NotifEvent::None);
 						TableBuilder(SpiChannel::MOSI, mMsgExtStr[SpiChannel::MOSI], NotifEvent::None);
 
-						if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
+						if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 						{
 							TableBuilder(SpiChannel::MOSI, "First Fragment; More Follow.", NotifEvent::None);
 						}
@@ -2522,7 +2522,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						}
 						else
 						{
-							if (frame.mFlags & SPI_MSG_FIRST_FRAG_FLAG)
+							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 							{
 								AddTabularText(MOSI_TAG_STR,
 											mMsgObjStr[SpiChannel::MOSI],

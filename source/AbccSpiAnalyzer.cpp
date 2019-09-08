@@ -78,6 +78,10 @@ void SpiAnalyzer::SetupResults()
 	{
 		mResults->AddChannelBubblesWillAppearOn(mSettings->mMisoChannel);
 	}
+	//if (mSettings->mClockChannel != UNDEFINED_CHANNEL)
+	//{
+	//	mResults->AddChannelBubblesWillAppearOn(mSettings->mClockChannel);
+	//}
 }
 
 void SpiAnalyzer::WorkerThread()
@@ -172,8 +176,7 @@ void SpiAnalyzer::WorkerThread()
 					// Signal error, do not commit packet
 					SetMosiPacketType(PacketType::Cancel);
 					SignalReadyForNewPacket(SpiChannel::MOSI);
-
-					}
+				}
 
 				mResults->CommitResults();
 			}
@@ -425,10 +428,8 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 		if (bitIndex == 0)
 		{
-			if (mClock->GetBitState() == BitState::BIT_HIGH)
-			{
-				clkIdleHigh = true;
-			}
+			// Determine the clock polarity to be used for the acquisition of this byte
+			clkIdleHigh = (mClock->GetBitState() == BitState::BIT_HIGH);
 		}
 
 		// For CLOCK IDLE LOW configurations, skip advancing the clock when sampling the first bit.
@@ -437,16 +438,17 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			// In 3-wire mode, idle condition is >=5us (during a transaction).
 			// On every advancement on clock, check for idle condition.
 			// If detected, a reset of the statemachines are need to re-sync
+			// If an idle condition is detected in the middle of receiving a
+			// byte an error status is signaled otherwise the routine can
+			// advance in the capture silently.
 			if (Is3WireIdleCondition(MAX_CLOCK_IDLE_HI_TIME))
 			{
 				if (bitIndex == 0)
 				{
-					// Simply advance forward to next transaction
 					AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				}
 				else
 				{
-					// Reset everything and return.
 					byteStatus = GetByteStatus::Error;
 					break;
 				}
@@ -800,7 +802,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket()
 			U32 maxAllowedTransitions = 0;
 			U32 transitionCount;
 
-			if(mClock->GetBitState() == BitState::BIT_HIGH)
+			if (mClock->GetBitState() == BitState::BIT_HIGH)
 			{
 				maxAllowedTransitions = 1;
 			}
@@ -823,7 +825,7 @@ void SpiAnalyzer::CheckForIdleAfterPacket()
 	{
 		// Skip idle check when m4WireOn3Channels is being used, since it is
 		// impossible to infer if the enable line had toggled or not
-		if( mSettings->m4WireOn3Channels == false )
+		if (mSettings->m4WireOn3Channels == false)
 		{
 			if (!Is3WireIdleCondition(MIN_IDLE_GAP_TIME))
 			{
@@ -1056,7 +1058,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 
 	if (e_state == AbccMisoStates::Crc32)
 	{
-		if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+		if (resultFrame.HasFlag(DISPLAY_AS_ERROR_FLAG))
 		{
 			SetMisoPacketType(PacketType::ChecksumError);
 			RestorePreviousStateVars();
@@ -1070,8 +1072,8 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 
 		if (mMisoVars.fNewMsg)
 		{
-			if (((resultFrame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
-				!((resultFrame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
+			if (resultFrame.HasFlag(SPI_MSG_FRAG_FLAG) &&
+				!resultFrame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 			{
 				SetMisoPacketType(PacketType::MessageFragment);
 			}
@@ -1092,7 +1094,7 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 			}
 		}
 	}
-	else if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	else if (resultFrame.HasFlag(DISPLAY_AS_ERROR_FLAG))
 	{
 		SetMisoPacketType(PacketType::ProtocolError);
 	}
@@ -1271,7 +1273,7 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 		}
 	}
 
-	if ((resultFrame.mFlags & DISPLAY_AS_ERROR_FLAG) == DISPLAY_AS_ERROR_FLAG)
+	if (resultFrame.HasFlag(DISPLAY_AS_ERROR_FLAG))
 	{
 		if (e_state == AbccMosiStates::Crc32)
 		{
@@ -1287,8 +1289,8 @@ void SpiAnalyzer::ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data,
 	{
 		if (mMosiVars.fNewMsg)
 		{
-			if (((resultFrame.mFlags & SPI_MSG_FRAG_FLAG) == SPI_MSG_FRAG_FLAG) &&
-				!((resultFrame.mFlags & SPI_MSG_FIRST_FRAG_FLAG) == SPI_MSG_FIRST_FRAG_FLAG))
+			if (resultFrame.HasFlag(SPI_MSG_FRAG_FLAG) &&
+				!resultFrame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 			{
 				SetMosiPacketType(PacketType::MessageFragment);
 			}
@@ -1762,7 +1764,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	case AbccMosiStates::SpiControl:
 		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if((mMosiVars.lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
+			if ((mMosiVars.lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
 			{
 				mMosiVars.fWrPdValid = true;
 			}
