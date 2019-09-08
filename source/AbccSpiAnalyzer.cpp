@@ -847,6 +847,17 @@ void SpiAnalyzer::CheckForIdleAfterPacket()
 			mClockingErrorCount++;
 			errorFrame.mFlags = (SPI_ERROR_FLAG | DISPLAY_AS_ERROR_FLAG);
 			errorFrame.mType = AbccSpiError::EndOfTransfer;
+
+			if (mSettings->mExpandBitFrames)
+			{
+				const int minFrameSpan = 8;
+
+				if (errorFrame.mEndingSampleInclusive - errorFrame.mStartingSampleInclusive < minFrameSpan)
+				{
+					errorFrame.mEndingSampleInclusive = errorFrame.mStartingSampleInclusive + minFrameSpan;
+				}
+			}
+
 			mResults->AddFrame(errorFrame);
 			mResults->AddMarker(markerSample, AnalyzerResults::ErrorSquare, chn);
 		}

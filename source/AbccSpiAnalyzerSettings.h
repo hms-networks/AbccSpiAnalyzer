@@ -117,6 +117,7 @@ public: /* Members */
 	bool m4WireOn3Channels;
 	std::string mExportDelimiter;
 	S32 mClockingAlertLimit;
+	bool mExpandBitFrames;
 
 protected: /* Members */
 

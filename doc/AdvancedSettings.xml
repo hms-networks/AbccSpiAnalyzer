@@ -35,4 +35,12 @@
 	reported. -->
 	<Setting name="clocking-alert-limit">-1</Setting>
 
+	<!-- "expand-bit-frames" provides a workaround for a limitation found in Saleae Logic software
+	version 1.2.x. Specifically, the software does not properly navigate to the associated bubble
+	text entry when clicking on a "Decoded Protocols" entry for a frame less than 8 samples.
+	Currently, this workaround is only applicable for error frames; any error frame less than 8
+	samples will be expanded to 8 samples to restore the linkage. This feature could have
+	undesirable sideffects in rare circumstances. In case of abnormal behavior it may be necessary
+	to disable this feature. -->
+	<Setting name="expand-bit-frames">1</Setting>
 </AdvancedSettings>

@@ -28,7 +28,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000009"
+#define SETTINGS_REVISION_STRING "REVISION_00000010"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -268,6 +268,7 @@ void SpiAnalyzerSettings::SetDefaultAdvancedSettings()
 	m4WireOn3Channels = false;
 	mExportDelimiter.assign(",");
 	mClockingAlertLimit = -1;
+	mExpandBitFrames = true;
 }
 
 bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
@@ -331,7 +332,7 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 						{
 							m4WireOn3Channels = (nodeValue.compare("1") == 0);
 						}
-						else if (nodeName.compare( "export-delimiter" ) == 0)
+						else if (nodeName.compare("export-delimiter") == 0)
 						{
 							if (nodeValue.length() == 1)
 							{
@@ -345,7 +346,7 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 								}
 							}
 						}
-						else if (nodeName.compare( "clocking-alert-limit" ) == 0)
+						else if (nodeName.compare("clocking-alert-limit") == 0)
 						{
 							try
 							{
@@ -356,6 +357,10 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 								(void)ia;
 								mClockingAlertLimit = -1;
 							}
+						}
+						else if (nodeName.compare("expand-bit-frames") == 0)
+						{
+							mExpandBitFrames = (nodeValue.compare("1") == 0);
 						}
 					}
 					else
@@ -486,6 +491,7 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> m4WireOn3Channels;
 		textArchive >> mExportDelimiter;
 		textArchive >> mClockingAlertLimit;
+		textArchive >> mExpandBitFrames;
 		textArchive >> &mAdvSettingsPath;
 	}
 
@@ -522,6 +528,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << m4WireOn3Channels;
 	textArchive << mExportDelimiter.c_str();
 	textArchive << mClockingAlertLimit;
+	textArchive << mExpandBitFrames;
 	textArchive << mAdvSettingsPath;
 
 	SaveSettingChangeID();
