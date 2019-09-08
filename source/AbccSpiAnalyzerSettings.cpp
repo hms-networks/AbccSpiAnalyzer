@@ -89,6 +89,10 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mAnybusStatusIndexing(true),
 	mApplStatusIndexing(true),
 	mAdvSettingsPath(""),
+	mClockingAlertLimit(-1),
+	m4WireOn3Channels(false),
+	m3WireOn4Channels(false),
+	mExportDelimiter(","),
 	mChangeID(0)
 {
 	SetDefaultAdvancedSettings();

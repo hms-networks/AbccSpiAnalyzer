@@ -47,7 +47,13 @@ SpiAnalyzer::SpiAnalyzer()
 	mMosi(nullptr),
 	mMiso(nullptr),
 	mClock(nullptr),
-	mEnable(nullptr)
+	mEnable(nullptr),
+	mCurrentSample(0),
+	mClockingErrorCount(0),
+	mMosiVars(),
+	mMisoVars(),
+	mPreviousMosiVars(),
+	mPreviousMisoVars()
 {
 	SetAnalyzerSettings(mSettings.get());
 

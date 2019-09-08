@@ -205,7 +205,7 @@ void SpiSimulationDataGenerator::UpdateProcessData()
 
 	// Simulate a 100Hz sinusoids on MOSI and MISO process data.
 	// This sinusoid will swing between -65535 and 65535
-	x = 2.0f * 3.14159265359f * freq * t;
+	x = 2.0 * 3.14159265359 * freq * t;
 	mMosiProcessData = (S32)(65535 * sin(x));
 	mMisoProcessData = (S32)(65535 * cos(x));
 

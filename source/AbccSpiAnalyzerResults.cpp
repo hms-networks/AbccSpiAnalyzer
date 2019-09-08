@@ -97,7 +97,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, No
 		{
 			/* We must pad the level3 (bit states) text to maintain display priority */
 			applyPad = true;
-			memset(pad, ' ', ((strLenValue - strLenVerbose) >> 1) + 1);
+			memset(pad, ' ', (size_t)((strLenValue - strLenVerbose) >> 1) + 1);
 		}
 	}
 

@@ -1697,7 +1697,7 @@ NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase di
 			if (!firstFlag)
 			{
 				SNPRINTF(str, max_str_len, separatorStr);
-				str += (U16)strlen(separatorStr);
+				str += strlen(separatorStr);
 				max_str_len -= (U16)strlen(separatorStr);
 			}
 
@@ -1712,13 +1712,13 @@ NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase di
 			{
 				// Special handling for command count
 				SNPRINTF(str, max_str_len, "%s%d", asSpiCtrlNames[i].name, (val & ABP_SPI_CTRL_CMDCNT) >> 1);
-				str += ((U16)strlen(asSpiCtrlNames[i].name) + 1);
-				max_str_len -= ((U16)strlen(asSpiCtrlNames[i].name) + 1);
+				str += (strlen(asSpiCtrlNames[i].name) + 1);
+				max_str_len -= (U16)(strlen(asSpiCtrlNames[i].name) + 1);
 			}
 			else
 			{
 				SNPRINTF(str, max_str_len, asSpiCtrlNames[i].name);
-				str += (U16)strlen(asSpiCtrlNames[i].name);
+				str += strlen(asSpiCtrlNames[i].name);
 				max_str_len -= (U16)strlen(asSpiCtrlNames[i].name);
 			}
 		}
@@ -1742,7 +1742,7 @@ NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 			if (!firstFlag)
 			{
 				SNPRINTF(str, max_str_len, separatorStr);
-				str += (U16)strlen(separatorStr);
+				str += strlen(separatorStr);
 				max_str_len -= (U16)strlen(separatorStr);
 			}
 
@@ -1757,13 +1757,13 @@ NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 			{
 				// Special handling for command count
 				SNPRINTF(str, max_str_len, "%s%d", asSpiStsNames[i].name, (val & ABP_SPI_STATUS_CMDCNT) >> 1);
-				str += ((U16)strlen(asSpiStsNames[i].name) + 1);
+				str += (strlen(asSpiStsNames[i].name) + 1);
 				max_str_len -= ((U16)strlen(asSpiStsNames[i].name) + 1);
 			}
 			else
 			{
 				SNPRINTF(str, max_str_len, asSpiStsNames[i].name);
-				str += (U16)strlen(asSpiStsNames[i].name);
+				str += strlen(asSpiStsNames[i].name);
 				max_str_len -= (U16)strlen(asSpiStsNames[i].name);
 			}
 		}
