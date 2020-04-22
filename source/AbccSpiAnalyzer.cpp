@@ -993,10 +993,11 @@ void SpiAnalyzer::ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data,
 	}
 	else if (e_state == AbccMisoStates::NetworkTime)
 	{
+		NetworkTimeInfo_t* networkTimeInfo = reinterpret_cast<NetworkTimeInfo_t*>(&resultFrame.mData2);
 		// Compute delta from last timestamp and save it
-		((NetworkTimeInfo_t*)&resultFrame.mData2)->deltaTime = (U32)resultFrame.mData1 - mMisoVars.dwLastTimestamp;
-		((NetworkTimeInfo_t*)&resultFrame.mData2)->newRdPd = mMisoVars.fNewRdPd;
-		((NetworkTimeInfo_t*)&resultFrame.mData2)->wrPdValid = mMosiVars.fWrPdValid;
+		networkTimeInfo->deltaTime = (U32)resultFrame.mData1 - mMisoVars.dwLastTimestamp;
+		networkTimeInfo->newRdPd = mMisoVars.fNewRdPd;
+		networkTimeInfo->wrPdValid = mMosiVars.fWrPdValid;
 		mMisoVars.fNewRdPd = false;
 		mMosiVars.fWrPdValid = false;
 		mMisoVars.dwLastTimestamp = (U32)resultFrame.mData1;
