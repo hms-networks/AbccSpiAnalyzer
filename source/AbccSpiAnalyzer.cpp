@@ -390,7 +390,7 @@ bool SpiAnalyzer::Is3WireIdleCondition(float idle_time_condition)
 
 GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr)
 {
-	// We're assuming we come into this function with the clock in the idle state
+	// Clock is assumed to be in the idle state when entering this function
 	const U32 bitsPerTransfer = 8;
 	DataBuilder mosiResult;
 	DataBuilder misoResult;
@@ -405,21 +405,21 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 	for (auto bitIndex = 0; bitIndex < bitsPerTransfer; bitIndex++)
 	{
-		// On every single edge, we need to check that "enable" doesn't toggle.
-		// Note that we can't just advance the enable line to the next edge, because there may not be another edge
+		// On every logic transition, check that "enable" doesn't change state.
+		// Note: Advancing the enable line to the next edge is not appropriate here since there may not be another edge
 
 		if (WouldAdvancingTheClockToggleEnable())
 		{
 			if (bitIndex == 0)
 			{
-				// Simply advance forward to next transaction
+				// Advance forward to next transaction
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				byteStatus = GetByteStatus::Skip;
 			}
 			else
 			{
-				// The enable state changed in the middle of acquiring a byte.
-				// Suggests we are not byte-synchronized.
+				// The enable state changed in the middle of acquiring a byte;
+				// this suggests we are not byte-synchronized.
 				byteStatus = GetByteStatus::Reset;
 			}
 
@@ -488,7 +488,7 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 		{
 			if (clkIdleHigh && (bitIndex == 0))
 			{
-				// Simply advance forward to next transaction
+				// Advance forward to next transaction
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				byteStatus = GetByteStatus::Skip;
 			}
