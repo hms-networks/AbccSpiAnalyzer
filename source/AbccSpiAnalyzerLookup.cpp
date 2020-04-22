@@ -175,7 +175,8 @@ static const LookupTable_t asApplStsNames[] =
 	{ ABP_APPSTAT_WRITE_PD_CFG_ERR,	"Write process data configuration error",	NotifEvent::Alert },
 	{ ABP_APPSTAT_SYNC_LOSS,		"Synchronization loss",						NotifEvent::Alert },
 	{ ABP_APPSTAT_PD_DATA_LOSS,		"Excessive data loss",						NotifEvent::Alert },
-	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								NotifEvent::Alert }
+	{ ABP_APPSTAT_OUTPUT_ERR,		"Output error",								NotifEvent::Alert },
+	{ ABP_APPSTAT_GENERAL_SYNC_ERR,	"General sync error",						NotifEvent::Alert }
 };
 
 static const LookupTable_t asSpiStsNames[] =
@@ -594,19 +595,20 @@ static const AttrLookupTable_t asAsmObjAttrNames[] =
 
 static const AttrLookupTable_t asAsmInstAttrNames[] =
 {
-	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",	BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",			BaseType::Numeric,		NotifEvent::None },
-	{ ABP_ASM_IA_NAME,				"Assembly Name",		BaseType::Character,	NotifEvent::None }
+	{ ABP_ASM_IA_DESCRIPTOR,		"Assembly Descriptor",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 0,	"ADI Map 0",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 1,	"ADI Map 1",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 2,	"ADI Map 2",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 3,	"ADI Map 3",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 4,	"ADI Map 4",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 5,	"ADI Map 5",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 6,	"ADI Map 6",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 7,	"ADI Map 7",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 8,	"ADI Map 8",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 9,	"ADI Map 9",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_ADI_MAP_XX + 10,	"ADI Map 10",					BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ASM_IA_NAME,				"Assembly Name",				BaseType::Character,	NotifEvent::None },
+	{ ABP_ASM_IA_MAX_NUM_ADI_MAPS,	"Max Number of ADI Mappings",	BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asBacInstAttrNames[] =
@@ -925,7 +927,10 @@ static const AttrLookupTable_t asEtcInstAttrNames[] =
 	{ ABP_ECT_IA_CLEAR_IDENT_AL_STS,	"Clear Identity AL_Status",					BaseType::Numeric,		NotifEvent::None },
 	{ ABP_ECT_IA_SII_ORDER_NUM,			"SII Order Number",							BaseType::Character,	NotifEvent::None },
 	{ ABP_ECT_IA_SII_DEV_NAME,			"SII Device Name",							BaseType::Character,	NotifEvent::None },
-	{ ABP_ECT_IA_FOEDATA_ACK_DELAY,		"FoE Data ACK Delay",						BaseType::Numeric,		NotifEvent::None }
+	{ ABP_ECT_IA_FOEDATA_ACK_DELAY,		"FoE Data ACK Delay",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_IA_DEF_TXPDO_ASSIGN,		"Default TxPDO Assign",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_IA_DEF_RXPDO_ASSIGN,		"Default RxPDO Assign",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_IA_SII_COE_DETAILS,		"SII CoE Details",							BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asEtnInstAttrNames[] =
@@ -1089,7 +1094,8 @@ static const AttrLookupTable_t asOpcuaInstAttrNames[] =
 	{ ABP_OPCUA_IA_VENDOR_NAMESPACE_URI,	"Vendor Namespace URI",	BaseType::Character,	NotifEvent::None },
 	{ ABP_OPCUA_IA_DEVICE_TYPE_NAME,		"Device Type Name",		BaseType::Character,	NotifEvent::None },
 	{ ABP_OPCUA_IA_DEVICE_INST_NAME,		"Device Instance Name",	BaseType::Character,	NotifEvent::None },
-	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			BaseType::Character,	NotifEvent::None }
+	{ ABP_OPCUA_IA_PRODUCT_URI,				"Product URI",			BaseType::Character,	NotifEvent::None },
+	{ ABP_OPCUA_IA_LIMITS,					"Limits",				BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asPnamInstAttrNames[] =
@@ -1138,7 +1144,9 @@ static const AttrLookupTable_t asPnioInstAttrNames[] =
 	{ ABP_PNIO_IA_CUSTOM_STATION_NAME,		"Custom Station Name",				BaseType::Character,	NotifEvent::None },
 	{ ABP_PNIO_IA_IM_MODULE_ORDER_ID,		"I&M Module Order ID",				BaseType::Character,	NotifEvent::None },
 	{ ABP_PNIO_IA_IM_ANNOTATION,			"I&M Annotation",					BaseType::Character,	NotifEvent::None },
-	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						BaseType::Numeric,		NotifEvent::None }
+	{ ABP_PNIO_IA_IM5_ENABLED,				"I&M5 Enabled",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_PNIO_IA_S2_ENABLED,				"S2 Enabled",						BaseType::Numeric,		NotifEvent::None },
+	{ ABP_PNIO_IA_S2_PRIMARY_AR_HANDLE,		"S2 Primary AR Handle",				BaseType::Numeric,		NotifEvent::None }
 };
 
 static const AttrLookupTable_t asSafeInstAttrNames[] =
@@ -1320,7 +1328,10 @@ static const CmdLookupTable_t asEcoCmdNames[] =
 
 static const CmdLookupTable_t asEctCmdNames[] =
 {
-	{ ABP_ECT_CMD_GET_OBJECT_DESC,	"Get_Object_Description",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
+	{ ABP_ECT_CMD_GET_OBJECT_DESC,		"Get_Object_Description",	BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_CMD_GET_OBJECT_ACCESS,	"Get_Object_Access",		BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_CMD_GET_DATA_TYPE,		"Get_Data_Type",			BaseType::Numeric,	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_ECT_CMD_GET_ENUM_DATA,		"Get_Enum_Data",			BaseType::Numeric,	BaseType::Character,	NotifEvent::None }
 };
 
 static const CmdLookupTable_t asEipCmdNames[] =
@@ -1426,7 +1437,7 @@ static const CmdLookupTable_t asPnioCmdNames[] =
 	{ ABP_PNIO_CMD_GET_IM_RECORD,		"Get_IM_Record",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_SET_IM_RECORD,		"Set_IM_Record",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_AR_CHECK_IND,		"AR_Check_Ind",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::Alert }, //TODO check if alert is appropriate here
+	{ ABP_PNIO_CMD_CFG_MISMATCH_IND,	"Cfg_Mismatch_Ind",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_AR_INFO_IND,			"AR_Info_Ind",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_END_OF_PRM_IND,		"End_Of_Prm_Ind",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_AR_ABORT_IND,		"AR_Abort_Ind",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::Alert }, //TODO check if alert is appropriate here
@@ -1434,7 +1445,8 @@ static const CmdLookupTable_t asPnioCmdNames[] =
 	{ ABP_PNIO_CMD_EXPECTED_IDENT_IND,	"Expected_Ident_Ind",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_SAVE_IP_SUITE,		"Save_IP_Suite",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
 	{ ABP_PNIO_CMD_SAVE_STATION_NAME,	"Save_Station_Name",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
+	{ ABP_PNIO_CMD_INDICATE_DEVICE,		"Indicate_Device",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
+	{ ABP_PNIO_CMD_PRM_BEGIN_IND,		"Prm_Begin_Ind",		BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
 };
 
 static const CmdLookupTable_t asSrc3CmdNames[] =
@@ -1594,29 +1606,29 @@ static const LookupTable_t asNwDpv1ErrNames[] =
 
 static const LookupTable_t asNwPnioErrNames[] =
 {
-	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI write not mapped",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_ADI_READ_NOT_MAPPED,		"ADI read not mapped",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_ADI_ELEM_NOT_PRESENT,		"ADI element not present",			NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_ADI_ALREADY_MAPPED,		"ADI already mapped",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_API_0_NOT_ADDED,			"API 0 not added",					NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_API_NOT_PRESENT,			"API not present",					NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_API_ALREADY_PRESENT,		"API already present",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_API_CANNOT_BE_ADDED,		"API cannot be added",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_NO_IO_IN_SLOT_0,			"No I/O in slot 0",					NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SLOT_0_NOT_PROP_PLUGGED,	"Slot 0 not properly plugged",		NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SLOT_OCCUPIED,				"Slot occupied",					NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SUBSLOT_OCCUPIED,			"Subslot occupied",					NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_NO_MODULE_SPECIFIED_SLOT,	"No module specified in slot",		NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_NO_SUBMOD_SPECIFIED_SLOT,	"No submodule specified in slot",	NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SLOT_OUT_OF_RANGE,			"Slot out of range",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SUBSLOT_OUT_OF_RANGE,		"Subslot out of range",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_AR_NOT_VALID,				"AR not valid",						NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_NO_PEND_APPL_READY,		"No pending application ready",		NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_UNKNOWN_STACK_ERROR,		"Unknown stack error",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_MAX_NBR_OF_PLUGGED_SUBMOD,	"Max number of plugged submodules",	NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_SAFETY_NOT_ENABLED,		"Safety not enabled",				NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",			NotifEvent::Alert },
-	{ ABP_NWPNIO_ERR_ASM_ALREADY_PLUGGED,		"ASM is already plugged",			NotifEvent::Alert }
+	{ ABP_NWPNIO_ERR_ADI_WRITE_NOT_MAPPED,		"ADI not mapped via Map_ADI_Write_Area",	NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_ADI_READ_NOT_MAPPED,		"ADI not mapped via Map_ADI_Read_Area",		NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_ADI_ELEM_NOT_PRESENT,		"ADI element not present",					NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_ADI_ALREADY_MAPPED,		"ADI/Element is already mapped",			NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_API_0_NOT_ADDED,			"API 0 must be added first",				NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_API_NOT_PRESENT,			"API does not exist",						NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_API_ALREADY_PRESENT,		"API already present",						NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_API_CANNOT_BE_ADDED,		"API cannot be added",						NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_NO_IO_IN_SLOT_0,			"Slot 0 cannot have any I/O data",			NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SLOT_0_NOT_PROP_PLUGGED,	"Slot 0 not properly plugged",				NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SLOT_OCCUPIED,				"Slot occupied",							NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OCCUPIED,			"Subslot occupied",							NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_NO_MODULE_SPECIFIED_SLOT,	"No module in the specified slot",			NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_NO_SUBMOD_SPECIFIED_SLOT,	"No submodule in the specified slot",		NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SLOT_OUT_OF_RANGE,			"Slot number specified is out of range",	NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SUBSLOT_OUT_OF_RANGE,		"Subslot number specified is out of range",	NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_AR_NOT_VALID,				"AR handle provided is not valid",			NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_NO_PEND_APPL_READY,		"No pending application ready",				NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_UNKNOWN_STACK_ERROR,		"Unknown stack error",						NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_MAX_NBR_OF_PLUGGED_SUBMOD,	"Max number of plugged submodules",			NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_SAFETY_NOT_ENABLED,		"Safety module has not been plugged",		NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_ADI_DATATYPE_CONSTRAINT,	"ADI datatype constraint",					NotifEvent::Alert },
+	{ ABP_NWPNIO_ERR_ASM_ALREADY_PLUGGED,		"Safety module already plugged",			NotifEvent::Alert }
 };
 
 static const LookupTable_t asSmtpErrNames[] =
