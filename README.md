@@ -1,6 +1,6 @@
 # Anybus CompactCom SPI Protocol Analyzer Plugin
 
-## Copyright &copy; 2015-2019 HMS Industrial Networks, Inc.
+## Copyright &copy; 2015-2020 HMS Industrial Networks, Inc.
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR
@@ -13,22 +13,24 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
 
 1. [Description](#description)
 2. [System Requirements](#system-requirements)
-3. [Compile & Install](#compile-&-install)
+3. [Precompiled Releases](#precompiled-releases)
+4. [Compile & Install](#compile-&-install)
    * [Initial Steps](#initial-steps)
    * [Windows](#windows)
    * [GNU/Linux](#gnulinux)
    * [macOS](#macos)
-4. [Documentation](#documentation)
-5. [Changelog](#changelog)
-6. [Licenses](#licenses)
+5. [Documentation](#documentation)
+6. [Changelog](#changelog)
+7. [Licenses](#licenses)
 
 ---
 
 ## [Description](#table-of-contents)
 
-This plugin in conjunction with the Saleae 'Logic' hardware and software provides
-an easy-to-use interface for analyzing bi-directional (full-duplex) [Anybus
-CompactCom (ABCC)](https://www.anybus.com/products/embedded-index) SPI protocol communication.
+This plugin, in conjunction with the [Saleae Logic][link_saleae] hardware and
+software, provides an easy-to-use interface for analyzing bi-directional (full-duplex)
+[Anybus CompactCom (ABCC)](https://www.anybus.com/products/embedded-index) SPI
+protocol communication.
 
 Each field within an SPI packet is added as a multi-layered bubble-text
 within the Logic software. Basic markup is displayed when zoomed-out, while
@@ -42,13 +44,15 @@ data from ABCC object messaging, or to plot a waveform extracted from the
 process data data field with accurate local timestamp information and
 (if supported by the network) the network time information.
 
-![Overview of Plugin](https://github.com/HMSAB/AbccSpiAnalyzer/wiki/overview.gif "Overview of Plugin")
+![Overview of Plugin][mov_overview]
 
 ## [System Requirements](#table-of-contents)
 
-* Saleae Logic Software (version 1.2.7)
+* Saleae Logic Software
+  * __Recommended Version__: 1.2.29
   * Other versions will work so long as **Analyzer SDK version 1.1.32** is
-    compatible
+    compatible.
+  * __NOTE__: At this time, Saleae Logic V2 is not supported.
 * Saleae Logic Hardware
   * While any of Saleae Logic hardware offerings is expected to be compatible,
   it is important to consider sample rate limitations of the Logic hardware and
@@ -68,19 +72,27 @@ process data data field with accurate local timestamp information and
   * Using the Saleae Logic on a dedicated USB controller is recommended for
   ensuring the best sampling performance of the hardware will be possible.
 
+## [Precompiled Releases](#table-of-contents)
+
+Precompiled plugins and documentation are available here: [Plugin Releases][link_releases]
+
 ## [Compile & Install](#table-of-contents)
 
-While tagged releases are provided which contain precompiled libraries and
+While tagged releases are provided which contain pre-compiled libraries and
 associated documentation, you may still opt to compile the libraries yourself.
 
 ### [Initial Steps](#table-of-contents)
 
-After checking out this git repository, the user will need to issue the
-following command in order to fetch the submodule git repos containing the
-Logic Analyzer SDK. Two copies are used of the same repo, one pointed at the
+After cloning this git repository, the user will need to initialize the
+submodules command in order to fetch the repositories containing the Logic
+Analyzer SDK. Two copies are used of the same repo, one pointed at the
 release/master branch and another pointing at the legacy SDK to support debugging.
 
+Example for cloning the repository and fetching/initializing the submodules:
+
 ```bash
+git clone https://github.com/hms-networks/AbccSpiAnalyzer.git
+cd AbccSpiAnalyzer
 git submodule update --init --recursive
 ```
 
@@ -88,7 +100,7 @@ git submodule update --init --recursive
 
 To compile the project please ensure the **additional** requirements are met:
 
-> DEPENDENCIES: **Visual Studio 2012** or later *(retargetting project may be necessary)*
+> DEPENDENCIES: **Visual Studio 2012** or later *(retargeting project may be necessary)*
 
 > NOTE: **Express** or **Community** versions of Visual Studio may require
 additional steps to replace occurrences of `#include "afxres.h"` with `#include "windows.h"`.
@@ -134,6 +146,7 @@ other protocol analyzers are added to the Logic software.
 
 * To compile simply run the `build_analyzer.py` python script. This script will
   compile the appropriate shared object library based on the host system.
+
 > DEPENDENCIES: **Python**, **G++**
 
 > ADDITIONAL DEPENDENCY: Depending on the system it may also be required to
@@ -148,6 +161,7 @@ installation in the "Analyzers" folder.
 ### [macOS](#table-of-contents)
 
 * To compile simply run the `build_analyzer.py` python script.
+
 > DEPENDENCIES: **Python**, **G++**
 
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside
@@ -157,8 +171,7 @@ software installation in the "Analyzers" folder.
 ## [Documentation](#table-of-contents)
 
 For complete details regarding this plugin's functionality please consult the
-[Wiki](https://github.com/HMSAB/AbccSpiAnalyzer/wiki) found within this repository
-or [Quick Start Guide](doc/AbccSpiAnalyzer_Plugin_Quick_Start_Guide.pdf)
+[Wiki][link_wiki] found within this repository or [Quick Start Guide][link_qsg]
 included in this repository's documentation folder. The Wiki is expected to
 contain more up-to-date details on the plugin's functionality in reference to
 the master branch whereas the PDF document will typically be updated when a new
@@ -166,7 +179,7 @@ tagged release is made and is provided as part of the tagged release's
 downloadable assets.
 
 For details on the Logic SDK's API please refer to the Saleae's
-[Protocol Analyzer SDK](https://support.saleae.com/saleae-api-and-sdk/protocol-analyzer-sdk) page.
+[Protocol Analyzer SDK][link_sdk] page.
 
 ## [Changelog](#table-of-contents)
 
@@ -175,3 +188,10 @@ Please see [CHANGELOG.md](CHANGELOG.md) provided within this repository for deta
 ## [Licenses](#table-of-contents)
 
 Please see [LICENSE.md](LICENSE.md) provided within this repository for details on the software licensing.
+
+[mov_overview]: https://github.com/HMSAB/AbccSpiAnalyzer/wiki/overview.gif "Overview of Plugin"
+[link_wiki]: https://github.com/HMSAB/AbccSpiAnalyzer/wiki
+[link_releases]: https://github.com/HMSAB/AbccSpiAnalyzer/releases
+[link_qsg]: doc/AbccSpiAnalyzer_Plugin_Quick_Start_Guide.pdf
+[link_sdk]: https://support.saleae.com/saleae-api-and-sdk/protocol-analyzer-sdk
+[link_saleae]: https://www.saleae.com/
