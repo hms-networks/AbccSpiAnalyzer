@@ -28,7 +28,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000008"
+#define SETTINGS_REVISION_STRING "REVISION_00000009"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -98,19 +98,19 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	SetDefaultAdvancedSettings();
 
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMosiChannelInterface->SetTitleAndTooltip("SPI Channel - MOSI :", "Master Out, Slave In (Host to Module)");
+	mMosiChannelInterface->SetTitleAndTooltip("MOSI", "Master Out, Slave In (Host to Module)");
 	mMosiChannelInterface->SetChannel(mMosiChannel);
 
 	mMisoChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMisoChannelInterface->SetTitleAndTooltip("SPI Channel - MISO :", "Master In, Slave Out (Module to Host)");
+	mMisoChannelInterface->SetTitleAndTooltip("MISO", "Master In, Slave Out (Module to Host)");
 	mMisoChannelInterface->SetChannel(mMisoChannel);
 
 	mClockChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mClockChannelInterface->SetTitleAndTooltip("SPI Channel - Clock :", "Clock (CLK)");
+	mClockChannelInterface->SetTitleAndTooltip("SCLK", "SPI Clock");
 	mClockChannelInterface->SetChannel(mClockChannel);
 
 	mEnableChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mEnableChannelInterface->SetTitleAndTooltip("SPI Channel - Enable :", "Enable (SS, Slave Select)");
+	mEnableChannelInterface->SetTitleAndTooltip("NSS", "Active Low Slave Select");
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
 
@@ -254,8 +254,8 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	ClearChannels();
 	AddChannel(mMosiChannel, "MOSI", false);
 	AddChannel(mMisoChannel, "MISO", false);
-	AddChannel(mClockChannel, "CLOCK", false);
-	AddChannel(mEnableChannel, "ENABLE", false);
+	AddChannel(mClockChannel, "SCLK", false);
+	AddChannel(mEnableChannel, "NSS", false);
 }
 
 SpiAnalyzerSettings::~SpiAnalyzerSettings()
@@ -438,8 +438,8 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	ClearChannels();
 	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
-	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  "SCLK",   mClockChannel  != UNDEFINED_CHANNEL);
+	AddChannel(mEnableChannel, "NSS",    mEnableChannel != UNDEFINED_CHANNEL);
 
 	if (!ParseAdvancedSettingsFile())
 	{
@@ -492,8 +492,8 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	ClearChannels();
 	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
 	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel,  "CLOCK",  mClockChannel  != UNDEFINED_CHANNEL);
-	AddChannel(mEnableChannel, "ENABLE", mEnableChannel != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  "SCLK",   mClockChannel  != UNDEFINED_CHANNEL);
+	AddChannel(mEnableChannel, "NSS",    mEnableChannel != UNDEFINED_CHANNEL);
 
 	UpdateInterfacesFromSettings();
 }
