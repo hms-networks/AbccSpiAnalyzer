@@ -225,14 +225,15 @@ ABP_MsgErrorCodeType;
 */
 typedef enum ABP_AppStatusType
 {
-   ABP_APPSTAT_NO_ERROR           = 0x0000,
-   ABP_APPSTAT_NOT_SYNCED         = 0x0001,
-   ABP_APPSTAT_SYNC_CFG_ERR       = 0x0002,
-   ABP_APPSTAT_READ_PD_CFG_ERR    = 0x0003,
-   ABP_APPSTAT_WRITE_PD_CFG_ERR   = 0x0004,
-   ABP_APPSTAT_SYNC_LOSS          = 0x0005,
-   ABP_APPSTAT_PD_DATA_LOSS       = 0x0006,
-   ABP_APPSTAT_OUTPUT_ERR         = 0x0007
+   ABP_APPSTAT_NO_ERROR         = 0x0000,
+   ABP_APPSTAT_NOT_SYNCED       = 0x0001,
+   ABP_APPSTAT_SYNC_CFG_ERR     = 0x0002,
+   ABP_APPSTAT_READ_PD_CFG_ERR  = 0x0003,
+   ABP_APPSTAT_WRITE_PD_CFG_ERR = 0x0004,
+   ABP_APPSTAT_SYNC_LOSS        = 0x0005,
+   ABP_APPSTAT_PD_DATA_LOSS     = 0x0006,
+   ABP_APPSTAT_OUTPUT_ERR       = 0x0007,
+   ABP_APPSTAT_GENERAL_SYNC_ERR = 0x0008
 }
 ABP_AppStatusType;
 
@@ -824,6 +825,7 @@ typedef enum ABP_AnbExceptionCodeType
    ABP_ANB_EXCPT_INSUFF_APPL_IMPL    = 0x0A, /* Insufficient application impl. */
    ABP_ANB_EXCPT_MISSING_SERIAL_NUM  = 0x0B, /* Missing serial number          */
    ABP_ANB_EXCPT_CORRUPT_FILE_SYSTEM = 0x0C, /* File system is corrupt         */
+   ABP_ANB_EXCPT_SECURITY_ERROR      = 0x0D, /* Security related error         */
 
    ABP_ANB_EXCPT_NUM_CODES                   /* Number of exception codes      */
 }
@@ -885,6 +887,17 @@ ABP_AbipLicenseType;
 #define ABP_ANB_GPIO_CONFIG_EXT_LED       0x01  /* Extended LED functionality */
 #define ABP_ANB_GPIO_CONFIG_RMII          0x02  /* RMII functionality         */
 #define ABP_ANB_GPIO_CONFIG_THREE_STATE   0x03  /* Three-state GPIO pins      */
+
+/*------------------------------------------------------------------------------
+**
+** Factory default reset bitfield definitions.
+**
+**------------------------------------------------------------------------------
+*/
+
+#define ABP_ANB_FACTORY_DEFAULT_NC         0x00000001  /* Set default NC parameters             */
+#define ABP_ANB_FACTORY_DEFAULT_ANB_FS     0x00000002  /* Default Anybus filesystem             */
+#define ABP_ANB_FACTORY_DEFAULT_SECURITY   0x00000004  /* Delete user accounts and certificates */
 
 
 /*******************************************************************************

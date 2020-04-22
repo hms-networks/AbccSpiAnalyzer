@@ -52,6 +52,7 @@
 #define ABP_ASM_IA_DESCRIPTOR               1    /* Descriptor                */
 #define ABP_ASM_IA_ADI_MAP_XX               2    /* Attributes 2-12 are valid */
 #define ABP_ASM_IA_NAME                     13   /* Name                      */
+#define ABP_ASM_IA_MAX_NUM_ADI_MAPS         14   /* Max number of ADI mappings*/
 
 /*------------------------------------------------------------------------------
 ** The data size of the Assembly Mapping object specific instance attributes
@@ -59,6 +60,7 @@
 **------------------------------------------------------------------------------
 */
 #define ABP_ASM_IA_DESCRIPTOR_DS                   ABP_UINT32_SIZEOF
+#define ABP_ASM_IA_MAX_NUM_ADI_MAPS_DS             ABP_UINT16_SIZEOF
 
 /*------------------------------------------------------------------------------
 ** Descriptor instance attribute specific defines.

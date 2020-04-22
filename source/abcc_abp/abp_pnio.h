@@ -85,6 +85,8 @@
 #define ABP_PNIO_IA_IM_MODULE_ORDER_ID          25
 #define ABP_PNIO_IA_IM_ANNOTATION               26
 #define ABP_PNIO_IA_IM5_ENABLED                 27
+#define ABP_PNIO_IA_S2_ENABLED                  28
+#define ABP_PNIO_IA_S2_PRIMARY_AR_HANDLE        29
 
 /*------------------------------------------------------------------------------
 **
@@ -119,6 +121,8 @@
 #define ABP_PNIO_IA_IM_MODULE_ORDER_ID_DS          ( 64 * ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_IM_ANNOTATION_ID_DS            ( 64 * ABP_UINT8_SIZEOF )
 #define ABP_PNIO_IA_IM5_ENABLE_DS                  ABP_BOOL_SIZEOF
+#define ABP_PNIO_IA_S2_ENABLE_DS                   ABP_BOOL_SIZEOF
+#define ABP_PNIO_IA_S2_PRIMARY_AR_HANDLE_DS        ABP_UINT16_SIZEOF
 
 /*------------------------------------------------------------------------------
 **
@@ -141,6 +145,7 @@
 #define ABP_PNIO_CMD_SAVE_IP_SUITE                 0x1C
 #define ABP_PNIO_CMD_SAVE_STATION_NAME             0x1D
 #define ABP_PNIO_CMD_INDICATE_DEVICE               0x1E
+#define ABP_PNIO_CMD_PRM_BEGIN_IND                 0x1F
 
 /*------------------------------------------------------------------------------
 **
@@ -161,6 +166,7 @@
 #define ABP_PNIO_CMD_PLUG_SUB_FAILED_DS            8
 #define ABP_PNIO_CMD_EXPECTED_IDENT_IND_DS         255
 #define ABP_PNIO_CMD_INDICATE_DEVICE_DS            0
+#define ABP_PNIO_CMD_PRM_BEGIN_IND_DS              8
 
 /*------------------------------------------------------------------------------
 **
@@ -187,6 +193,7 @@
 #define ABP_PNIO_NW_EXCPT_MDD_ERR               6
 #define ABP_PNIO_NW_EXCPT_PE_WRONG_VERSION      7
 #define ABP_PNIO_NW_EXCPT_PE_INST_OUT_OF_RANGE  8
+#define ABP_PNIO_NW_EXCPT_INVALID_MAX_AR        9
 
 #endif  /* inclusion lock */
 

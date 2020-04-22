@@ -1,6 +1,6 @@
 /*******************************************************************************
 ********************************************************************************
-** COPYRIGHT NOTIFICATION (c) 2018 HMS Industrial Networks AB                 **
+** COPYRIGHT NOTIFICATION (c) 2017 HMS Industrial Networks AB                 **
 **                                                                            **
 ** This code is the property of HMS Industrial Networks AB.                   **
 ** The source code may not be reproduced, distributed, or used without        **
@@ -33,6 +33,7 @@
 #define ABP_OPCUA_IA_DEVICE_TYPE_NAME        4
 #define ABP_OPCUA_IA_DEVICE_INST_NAME        5
 #define ABP_OPCUA_IA_PRODUCT_URI             6
+#define ABP_OPCUA_IA_LIMITS                  7
 
 /*------------------------------------------------------------------------------
 ** The data size of the OPC UA instance attributes
@@ -44,7 +45,7 @@
 #define ABP_OPCUA_IA_DEVICE_TYPE_NAME_MAX_DS     ( 64 * ABP_CHAR_SIZEOF )
 #define ABP_OPCUA_IA_DEVICE_INST_NAME_MAX_DS     ( 64 * ABP_CHAR_SIZEOF )
 #define ABP_OPCUA_IA_PRODUCT_URI_MAX_DS          ( 128 * ABP_CHAR_SIZEOF )
-
+#define ABP_OPCUA_IA_LIMITS_DS                   ( ABP_UINT16_SIZEOF + ABP_UINT32_SIZEOF )
 
 /*------------------------------------------------------------------------------
 ** Values of Model attribute
@@ -56,5 +57,14 @@ typedef enum ABP_OpcuaModel
    ABP_OPCUA_MODEL_CC40                = 1
 }
 ABP_OpcuaModelType;
+
+/*------------------------------------------------------------------------------
+** Valid ranges for the "Limits" attribute
+**------------------------------------------------------------------------------
+*/
+#define ABP_OPCUA_IA_LIMITS_MAX_MON_ITEMS_MIN    ( 8 )
+#define ABP_OPCUA_IA_LIMITS_MAX_MON_ITEMS_MAX    ( 100 )
+#define ABP_OPCUA_IA_LIMITS_MIN_PUB_INT_MIN      ( 1000 )
+#define ABP_OPCUA_IA_LIMITS_MIN_PUB_INT_MAX      ( 1000 * 3600 * 24 )
 
 #endif  /* inclusion lock */

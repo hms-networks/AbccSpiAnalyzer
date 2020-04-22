@@ -1,6 +1,6 @@
 /*******************************************************************************
 ********************************************************************************
-** COPYRIGHT NOTIFICATION (c) 2018 HMS Industrial Networks AB                 **
+** COPYRIGHT NOTIFICATION (c) 2017 HMS Industrial Networks AB                 **
 **                                                                            **
 ** This code is the property of HMS Industrial Networks AB.                   **
 ** The source code may not be reproduced, distributed, or used without        **

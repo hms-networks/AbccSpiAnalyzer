@@ -106,6 +106,9 @@
 #define ABP_ECT_IA_SII_ORDER_NUM          25
 #define ABP_ECT_IA_SII_DEV_NAME           26
 #define ABP_ECT_IA_FOEDATA_ACK_DELAY      27
+#define ABP_ECT_IA_DEF_TXPDO_ASSIGN       28
+#define ABP_ECT_IA_DEF_RXPDO_ASSIGN       29
+#define ABP_ECT_IA_SII_COE_DETAILS        30
 
 /*------------------------------------------------------------------------------
 **
@@ -142,6 +145,9 @@
 #define ABP_ECT_IA_SII_ORDER_NUM_MAX_DS         ( ABP_CHAR_SIZEOF * ABP_ECT_CFG_STR_LEN )
 #define ABP_ECT_IA_SII_DEV_NAME_MAX_DS          ( ABP_CHAR_SIZEOF * ABP_ECT_CFG_STR_LEN )
 #define ABP_ECT_IA_FOEDATA_ACK_DELAY_DS         ABP_UINT16_SIZEOF
+#define ABP_ECT_IA_DEF_TXPDO_ASSIGN_MAX_DS      ( ABP_UINT16_SIZEOF * 64 )
+#define ABP_ECT_IA_DEF_RXPDO_ASSIGN_MAX_DS      ( ABP_UINT16_SIZEOF * 64 )
+#define ABP_ECT_IA_SII_COE_DETAILS_DS           ABP_UINT8_SIZEOF
 
 
 /*------------------------------------------------------------------------------
@@ -152,6 +158,9 @@
 */
 
 #define ABP_ECT_CMD_GET_OBJECT_DESC             0x10
+#define ABP_ECT_CMD_GET_OBJECT_ACCESS           0x11
+#define ABP_ECT_CMD_GET_DATA_TYPE               0x12
+#define ABP_ECT_CMD_GET_ENUM_DATA               0x13
 
 
 /*******************************************************************************
