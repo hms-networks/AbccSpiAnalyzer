@@ -80,6 +80,37 @@
 #define ABCC_MSG_CMDEXT1_FIELD_SIZE		1
 #define ABCC_MSG_DATA_FIELD_SIZE		1
 
+typedef struct AttributeNameTable
+{
+	U8 object_num;
+	U8 num_obj_names;
+	U8 num_inst_names;
+	const AttrLookupTable_t* obj_names;
+	const AttrLookupTable_t* inst_names;
+} AttributeNameTable_t;
+
+typedef struct ErrorNameTable
+{
+	U8 object_num;
+	U8 num_err_names;
+	const LookupTable_t* err_names;
+} ErrorNameTable_t;
+
+typedef struct CommandNameTable
+{
+	U8 object_num;
+	U8 num_cmd_names;
+	const CmdLookupTable_t* cmd_names;
+} CommandNameTable_t;
+
+typedef struct NcInstNameTable
+{
+	U8 object_num;
+	U8 num_inst_names;
+	const LookupTable_t* inst_names;
+} NcInstNameTable_t;
+
+
 /*******************************************************************************
 **
 ** Protocol state lookup tables
@@ -488,6 +519,34 @@ static const LookupTable_t asPirNcInstNames[] =
 	{ 19,	"Reserved",								NotifEvent::None },
 	{ 20,	"Station Name",							NotifEvent::None },
 	{ 21,	"F-Address",							NotifEvent::None }
+};
+
+NcInstNameTable_t asNcInstNameTables[] =
+{
+	{ ABP_NW_TYPE_BIP,				NUM_ENTRIES(asBipNcInstNames),	asBipNcInstNames },
+	{ ABP_NW_TYPE_CCL,				NUM_ENTRIES(asCclNcInstNames),	asCclNcInstNames },
+
+	{ ABP_NW_TYPE_CET,				NUM_ENTRIES(asCetNcInstNames),	asCetNcInstNames },
+	{ ABP_NW_TYPE_CET_IIOT,			NUM_ENTRIES(asCetNcInstNames),	asCetNcInstNames },
+
+	{ ABP_NW_TYPE_COP,				NUM_ENTRIES(asCopNcInstNames),	asCopNcInstNames },
+	{ ABP_NW_TYPE_DEV,				NUM_ENTRIES(asDevNcInstNames),	asDevNcInstNames },
+	{ ABP_NW_TYPE_ECT,				NUM_ENTRIES(asEctNcInstNames),	asEctNcInstNames },
+
+	{ ABP_NW_TYPE_EIP_1P,			NUM_ENTRIES(asEipNcInstNames),	asEipNcInstNames },
+	{ ABP_NW_TYPE_EIP_2P_BB,		NUM_ENTRIES(asEipNcInstNames),	asEipNcInstNames },
+	{ ABP_NW_TYPE_EIP_2P,			NUM_ENTRIES(asEipNcInstNames),	asEipNcInstNames },
+	{ ABP_NW_TYPE_EIP_2P_BB_IIOT,	NUM_ENTRIES(asEipNcInstNames),	asEipNcInstNames },
+
+	{ ABP_NW_TYPE_EPL,				NUM_ENTRIES(asEplNcInstNames),	asEplNcInstNames },
+
+	{ ABP_NW_TYPE_ETN_1P,			NUM_ENTRIES(asEtnNcInstNames),	asEtnNcInstNames },
+	{ ABP_NW_TYPE_ETN_2P,			NUM_ENTRIES(asEtnNcInstNames),	asEtnNcInstNames },
+
+	{ ABP_NW_TYPE_PIR,				NUM_ENTRIES(asPirNcInstNames),	asPirNcInstNames },
+	{ ABP_NW_TYPE_PIR_FO,			NUM_ENTRIES(asPirNcInstNames),	asPirNcInstNames },
+	{ ABP_NW_TYPE_PIR_FO_IIOT,		NUM_ENTRIES(asPirNcInstNames),	asPirNcInstNames },
+	{ ABP_NW_TYPE_PIR_IIOT,			NUM_ENTRIES(asPirNcInstNames),	asPirNcInstNames },
 };
 
 /*******************************************************************************
@@ -1056,6 +1115,30 @@ static const AttrLookupTable_t asNwCfnInstAttrNames[] =
 	{ ABP_NWCFN_IA_SLMP_REC_LOCK,	"SLMP Reception Lock",		BaseType::Numeric,	NotifEvent::None }
 };
 
+static const AttrLookupTable_t asNwDpv1InstAttrNames[] =
+{
+   { ABP_DPV1_IA_IDENT_NUMBER,			"PNO Identity Number",		BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_PRM_DATA,				"Parameterization Data",	BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_EXPECTED_CFG_DATA,		"Expected Configuration",	BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_SSA_ENABLED,			"SSA Enabled",				BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_SIZEOF_ID_REL_DIAG,	"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_BUFFER_MODE,			"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_ALARM_SETTINGS,		"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_MANUFACTURER_ID,		"Manufacturer ID",			BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_ORDER_ID,				"Order ID",					BaseType::Character,	NotifEvent::None },
+   { ABP_DPV1_IA_SERIAL_NO,				"Serial Number ID",			BaseType::Character,	NotifEvent::None },
+   { ABP_DPV1_IA_HW_REV,				"Hardware Revision",		BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_SW_REV,				"Software Revision",		BaseType::Character,	NotifEvent::None }, /* The value here is more 'numeric' in nature, but the first byte is a character. */
+   { ABP_DPV1_IA_REV_COUNTER,			"Revision Counter",			BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_PROFILE_ID,			"Profile ID",				BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_PROFILE_SPEC_TYPE,		"Profile Specific Type",	BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_IM_VERSION,			"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_IM_SUPPORTED,			"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_IM_HEADER,				"IM Header",				BaseType::Numeric,		NotifEvent::None },
+   { ABP_DPV1_IA_CHK_CFG_BEHAVIOR,		"Reserved",					BaseType::Numeric,		NotifEvent::Alert },
+   { ABP_DPV1_IA_RESERVED,				"Reserved",					BaseType::Numeric,		NotifEvent::Alert }
+};
+
 static const AttrLookupTable_t asNwEtnInstAttrNames[] =
 {
 	{ ABP_NWETN_IA_MAC_ID,				"MAC Address",			BaseType::Numeric,	NotifEvent::None },
@@ -1218,6 +1301,57 @@ static const AttrLookupTable_t asSyncInstAttrNames[] =
 	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",					BaseType::Numeric,	NotifEvent::None },
 	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",			BaseType::Numeric,	NotifEvent::None },
 	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	BaseType::Numeric,	NotifEvent::None },
+};
+
+
+// Entries contained in this table shall be sorted by object number.
+// { Object, Object names pointer, Num object names, Instance names pointer, Num instance names } */
+AttributeNameTable_t asAttributeNameTables[] = {
+	{ ABP_OBJ_NUM_ANB,		0,									NUM_ENTRIES(asAnbInstAttrNames),	nullptr,			asAnbInstAttrNames },
+	{ ABP_OBJ_NUM_DI,		NUM_ENTRIES(asDiObjAttrNames),		NUM_ENTRIES(asDiInstAttrNames),		asDiObjAttrNames,	asDiInstAttrNames },
+	{ ABP_OBJ_NUM_NW,		0,									NUM_ENTRIES(asNwInstAttrNames),		nullptr,			asNwInstAttrNames },
+	{ ABP_OBJ_NUM_NC,		0,									NUM_ENTRIES(asNcInstAttrNames),		nullptr,			asNcInstAttrNames },
+	{ ABP_OBJ_NUM_ADD,		NUM_ENTRIES(asAddObjAttrNames),		NUM_ENTRIES(asAddInstAttrNames),	asAddObjAttrNames,	asAddInstAttrNames },
+	{ ABP_OBJ_NUM_SOC,		NUM_ENTRIES(asSocObjAttrNames),		NUM_ENTRIES(asSocInstAttrNames),	asSocObjAttrNames,	asSocInstAttrNames },
+	{ ABP_OBJ_NUM_NWCCL,	0,									NUM_ENTRIES(asNwCclInstAttrNames),	nullptr,			asNwCclInstAttrNames },
+	{ ABP_OBJ_NUM_SMTP,		NUM_ENTRIES(asSmtpObjAttrNames),	NUM_ENTRIES(asSmtpInstAttrNames),	asSmtpObjAttrNames,	asSmtpInstAttrNames },
+	{ ABP_OBJ_NUM_FSI,		NUM_ENTRIES(asFsiObjAttrNames),		NUM_ENTRIES(asFsiInstAttrNames),	asFsiObjAttrNames,	asFsiInstAttrNames },
+	{ ABP_OBJ_NUM_NWDPV1,	0,									NUM_ENTRIES(asNwDpv1InstAttrNames),	nullptr,			asNwDpv1InstAttrNames },
+	{ ABP_OBJ_NUM_NWETN,	0,									NUM_ENTRIES(asNwEtnInstAttrNames),	nullptr,			asNwEtnInstAttrNames },
+	{ ABP_OBJ_NUM_CPC,		NUM_ENTRIES(asCpcObjAttrNames),		NUM_ENTRIES(asCpcInstAttrNames),	asCpcObjAttrNames,	asCpcInstAttrNames },
+	{ ABP_OBJ_NUM_NWPNIO,	0,									NUM_ENTRIES(asNwPnioInstAttrNames),	nullptr,			asNwPnioInstAttrNames },
+	{ ABP_OBJ_NUM_FUSM,		0,									NUM_ENTRIES(asFusmInstAttrNames),	nullptr,			asFusmInstAttrNames },
+	{ ABP_OBJ_NUM_NWCFN,	0,									NUM_ENTRIES(asNwCfnInstAttrNames),	nullptr,			asNwCfnInstAttrNames },
+
+	{ ABP_OBJ_NUM_MQTT,		0,									NUM_ENTRIES(asMqttInstAttrNames),	nullptr,			asMqttInstAttrNames },
+	{ ABP_OBJ_NUM_OPCUA,	0,									NUM_ENTRIES(asOpcuaInstAttrNames),	nullptr,			asOpcuaInstAttrNames },
+	{ ABP_OBJ_NUM_EME,		0,									NUM_ENTRIES(asEmeInstAttrNames),	nullptr,			asEmeInstAttrNames },
+	{ ABP_OBJ_NUM_PNAM,		0,									NUM_ENTRIES(asPnamInstAttrNames),	nullptr,			asPnamInstAttrNames },
+	{ ABP_OBJ_NUM_CFN,		0,									NUM_ENTRIES(asCfnInstAttrNames),	nullptr,			asCfnInstAttrNames },
+	{ ABP_OBJ_NUM_ER,		0,									NUM_ENTRIES(asErInstAttrNames),		nullptr,			asErInstAttrNames },
+	{ ABP_OBJ_NUM_SAFE,		0,									NUM_ENTRIES(asSafeInstAttrNames),	nullptr,			asSafeInstAttrNames },
+	{ ABP_OBJ_NUM_EPL,		0,									NUM_ENTRIES(asEplInstAttrNames),	nullptr,			asEplInstAttrNames },
+	{ ABP_OBJ_NUM_AFSI,		NUM_ENTRIES(asFsiObjAttrNames),		NUM_ENTRIES(asFsiInstAttrNames),	asFsiObjAttrNames,	asFsiInstAttrNames }, // AFSI has the same functionality has FSI.
+	{ ABP_OBJ_NUM_ASM,		NUM_ENTRIES(asAsmObjAttrNames),		NUM_ENTRIES(asAsmInstAttrNames),	asAsmObjAttrNames,	asAsmInstAttrNames },
+	{ ABP_OBJ_NUM_MDD,		NUM_ENTRIES(asMddObjAttrNames),		0,									asMddObjAttrNames,	nullptr },
+	{ ABP_OBJ_NUM_CIPID,	0,									NUM_ENTRIES(asCipIdInstAttrNames),	nullptr,			asCipIdInstAttrNames },
+	{ ABP_OBJ_NUM_SYNC,		0,									NUM_ENTRIES(asSyncInstAttrNames),	nullptr,			asSyncInstAttrNames },
+	{ ABP_OBJ_NUM_BAC,		0,									NUM_ENTRIES(asBacInstAttrNames),	nullptr,			asBacInstAttrNames },
+	{ ABP_OBJ_NUM_ECO,		NUM_ENTRIES(asEcoObjAttrNames),		NUM_ENTRIES(asEcoInstAttrNames),	asEcoObjAttrNames,	asEcoInstAttrNames },
+	{ ABP_OBJ_NUM_SRC3,		0,									NUM_ENTRIES(asSrc3InstAttrNames),	nullptr,			asSrc3InstAttrNames },
+	{ ABP_OBJ_NUM_CNT,		0,									NUM_ENTRIES(asCntInstAttrNames),	nullptr,			asCntInstAttrNames },
+	{ ABP_OBJ_NUM_CPN,		0,									NUM_ENTRIES(asCpnInstAttrNames),	nullptr,			asCpnInstAttrNames },
+	{ ABP_OBJ_NUM_ECT,		0,									NUM_ENTRIES(asEtcInstAttrNames),	nullptr,			asEtcInstAttrNames },
+	{ ABP_OBJ_NUM_PNIO,		0,									NUM_ENTRIES(asPnioInstAttrNames),	nullptr,			asPnioInstAttrNames },
+	{ ABP_OBJ_NUM_CCL,		0,									NUM_ENTRIES(asCclInstAttrNames),	nullptr,			asCclInstAttrNames },
+	{ ABP_OBJ_NUM_EIP,		0,									NUM_ENTRIES(asEipInstAttrNames),	nullptr,			asEipInstAttrNames },
+	{ ABP_OBJ_NUM_ETN,		0,									NUM_ENTRIES(asEtnInstAttrNames),	nullptr,			asEtnInstAttrNames },
+	{ ABP_OBJ_NUM_MOD,		0,									NUM_ENTRIES(asModInstAttrNames),	nullptr,			asModInstAttrNames },
+	{ ABP_OBJ_NUM_COP,		0,									NUM_ENTRIES(asCopInstAttrNames),	nullptr,			asCopInstAttrNames },
+	{ ABP_OBJ_NUM_DEV,		0,									NUM_ENTRIES(asDevInstAttrNames),	nullptr,			asDevInstAttrNames },
+	{ ABP_OBJ_NUM_DPV1,		0,									NUM_ENTRIES(asDpv1InstAttrNames),	nullptr,			asDpv1InstAttrNames },
+	{ ABP_OBJ_NUM_APPD,		NUM_ENTRIES(asAppdObjAttrNames),	NUM_ENTRIES(asAppdInstAttrNames),	asAppdObjAttrNames,	asAppdInstAttrNames },
+	{ ABP_OBJ_NUM_APP,		0,									NUM_ENTRIES(asAppInstAttrNames),	nullptr,			asAppInstAttrNames },
 };
 
 /*******************************************************************************
@@ -1454,6 +1588,38 @@ static const CmdLookupTable_t asSrc3CmdNames[] =
 	{ ABP_SRC3_CMD_RESET_DIAGNOSTIC,	"Reset_Diagnostic",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
 };
 
+CommandNameTable_t asCommandNameTables[] =
+{
+	{ ABP_OBJ_NUM_ADD,		NUM_ENTRIES(asAddCmdNames),		asAddCmdNames },
+	{ ABP_OBJ_NUM_NW,		NUM_ENTRIES(asNwCmdNames),		asNwCmdNames },
+	{ ABP_OBJ_NUM_NWCCL,	NUM_ENTRIES(asNwCclCmdNames),	asNwCclCmdNames },
+	{ ABP_OBJ_NUM_FUSM,		NUM_ENTRIES(asFusmCmdNames),	asFusmCmdNames },
+	{ ABP_OBJ_NUM_FSI,		NUM_ENTRIES(asFsiCmdNames),		asFsiCmdNames },
+	{ ABP_OBJ_NUM_AFSI,		NUM_ENTRIES(asFsiCmdNames),		asFsiCmdNames },
+	{ ABP_OBJ_NUM_ASM,		NUM_ENTRIES(asAsmCmdNames),		asAsmCmdNames },
+	{ ABP_OBJ_NUM_BAC,		NUM_ENTRIES(asBacCmdNames),		asBacCmdNames },
+	{ ABP_OBJ_NUM_CCL,		NUM_ENTRIES(asCclCmdNames),		asCclCmdNames },
+	{ ABP_OBJ_NUM_CFN,		NUM_ENTRIES(asCfnCmdNames),		asCfnCmdNames },
+	{ ABP_OBJ_NUM_CNT,		NUM_ENTRIES(asCntCmdNames),		asCntCmdNames },
+	{ ABP_OBJ_NUM_CPN,		NUM_ENTRIES(asCpnCmdNames),		asCpnCmdNames },
+	{ ABP_OBJ_NUM_DEV,		NUM_ENTRIES(asDevCmdNames),		asDevCmdNames },
+	{ ABP_OBJ_NUM_DPV1,		NUM_ENTRIES(asDpv1CmdNames),	asDpv1CmdNames },
+	{ ABP_OBJ_NUM_ECO,		NUM_ENTRIES(asEcoCmdNames),		asEcoCmdNames },
+	{ ABP_OBJ_NUM_MOD,		NUM_ENTRIES(asModCmdNames),		asModCmdNames },
+	{ ABP_OBJ_NUM_MDD,		NUM_ENTRIES(asMddCmdNames),		asMddCmdNames },
+	{ ABP_OBJ_NUM_MQTT,		NUM_ENTRIES(asMqttCmdNames),	asMqttCmdNames },
+	{ ABP_OBJ_NUM_PNIO,		NUM_ENTRIES(asPnioCmdNames),	asPnioCmdNames },
+	{ ABP_OBJ_NUM_EIP,		NUM_ENTRIES(asEipCmdNames),		asEipCmdNames },
+	{ ABP_OBJ_NUM_ECT,		NUM_ENTRIES(asEctCmdNames),		asEctCmdNames },
+	{ ABP_OBJ_NUM_APPD,		NUM_ENTRIES(asAppdCmdNames),	asAppdCmdNames },
+	{ ABP_OBJ_NUM_APP,		NUM_ENTRIES(asAppCmdNames),		asAppCmdNames },
+	{ ABP_OBJ_NUM_NWCFN,	NUM_ENTRIES(asNwCfnCmdNames),	asNwCfnCmdNames },
+	{ ABP_OBJ_NUM_NWPNIO,	NUM_ENTRIES(asNwPnioCmdNames),	asNwPnioCmdNames },
+	{ ABP_OBJ_NUM_NWDPV1,	NUM_ENTRIES(asNwDpv1CmdNames),	asNwDpv1CmdNames },
+	{ ABP_OBJ_NUM_EME,		NUM_ENTRIES(asEmeCmdNames),		asEmeCmdNames },
+	{ ABP_OBJ_NUM_SRC3,		NUM_ENTRIES(asSrc3CmdNames),	asSrc3CmdNames },
+};
+
 /*******************************************************************************
 **
 ** Common Error response lookup table
@@ -1670,6 +1836,26 @@ static const LookupTable_t asSocErrNames[] =
 	{ SOC_ERR_DNS_NAME,			"DNS_NAME",			NotifEvent::Alert },
 	{ SOC_ERR_DNS_TIMEOUT,		"DNS_TIMEOUT",		NotifEvent::Alert },
 	{ SOC_ERR_DNS_CMD_FAILED,	"DNS_CMD_FAILED",	NotifEvent::Alert }
+};
+
+ErrorNameTable_t asErrorNameTables[] =
+{
+	{ ABP_OBJ_NUM_FSI,		NUM_ENTRIES(asFsiErrNames),		asFsiErrNames },
+	{ ABP_OBJ_NUM_AFSI,		NUM_ENTRIES(asFsiErrNames),		asFsiErrNames },
+	{ ABP_OBJ_NUM_FUSM,		NUM_ENTRIES(asFusmErrNames),	asFusmErrNames },
+	{ ABP_OBJ_NUM_ANB,		NUM_ENTRIES(asAnbErrNames),		asAnbErrNames },
+	// NOTE: ABP_OBJ_NUM_DI is handled in a unique way
+	{ ABP_OBJ_NUM_MOD,		NUM_ENTRIES(asModErrNames),		asModErrNames },
+	{ ABP_OBJ_NUM_NW,		NUM_ENTRIES(asNwErrNames),		asNwErrNames },
+	{ ABP_OBJ_NUM_NWCCL,	NUM_ENTRIES(asNwCclErrNames),	asNwCclErrNames },
+	{ ABP_OBJ_NUM_NWDPV1,	NUM_ENTRIES(asNwDpv1ErrNames),	asNwDpv1ErrNames },
+
+	{ ABP_OBJ_NUM_NWPNIO,	NUM_ENTRIES(asNwPnioErrNames),	asNwPnioErrNames },
+	{ ABP_OBJ_NUM_APPD,		NUM_ENTRIES(asAppdErrNames),	asAppdErrNames },
+	{ ABP_OBJ_NUM_SMTP,		NUM_ENTRIES(asSmtpErrNames),	asSmtpErrNames },
+
+	{ ABP_OBJ_NUM_SOC,		NUM_ENTRIES(asSocErrNames),		asSocErrNames },
+	{ ABP_OBJ_NUM_EIP,		NUM_ENTRIES(asEipErrNames),		asEipErrNames }
 };
 
 static const CmdLookupTable_t* FindCmdEntryInTable(U8 cmd,
@@ -1890,31 +2076,14 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
-	switch (obj)
+	// Special handling is needed for ABP_OBJ_NUM_DI.
+	if (obj == ABP_OBJ_NUM_DI)
 	{
-	case ABP_OBJ_NUM_FSI:
-	case ABP_OBJ_NUM_AFSI:
-		// (Application/Anybus) File System Interface Object
-		GetObjSpecificErrString(val, str, max_str_len, &asFsiErrNames[0],
-								NUM_ENTRIES(asFsiErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_FUSM:
-		// Functional Safety Module Object
-		GetObjSpecificErrString(val, str, max_str_len, &asFusmErrNames[0],
-								NUM_ENTRIES(asFusmErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_ANB:
-		// Anybus Object
-		GetObjSpecificErrString(val, str, max_str_len, &asAnbErrNames[0],
-								NUM_ENTRIES(asAnbErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_DI:
-		// Diagnostic Object
 		if (nw_type_idx == 0)
 		{
 			// Use object-specific lookup table
 			GetObjSpecificErrString(val, str, max_str_len, &asDiErrNames[0],
-									NUM_ENTRIES(asDiErrNames), display_base);
+				NUM_ENTRIES(asDiErrNames), display_base);
 		}
 		else
 		{
@@ -1929,7 +2098,7 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 			case ABP_NW_TYPE_PIR_IIOT:
 				// Profinet
 				GetObjSpecificErrString(val, str, max_str_len, &asPirDiErrNames[0],
-										NUM_ENTRIES(asPirDiErrNames), display_base);
+					NUM_ENTRIES(asPirDiErrNames), display_base);
 				break;
 			default:
 				GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
@@ -1937,70 +2106,32 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 				break;
 			}
 		}
-		break;
-	case ABP_OBJ_NUM_MOD:
-		// Modbus Object
-		GetObjSpecificErrString(val, str, max_str_len, &asModErrNames[0],
-								NUM_ENTRIES(asModErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_NW:
-		// Network Object
-		GetObjSpecificErrString(val, str, max_str_len, &asNwErrNames[0],
-								NUM_ENTRIES(asNwErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_NWCCL:
-		// Network CCL Object
-		GetObjSpecificErrString(val, str, max_str_len, &asNwCclErrNames[0],
-								NUM_ENTRIES(asNwCclErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_NWDPV1:
-		// Network DPV1 Object
-		GetObjSpecificErrString(val, str, max_str_len, &asNwDpv1ErrNames[0],
-								NUM_ENTRIES(asNwDpv1ErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_NWPNIO:
-		// Network PNIO Object
-		GetObjSpecificErrString(val, str, max_str_len, &asNwPnioErrNames[0],
-								NUM_ENTRIES(asNwPnioErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_APPD:
-		// Application Data Object
-		GetObjSpecificErrString(val, str, max_str_len, &asAppdErrNames[0],
-								NUM_ENTRIES(asAppdErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_SMTP:
-		// SMTP Object
-		GetObjSpecificErrString(val, str, max_str_len, &asSmtpErrNames[0],
-								NUM_ENTRIES(asSmtpErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_SOC:
-		// Socket Object
-		GetObjSpecificErrString(val, str, max_str_len, &asSocErrNames[0],
-								NUM_ENTRIES(asSocErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_EIP:
-		// EtherNet/IP Object
-		GetObjSpecificErrString(val, str, max_str_len, &asEipErrNames[0],
-								NUM_ENTRIES(asEipErrNames), display_base);
-		break;
-	case ABP_OBJ_NUM_PNIO:
-		// PROFINET IO Object
-	case ABP_OBJ_NUM_CCL:
-		// CC-Link Object
-	case ABP_OBJ_NUM_DPV1:
-		// DPV1 Object
-	case ABP_OBJ_NUM_BAC:
-		// BacNet Object
-	case ABP_OBJ_NUM_CNT:
-		// ControlNet Object
-	case ABP_OBJ_NUM_CPN:
-		// CompoNet Object
-	case ABP_OBJ_NUM_DEV:
-		// DeviceNet Object
-	default:
-		GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
-		SNPRINTF(str, max_str_len, "Unknown: 0x%02X, %s", obj, numberStr);
-		break;
+	}
+	else
+	{
+		bool objFound = false;
+
+		for (U8 i = 0; i < sizeof(asErrorNameTables) / sizeof(ErrorNameTable_t); i++)
+		{
+			if (asErrorNameTables[i].object_num == obj)
+			{
+				GetObjSpecificErrString(
+					val,
+					str,
+					max_str_len,
+					asErrorNameTables[i].err_names,
+					asErrorNameTables[i].num_err_names,
+					display_base);
+
+				break;
+			}
+		}
+
+		if (!objFound)
+		{
+			GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
+			SNPRINTF(str, max_str_len, "Unknown: 0x%02X, %s", obj, numberStr);
+		}
 	}
 
 	return NotifEvent::Alert;
@@ -2086,10 +2217,11 @@ NotifEvent_t GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase
 	return notification;
 }
 
-NotifEvent_t GetNamedInstString(U16 val,
-								char* str, U16 max_str_len,
-								DisplayBase /* display_base */,
-								const LookupTable_t* inst_names, U8 num_inst_names)
+NotifEvent_t GetNamedInstString(
+	U16 val,
+	char* str, U16 max_str_len,
+	DisplayBase /* display_base */,
+	const LookupTable_t* inst_names, U8 num_inst_names)
 {
 	NotifEvent_t notification = NotifEvent::None;
 
@@ -2122,11 +2254,12 @@ NotifEvent_t GetNamedInstString(U16 val,
 	return notification;
 }
 
-NotifEvent_t GetNamedAttrString(U16 inst, U8 val,
-								char* str, U16 max_str_len,
-								DisplayBase display_base,
-								const AttrLookupTable_t* obj_names, U8 num_obj_names,
-								const AttrLookupTable_t* inst_names, U8 num_inst_names)
+NotifEvent_t GetNamedAttrString(
+	U16 inst, U8 val,
+	char* str, U16 max_str_len,
+	DisplayBase display_base,
+	const AttrLookupTable_t* obj_names, U8 num_obj_names,
+	const AttrLookupTable_t* inst_names, U8 num_inst_names)
 {
 	const AttrLookupTable_t* entryPtr = nullptr;
 	U8 numAttrs = 0;
@@ -2245,78 +2378,26 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 
 bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base)
 {
-	bool objFound = true;
+	bool objFound = false;
 
 	if (obj == ABP_OBJ_NUM_NC)
 	{
-		switch (abNetworkTypeValue[nw_type_idx])
+		for (U8 i = 0; i < sizeof(asNcInstNameTables) / sizeof(NcInstNameTable_t); i++)
 		{
-		case ABP_NW_TYPE_BIP:
-			// BACnet IP
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asBipNcInstNames[0], NUM_ENTRIES(asBipNcInstNames));
-			break;
-		case ABP_NW_TYPE_CCL:
-			// CC-Link IE
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asCclNcInstNames[0], NUM_ENTRIES(asCclNcInstNames));
-			break;
-		case ABP_NW_TYPE_CET:
-		case ABP_NW_TYPE_CET_IIOT:
-			// Common Ethernet
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asCetNcInstNames[0], NUM_ENTRIES(asCetNcInstNames));
-			break;
-		case ABP_NW_TYPE_COP:
-			// CANopen
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asCopNcInstNames[0], NUM_ENTRIES(asCopNcInstNames));
-			break;
-		case ABP_NW_TYPE_DEV:
-			// DeviceNet
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asDevNcInstNames[0], NUM_ENTRIES(asDevNcInstNames));
-			break;
-		case ABP_NW_TYPE_ECT:
-			// EtherCAT
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asEctNcInstNames[0], NUM_ENTRIES(asEctNcInstNames));
-			break;
-		case ABP_NW_TYPE_EIP_1P:
-		case ABP_NW_TYPE_EIP_2P_BB:
-		case ABP_NW_TYPE_EIP_2P:
-		case ABP_NW_TYPE_EIP_2P_BB_IIOT:
-			// EtherNet/IP
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asEipNcInstNames[0], NUM_ENTRIES(asEipNcInstNames));
-			break;
-		case ABP_NW_TYPE_EPL:
-			// Powerlink
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asEplNcInstNames[0], NUM_ENTRIES(asEplNcInstNames));
-			break;
-		case ABP_NW_TYPE_ETN_1P:
-		case ABP_NW_TYPE_ETN_2P:
-			// Modbus/TCP
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asEtnNcInstNames[0], NUM_ENTRIES(asEtnNcInstNames));
-			break;
-		case ABP_NW_TYPE_PIR:
-		case ABP_NW_TYPE_PIR_FO:
-		case ABP_NW_TYPE_PIR_FO_IIOT:
-		case ABP_NW_TYPE_PIR_IIOT:
-			// Profinet
-			*notif_ptr = GetNamedInstString((U8)val, &str[0], max_str_len, display_base,
-											  &asPirNcInstNames[0], NUM_ENTRIES(asPirNcInstNames));
-			break;
-		default:
-			objFound = false;
-			break;
+			if (asNcInstNameTables[i].object_num == obj)
+			{
+				objFound = true;
+				*notif_ptr = GetNamedInstString(
+					(U8)val,
+					&str[0],
+					max_str_len,
+					display_base,
+					asNcInstNameTables[i].inst_names,
+					asNcInstNameTables[i].num_inst_names);
+
+				break;
+			}
 		}
-	}
-	else
-	{
-		objFound = false;
 	}
 
 	return objFound;
@@ -2393,9 +2474,10 @@ BaseType GetCmdBaseType(U8 obj, U8 cmd)
 	return type;
 }
 
-static const AttrLookupTable_t* FindAttrEntryInTable(U16 inst, U8 attr,
-													 const AttrLookupTable_t* obj_names, U8 num_obj_names,
-													 const AttrLookupTable_t* inst_names, U8 num_inst_names)
+static const AttrLookupTable_t* FindAttrEntryInTable(
+	U16 inst, U8 attr,
+	const AttrLookupTable_t* obj_names, U8 num_obj_names,
+	const AttrLookupTable_t* inst_names, U8 num_inst_names)
 {
 	const AttrLookupTable_t* tablePtr = nullptr;
 	const AttrLookupTable_t* entryPtr = nullptr;
@@ -2445,236 +2527,20 @@ static const AttrLookupTable_t* LookupAttrEntry(U8 obj, U16 inst, U8 attr)
 {
 	const AttrLookupTable_t* entryPtr = nullptr;
 
-	switch (obj)
+	for (U8 i = 0; i < sizeof(asAttributeNameTables) / sizeof(AttributeNameTable_t); i++)
 	{
-	case ABP_OBJ_NUM_ADD:
-		// Additional Diagnostic Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asAddObjAttrNames[0], NUM_ENTRIES(asAddObjAttrNames),
-										&asAddInstAttrNames[0], NUM_ENTRIES(asAddInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ANB:
-		// Anybus Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asAnbInstAttrNames[0], NUM_ENTRIES(asAnbInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_BAC:
-		// BacNet Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asBacInstAttrNames[0], NUM_ENTRIES(asBacInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_CCL:
-		// CC-Link Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCclInstAttrNames[0], NUM_ENTRIES(asCclInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_CFN:
-		// CFN Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCfnInstAttrNames[0], NUM_ENTRIES(asCfnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_CNT:
-		// ControlNet Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCntInstAttrNames[0], NUM_ENTRIES(asCntInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_COP:
-		// CANopen Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCopInstAttrNames[0], NUM_ENTRIES(asCopInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_CPN:
-		// CompoNet Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCpnInstAttrNames[0], NUM_ENTRIES(asCpnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_DEV:
-		// DeviceNet Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asDevInstAttrNames[0], NUM_ENTRIES(asDevInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_DI:
-		// Diagnostic Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asDiObjAttrNames[0], NUM_ENTRIES(asDiObjAttrNames),
-										&asDiInstAttrNames[0], NUM_ENTRIES(asDiInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_DPV1:
-		// DPV1 Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asDpv1InstAttrNames[0], NUM_ENTRIES(asDpv1InstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ECO:
-		// Energy Control Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asEcoObjAttrNames[0], NUM_ENTRIES(asEcoObjAttrNames),
-										&asEcoInstAttrNames[0], NUM_ENTRIES(asEcoInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ER:
-		// Energy Reporting Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asErInstAttrNames[0], NUM_ENTRIES(asErInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_MOD:
-		// Modbus Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asModInstAttrNames[0], NUM_ENTRIES(asModInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NW:
-		// Network Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwInstAttrNames[0], NUM_ENTRIES(asNwInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NC:
-		// Network Configuration Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNcInstAttrNames[0], NUM_ENTRIES(asNcInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_SOC:
-		// Socket Interface Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asSocObjAttrNames[0], NUM_ENTRIES(asSocObjAttrNames),
-										&asSocInstAttrNames[0], NUM_ENTRIES(asSocInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_SMTP:
-		// SMTP Client Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asSmtpObjAttrNames[0], NUM_ENTRIES(asSmtpObjAttrNames),
-										&asSmtpInstAttrNames[0], NUM_ENTRIES(asSmtpInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_FSI:
-	case ABP_OBJ_NUM_AFSI:
-		// File system objects
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asFsiObjAttrNames[0], NUM_ENTRIES(asFsiObjAttrNames),
-										&asFsiInstAttrNames[0], NUM_ENTRIES(asFsiInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_FUSM:
-		// Functional Safety Module Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asFusmInstAttrNames[0], NUM_ENTRIES(asFusmInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NWETN:
-		// Network Ethernet Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NWCCL:
-		// Network CCL Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwCclInstAttrNames[0], NUM_ENTRIES(asNwCclInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NWCFN:
-		// Network CFN Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwCfnInstAttrNames[0], NUM_ENTRIES(asNwCfnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NWPNIO:
-		// Network PNIO Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwPnioInstAttrNames[0], NUM_ENTRIES(asNwPnioInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_NWDPV1:
-		// Network DPV1 Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asNwEtnInstAttrNames[0], NUM_ENTRIES(asNwEtnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ETN:
-		// Ethernet Host Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asEtnInstAttrNames[0], NUM_ENTRIES(asEtnInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_CPC:
-		// CIP Port Configuration Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asCpcObjAttrNames[0], NUM_ENTRIES(asCpcObjAttrNames),
-										&asCpcInstAttrNames[0], NUM_ENTRIES(asCpcInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_SAFE:
-		// Functional Safety Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asSafeInstAttrNames[0], NUM_ENTRIES(asSafeInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_EPL:
-		// Ethernet POWERLINK Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asEplInstAttrNames[0], NUM_ENTRIES(asEplInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ASM:
-		// Assembly Mapping Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asAsmObjAttrNames[0], NUM_ENTRIES(asAsmObjAttrNames),
-										&asAsmInstAttrNames[0], NUM_ENTRIES(asAsmInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_MDD:
-		// Modular Device Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asMddObjAttrNames[0], NUM_ENTRIES(asMddObjAttrNames),
-										nullptr, 0);
-		break;
-	case ABP_OBJ_NUM_CIPID:
-		// CIP Identity Host Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asCipIdInstAttrNames[0], NUM_ENTRIES(asCipIdInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_SYNC:
-		// Sync Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asSyncInstAttrNames[0], NUM_ENTRIES(asSyncInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_ECT:
-		// EtherCAT Host Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asEtcInstAttrNames[0], NUM_ENTRIES(asEtcInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_PNIO:
-		// PROFINET IO Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asPnioInstAttrNames[0], NUM_ENTRIES(asPnioInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_EIP:
-		// EtherNet/IP Host Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asEipInstAttrNames[0], NUM_ENTRIES(asEipInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_APPD:
-		// Application Data Object
-		entryPtr = FindAttrEntryInTable(inst, attr,
-										&asAppdObjAttrNames[0], NUM_ENTRIES(asAppdObjAttrNames),
-										&asAppdInstAttrNames[0], NUM_ENTRIES(asAppdInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_APP:
-		// Application Object
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asAppInstAttrNames[0], NUM_ENTRIES(asAppInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_PNAM:
-		// PROFINET Asset Management
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asPnamInstAttrNames[0], NUM_ENTRIES(asPnamInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_EME:
-		// Energy Measurement
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asEmeInstAttrNames[0], NUM_ENTRIES(asEmeInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_OPCUA:
-		// OPC Unified Architecture
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asOpcuaInstAttrNames[0], NUM_ENTRIES(asOpcuaInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_MQTT:
-		// MQTT
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asMqttInstAttrNames[0], NUM_ENTRIES(asMqttInstAttrNames));
-		break;
-	case ABP_OBJ_NUM_SRC3:
-		// SERCOS III
-		entryPtr = FindAttrEntryInTable(inst, attr, nullptr, 0,
-										&asSrc3InstAttrNames[0], NUM_ENTRIES(asSrc3InstAttrNames));
-		break;
-	default:
-		break;
+		if (asAttributeNameTables[i].object_num == obj)
+		{
+			entryPtr = FindAttrEntryInTable(
+				inst,
+				attr,
+				asAttributeNameTables[i].obj_names,
+				asAttributeNameTables[i].num_obj_names,
+				asAttributeNameTables[i].inst_names,
+				asAttributeNameTables[i].num_inst_names);
+
+			break;
+		}
 	}
 
 	return entryPtr;
@@ -2715,119 +2581,17 @@ static const CmdLookupTable_t* LookupCmdEntry(U8 obj, U8 cmd)
 	}
 	else if (IS_CMD_OBJECT_SPECIFIC(cmd))
 	{
-		switch (obj)
+		for (U8 i = 0; i < sizeof(asCommandNameTables) / sizeof(CommandNameTable_t); i++)
 		{
-		case ABP_OBJ_NUM_ADD:
-			// Additional Diagnostic Object
-			entryPtr = FindCmdEntryInTable(cmd, &asAddCmdNames[0], NUM_ENTRIES(asAddCmdNames));
-			break;
-		case ABP_OBJ_NUM_NW:
-			// Network Object
-			entryPtr = FindCmdEntryInTable(cmd, &asNwCmdNames[0], NUM_ENTRIES(asNwCmdNames));
-			break;
-		case ABP_OBJ_NUM_NWCCL:
-			// Network CCL Object
-			entryPtr = FindCmdEntryInTable(cmd, &asNwCclCmdNames[0], NUM_ENTRIES(asNwCclCmdNames));
-			break;
-		case ABP_OBJ_NUM_FUSM:
-			// Functional Safety Module Object
-			entryPtr = FindCmdEntryInTable(cmd, &asFusmCmdNames[0], NUM_ENTRIES(asFusmCmdNames));
-			break;
-		case ABP_OBJ_NUM_FSI:
-		case ABP_OBJ_NUM_AFSI:
-			// (Application/Anybus) File System Interface Object
-			entryPtr = FindCmdEntryInTable(cmd, &asFsiCmdNames[0], NUM_ENTRIES(asFsiCmdNames));
-			break;
-		case ABP_OBJ_NUM_ASM:
-			// Assembly Mapping Object
-			entryPtr = FindCmdEntryInTable(cmd, &asAsmCmdNames[0], NUM_ENTRIES(asAsmCmdNames));
-			break;
-		case ABP_OBJ_NUM_BAC:
-			// BacNet Object
-			entryPtr = FindCmdEntryInTable(cmd, &asBacCmdNames[0], NUM_ENTRIES(asBacCmdNames));
-			break;
-		case ABP_OBJ_NUM_CCL:
-			// CC-Link Object
-			entryPtr = FindCmdEntryInTable(cmd, &asCclCmdNames[0], NUM_ENTRIES(asCclCmdNames));
-			break;
-		case ABP_OBJ_NUM_CFN:
-			// CFN Object
-			entryPtr = FindCmdEntryInTable(cmd, &asCfnCmdNames[0], NUM_ENTRIES(asCfnCmdNames));
-			break;
-		case ABP_OBJ_NUM_CNT:
-			// ControlNet Object
-			entryPtr = FindCmdEntryInTable(cmd, &asCntCmdNames[0], NUM_ENTRIES(asCntCmdNames));
-			break;
-		case ABP_OBJ_NUM_CPN:
-			// CompoNet Object
-			entryPtr = FindCmdEntryInTable(cmd, &asCpnCmdNames[0], NUM_ENTRIES(asCpnCmdNames));
-			break;
-		case ABP_OBJ_NUM_DEV:
-			// DeviceNet Object
-			entryPtr = FindCmdEntryInTable(cmd, &asDevCmdNames[0], NUM_ENTRIES(asDevCmdNames));
-			break;
-		case ABP_OBJ_NUM_DPV1:
-			// DPV1 Object
-			entryPtr = FindCmdEntryInTable(cmd, &asDpv1CmdNames[0], NUM_ENTRIES(asDpv1CmdNames));
-			break;
-		case ABP_OBJ_NUM_ECO:
-			// Energy Control Object
-			entryPtr = FindCmdEntryInTable(cmd, &asEcoCmdNames[0], NUM_ENTRIES(asEcoCmdNames));
-			break;
-		case ABP_OBJ_NUM_MOD:
-			// Modbus Object
-			entryPtr = FindCmdEntryInTable(cmd, &asModCmdNames[0], NUM_ENTRIES(asModCmdNames));
-			break;
-		case ABP_OBJ_NUM_MDD:
-			// Modular Device Object
-			entryPtr = FindCmdEntryInTable(cmd, &asMddCmdNames[0], NUM_ENTRIES(asMddCmdNames));
-			break;
-		case ABP_OBJ_NUM_MQTT:
-			// MQTT
-			entryPtr = FindCmdEntryInTable(cmd, &asMqttCmdNames[0], NUM_ENTRIES(asMqttCmdNames));
-			break;
-		case ABP_OBJ_NUM_PNIO:
-			// PROFINET IO Object
-			entryPtr = FindCmdEntryInTable(cmd, &asPnioCmdNames[0], NUM_ENTRIES(asPnioCmdNames));
-			break;
-		case ABP_OBJ_NUM_EIP:
-			// EtherNet/IP Object
-			entryPtr = FindCmdEntryInTable(cmd, &asEipCmdNames[0], NUM_ENTRIES(asEipCmdNames));
-			break;
-		case ABP_OBJ_NUM_ECT:
-			// EtherNet/IP Object
-			entryPtr = FindCmdEntryInTable(cmd, &asEctCmdNames[0], NUM_ENTRIES(asEctCmdNames));
-			break;
-		case ABP_OBJ_NUM_APPD:
-			// Application Data Object
-			entryPtr = FindCmdEntryInTable(cmd, &asAppdCmdNames[0], NUM_ENTRIES(asAppdCmdNames));
-			break;
-		case ABP_OBJ_NUM_APP:
-			// Application Object
-			entryPtr = FindCmdEntryInTable(cmd, &asAppCmdNames[0], NUM_ENTRIES(asAppCmdNames));
-			break;
-		case ABP_OBJ_NUM_NWCFN:
-			// Network CFN Object
-			entryPtr = FindCmdEntryInTable(cmd, &asNwCfnCmdNames[0], NUM_ENTRIES(asNwCfnCmdNames));
-			break;
-		case ABP_OBJ_NUM_NWPNIO:
-			// Network PNIO Object
-			entryPtr = FindCmdEntryInTable(cmd, &asNwPnioCmdNames[0], NUM_ENTRIES(asNwPnioCmdNames));
-			break;
-		case ABP_OBJ_NUM_NWDPV1:
-			// Network DPV1 Object
-			entryPtr = FindCmdEntryInTable(cmd, &asNwDpv1CmdNames[0], NUM_ENTRIES(asNwDpv1CmdNames));
-			break;
-		case ABP_OBJ_NUM_EME:
-			// Energy Measurement
-			entryPtr = FindCmdEntryInTable(cmd, &asEmeCmdNames[0], NUM_ENTRIES(asEmeCmdNames));
-			break;
-		case ABP_OBJ_NUM_SRC3:
-			// SERCOS III
-			entryPtr = FindCmdEntryInTable(cmd, &asSrc3CmdNames[0], NUM_ENTRIES(asSrc3CmdNames));
-			break;
-		default:
-			break;
+			if (asCommandNameTables[i].object_num == obj)
+			{
+				entryPtr = FindCmdEntryInTable(
+					cmd,
+					asCommandNameTables[i].cmd_names,
+					asCommandNameTables[i].num_cmd_names);
+
+				break;
+			}
 		}
 	}
 
