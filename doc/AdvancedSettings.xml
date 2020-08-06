@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AdvancedSettings>
 
-	<!-- "4-wire-on-3-channels" is useful when a 4-wire SPI configuration is used to
-	interface with the ABCC but only MOSI, MISO, and SCLK are connected to the Logic
-	analyzer. This mode will ignore timing and CPOL/CPHA requirements that the ABCC's
-	3-wire mode enforces. -->
+	<!-- "4-wire-on-3-channels" is useful when a 4-wire SPI configuration is used to	interface with
+	the ABCC but only MOSI, MISO, and SCLK are connected to the Logic analyzer. This mode will
+	ignore timing and CPOL/CPHA requirements that the ABCC's 3-wire mode enforces. -->
 	<Setting name="4-wire-on-3-channels">0</Setting>
 
-	<!-- "3-wire-on-4-channels" is useful when a 3-wire SPI configuration is used to
-	interface with the ABCC but the user has a spare Logic channel that can be used
-	as a dummy place holder for placing the markers that the plugin normally applied
-	to the SPI Enable channel. -->
+	<!-- "3-wire-on-4-channels" is useful when a 3-wire SPI configuration is used to interface with
+	the ABCC but the user has a spare Logic channel that can be used as a dummy place holder for
+	placing the markers that the plugin normally applied to the SPI Enable channel. -->
 	<Setting name="3-wire-on-4-channels">0</Setting>
 
-	<!-- "export-delimiter" allows the user to define a delimiter to use when
-	using one of the plugin's supported export options. Any single (visible)
-	character is accepted as a delimiter. A tab-delimiter can be specified
-	by using "\t" without the quotes. -->
+	<!-- "export-delimiter" allows the user to define a delimiter to use when using one of the
+	plugin's supported export options. Any single (visible) character is accepted as a delimiter.
+	A tab-delimiter can be specified by using "\t" without the quotes. -->
 	<Setting name="export-delimiter">,</Setting>
 
-	<!-- "clocking-alert-limit" provides the user with a way restrict how many
-	times a "clocking alert" event will be reported by the plugin. This can be
-	useful in cases where a device's SPI chipselect line may "appear" to toggle
-	at the same time the SPI clock transitions high after receiving the last
-	bit in the SPI transaction. This event results in a "clocking alert"
-	notification. This type of event is more of an informational warning/error
-	event, and as long as the user understands the reason and deems the behavior
-	acceptable, then this setting may be set to a value >=0. Setting the value
-	to 0 disables the notification entirely. While any value	above zero
-	(datatype is S32)  will set a maximum count for producing the
-	notification in the processed results. An invalid value or value <0 indicates
-	that there is no limit.-->
+	<!-- "clocking-alert-limit" provides the user with a way to restrict how many times a
+	"clocking alert" event will be reported by the plugin. This can be useful in cases where a
+	device's SPI chipselect line may "appear" to toggle at the same time the SPI clock transitions
+	high after receiving the last bit in the SPI transaction. This event results in a
+	"clocking alert" notification. This type of event is more of an informational warning/error
+	event, and as long as the user understands the reason and deems the behavior acceptable, then
+	this setting may be set to a value >=0. Setting the value to 0 disables the notification
+	entirely. While any value	above zero (datatype is S32) will set a maximum count for producing
+	the notification in the processed results. An invalid value or value <0 indicates that there is
+	no limit. Users of the ABCC StarterKit may encounter this scenario since the chipselect line is
+	deasserted close in time (~8ns) with the SPI clock returning to the "clock idle high" state.
+	This results in a	higher than normal sampling time requirement to resolve the two events
+	occurring at different points in time. Sampling more than 125MSamples/second is necessary to
+	avoid this issue; thus, a general recommendation for this scenario is to use sampling rates of
+	250MS/s or higher. If this is not possible due to hardware limitations of the PC/analyzer then
+	it is recommended to set this parameter to a value >= 0 to limit how many times the error is
+	reported. -->
 	<Setting name="clocking-alert-limit">-1</Setting>
 
 </AdvancedSettings>
