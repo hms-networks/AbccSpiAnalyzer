@@ -2376,7 +2376,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 	return notification;
 }
 
-bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base)
+bool GetInstString(U8 /* nw_type_idx */, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base)
 {
 	bool objFound = false;
 
