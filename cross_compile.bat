@@ -7,10 +7,12 @@ REM $sudo apt-get install g++
 REM $sudo apt-get install g++-multilib
 REM $sudo apt-get install gcc-multilib
 
+@echo ----- Building on Windows -----
+py.exe .\build_analyzer.py
 @echo ----- Entering Ubuntu bash on Windows -----
 bash --version
 @echo.
-@echo python build_analyzer.py
+@echo python3 build_analyzer.py
 @echo.
-bash -c "python build_analyzer.py"
+bash -c "python3 build_analyzer.py"
 REM pause
