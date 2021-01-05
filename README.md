@@ -68,9 +68,10 @@ process data data field with accurate local timestamp information and
   * Windows 7 or later
   * Ubuntu 12.04.2+
   * Mac OSX 10.7 Lion+
-* USB 2.0 or 3.0 port
-  * Using the Saleae Logic on a dedicated USB controller is recommended for
-  ensuring the best sampling performance of the hardware will be possible.
+* USB 2.0 or better
+  * Using the Saleae Logic on a dedicated USB controller that matches or exceeds
+  the Logic's supported USB version is recommended for ensuring the best
+  possible sampling performance.
 
 ## [Precompiled Releases](#table-of-contents)
 
