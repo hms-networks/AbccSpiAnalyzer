@@ -1,10 +1,23 @@
 # Changelog
 
+## Version 2021.1.5.1
+
+### Changes
+
+* Code refactoring
+* Updated lookup tables to support latest ABP additions.
+* Changed channel names to more closely match ABCC documentation.
+
+### Fixes
+
+* Resolved static analysis issues.
+
+
 ## Version 2019.07.17.1
 
 ### Changes
 
-* Updated lookup tables to contain latest ABP header information
+* Updated lookup tables to contain latest ABP header information.
 * Migrated from VS2017 to VS2019
 * Other minor changes & refactoring
 
@@ -20,7 +33,7 @@
 ### Changes
 
 * Significant internal code refactoring
-* Updated lookup tables to contain latest ABP header information
+* Updated lookup tables to contain latest ABP header information.
 * Added support for network specific error codes for Profinet Diagnostic object
 * Significant rework of the plugin's simulation was done to improve highlighting
   the functionality of the plugin. The simulation now performs a more complex
