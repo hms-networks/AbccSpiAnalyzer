@@ -1,6 +1,6 @@
 # Licenses
 
-## Copyright &copy; 2015-2019 HMS Industrial Networks, Inc.
+## Copyright &copy; 2015-2021 HMS Industrial Networks, Inc.
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR

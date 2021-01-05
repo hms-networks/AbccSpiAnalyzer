@@ -1,6 +1,6 @@
 # Anybus CompactCom SPI Protocol Analyzer Plugin
 
-## Copyright &copy; 2015-2020 HMS Industrial Networks, Inc.
+## Copyright &copy; 2015-2021 HMS Industrial Networks, Inc.
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR
