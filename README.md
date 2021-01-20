@@ -36,13 +36,13 @@ Each field within an SPI packet is added as a multi-layered bubble-text
 within the Logic software. Basic markup is displayed when zoomed-out, while
 more detailed information is displayed when zoomed-in.
 
-The decoded results are indexed and searchable within the Logic software; and
-for even more detail, the user can export the message data or process data
-to a CSV file to be imported into Excel (or similar) for further analysis. This
-functionality makes it a fairly straight-forward task to extract file transfer
-data from ABCC object messaging, or to plot a waveform extracted from the
-process data data field with accurate local timestamp information and
-(if supported by the network) the network time information.
+The decoded results are indexed and searchable within the Logic software; for
+even more detail, the user can export the message data or process data to a CSV
+file to be imported into Excel (or similar) for further analysis. For instance,
+this functionality may reduce the effort required to extract file data
+transferred from ABCC object messaging, or to plot a waveform extracted from
+process data using either local timestamp information or the network timestamps
+(if supported by the network protocol).
 
 ![Overview of Plugin][mov_overview]
 
@@ -80,7 +80,8 @@ Precompiled plugins and documentation are available here: [Plugin Releases][link
 ## [Compile & Install](#table-of-contents)
 
 While tagged releases are provided which contain pre-compiled libraries and
-associated documentation, you may still opt to compile the libraries yourself.
+associated documentation, the user may still opt to compile the libraries
+for themself.
 
 ### [Initial Steps](#table-of-contents)
 
@@ -107,11 +108,11 @@ To compile the project please ensure the **additional** requirements are met:
 additional steps to replace occurrences of `#include "afxres.h"` with `#include "windows.h"`.
 
 When compiling the project, please ensure that the correct library is linked
-for your Windows OS. The VS solutions provided are setup with the expectation
-that the host system will be x64. The solutions are also setup for batch build
-such that an x64 system can compile all supported build configurations with
-one request. To access this, right-click the **Solution 'AbccSpiAnalyzer'** item
-in the **Solution Explorer** subwindow to access the context menu and select
+for the Windows OS being used. The VS solutions provided are setup with the
+expectation that the host system will be x64. The solutions are also setup for
+batch build such that an x64 system can compile all supported build configurations
+with one request. To access this, right-click the **Solution 'AbccSpiAnalyzer'**
+item in the **Solution Explorer** subwindow to access the context menu and select
 **Batch Build...**.
 
 #### Cross-compile for GNU/Linux Operating Systems
@@ -125,18 +126,17 @@ for GNU/Linux.
 
 #### Custom Visual Studio Projects
 
-If you decide to make your own Visual Studio project (perhaps to use some other
-version), ensure that you configure the linker to correctly select the proper
-library
+If there is a need to create a new Visual Studio project, ensure the linker is
+configured to include the correct library:
 
-* If you are using **Win64**, specify `./sdk/release/Analyzer64.lib` in your linker input.
+* If using **Win64**, specify `./sdk/release/Analyzer64.lib` in the linker input.
   * The configuration manager has this setup as x64.
-* If you are using **Win32**, specify `./sdk/release/Analyzer.lib` in your linker input.
+* If using **Win32**, specify `./sdk/release/Analyzer.lib` in the linker input.
   * The configuration manager has this setup as Win32.
 
 Once compiled, a file called `AbccSpiAnalyzer.dll` or `AbccSpiAnalyzer64.dll`
 in the either `./plugins/Win32/` or `./plugins/Win64` folder, respectively. Copy
-this DLL to your Saleae Logic software installation in the "Analyzers" folder:
+this DLL to the user's Saleae Logic software installation in the "Analyzers" folder:
 
 * Example: `C:\Program Files\Saleae LLC\Analyzers\AbccSpiAnalyzer.dll`
 
@@ -156,7 +156,7 @@ error. This is so a 64-bit system can cross-compile for 32-bit machines.
 
 Once compiled, a file called `AbccSpiAnalyzer.so` or `AbccSpiAnalyzer64.so`
 will reside in the either `./plugins/Linux/` or `./plugins/Linux64` folder,
-respectively. Copy this shared object to your Saleae Logic software
+respectively. Copy this shared object to the user's Saleae Logic software
 installation in the "Analyzers" folder.
 
 ### [macOS](#table-of-contents)
@@ -166,8 +166,8 @@ installation in the "Analyzers" folder.
 > DEPENDENCIES: **Python**, **G++**
 
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside
-in the `./plugins/OSX/` folder. Copy this dynamic object to your Saleae Logic
-software installation in the "Analyzers" folder.
+in the `./plugins/OSX/` folder. Copy this dynamic object to the user's Saleae
+Logic software installation in the "Analyzers" folder.
 
 ## [Documentation](#table-of-contents)
 
