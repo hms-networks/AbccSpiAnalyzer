@@ -1,0 +1,51 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+env:
+  PROJECT_FILE_PATH: ./project/vs2019/AbccSpiAnalyzer.vcxproj
+  BUILD_CONFIGURATION: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: ["x64", "x86"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache submodules
+      id: cache-submodules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-submodules
+      with:
+        path: .git/modules/sdk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+
+    - name: Cache SDK
+      id: cache-sdk
+      if: steps.cache-submodules.outputs.cache-hit == 'true'
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-sdk
+      with:
+        path: ./sdk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+
+    - name: Checkout submodules
+      if: steps.cache-submodules.outputs.cache-hit != 'true'
+      run: git submodule update --init --recursive
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild ${{env.PROJECT_FILE_PATH}} -p:Configuration=${{env.BUILD_CONFIGURATION}} -p:Platform=${{matrix.platform}}

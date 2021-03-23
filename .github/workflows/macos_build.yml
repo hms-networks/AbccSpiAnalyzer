@@ -1,0 +1,45 @@
+name: macOS Build
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache submodules
+      id: cache-submodules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-submodules
+      with:
+        path: .git/modules/sdk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+
+    - name: Cache SDK
+      id: cache-sdk
+      if: steps.cache-submodules.outputs.cache-hit == 'true'
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-sdk
+      with:
+        path: ./sdk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+
+    - name: Checkout submodules
+      if: steps.cache-submodules.outputs.cache-hit != 'true'
+      run: git submodule update --init --recursive
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Build
+      run: python build_analyzer.py

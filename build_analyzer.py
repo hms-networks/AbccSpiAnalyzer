@@ -18,6 +18,8 @@ X64_ARCH = "-p:Platform=x64"
 X86_ARCH = "-p:Platform=x86"
 
 def _build() -> None:
+    build_error = False
+
     # Find out if we're running on mac or linux and set the dynamic library extension
     dylib_ext = ""
     arch = ""
@@ -46,15 +48,22 @@ def _build() -> None:
         # pre-configured project.
         if arch == "64":
             command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X64_ARCH]
-            subprocess.call(command)
+            retcode = subprocess.call(command)
+            build_error |= (retcode != 0)
+
             command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X64_ARCH]
-            subprocess.call(command)
+            retcode = subprocess.call(command)
+            build_error |= (retcode != 0)
 
         command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X86_ARCH]
-        subprocess.call(command)
+        retcode = subprocess.call(command)
+        build_error |= (retcode != 0)
+
         command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X86_ARCH]
-        subprocess.call(command)
-        return
+        retcode = subprocess.call(command)
+        build_error |= (retcode != 0)
+
+        exit(build_error)
     elif platform.system().lower() == "darwin":
         release_path = "./plugins/OSX/"
         if not os.path.exists( release_path ):
@@ -160,13 +169,16 @@ def _build() -> None:
 
         # Run the commands from the command line
         print(release_command)
-        os.system( release_command )
+        retcode = os.system(release_command)
+        build_error |= (retcode != 0)
         if dylib_ext != ".dylib":
             if arch == "64":
                 print(release_command32)
-                os.system( release_command32 )
+                retcode = os.system(release_command32)
+                build_error |= (retcode != 0)
         print(debug_command)
-        os.system( debug_command )
+        retcode = os.system(debug_command)
+        build_error |= (retcode != 0)
 
     #Lastly, link
     command = "g++ "
@@ -226,13 +238,16 @@ def _build() -> None:
 
     # Run the commands from the command line
     print( release_command )
-    os.system( release_command )
+    retcode = os.system(release_command)
+    build_error |= (retcode != 0)
     if dylib_ext != ".dylib":
         if arch == "64":
             print( release_command32 )
-            os.system( release_command32 )
+            retcode = os.system(release_command32)
+            build_error |= (retcode != 0)
         print( debug_command )
-        os.system( debug_command )
+        retcode = os.system(debug_command)
+        build_error |= (retcode != 0)
     else:
         # Only build 32-bit debug library on versions prior to 10.14,
         # newer versions of XCode do not support compiling for 32-bit.
@@ -240,8 +255,10 @@ def _build() -> None:
         ver = float('.'.join(ver.split('.')[:2]))
         if ver < 10.14:
             print( debug_command )
-            os.system( debug_command )
+            retcode = os.system(debug_command)
+            build_error |= (retcode != 0)
 
+    exit(build_error)
 
 if __name__ == "__main__":
     _build()

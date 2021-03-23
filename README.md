@@ -1,5 +1,9 @@
 # Anybus CompactCom SPI Protocol Analyzer Plugin
 
+[![windows_build](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/windows_build.yml/badge.svg)](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/windows_build.yml)
+[![ubuntu_build](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/ubuntu_build.yml/badge.svg)](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/ubuntu_build.yml)
+[![macos_build](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/macos_build.yml/badge.svg)](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/macos_build.yml)
+
 ## Copyright &copy; 2015-2021 HMS Industrial Networks, Inc.
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT
