@@ -23,9 +23,10 @@ THAT DEFECTS IN IT CAN BE CORRECTED.
    * [Windows](#windows)
    * [GNU/Linux](#gnulinux)
    * [macOS](#macos)
-5. [Documentation](#documentation)
-6. [Changelog](#changelog)
-7. [Licenses](#licenses)
+5. [Generating Releases](#generating-releases)
+6. [Documentation](#documentation)
+7. [Changelog](#changelog)
+8. [Licenses](#licenses)
 
 ---
 
@@ -122,11 +123,9 @@ item in the **Solution Explorer** subwindow to access the context menu and selec
 #### Cross-compile for GNU/Linux Operating Systems
 
 Also included in the repository is a simple batch file that can be used to quickly
-launch an instance of Windows 10 WSL (Windows Subsystem for Linux) and then launch
-the build_analyzer.py script. This can be included as part of the post/pre-build
-process in a Visual Studio project to support automatic cross-compilation for
-GNU/Linux. This functionality requires the same set of dependencies documented below
-for GNU/Linux.
+build both the Windows and GNU/Linux libraries via the use of Windows 10 WSL
+(Windows Subsystem for Linux). Cross-compiling for GNU/Linux requires the same
+set of dependencies documented below for GNU/Linux.
 
 #### Custom Visual Studio Projects
 
@@ -172,6 +171,31 @@ installation in the "Analyzers" folder.
 Once compiled, a dynamic library called `AbccSpiAnalyzer.dylib` will reside
 in the `./plugins/OSX/` folder. Copy this dynamic object to the user's Saleae
 Logic software installation in the "Analyzers" folder.
+
+### [Generating Releases](#table-of-contents)
+
+This section is not typically applicable for most users, but is documented here
+for completeness. The python script `make_release.py` will generate the ZIP file
+used for releases. However to use this without error a user must collect the
+compiled library files for each platform. On a Windows 64-bit host with Ubuntu
+bash on Windows using WSL (Windows Subsystem for Linux), it is possible to
+generate all required library files with the exception to macOS using
+`cross_compile.bat`. Obtaining the macOS dynamic library is a separate manual
+step, transferring the dylib from the macOS build host to the Windows host.
+
+Windows:
+
+```bash
+py.exe -3 -m pip install -r py_requirements.txt
+py.exe -3 ./make_release.py
+```
+
+macOS/Linux:
+
+```bash
+python3 -m pip install -r py_requirements.txt
+python3 ./make_release.py
+```
 
 ## [Documentation](#table-of-contents)
 
