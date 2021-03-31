@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import os, glob, platform
+import os
+import glob
+import platform
 import subprocess
 
 """
@@ -9,7 +11,7 @@ Builds the plugin for the current platform and when appropriate for both x86
 and x64 architectures.
 """
 
-# If MSBUild is not included in system path, full path can be specified here
+# If MSBuild is not included in system path, full path can be specified here
 MSBUILD_EXE = "MSBuild.exe"
 VS_PROJECT_PATH = "project/vs2019/AbccSpiAnalyzer.vcxproj"
 RELEASE_TARGET = "-p:Configuration=Release"
@@ -17,249 +19,433 @@ DEBUG_TARGET = "-p:Configuration=Debug"
 X64_ARCH = "-p:Platform=x64"
 X86_ARCH = "-p:Platform=x86"
 
-def _build() -> None:
-    build_error = False
+GNU_CPP_STD = "c++11"
 
-    # Find out if we're running on mac or linux and set the dynamic library extension
+MAC_EXT = ".dylib"
+WIN_EXT = ".dll"
+LINUX_EXT = ".so"
+CPP_EXT = ".cpp"
+OBJ_EXT = ".o"
+
+COMPILER = "g++ "
+CROSS_COMPILE_32BIT_FLAG = "-m32 "
+DYNAMIC_LIB_FLAG = "-dynamiclib "
+SHARED_LIB_FLAG = "-shared "
+
+DEBUG_FOLDER = "Debug"
+
+# Specify the search paths/dependencies/options for gcc
+INCLUDE_PATHS = ["./sdk/release/include"]
+LINK_PATHS = ["./sdk/release/lib"]
+INCLUDE_PATHS_DBG = ["./sdk/debug/include"]
+LINK_PATHS_DBG = ["./sdk/debug/lib"]
+
+windows_platform = False
+mac_platform = False
+linux_platform = False
+platform_64bit = False
+
+
+def _build() -> None:
+    '''
+    Top-level build routine. Builds the plugin for one of the supported host platforms.
+    '''
+
+    global mac_platform
+    global windows_platform
+    global linux_platform
+    global platform_64bit
+
     dylib_ext = ""
     arch = ""
+
     if platform.system().lower() == "windows":
-        dylib_ext = ".dll"
-        tmp = platform.architecture()
-        if tmp[0] == "64bit":
-            arch = "64"
+        windows_platform = True
+        dylib_ext = WIN_EXT
+
+        if platform.architecture()[0] == "64bit":
+            platform_64bit = True
+
     elif platform.system().lower() == "darwin":
-        dylib_ext = ".dylib"
+        mac_platform = True
+        dylib_ext = MAC_EXT
+
     else:
-        dylib_ext = ".so"
-        tmp = platform.architecture()
-        if tmp[0] == "64bit":
-            arch = "64"
+        linux_platform = True
+        dylib_ext = LINUX_EXT
+
+        if platform.architecture()[0] == "64bit":
+            platform_64bit = True
 
     print("Running on " + platform.system())
 
-    release_path = ""
+    [release_path, release_path32] = _get_release_paths()
 
-    # Make sure the release folder exists
-    if not os.path.exists( "plugins" ):
-        os.makedirs( "plugins" )
-    if platform.system().lower() == "windows":
-        # Simply call MSBuild for each pre-configured build target in the
-        # pre-configured project.
-        if arch == "64":
-            command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X64_ARCH]
-            retcode = subprocess.call(command)
-            build_error |= (retcode != 0)
+    _make_release_dirs(release_path, release_path32)
+    _clean_release_dir(release_path, dylib_ext)
 
-            command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X64_ARCH]
-            retcode = subprocess.call(command)
-            build_error |= (retcode != 0)
+    if not mac_platform and platform_64bit:
+        _clean_release_dir(release_path32, dylib_ext)
 
-        command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X86_ARCH]
+    # The routines called below call exit() and will not return.
+    if windows_platform:
+        _msbuild()
+    else:
+        _gnu_build(release_path, release_path32)
+
+
+def _msbuild() -> None:
+    '''
+    Routine to compile the plugin using MSBuild.
+    '''
+
+    build_error = False
+
+    # Simply call MSBuild for each pre-configured build target in the
+    # pre-configured project.
+    if platform_64bit:
+        command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X64_ARCH]
         retcode = subprocess.call(command)
         build_error |= (retcode != 0)
 
-        command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X86_ARCH]
+        command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X64_ARCH]
         retcode = subprocess.call(command)
         build_error |= (retcode != 0)
 
-        exit(build_error)
-    elif platform.system().lower() == "darwin":
-        release_path = "./plugins/OSX/"
-        if not os.path.exists( release_path ):
-            os.makedirs( release_path )
-            print("Made OS plugin directory")
+    command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X86_ARCH]
+    retcode = subprocess.call(command)
+    build_error |= (retcode != 0)
+
+    command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X86_ARCH]
+    retcode = subprocess.call(command)
+    build_error |= (retcode != 0)
+
+    exit(build_error)
+
+
+def _gnu_build(release_path: str, release_path32: str = None, dylib_ext: str = LINUX_EXT) -> None:
+    '''
+    Routine to compile the plugin using G++.
+
+    Parameters
+    ----------
+    release_path: str
+        The output path of the compiled plugin.
+    release_path32 : str
+        The path where the optional 32-bit plugin will be written to. This
+        option shall only be used if on a 64-bit host platform. On a 32-bit
+        platform, release_path represents the output path for the plugin.
+    dylib_ext: str
+        The extension used for the compiled plugin.
+
+    Returns
+    ----------
+    None
+    '''
+
+    build_error = False
+
+    if platform_64bit:
+        arch = "64"
     else:
-        # Regardless of architecture always build the 32-bit variant
-        release_path32 = "./plugins/Linux32/"
-        if not os.path.exists( release_path32 ):
-            os.makedirs( release_path32 )
-            print("Made 32-bit OS plugin directory")
-        if arch == "64":
-            release_path = "./plugins/Linux64/"
-            if not os.path.exists( release_path ):
-                os.makedirs( release_path )
-                print("Made 64-bit OS plugin directory")
-        else:
-            release_path = "./plugins/Linux32/"
+        arch = ""
 
+    debug_path = release_path + DEBUG_FOLDER + "/"
 
+    cpp_files = _get_cpp_file_list()
 
-    if platform.system().lower() != "darwin":
-        if arch == "64":
-            # For 64-bit linux systems, perform an additional clean on the 32-bit release folder
-            os.chdir( release_path32 )
-            o_files = glob.glob( "*.o" )
-            o_files.extend( glob.glob( "*" + dylib_ext ) )
-            for o_file in o_files:
-                os.remove( o_file )
-            os.chdir( "../.." )
-
-    # Clean the release folder of .o/.so object files
-    os.chdir( release_path )
-    o_files = glob.glob( "*.o" )
-    o_files.extend( glob.glob( "*" + dylib_ext ) )
-    for o_file in o_files:
-        os.remove( o_file )
-
-    # Make sure the debug folder exists
-    debug_path = ""
-    if not os.path.exists( "Debug" ):
-        os.makedirs( "Debug" )
-    os.chdir( "Debug" )
-    debug_path = release_path + "Debug/"
-
-    # Clean the debug folder of .o/.so object files
-    o_files = glob.glob( "*.o" )
-    o_files.extend( glob.glob( "*" + dylib_ext ) )
-    for o_file in o_files:
-        os.remove( o_file )
-    os.chdir( "../../.." )
-
-    # Find all the cpp files in /source folder
-    os.chdir( "source" )
-    cpp_files = glob.glob( "*.cpp" )
-    os.chdir( ".." )
-
-    # Specify the search paths/dependencies/options for gcc
-    include_paths = [ "./sdk/release/include" ]
-    link_paths = [ "./sdk/release/lib" ]
-    include_paths_dbg = [ "./sdk/debug/include" ]
-    link_paths_dbg = [ "./sdk/debug/lib" ]
-
-    if arch == "64":
-        link_dependencies = [ "-lAnalyzer" + arch ]
-        link_dependencies32 =  [ "-lAnalyzer" ]
+    if platform_64bit:
+        link_dependencies = ["-lAnalyzer" + arch]
+        link_dependencies32 = ["-lAnalyzer"]
     else:
-        link_dependencies = [ "-lAnalyzer" ] # Refers to libAnalyzer.dylib or libAnalyzer.so
+        link_dependencies = ["-lAnalyzer"]
 
-    debug_compile_flags = "-O0 -w -c -fpic -g -std=c++11"
-    release_compile_flags = "-O3 -w -c -fpic -std=c++11"
+    debug_compile_flags = f"-O0 -w -c -fpic -g -std={GNU_CPP_STD} "
+    release_compile_flags = f"-O3 -w -c -fpic -std={GNU_CPP_STD} "
 
-    # Loop through all the cpp files, build up the gcc command line, and attempt to compile each cpp file
     for cpp_file in cpp_files:
-        command = "g++ "
-        command_dbg = "g++ "
+        #
+        # Generate the command strings for compiling object files
+        #
+        command = COMPILER
+        command_dbg = COMPILER
+        obj_file = cpp_file.replace(CPP_EXT, OBJ_EXT)
 
-        #Include paths
-        for path in include_paths:
-            command += "-I\"" + path + "\" "
+        for path in INCLUDE_PATHS:
+            command += f"-I\"{path}\" "
 
-        for path in include_paths_dbg:
-            command_dbg += "-I\"" + path + "\" "
+        for path in INCLUDE_PATHS_DBG:
+            command_dbg += f"-I\"{path}\" "
 
         release_command = command
         release_command += release_compile_flags
-        release_command += " -o " + "\"" + release_path + cpp_file.replace( ".cpp", ".o" ) + "\"" #the output file
-        release_command += " \"" + "source/" + cpp_file + "\"" #the cpp file to compile
+        release_command += f"-o \"{release_path}{obj_file}\" "
+        release_command += f"\"source/{cpp_file}\""
 
-        if dylib_ext != ".dylib":
-            if arch == "64":
+        if not mac_platform:
+            if platform_64bit:
                 release_command32 = command
                 release_command32 += release_compile_flags
-                release_command32 += " -m32 -o " + "\"" + release_path32 + cpp_file.replace( ".cpp", ".o" ) + "\"" #the output file
-                release_command32 += " \"" + "source/" + cpp_file + "\"" #the cpp file to compile
+                release_command32 += f"{CROSS_COMPILE_32BIT_FLAG}-o \"{release_path32}{obj_file}\""
+                release_command32 += f" \"source/{cpp_file}\""
 
         debug_command = command_dbg
         debug_command += debug_compile_flags
-        if dylib_ext == ".dylib":
-            debug_command += " -m32"
-        debug_command += " -o " + "\"" + debug_path + cpp_file.replace( ".cpp", ".o" ) + "\"" #the output file
-        debug_command += " \"" + "source/" + cpp_file + "\"" + " -D _DEBUG" #the cpp file to compile
 
-        # Run the commands from the command line
+        if mac_platform:
+            debug_command += CROSS_COMPILE_32BIT_FLAG
+
+        debug_command += f"-o \"{debug_path}{obj_file}\" "
+        debug_command += f"\"source/{cpp_file}\" -D _DEBUG"
+
+        #
+        # Compile object files
+        #
+
         print(release_command)
         retcode = os.system(release_command)
-        build_error |= (retcode != 0)
-        if dylib_ext != ".dylib":
-            if arch == "64":
+        build_error |= _error_returned(retcode)
+
+        if not mac_platform:
+            if platform_64bit:
                 print(release_command32)
                 retcode = os.system(release_command32)
-                build_error |= (retcode != 0)
+                build_error |= _error_returned(retcode)
+
         print(debug_command)
         retcode = os.system(debug_command)
-        build_error |= (retcode != 0)
+        build_error |= _error_returned(retcode)
 
-    #Lastly, link
-    command = "g++ "
+    #
+    # Generate the command strings for linking object files
+    #
+
+    command = COMPILER
     command_dbg = command
 
-    #Add the library search paths
-    for link_path in link_paths:
-        command += "-L\"" + link_path + "\" "
+    for link_path in LINK_PATHS:
+        command += f"-L\"{link_path}\" "
 
-    for link_path in link_paths_dbg:
-        command_dbg += "-L\"" + link_path + "\" "
+    for link_path in LINK_PATHS_DBG:
+        command_dbg += f"-L\"{link_path}\" "
 
     command32 = command
 
-    #Add libraries to link against
     for link_dependency in link_dependencies:
         command += link_dependency + " "
         command_dbg += link_dependency + " "
 
-    if arch == "64":
+    if platform_64bit:
         for link_dependency in link_dependencies32:
             command32 += link_dependency + " "
 
-
-    # Make a dynamic (shared) library (.so/.dylib)
-    if dylib_ext == ".dylib":
-        command += "-dynamiclib "
-        command_dbg += "-dynamiclib "
+    if mac_platform:
+        command += DYNAMIC_LIB_FLAG
+        command_dbg += DYNAMIC_LIB_FLAG
     else:
-        command += "-shared "
-        command32 += "-shared "
-        command_dbg += "-shared "
+        command += SHARED_LIB_FLAG
+        command32 += SHARED_LIB_FLAG
+        command_dbg += SHARED_LIB_FLAG
 
     # Figure out what the name of this analyzer is
     analyzer_name = ""
+
     for cpp_file in cpp_files:
-        if cpp_file.endswith( "Analyzer.cpp" ):
-            analyzer_name = cpp_file.replace( "Analyzer.cpp", "" )
+        if cpp_file.endswith("Analyzer.cpp"):
+            analyzer_name = cpp_file.replace("Analyzer.cpp", "")
             break
 
     # The files to create (.so/.dylib files)
-    if dylib_ext == ".dylib":
-        release_command = command + "-o \"" + release_path + "lib" + analyzer_name + "Analyzer.dylib\" "
-        debug_command = command_dbg + "-m32 -o \"" + debug_path + "lib" + analyzer_name + "Analyzer.dylib\" "
+    if mac_platform:
+        release_command = command + \
+            f"-o \"{release_path}lib{analyzer_name}Analyzer{MAC_EXT}\" "
+        debug_command = command_dbg + CROSS_COMPILE_32BIT_FLAG + \
+            f"-o \"{debug_path}lib{analyzer_name}Analyzer{MAC_EXT}\" "
     else:
-        release_command = command + "-o \"" + release_path + "lib" + analyzer_name + "Analyzer" + arch + ".so\" "
-        if arch == "64":
-            release_command32 = command32 + "-m32 " + "-o \"" + release_path32 + "lib" + analyzer_name + "Analyzer" + ".so\" "
-        debug_command = command_dbg + "-o \"" + debug_path + "lib" + analyzer_name + "Analyzer" + arch + ".so\" "
+        release_command = command + \
+            f"-o \"{release_path}lib{analyzer_name}Analyzer{arch}{LINUX_EXT}\" "
+
+        if platform_64bit:
+            release_command32 = command32 + CROSS_COMPILE_32BIT_FLAG + \
+                f"-o \"{release_path32}lib{analyzer_name}Analyzer{LINUX_EXT}\" "
+        debug_command = command_dbg + \
+            f"-o \"{debug_path}lib{analyzer_name}Analyzer{arch}{LINUX_EXT}\" "
 
     # Add all the object files to link
     for cpp_file in cpp_files:
-        release_command += "\"" + release_path + cpp_file.replace( ".cpp", ".o" ) + "\" "
-        if arch == "64":
-            release_command32 += "\"" + release_path32 + cpp_file.replace( ".cpp", ".o" ) + "\" "
-        debug_command += "\"" + debug_path + cpp_file.replace( ".cpp", ".o" ) + "\" "
+        obj_file = cpp_file.replace(CPP_EXT, OBJ_EXT)
+        release_command += f"\"{release_path}{obj_file}\" "
 
-    # Run the commands from the command line
-    print( release_command )
+        if platform_64bit:
+            release_command32 += f"\"{release_path32}{obj_file}\" "
+        debug_command += f"\"{debug_path}{obj_file}\" "
+
+    #
+    # Compile dynamic libraries
+    #
+
+    print(release_command)
     retcode = os.system(release_command)
-    build_error |= (retcode != 0)
-    if dylib_ext != ".dylib":
-        if arch == "64":
-            print( release_command32 )
+    build_error |= _error_returned(retcode)
+
+    if not mac_platform:
+        if platform_64bit:
+            print(release_command32)
             retcode = os.system(release_command32)
-            build_error |= (retcode != 0)
-        print( debug_command )
+            build_error |= _error_returned(retcode)
+
+        print(debug_command)
         retcode = os.system(debug_command)
-        build_error |= (retcode != 0)
+        build_error |= _error_returned(retcode)
+
     else:
         # Only build 32-bit debug library on versions prior to 10.14,
         # newer versions of XCode do not support compiling for 32-bit.
         ver, _, _ = platform.mac_ver()
         ver = float('.'.join(ver.split('.')[:2]))
+
         if ver < 10.14:
-            print( debug_command )
+            print(debug_command)
             retcode = os.system(debug_command)
-            build_error |= (retcode != 0)
+            build_error |= _error_returned(retcode)
 
     exit(build_error)
 
+
+def _error_returned(ret_code: int) -> bool:
+    '''
+    Determines if the return code from a system-call indicates an error.
+    '''
+    return ret_code != 0
+
+
+def _get_cpp_file_list() -> list:
+    '''
+    Returns a list of all the cpp files in /source folder.
+    '''
+    os.chdir("source")
+    cpp_files = glob.glob("*.cpp")
+    os.chdir("..")
+
+    return cpp_files
+
+
+def _get_release_paths() -> list:
+    '''
+    Returns a list of up to two paths indicating where the compiled output
+    artifacts will be written to. One a 32-bit host system there will only be
+    one path. On 64-bit systems, with the exception to macOS, there will be
+    two paths, one for 32-bit and one for 64-bit. The first element in the
+    list will always exist and represent the path that corresponds to the
+    native host operating system.
+    '''
+    release_path_native = None
+    release_path32 = None
+
+    if windows_platform:
+        if platform_64bit:
+            release_path_native = "./plugins/Win64/"
+            release_path32 = "./plugins/Win32/"
+        else:
+            release_path_native = "./plugins/Win32/"
+
+    elif mac_platform:
+        release_path_native = "./plugins/OSX/"
+    else:
+        if platform_64bit:
+            release_path_native = "./plugins/Linux64/"
+            release_path32 = "./plugins/Linux32/"
+        else:
+            release_path_native = "./plugins/Linux32/"
+
+    return [release_path_native, release_path32]
+
+
+def _make_release_dirs(release_path: str, release_path32: str =None) -> None:
+    '''
+    The specified directory will be created if it does not exist.
+    Also, if the platform is compatible with debugging, the associated debug
+    path will be created if it does not already exist.
+
+    Parameters
+    ----------
+    release_path: str
+        The output path of the compiled plugin.
+    release_path32 : str
+        The path where the optional 32-bit plugin will be written to. This
+        option shall only be used if on a 64-bit host platform. On a 32-bit
+        platform, release_path represents the output path for the plugin.
+    dylib_ext: str
+        The extension used for the compiled plugin.
+
+    Returns
+    ----------
+    None
+    '''
+
+    if release_path != None and not(windows_platform):
+        # NOTE: Unlike other supported targets, the Windows 32-bit debug is
+        # sent to the ./debug folder. The visual studio configuration handles
+        # this special case.
+        release_path += DEBUG_FOLDER
+
+    if release_path32 != None:
+        release_path32 += DEBUG_FOLDER
+
+    if release_path != None and not os.path.exists(release_path):
+        os.makedirs(release_path)
+
+        if mac_platform:
+            print("Made OS plugin directory")
+        elif platform_64bit:
+            print("Made 64-bit OS plugin directory")
+        else:
+            print("Made 32-bit OS plugin directory")
+
+    if not mac_platform and release_path32 != None and not os.path.exists(release_path32):
+        os.makedirs(release_path32)
+        print("Made 32-bit OS plugin directory")
+
+
+def _clean_release_dir(release_path: str, dylib_ext: str) -> None:
+    '''
+    Clean the specified folder of output artifacts.
+
+    Parameters
+    ----------
+    release_path: str
+        The output path of the compiled plugin to clean.
+    dylib_ext: str
+        The extension used for the compiled plugin.
+
+    Returns
+    ----------
+    None
+    '''
+
+    if release_path == None:
+        return
+
+    cwd = os.getcwd()
+    os.chdir(release_path)
+
+    if windows_platform:
+        o_files = glob.glob("./**/*.exp", recursive=True)
+        o_files.extend(glob.glob("./**/*.iobj", recursive=True))
+        o_files.extend(glob.glob("./**/*.ipdb", recursive=True))
+        o_files.extend(glob.glob("./**/*.ilk", recursive=True))
+        o_files.extend(glob.glob("./**/*.pdb", recursive=True))
+        o_files.extend(glob.glob("./**/*.lib", recursive=True))
+    else:
+        o_files = glob.glob("./**/*.o", recursive=True)
+
+    o_files.extend(glob.glob("./**/*" + dylib_ext, recursive=True))
+
+    for o_file in o_files:
+        os.remove(o_file)
+
+    os.chdir(cwd)
+
+
 if __name__ == "__main__":
     _build()
-
