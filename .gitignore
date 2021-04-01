@@ -8,6 +8,9 @@ debug/Logic/
 .vscode
 .vs
 
+# Ignore release directory
+release/
+
 # Ignore Build Artifacts
 plugins/*/*.lib
 plugins/*/Debug/
