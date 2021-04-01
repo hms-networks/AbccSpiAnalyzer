@@ -19,7 +19,7 @@ DEBUG_TARGET = "-p:Configuration=Debug"
 X64_ARCH = "-p:Platform=x64"
 X86_ARCH = "-p:Platform=x86"
 
-GNU_CPP_STD = "c++11"
+GNU_CPP_STD = "c++17"
 
 MAC_EXT = ".dylib"
 WIN_EXT = ".dll"
