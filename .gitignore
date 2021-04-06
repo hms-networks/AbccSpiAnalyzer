@@ -12,10 +12,9 @@ debug/Logic/
 release/
 
 # Ignore Build Artifacts
-plugins/*/*.lib
-plugins/*/Debug/
-project/*/Debug/
-project/*/x64/Debug/
+plugins/*
+project/*/Win32/
+project/*/x64/
 *.aps
 *.db
 *.exp
