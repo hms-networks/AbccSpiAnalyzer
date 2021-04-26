@@ -15,23 +15,20 @@
 #include <AnalyzerHelpers.h>
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
+#include "AbccLogFileParser.h"
 
-#define NUM_BYTES_2_WORDS(x)				( ( (x) + 1 ) >> 1 )
-
-#define ABCC_CFG_MAX_MSG_SIZE				( 1524 )
-#define ABCC_CFG_SPI_MSG_FRAG_LEN			( 16 )
-#define ABCC_CFG_MAX_PROCESS_DATA_SIZE		( 4 )
-
-#define CRC_WORD_LEN_IN_WORDS				( 2 )
-#define SPI_FRAME_SIZE_EXCLUDING_DATA		( 7 )
-
-#if ABCC_CFG_SPI_MSG_FRAG_LEN > ABCC_CFG_MAX_MSG_SIZE
-#error  spi fragmentation length cannot exceed max msg size
+#ifdef _MSC_VER
+	#include <stdlib.h>
+	#define bswap_16(x) _byteswap_ushort(x)
+#elif defined(__APPLE__)
+	#include <libkern/OSByteOrder.h>
+	#define bswap_16(x) OSSwapInt16(x)
+#else
+	#include <byteswap.h>
 #endif
 
-#define MAX_PAYLOAD_WORD_LEN ( ( NUM_BYTES_2_WORDS( ABCC_CFG_SPI_MSG_FRAG_LEN ) ) + \
-							   ( NUM_BYTES_2_WORDS( ABCC_CFG_MAX_PROCESS_DATA_SIZE ) ) + \
-							   ( CRC_WORD_LEN_IN_WORDS ) )
+#define ABCC_CFG_MAX_MSG_SIZE				( 1524 )
+#define ABCC_CFG_MAX_PROCESS_DATA_SIZE		( 4 )
 
 class SpiAnalyzerSettings;
 
@@ -59,10 +56,11 @@ protected: /* Enums, Types, and Classes */
 		Error
 	};
 
-	enum class ClockIdleLevel : U8
+	enum class ClockIdleMode : U8
 	{
 		Low,
-		High
+		High,
+		Auto
 	};
 
 	typedef struct AbccMosiPacket
@@ -73,7 +71,7 @@ protected: /* Enums, Types, and Classes */
 		U16	pdLen;
 		U8	appStat;
 		U8	intMask;
-		U8	msgData[ABCC_CFG_SPI_MSG_FRAG_LEN];
+		U8	msgData[ABCC_CFG_MAX_MSG_SIZE];
 		U8	processData[ABCC_CFG_MAX_PROCESS_DATA_SIZE];
 		U16	crc32_lo;
 		U16	crc32_hi;
@@ -88,17 +86,13 @@ protected: /* Enums, Types, and Classes */
 		U8	spiStat;
 		U16	netTime_lo;
 		U16	netTime_hi;
-		U8	msgData[ABCC_CFG_SPI_MSG_FRAG_LEN];
+		U8	msgData[ABCC_CFG_MAX_MSG_SIZE];
 		U8	processData[ABCC_CFG_MAX_PROCESS_DATA_SIZE];
 		U16	crc32_lo;
 		U16	crc32_hi;
 	} AbccMisoPacket_t;
 
 protected: /* Members */
-
-	SpiAnalyzerSettings * mSettings;
-	U32 mSimulationSampleRateHz;
-	U64 mValue;
 
 	ClockGenerator mClockGenerator;
 	SimulationChannelDescriptorGroup mSpiSimulationChannels;
@@ -107,27 +101,70 @@ protected: /* Members */
 	SimulationChannelDescriptor* mClock;
 	SimulationChannelDescriptor* mEnable;
 
-	double mTargetClockFrequencyHz;
+	SpiAnalyzerSettings* mSettings;
+	AbccLogFileParser* mLogFileParser;
 
-	/* SPI (fragmentation) packet variables */
+	/* Dummy value used as the payload for various random SPI events. */
+	U64 mIncrementingValue;
+
+	bool m3WireMode;
+	bool mLogFileSimulation;
+	bool mAbortTransfer;
+	MessageReturnType mLogFileMessageType;
+	ClockIdleMode mClockIdleMode;
+	ClockIdleMode mNextClockIdleMode;
+	U32 mNetTime;
+	U8  mSourceId;
+	U8  mToggleBit;
+	U16 mMsgCmdRespState;
+
+	/* Simulation timing variables */
+	U32 mSimulationSampleRateHz;
+	double mTargetClockFrequencyHz;
+	double mInterPacketGapTime;
+	double mInterByteGapTime;
+	double mChipSelectDelay;
+
+	/* SPI fragmentation state variables */
+	bool mDynamicMsgFragmentationLength;
+	U16 mMaxMsgFragmentationLength;
+	U16 mMsgFragmentationLength;
+	U32 mMessageDataOffset;
+	U32 mTotalMsgDataBytesToSend;
+
+	/* Counter is conveyed in process data during log file simulation. */
+	U32 mMessageCount;
+
+	/* SPI (fragmentation) packet buffers */
 	AbccMisoPacket_t mMisoPacket;
 	AbccMosiPacket_t mMosiPacket;
-	U32 mPacketOffset;
-	U32 mPacketMsgFieldSize;
-	bool mAbortTransfer;
 
 	/* Full (unfragmented) message buffers */
 	ABP_MsgType mMisoMsgData;
 	ABP_MsgType mMosiMsgData;
 
-	U32 mNetTime;
-	U8  mSourceId;
-	U8  mToggleBit;
-	U16 mMsgCmdRespState;
-	S32 mMosiProcessData;
-	S32 mMisoProcessData;
+	/* Pointers to the actual position of the process data in the SPI packets.
+	** Actual location depends on the currently set message data length field. */
+	U8* mMosiProcessDataPtr;
+	U8* mMisoProcessDataPtr;
+
+	/* Pointers to the actual position of the CRC in the SPI packets.
+	** Actual location depends on the currently set message data length field. */
+	U8* mMosiCrc32Ptr;
+	U8* mMisoCrc32Ptr;
+
+	/* Length used for CRC32 computation */
+	U16 mMosiCrcPacketLength;
+	U16 mMisoCrcPacketLength;
+
+	/* Represents the total number of bytes to send per SPI packet */
+	U16 mNumBytesInSpiPacket;
 
 protected: /* Methods */
+
+	void InitializeSpiClockIdleMode();
+	void InitializeSpiTimingCharacteristics();
+	void InitializeSpiChannels();
 
 	inline void SetMosiObjectSpecificError(U8 error_code);
 
@@ -141,10 +178,13 @@ protected: /* Methods */
 	void FileClose(ABP_MsgType* msg_ptr, MessageType message_type, UINT32 file_size);
 	void DeleteFileInstance(ABP_MsgType* msg_ptr, MessageType message_type);
 
+	void UpdatePacketDynamicFormat(U16 message_data_field_length, U16 process_data_field_length);
 	void UpdateProcessData();
-	void CreateSpiTransaction();
-	void SendPacketData(ClockIdleLevel clock_idle_level, U32 length);
-	void OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_data);
-	void OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_data);
+	bool UpdateMessageData(U8* mosi_msg_data_source, U8* miso_msg_data_source);
+	void UpdateCrc32(bool generate_mosi_crc_error, bool generate_miso_crc_error);
+	bool CreateSpiTransaction();
+	void SendPacketData(ClockIdleMode clock_idle_level, U32 length);
+	void OutputByte_CPOL0_CPHA0(U64 mosi_data, U64 miso_data, bool word_mode = false);
+	void OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_data, bool word_mode = false);
 };
 #endif /* ABCC_SPI_SIMULATION_DATA_GENERATOR_H */

@@ -14,8 +14,11 @@
 
 #include <AnalyzerSettings.h>
 #include <AnalyzerTypes.h>
+#include "rapidxml-1.13/rapidxml.hpp"
 
 #include "AbccSpiAnalyzerTypes.h"
+#include "abcc_td.h"
+#include "abcc_abp/abp.h"
 
 enum class MessageIndexing : U32
 {
@@ -119,6 +122,16 @@ public: /* Members */
 	S32 mClockingAlertLimit;
 	bool mExpandBitFrames;
 
+	std::string mSimulateLogFilePath;
+	U32 mSimulateLogFileDefaultState;
+	S32 mSimulateClockIdleHigh;
+	S32 mSimulateClockFrequency;
+	S32 mSimulatePacketGapNs;
+	S32 mSimulateByteGapNs;
+	S32 mSimulateChipSelectNs;
+	S32 mSimulateMsgDataLength;
+	bool mSimulateWordMode;
+
 protected: /* Members */
 
 	std::unique_ptr< AnalyzerSettingInterfaceChannel >		mMosiChannelInterface;
@@ -139,6 +152,7 @@ protected: /* Methods */
 
 	std::unique_ptr< AnalyzerSettingInterfaceText >			mAdvancedSettingsInterface;
 	bool ParseAdvancedSettingsFile();
+	void ParseSimulationSettings(rapidxml::xml_node<>* simulation_node);
 	void SetDefaultAdvancedSettings();
 
 	void SetSettingError( const std::string& setting_name, const std::string& error_text );

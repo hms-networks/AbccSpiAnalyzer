@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AdvancedSettings>
 
-	<!-- "4-wire-on-3-channels" is useful when a 4-wire SPI configuration is used to	interface with
+	<!-- "4-wire-on-3-channels" is useful when a 4-wire SPI configuration is used to interface with
 	the ABCC but only MOSI, MISO, and SCLK are connected to the Logic analyzer. This mode will
 	ignore timing and CPOL/CPHA requirements that the ABCC's 3-wire mode enforces. -->
 	<Setting name="4-wire-on-3-channels">0</Setting>
@@ -23,11 +23,11 @@
 	"clocking alert" notification. This type of event is more of an informational warning/error
 	event, and as long as the user understands the reason and deems the behavior acceptable, then
 	this setting may be set to a value >=0. Setting the value to 0 disables the notification
-	entirely. While any value	above zero (datatype is S32) will set a maximum count for producing
+	entirely. While any value above zero (datatype is S32) will set a maximum count for producing
 	the notification in the processed results. An invalid value or value <0 indicates that there is
 	no limit. Users of the ABCC StarterKit may encounter this scenario since the chipselect line is
 	deasserted close in time (~8ns) with the SPI clock returning to the "clock idle high" state.
-	This results in a	higher than normal sampling time requirement to resolve the two events
+	This results in a higher than normal sampling time requirement to resolve the two events
 	occurring at different points in time. Sampling more than 125MSamples/second is necessary to
 	avoid this issue; thus, a general recommendation for this scenario is to use sampling rates of
 	250MS/s or higher. If this is not possible due to hardware limitations of the PC/analyzer then
@@ -40,7 +40,72 @@
 	text entry when clicking on a "Decoded Protocols" entry for a frame less than 8 samples.
 	Currently, this workaround is only applicable for error frames; any error frame less than 8
 	samples will be expanded to 8 samples to restore the linkage. This feature could have
-	undesirable sideffects in rare circumstances. In case of abnormal behavior it may be necessary
+	undesirable side effects in rare circumstances. In case of abnormal behavior it may be necessary
 	to disable this feature. -->
 	<Setting name="expand-bit-frames">1</Setting>
+
+	<!-- "simulation" provides various options for generating simulated ABCC SPI communication.
+	There are two primary modes supported: "standard simulation" and "log file simulation".
+	"Standard simulation" involves a general hardcoded procedure for file object communication. This
+	simulation functions on various pseudorandom number generators for randomly creating different
+	events including various error events. This mode also conveys the plugin's version information.
+	"Log file simulation" involves parsing a standard ABCC SDK log file and generating ABCC
+	SPI packets that convey these messages. The SDK message logging is activated via
+	ABCC_CFG_DEBUG_MESSAGING in abcc_drv_cfg.h. The target platform must have support for
+	ABCC_PORT_DebugPrint() in abcc_sw_port.h. -->
+	<Setting name="simulation">
+		<!-- Path to the log file to simulate. No quotes, backslash/forward slashes are acceptable.
+		Empty or invalid paths will disable "log file simulation" and instead "standard simulation"
+		mode will be executed. -->
+		<LogFilePath></LogFilePath>
+
+		<!-- Default ABCC state (integer) for "log file simulation". Use one of the raw values
+		specified in ABP_AnbStateType. Invalid values will default to SETUP state. -->
+		<LogFileDefaultAnbState>0</LogFileDefaultAnbState>
+
+		<!-- SPI clock polarity setting (integer). 0 = Clock Idles Low, 1 = Clock Idles High,
+		Else = "Auto-mode". "Auto-mode" changes behavior depending on simulation mode. When running
+		"log file simulation", auto-mode will use clock-idle-high for 3-wire mode, and clock-idle-low
+		for 4-wire mode. When running "standard simulation" mode, auto-mode will use a pseudorandom
+		number generator to toggle between clock-idle-high and clock-idle-low to illustrate both modes
+		in one simulation run. NOTE: The ABCC's 3-wire mode only supports clock-idle-high, while in
+		3-wire mode clock-idle-high will be enforced. -->
+		<SpiClockIdleHigh>-1</SpiClockIdleHigh>
+
+		<!-- SPI clock frequency (integer, in Hertz). Values <= 0 or parsing errors will default to
+		auto-frequency (this is a mode where the SPI clock frequency is set, when possible, to
+		1/10th the sampling frequency). Values > 20MHz will be limited to 20MHz. 3-wire mode will
+		enforce a minimum of 100KHz. Please keep in mind the analyzer's configured sample rate, this
+		mode of simulation requires the user to consider Nyquist rate just like in real world logic
+		analyzer usage. -->
+		<SpiClockFrequency>0</SpiClockFrequency>
+
+		<!-- SPI inter-packet gap (integer, in nanoseconds). Values <= 0 or parsing errors will
+		default to 15000ns. -->
+		<SpiPacketGapNs>0</SpiPacketGapNs>
+
+		<!-- SPI inter-byte gap (integer, in nanoseconds). Values < half the SPI clock period or
+		parsing errors will default to half the SPI clock period. -->
+		<SpiByteGapNs>0</SpiByteGapNs>
+
+		<!-- SPI spacing between chip-select going active-low and the first clock edge and the
+		spacing after the last clock edge before chip-select returns high (integer, in nanoseconds).
+		Note, depending on SPI configuration the spacing on one side will have an additional 1/2
+		clock period delay. Values <= 0 or parsing errors will default to 1000ns. -->
+		<SpiChipSelectDelayNs>0</SpiChipSelectDelayNs>
+
+		<!-- SPI register data size (in bits). This parameter represents the underlying SPI
+		controller register data size and is used to determine when to apply "SpiByteGapNs".
+		This value must be 8 or 16 bits; other values or parsing errors will default to 8 bits. -->
+
+		<!-- Configures the message data length field. {size} = 0: 8 words (default),
+		0 < {size} <= 762: fixed message data length, {size} < 0: dynamic mode. When in SETUP,
+		NW_INIT, or WAIT_PROCESS, "dynamic mode" will dynamically adapt the message field length based
+		on the number of bytes being sent by the host; if the host does not need to send any data the
+		absolute value of {size} will be used for the message data length field for communicating any
+		data that the ABCC needs to send to the host. While in IDLE or PROCESS_ACTIVE the message data
+		length will be set to the absolute value of {size}. -->
+		<SpiMessageDataLength>0</SpiMessageDataLength>
+	</Setting>
+
 </AdvancedSettings>

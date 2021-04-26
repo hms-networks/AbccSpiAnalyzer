@@ -28,7 +28,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000010"
+#define SETTINGS_REVISION_STRING "REVISION_00000011"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -269,6 +269,157 @@ void SpiAnalyzerSettings::SetDefaultAdvancedSettings()
 	mExportDelimiter.assign(",");
 	mClockingAlertLimit = -1;
 	mExpandBitFrames = true;
+	mSimulateLogFilePath = "";
+	mSimulateLogFileDefaultState = ABP_ANB_STATE_SETUP;
+	mSimulateClockIdleHigh = -1;
+	mSimulateClockFrequency = 0;
+	mSimulatePacketGapNs = 0;
+	mSimulateByteGapNs = 0;
+	mSimulateChipSelectNs = 0;
+	mSimulateWordMode = false;
+	mSimulateMsgDataLength = 8;
+}
+
+void SpiAnalyzerSettings::ParseSimulationSettings(rapidxml::xml_node<>* simulation_node)
+{
+	// Simulation node must have the following data in the order specified:
+	const char* firstNode = "LogFilePath";
+	const char* secondNode = "LogFileDefaultAnbState";
+	const char* thirdNode = "SpiClockIdleHigh";
+	const char* fourthNode = "SpiClockFrequency";
+	const char* fifthNode = "SpiPacketGapNs";
+	const char* sixthNode = "SpiByteGapNs";
+	const char* seventhNode = "SpiChipSelectDelayNs";
+	const char* eigthNode = "SpiDataSize";
+	const char* ninthNode = "SpiMessageDataLength";
+
+	rapidxml::xml_node<>* node = simulation_node->first_node(firstNode);
+
+	if (node)
+	{
+		mSimulateLogFilePath = node->value();
+		TrimString(mSimulateLogFilePath);
+		node = node->next_sibling(secondNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(secondNode);
+	}
+
+	if (node)
+	{
+		const int reservedValue = 6;
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		if ((parsedValue >= ABP_ANB_STATE_SETUP) &&
+			(parsedValue <= ABP_ANB_STATE_EXCEPTION) &&
+			(parsedValue != reservedValue))
+		{
+			mSimulateLogFileDefaultState = static_cast<U32>(parsedValue);
+		}
+
+		node = node->next_sibling(thirdNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(thirdNode);
+	}
+
+	if (node)
+	{
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		mSimulateClockIdleHigh = static_cast<S32>(parsedValue);
+		node = node->next_sibling(fourthNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(fourthNode);
+	}
+
+	if (node)
+	{
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		mSimulateClockFrequency = static_cast<S32>(parsedValue);
+		node = node->next_sibling(fifthNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(fifthNode);
+	}
+
+	if (node)
+	{
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		mSimulatePacketGapNs = static_cast<S32>(parsedValue);
+		node = node->next_sibling(sixthNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(sixthNode);
+	}
+
+	if (node)
+	{
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		mSimulateByteGapNs = static_cast<S32>(parsedValue);
+		node = node->next_sibling(seventhNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(seventhNode);
+	}
+
+	if (node)
+	{
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		if (parsedValue < 0)
+		{
+			parsedValue = 0;
+		}
+
+		mSimulateChipSelectNs = static_cast<S32>(parsedValue);
+		node = node->next_sibling(eigthNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(eigthNode);
+	}
+
+	if (node)
+	{
+		const int wordMode = 16;
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		mSimulateWordMode = (parsedValue == wordMode);
+		node = node->next_sibling(ninthNode);
+	}
+	else
+	{
+		node = simulation_node->first_node(ninthNode);
+	}
+
+	if (node)
+	{
+		const int defaultValue = 8;
+		const int maxMessageDataWords = 762;
+		long parsedValue = strtol(node->value(), nullptr, 0);
+
+		if (parsedValue == 0 ||
+			parsedValue > maxMessageDataWords ||
+			parsedValue < -maxMessageDataWords)
+		{
+			mSimulateMsgDataLength = defaultValue;
+		}
+		else
+		{
+			mSimulateMsgDataLength = static_cast<S32>(parsedValue);
+		}
+	}
 }
 
 bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
@@ -361,6 +512,11 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 						else if (nodeName.compare("expand-bit-frames") == 0)
 						{
 							mExpandBitFrames = (nodeValue.compare("1") == 0);
+						}
+						else if (nodeName.compare("simulation") == 0)
+						{
+							// Attempt to get applicable settings for simulation from child nodes.
+							ParseSimulationSettings(settings_node);
 						}
 					}
 					else
@@ -492,6 +648,15 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> mExportDelimiter;
 		textArchive >> mClockingAlertLimit;
 		textArchive >> mExpandBitFrames;
+		textArchive	>> mSimulateLogFilePath;
+		textArchive >> mSimulateLogFileDefaultState;
+		textArchive >> mSimulateClockIdleHigh;
+		textArchive >> mSimulateClockFrequency;
+		textArchive >> mSimulatePacketGapNs;
+		textArchive >> mSimulateByteGapNs;
+		textArchive >> mSimulateChipSelectNs;
+		textArchive >> mSimulateWordMode;
+		textArchive >> mSimulateMsgDataLength;
 		textArchive >> &mAdvSettingsPath;
 	}
 
@@ -529,6 +694,15 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << mExportDelimiter.c_str();
 	textArchive << mClockingAlertLimit;
 	textArchive << mExpandBitFrames;
+	textArchive << mSimulateLogFilePath.c_str();
+	textArchive << mSimulateLogFileDefaultState;
+	textArchive << mSimulateClockIdleHigh;
+	textArchive << mSimulateClockFrequency;
+	textArchive << mSimulatePacketGapNs;
+	textArchive << mSimulateByteGapNs;
+	textArchive << mSimulateChipSelectNs;
+	textArchive << mSimulateWordMode;
+	textArchive << mSimulateMsgDataLength;
 	textArchive << mAdvSettingsPath;
 
 	SaveSettingChangeID();
