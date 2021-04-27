@@ -28,6 +28,7 @@ static const U32 adwCrcTable32[] =
 	0xD6D930ACUL, 0xCB6E20C8UL, 0xEDB71064UL, 0xF0000000UL
 };
 
+#if ABCC_CRC_ENABLE_CRC16
 static const U8 abCrc16Hi[] =
 {
 	0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00,
@@ -75,23 +76,30 @@ static const U8 abCrc16Lo[] =
 	0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C, 0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46,
 	0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80, 0x40
 };
+#endif
 
 void AbccCrc::Init()
 {
 	mCrc32 = 0;
+#if ABCC_CRC_ENABLE_CRC16
 	mCrc16 = 0;
+#endif
 }
 
 void AbccCrc::Update(U8* pbBufferStart, U16 iLength)
 {
 	mCrc32 = CRC_Crc32(mCrc32, pbBufferStart, iLength);
+#if ABCC_CRC_ENABLE_CRC16
 	mCrc16 = CRC_Crc16(mCrc16, pbBufferStart, iLength);
+#endif
 }
 
+#if ABCC_CRC_ENABLE_CRC16
 U16 AbccCrc::Crc16()
 {
 	return CRC_FormatCrc16(mCrc16);
 }
+#endif
 
 U32 AbccCrc::Crc32()
 {
@@ -101,21 +109,24 @@ U32 AbccCrc::Crc32()
 U32 AbccCrc::CRC_Crc32(U32 iInitCrc, U8* pbBufferStart, U16 iLength)
 {
 	U8 bCrcReverseByte;
-	U16 i;
 	U32 lCrc = iInitCrc;
-	for (i = 0; i < iLength; i++)
+
+	for (U16 i = 0; i < iLength; i++)
 	{
 		// Process upper-nibble
 		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 4) & 0x0F]);
 		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
+
 		// Process lower-nibble
 		bCrcReverseByte = (U8)(lCrc ^ abBitReverseTable16[(*pbBufferStart >> 0) & 0x0F]);
 		lCrc = (lCrc >> 4) ^ adwCrcTable32[bCrcReverseByte & 0x0F];
 		pbBufferStart++;
 	}
+
 	return lCrc;
 }
 
+#if ABCC_CRC_ENABLE_CRC16
 U16 AbccCrc::CRC_Crc16(U16 iInitCrc, U8* pbBufferStart, U16 iLength)
 {
 	U8 bIndex, bCrcLo, bCrcHi;
@@ -133,12 +144,13 @@ U16 AbccCrc::CRC_Crc16(U16 iInitCrc, U8* pbBufferStart, U16 iLength)
 		iLength--;
 	}
 
-	return(bCrcHi | bCrcLo << 8);
+	return (bCrcHi | bCrcLo << 8);
 }
+#endif
 
 U32 AbccCrc::CRC_FormatCrc32(U32 lCrc)
 {
-	return 	((U32)abBitReverseTable16[(lCrc & 0x000000F0UL) >> 4]) |
+	return	((U32)abBitReverseTable16[(lCrc & 0x000000F0UL) >> 4]) |
 			((U32)abBitReverseTable16[(lCrc & 0x0000000FUL)]) << 4 |
 			((U32)abBitReverseTable16[(lCrc & 0x0000F000UL) >> 12] << 8) |
 			((U32)abBitReverseTable16[(lCrc & 0x00000F00UL) >> 8] << 12) |
@@ -148,8 +160,10 @@ U32 AbccCrc::CRC_FormatCrc32(U32 lCrc)
 			((U32)abBitReverseTable16[(lCrc & 0x0F000000UL) >> 24] << 28);
 }
 
-U16 AbccCrc::CRC_FormatCrc16(U16 lCrc)
+#if ABCC_CRC_ENABLE_CRC16
+U16 AbccCrc::CRC_FormatCrc16(U16 iCrc)
 {
-	return lCrc;
+	return iCrc;
 }
+#endif
 
