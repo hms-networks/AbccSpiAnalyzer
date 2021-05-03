@@ -229,14 +229,14 @@ void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const
 	}
 }
 
-void SpiAnalyzerResults::TableBuilder(SpiChannel_t e_channel, const char* text, NotifEvent_t notification)
+void SpiAnalyzerResults::TableBuilder(SpiChannel_t channel, const char* text, NotifEvent_t notification)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char *prefix;
 	char mosiPrefix[] = MOSI_TAG_STR;
 	char misoPrefix[] = MISO_TAG_STR;
 
-	if (e_channel == SpiChannel::MOSI)
+	if (channel == SpiChannel::MOSI)
 	{
 		prefix = &mosiPrefix[0];
 	}
@@ -1936,7 +1936,7 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 	}
 }
 
-U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, SpiChannel_t e_channel, U8 type)
+U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, SpiChannel_t channel, U8 type)
 {
 	U64 frameIndex = INVALID_RESULT_INDEX;
 	U64 firstFrameIndex;
@@ -1950,8 +1950,8 @@ U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index,
 			for (frameIndex = firstFrameIndex; frameIndex <= lastFrameIndex; frameIndex++)
 			{
 				Frame frame = GetFrame(frameIndex);
-				if (((e_channel == SpiChannel::MOSI) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
-					((e_channel == SpiChannel::MISO) && IS_MISO_FRAME(frame) && (frame.mType == type)))
+				if (((channel == SpiChannel::MOSI) && IS_MOSI_FRAME(frame) && (frame.mType == type)) ||
+					((channel == SpiChannel::MISO) && IS_MISO_FRAME(frame) && (frame.mType == type)))
 				{
 					break;
 				}

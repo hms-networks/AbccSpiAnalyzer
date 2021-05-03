@@ -45,7 +45,7 @@ public:
 	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
 	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
 
-	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, SpiChannel_t e_channel, U8 type);
+	virtual U64 GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index, SpiChannel_t channel, U8 type);
 
 protected: /* Enums, Types, and Classes */
 
@@ -73,7 +73,7 @@ protected: /* Methods */
 
 	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification);
 	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
-	void TableBuilder(SpiChannel_t e_channel, const char* text, NotifEvent_t notification);
+	void TableBuilder(SpiChannel_t channel, const char* text, NotifEvent_t notification);
 
 	void BuildSpiCtrlString(U8 val, DisplayBase display_base);
 	void BuildSpiStsString(U8 val, DisplayBase display_base);

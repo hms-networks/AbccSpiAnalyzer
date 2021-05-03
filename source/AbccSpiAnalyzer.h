@@ -210,21 +210,21 @@ protected: // Methods
 	GetByteStatus GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* first_sample_ptr);
 
 	void CheckForIdleAfterPacket();
-	void AddFragFrame(SpiChannel_t e_channel, U64 first_sample, U64 last_sample);
-	void SignalReadyForNewPacket(SpiChannel_t e_channel);
+	void AddFragFrame(SpiChannel_t channel, U64 first_sample, U64 last_sample);
+	void SignalReadyForNewPacket(SpiChannel_t channel);
 
 	void SetMosiPacketType(PacketType packet_type);
 	void SetMisoPacketType(PacketType packet_type);
 	AnalyzerResults::MarkerType GetPacketMarkerType();
 
-	void ProcessMosiFrame(AbccMosiStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
-	void ProcessMisoFrame(AbccMisoStates::Enum e_state, U64 frame_data, S64 frames_first_sample);
+	void ProcessMosiFrame(AbccMosiStates::Enum state, U64 frame_data, S64 frames_first_sample);
+	void ProcessMisoFrame(AbccMisoStates::Enum state, U64 frame_data, S64 frames_first_sample);
 
 	bool RunAbccMosiStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 mosi_data, S64 first_sample);
 	bool RunAbccMisoStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 miso_data, S64 first_sample);
 
-	bool RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMisoStates::Enum* e_substate_ptr);
-	bool RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMosiStates::Enum* e_substate_ptr);
+	bool RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMisoStates::Enum* substate_ptr);
+	bool RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMosiStates::Enum* substate_ptr);
 
 	bool Is3WireIdleCondition(float idle_time_condition);
 	void RestorePreviousStateVars();
