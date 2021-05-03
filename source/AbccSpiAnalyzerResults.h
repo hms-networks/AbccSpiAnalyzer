@@ -71,9 +71,9 @@ protected:  /* Members */
 
 protected: /* Methods */
 
-	void StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification);
-	void StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
-	void TableBuilder(SpiChannel_t e_channel, char* text, NotifEvent_t notification);
+	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification);
+	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
+	void TableBuilder(SpiChannel_t e_channel, const char* text, NotifEvent_t notification);
 
 	void BuildSpiCtrlString(U8 val, DisplayBase display_base);
 	void BuildSpiStsString(U8 val, DisplayBase display_base);

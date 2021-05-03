@@ -151,21 +151,21 @@ enum class AbccMsgField
 typedef struct AbccMsgInfo
 {
 	AbccMsgField eMsgState;
-	char* tag;
+	const char* tag;
 	U8 frameSize;
 } AbccMsgInfo_t;
 
 typedef struct AbccMosiInfo
 {
 	AbccMosiStates::Enum eMosiState;
-	char* tag;
+	const char* tag;
 	U8 frameSize;
 } AbccMosiInfo_t;
 
 typedef struct AbccMisoInfo
 {
 	AbccMisoStates::Enum eMisoState;
-	char* tag;
+	const char* tag;
 	U8 frameSize;
 } AbccMisoInfo_t;
 

@@ -82,31 +82,31 @@
 
 typedef struct AttributeNameTable
 {
-	U8 object_num;
-	U8 num_obj_names;
-	U8 num_inst_names;
+	const U8 object_num;
+	const U8 num_obj_names;
+	const U8 num_inst_names;
 	const AttrLookupTable_t* obj_names;
 	const AttrLookupTable_t* inst_names;
 } AttributeNameTable_t;
 
 typedef struct ErrorNameTable
 {
-	U8 object_num;
-	U8 num_err_names;
+	const U8 object_num;
+	const U8 num_err_names;
 	const LookupTable_t* err_names;
 } ErrorNameTable_t;
 
 typedef struct CommandNameTable
 {
-	U8 object_num;
-	U8 num_cmd_names;
+	const U8 object_num;
+	const U8 num_cmd_names;
 	const CmdLookupTable_t* cmd_names;
 } CommandNameTable_t;
 
 typedef struct NcInstNameTable
 {
-	U8 object_num;
-	U8 num_inst_names;
+	const U8 object_num;
+	const U8 num_inst_names;
 	const LookupTable_t* inst_names;
 } NcInstNameTable_t;
 
@@ -1915,7 +1915,7 @@ NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase di
 			}
 			else
 			{
-				SNPRINTF(str, max_str_len, asSpiCtrlNames[i].name);
+				SNPRINTF(str, max_str_len, "%s", asSpiCtrlNames[i].name);
 				str += strlen(asSpiCtrlNames[i].name);
 				max_str_len -= (U16)strlen(asSpiCtrlNames[i].name);
 			}
@@ -1960,7 +1960,7 @@ NotifEvent_t GetSpiStsString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 			}
 			else
 			{
-				SNPRINTF(str, max_str_len, asSpiStsNames[i].name);
+				SNPRINTF(str, max_str_len, "%s", asSpiStsNames[i].name);
 				str += strlen(asSpiStsNames[i].name);
 				max_str_len -= (U16)strlen(asSpiStsNames[i].name);
 			}
@@ -1980,7 +1980,7 @@ NotifEvent_t GetApplStsString(U8 val, char* str, U16 max_str_len, DisplayBase di
 	{
 		if (asApplStsNames[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, asApplStsNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", asApplStsNames[i].name);
 			notification = asApplStsNames[i].notification;
 			found = true;
 			break;
@@ -2008,7 +2008,7 @@ NotifEvent_t GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase
 	{
 		if (asAnybusStsNames[i].value == (val & (ABCC_STATUS_CODE_MASK | ABCC_STATUS_RESERVED_MASK)))
 		{
-			SNPRINTF(tmpstr, sizeof(tmpstr), asAnybusStsNames[i].name);
+			SNPRINTF(tmpstr, sizeof(tmpstr), "%s", asAnybusStsNames[i].name);
 			notification = asAnybusStsNames[i].notification;
 			found = true;
 			break;
@@ -2042,7 +2042,7 @@ NotifEvent_t GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase d
 	{
 		if (asErrorRspNames[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, asErrorRspNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", asErrorRspNames[i].name);
 			return asErrorRspNames[i].notification;
 		}
 	}
@@ -2061,7 +2061,7 @@ NotifEvent_t GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const L
 	{
 		if (pasErrNames[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, pasErrNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", pasErrNames[i].name);
 			return pasErrNames[i].notification;
 		}
 	}
@@ -2163,7 +2163,7 @@ NotifEvent_t GetIntMaskString(U8 val, char* str, U16 max_str_len, DisplayBase di
 				notification = asIntMaskNames[i].notification;
 			}
 
-			SNPRINTF(str, max_str_len, asIntMaskNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", asIntMaskNames[i].name);
 			str += (U16)strlen(asIntMaskNames[i].name);
 			max_str_len -= (U16)strlen(asIntMaskNames[i].name);
 		}
@@ -2203,7 +2203,7 @@ NotifEvent_t GetLedStatusString(U16 val, char* str, U16 max_str_len, DisplayBase
 				notification = asLedStsNames[i].notification;
 			}
 
-			SNPRINTF(str, max_str_len, asLedStsNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", asLedStsNames[i].name);
 			str += (U16)strlen(asLedStsNames[i].name);
 			max_str_len -= (U16)strlen(asLedStsNames[i].name);
 		}
@@ -2237,7 +2237,7 @@ NotifEvent_t GetNamedInstString(
 		{
 			if (inst_names[i].value == val)
 			{
-				SNPRINTF(str, max_str_len, inst_names[i].name);
+				SNPRINTF(str, max_str_len, "%s", inst_names[i].name);
 				notification = inst_names[i].notification;
 				found = true;
 				break;
@@ -2297,7 +2297,7 @@ NotifEvent_t GetNamedAttrString(
 		{
 			if (entryPtr[i].value == val)
 			{
-				SNPRINTF(str, max_str_len, entryPtr[i].name);
+				SNPRINTF(str, max_str_len, "%s", entryPtr[i].name);
 				notification = entryPtr[i].notification;
 				found = true;
 				break;
@@ -2323,7 +2323,7 @@ NotifEvent_t GetObjectString(U8 val, char* str, U16 max_str_len, DisplayBase dis
 	{
 		if (asObjectNames[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, asObjectNames[i].name);
+			SNPRINTF(str, max_str_len, "%s", asObjectNames[i].name);
 
 			return asObjectNames[i].notification;
 		}
@@ -2343,7 +2343,7 @@ NotifEvent_t GetObjSpecificCmdString(U8 val, char* str, U16 max_str_len, const C
 	{
 		if (command_names[i].value == val)
 		{
-			SNPRINTF(str, max_str_len, command_names[i].name);
+			SNPRINTF(str, max_str_len, "%s", command_names[i].name);
 
 			return command_names[i].notification;
 		}
@@ -2370,7 +2370,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 	else
 	{
 		notification = entryPtr->notification;
-		SNPRINTF(str, max_str_len, entryPtr->name);
+		SNPRINTF(str, max_str_len, "%s", entryPtr->name);
 	}
 
 	return notification;
@@ -2427,7 +2427,7 @@ bool GetAttrString(U8 obj, U16 inst, U16 val, char* str, U16 max_str_len, Attrib
 	else
 	{
 		*notif_ptr = entryPtr->notification;
-		SNPRINTF(&str[offset], max_str_len, entryPtr->name);
+		SNPRINTF(&str[offset], max_str_len, "%s", entryPtr->name);
 	}
 
 	return entryFound;

@@ -69,12 +69,12 @@ SpiAnalyzerResults::~SpiAnalyzerResults()
 {
 }
 
-void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification)
+void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification)
 {
 	StringBuilder(tag, value, verbose, notification, DisplayPriority::Tag);
 }
 
-void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, NotifEvent_t notification, DisplayPriority disp_priority)
+void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority)
 {
 	const char alertStr[] = "!ALERT - ";
 	U16 strLenValue, strLenVerbose;
@@ -229,7 +229,7 @@ void SpiAnalyzerResults::StringBuilder(char* tag, char* value, char* verbose, No
 	}
 }
 
-void SpiAnalyzerResults::TableBuilder(SpiChannel_t e_channel, char* text, NotifEvent_t notification)
+void SpiAnalyzerResults::TableBuilder(SpiChannel_t e_channel, const char* text, NotifEvent_t notification)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
 	char *prefix;
@@ -524,7 +524,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 					GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), type);
 					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
 
-					if ((mSettings->mMsgDataPriority == DisplayPriority::Value))
+					if (mSettings->mMsgDataPriority == DisplayPriority::Value)
 					{
 						/* Conditionally trim the leading 0x specifier */
 						U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
@@ -614,7 +614,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
 
-				if ((mSettings->mProcessDataPriority == DisplayPriority::Value))
+				if (mSettings->mProcessDataPriority == DisplayPriority::Value)
 				{
 					/* Conditionally trim the leading 0x specifier */
 					U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
@@ -829,7 +829,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
 				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
 
-				if ((mSettings->mProcessDataPriority == DisplayPriority::Value))
+				if (mSettings->mProcessDataPriority == DisplayPriority::Value)
 				{
 					/* Conditionally trim the leading 0x specifier */
 					U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
@@ -1822,6 +1822,8 @@ void SpiAnalyzerResults::GenerateExportFile(const char* file, DisplayBase displa
 	case ExportType::ProcessData:
 		/* Export 'valid' process data */
 		ExportProcessDataToFile(file, display_base);
+		break;
+	default:
 		break;
 	}
 }

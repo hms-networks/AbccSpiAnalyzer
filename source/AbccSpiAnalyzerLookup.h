@@ -22,26 +22,26 @@ enum class BaseType : U8
 
 typedef struct LookupTable_t
 {
-	U16	value;
-	char* name;
-	NotifEvent_t notification;
+	const U16 value;
+	const char* name;
+	const NotifEvent_t notification;
 } LookupTable_t;
 
 typedef struct AttrLookupTable_t
 {
-	U16	value;
-	char* name;
-	BaseType msgDataType;
-	NotifEvent_t notification;
+	const U16 value;
+	const char* name;
+	const BaseType msgDataType;
+	const NotifEvent_t notification;
 } AttrLookupTable_t;
 
 typedef struct CmdLookupTable_t
 {
-	U16	value;
-	char* name;
-	BaseType commandType;
-	BaseType responseType;
-	NotifEvent_t notification;
+	const U16 value;
+	const char* name;
+	const BaseType commandType;
+	const BaseType responseType;
+	const NotifEvent_t notification;
 } CmdLookupTable_t;
 
 NotifEvent_t GetSpiCtrlString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);

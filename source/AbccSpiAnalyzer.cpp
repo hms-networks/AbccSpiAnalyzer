@@ -617,9 +617,9 @@ static bool IsErrorPacketType(PacketType packet_type)
 	case PacketType::MultiEventWithError:
 	case PacketType::Cancel:
 		return true;
+	default:
+		return false;
 	}
-
-	return false;
 }
 
 AnalyzerResults::MarkerType SpiAnalyzer::GetPacketMarkerType()
@@ -2158,7 +2158,7 @@ bool SpiAnalyzer::RunAbccMosiMsgSubStateMachine(StateOperation operation, bool* 
 			mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Object;
 		}
 		break;
-	case AbccMisoStates::MessageField_Object:
+	case AbccMosiStates::MessageField_Object:
 		if (mMosiVars.bFrameSizeCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eMsgSubState))
 		{
 			*add_frame_ptr = true;
