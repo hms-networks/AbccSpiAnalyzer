@@ -54,7 +54,7 @@ NotifEvent_t GetAbccStatusString(U8 val, char* str, U16 max_str_len, DisplayBase
 
 NotifEvent_t GetErrorRspString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
-NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base);
+NotifEvent_t GetErrorRspString(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 
 NotifEvent_t GetIntMaskString(U8 val, char* str, U16 max_str_len, DisplayBase display_base);
 

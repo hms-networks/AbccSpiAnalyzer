@@ -364,20 +364,20 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
 	StringBuilder("ERR_CODE", numberStr, str, notification);
 }
 
-void SpiAnalyzerResults::BuildErrorRsp(U8 nw_type_idx, U8 obj, U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 val, DisplayBase display_base)
 {
-	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetErrorRspString(nw_type_idx, obj, val, &str[0], sizeof(str), display_base);
+	NotifEvent_t notification = GetErrorRspString(nw_spec_err, nw_type_idx, obj, val, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-	if (nw_type_idx == 0)
+	if (nw_spec_err)
 	{
-		StringBuilder("OBJ_ERR", numberStr, str, notification);
+		StringBuilder("NW_ERR", numberStr, verboseStr, notification);
 	}
 	else
 	{
-		StringBuilder("NW_ERR", numberStr, str, notification);
+		StringBuilder("OBJ_ERR", numberStr, verboseStr, notification);
 	}
 }
 
@@ -485,24 +485,27 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
 				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
+					/* The error response may be composed of one to three bytes.
+					** This payload can represent a common error response,
+					** an object specific error response, or a network specific
+					** error response. */
+
 					if (info->msgDataCnt == 0)
 					{
 						BuildErrorRsp((U8)frame.mData1, display_base);
 					}
 					else
 					{
-						U8 nw_type_idx = 0;
+						const U16 nwSpecErrCodeOffset = 2;
+						U8 nwTypeIdx = 0;
+						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
 
-						/* Bytes 1 and onward are always understood as object-specific
-						** or network-specific error codes. The current implementation
-						** supports only one extra byte in the error response message
-						** data past the object specific or network-specific error */
-						if (info->msgDataCnt == 2)
+						if (nwSpecificError)
 						{
-							nw_type_idx = (U8)mSettings->mNetworkType;
+							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
 						}
 
-						BuildErrorRsp(nw_type_idx, info->msgHeader.obj, (U8)frame.mData1, display_base);
+						BuildErrorRsp(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, display_base);
 					}
 				}
 				else
@@ -700,24 +703,27 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
 				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 				{
+					/* The error response may be composed of one to three bytes.
+					** This payload can represent a common error response,
+					** an object specific error response, or a network specific
+					** error response. */
+
 					if (info->msgDataCnt == 0)
 					{
 						BuildErrorRsp((U8)frame.mData1, display_base);
 					}
 					else
 					{
-						U8 nw_type_idx = 0;
+						const U16 nwSpecErrCodeOffset = 2;
+						U8 nwTypeIdx = 0;
+						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
 
-						/* Bytes 1 and onward are always understood as object-specific
-						** or network-specific error codes. The current implementation
-						** supports only one extra byte in the error response message
-						** data past the object specific or network-specific error */
-						if (info->msgDataCnt == 2)
+						if (nwSpecificError)
 						{
-							nw_type_idx = (U8)mSettings->mNetworkType;
+							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
 						}
 
-						BuildErrorRsp(nw_type_idx, info->msgHeader.obj, (U8)frame.mData1, display_base);
+						BuildErrorRsp(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, display_base);
 					}
 				}
 				else
@@ -991,50 +997,83 @@ void SpiAnalyzerResults::AppendCsvMessageEntry(void* file, std::stringstream &ss
 	AnalyzerHelpers::AppendToFile((U8*)ss_csv_tail.str().c_str(), (U32)ss_csv_tail.str().length(), file);
 }
 
-void SpiAnalyzerResults::AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str)
+void SpiAnalyzerResults::AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str, DisplayBase display_base)
 {
+	const char doubleQuote[] = "\"";
 	std::string csvStr;
+	bool isStringData = (
+		(display_base == DisplayBase::ASCII) ||
+		(display_base == DisplayBase::AsciiHex));
+
+	if (!isStringData)
+	{
+		ss_csv_data << CSV_DELIMITER << input_data_str;
+		return;
+	}
 
 	csvStr.assign(input_data_str);
 
 	ss_csv_data << CSV_DELIMITER;
 
-	if (csvStr.find('"') != std::string::npos)
-	{
-		/* Escape double-quotes */
-		for (std::string::size_type n = 0;
-			 (n = csvStr.find('"', n)) != std::string::npos;
-			 n += 2)
-		{
-			csvStr.replace(n, 1, "\"\"");
-		}
+	// The first two cases below are to reverse the Saleae Logic SDK's handling
+	// of the 'space' and 'comma' ASCII characters. In this case the plugin will
+	// escape the characters only is necessary based on the state of the
+	// CSV delimiter.
 
-		ss_csv_data << '"' << csvStr << '"';
-	}
-	else if( csvStr.find( CSV_DELIMITER ) != std::string::npos )
+	if (csvStr.find("COMMA") != std::string::npos)
 	{
-		/* Escape delimiter */
-		for( std::string::size_type n = 0;
-			( n = csvStr.find( CSV_DELIMITER, n ) ) != std::string::npos;
-			n += 2 )
-		{
-			csvStr.replace( n, 1, "\"" + CSV_DELIMITER + "\"" );
-		}
+		std::string comma = ",";
 
-		ss_csv_data << '"' << csvStr << '"';
-	}
-	else if (csvStr.find("COMMA") != std::string::npos)
-	{
-		/* Replace with comma-character and surround with double quotes */
-		ss_csv_data << "\",\"";
+		if (CSV_DELIMITER.compare(comma) == 0)
+		{
+			/* Replace with comma-character and surround with double quotes */
+			ss_csv_data << doubleQuote << comma << doubleQuote;
+		}
+		else
+		{
+			/* Replace with space-character */
+			ss_csv_data << comma;
+		}
 	}
 	else if (csvStr.find("' '") != std::string::npos)
 	{
-		/* Replace with space-character */
-		ss_csv_data << ' ';
+		std::string space = " ";
+
+		if (CSV_DELIMITER.compare(space) == 0)
+		{
+			/* Replace with space-character and surround with double quotes */
+			ss_csv_data << doubleQuote << space << doubleQuote;
+		}
+		else
+		{
+			/* Replace with space-character */
+			ss_csv_data << space;
+		}
 	}
 	else
 	{
+		if (csvStr.find('"') != std::string::npos)
+		{
+			/* Escape double-quotes */
+			for (std::string::size_type n = 0;
+				(n = csvStr.find(doubleQuote, n)) != std::string::npos;
+				n += 2)
+			{
+				csvStr.replace(n, 1, "\"\"");
+			}
+
+			/* Wrap element in double quotes */
+			csvStr.insert(0, doubleQuote);
+			csvStr.append(doubleQuote);
+		}
+
+		if (csvStr.find(CSV_DELIMITER) != std::string::npos)
+		{
+			/* Wrap element in double quotes */
+			csvStr.insert(0, doubleQuote);
+			csvStr.append(doubleQuote);
+		}
+
 		/* No escaping needed */
 		ss_csv_data << csvStr;
 	}
@@ -1254,13 +1293,32 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 
 						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 						{
+							const U16 nwSpecErrCodeOffset = 2;
+
+							/* The error response may be composed of one to three bytes.
+							** This payload can represent a common error response,
+							** an object specific error response, or a network specific
+							** error response. */
+
 							if (info->msgDataCnt == 0)
 							{
 								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
-							else
+							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
 							{
-								GetErrorRspString((U8)mSettings->mNetworkType, info->msgHeader.obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								U8 nwTypeIdx = 0;
+								bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+								if (nwSpecificError)
+								{
+									nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+								}
+
+								GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+
+								// Explicitly set display_base to ASCII to ensure proper escaping
+								// is performed when calling AppendCsvSafeString().
+								display_base = DisplayBase::ASCII;
 							}
 						}
 						else
@@ -1288,15 +1346,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 							addLastMosiMsgHeader = false;
 						}
 
-						if ((display_base == DisplayBase::ASCII) ||
-							(display_base == DisplayBase::AsciiHex))
-						{
-							AppendCsvSafeString(ssMosiTail, dataStr);
-						}
-						else
-						{
-							ssMosiTail << CSV_DELIMITER << dataStr;
-						}
+						AppendCsvSafeString(ssMosiTail, dataStr, display_base);
 
 						break;
 					}
@@ -1454,13 +1504,32 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 
 						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 						{
+							const U16 nwSpecErrCodeOffset = 2;
+
+							/* The error response may be composed of one to three bytes.
+							** This payload can represent a common error response,
+							** an object specific error response, or a network specific
+							** error response. */
+
 							if (info->msgDataCnt == 0)
 							{
 								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
 							}
-							else
+							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
 							{
-								GetErrorRspString((U8)mSettings->mNetworkType, info->msgHeader.obj, (U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								U8 nwTypeIdx = 0;
+								bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+								if (nwSpecificError)
+								{
+									nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+								}
+
+								GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+
+								// Explicitly set display_base to ASCII to ensure proper escaping
+								// is performed when calling AppendCsvSafeString().
+								display_base = DisplayBase::ASCII;
 							}
 						}
 						else
@@ -1488,15 +1557,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 							addLastMisoMsgHeader = false;
 						}
 
-						if ((display_base == DisplayBase::ASCII) ||
-							(display_base == DisplayBase::AsciiHex))
-						{
-							AppendCsvSafeString(ssMisoTail, dataStr);
-						}
-						else
-						{
-							ssMisoTail << CSV_DELIMITER << dataStr;
-						}
+						AppendCsvSafeString(ssMisoTail, dataStr, display_base);
 
 						break;
 					}
@@ -2286,6 +2347,54 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				}
 
 				break;
+			case AbccMisoStates::MessageField_Data:
+			{
+				NotifEvent_t notification = NotifEvent::None;
+				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+				{
+					const U16 nwSpecErrCodeOffset = 2;
+					char errorStr[FORMATTED_STRING_BUFFER_SIZE];
+
+					// The error response may be composed of one to three bytes.
+					// This payload can represent a common error response,
+					// an object specific error response, or a network specific
+					// error response.
+
+					if (info->msgDataCnt == 0)
+					{
+						notification = GetErrorRspString((U8)frame.mData1, str, sizeof(str), display_base);
+						SNPRINTF(errorStr, sizeof(errorStr), "Error Code: %s", str);
+						TableBuilder(SpiChannel::MISO, errorStr, notification);
+					}
+					else if (info->msgDataCnt <= nwSpecErrCodeOffset)
+					{
+						U8 nwTypeIdx = 0;
+						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+						if (nwSpecificError)
+						{
+							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+						}
+
+						notification = GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, str, sizeof(str), display_base);
+
+						if (nwSpecificError)
+						{
+							SNPRINTF(errorStr, sizeof(errorStr), "Network Error: %s", str);
+						}
+						else
+						{
+							SNPRINTF(errorStr, sizeof(errorStr), "Object Error: %s", str);
+						}
+
+						TableBuilder(SpiChannel::MISO, errorStr, notification);
+					}
+				}
+
+				break;
+			}
 			default:
 				break;
 			}
@@ -2548,6 +2657,54 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				}
 
 				break;
+			case AbccMosiStates::MessageField_Data:
+			{
+				NotifEvent_t notification = NotifEvent::None;
+				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+				{
+					const U16 nwSpecErrCodeOffset = 2;
+					char errorStr[FORMATTED_STRING_BUFFER_SIZE];
+
+					// The error response may be composed of one to three bytes.
+					// This payload can represent a common error response,
+					// an object specific error response, or a network specific
+					// error response.
+
+					if (info->msgDataCnt == 0)
+					{
+						notification = GetErrorRspString((U8)frame.mData1, str, sizeof(str), display_base);
+						SNPRINTF(errorStr, sizeof(errorStr), "Error Code: %s", str);
+						TableBuilder(SpiChannel::MISO, errorStr, notification);
+					}
+					else if (info->msgDataCnt <= nwSpecErrCodeOffset)
+					{
+						U8 nwTypeIdx = 0;
+						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+						if (nwSpecificError)
+						{
+							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+						}
+
+						notification = GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, str, sizeof(str), display_base);
+
+						if (nwSpecificError)
+						{
+							SNPRINTF(errorStr, sizeof(errorStr), "Network Error: %s", str);
+						}
+						else
+						{
+							SNPRINTF(errorStr, sizeof(errorStr), "Object Error: %s", str);
+						}
+
+						TableBuilder(SpiChannel::MISO, errorStr, notification);
+					}
+				}
+
+				break;
+			}
 			default:
 				break;
 			}

@@ -2072,24 +2072,22 @@ NotifEvent_t GetObjSpecificErrString(U8 val, char* str, U16 max_str_len, const L
 	return NotifEvent::Alert;
 }
 
-NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
+NotifEvent_t GetErrorRspString(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 val, char* str, U16 max_str_len, DisplayBase display_base)
 {
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 
 	// Special handling is needed for ABP_OBJ_NUM_DI.
 	if (obj == ABP_OBJ_NUM_DI)
 	{
-		if (nw_type_idx == 0)
-		{
-			// Use object-specific lookup table
-			GetObjSpecificErrString(val, str, max_str_len, &asDiErrNames[0],
-				NUM_ENTRIES(asDiErrNames), display_base);
-		}
-		else
+		if (nw_spec_err)
 		{
 			// Use network-specific lookup table
 			switch (abNetworkTypeValue[nw_type_idx])
 			{
+			case 0: // Unspecified network type
+				GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
+				SNPRINTF(str, max_str_len, "Unspecified network type, set in settings to enumerate: %s", numberStr);
+				break;
 			case ABP_NW_TYPE_PRT:
 			case ABP_NW_TYPE_PRT_2P:
 			case ABP_NW_TYPE_PIR:
@@ -2097,14 +2095,20 @@ NotifEvent_t GetErrorRspString(U8 nw_type_idx, U8 obj, U8 val, char* str, U16 ma
 			case ABP_NW_TYPE_PIR_FO_IIOT:
 			case ABP_NW_TYPE_PIR_IIOT:
 				// Profinet
-				GetObjSpecificErrString(val, str, max_str_len, &asPirDiErrNames[0],
+				GetObjSpecificErrString(val, str, max_str_len, asPirDiErrNames,
 					NUM_ENTRIES(asPirDiErrNames), display_base);
 				break;
 			default:
 				GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, max_str_len, BaseType::Numeric);
-				SNPRINTF(str, max_str_len, "Unknown: %s", numberStr);
+				SNPRINTF(str, max_str_len, "Could not enumerate: %s. Unsupported network type 0x%02X specified for object 0x%02X.", numberStr, nw_type_idx, obj);
 				break;
 			}
+		}
+		else
+		{
+			// Use object-specific lookup table
+			GetObjSpecificErrString(val, str, max_str_len, asDiErrNames,
+				NUM_ENTRIES(asDiErrNames), display_base);
 		}
 	}
 	else

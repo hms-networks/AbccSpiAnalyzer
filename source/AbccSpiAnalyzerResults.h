@@ -79,7 +79,7 @@ protected: /* Methods */
 	void BuildSpiStsString(U8 val, DisplayBase display_base);
 	bool BuildCmdString(U8 val, U8 obj, DisplayBase display_base);
 	void BuildErrorRsp(U8 val, DisplayBase display_base);
-	void BuildErrorRsp(U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
+	void BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
 	void BuildAbccStatus(U8 val, DisplayBase display_base);
 	void BuildApplStatus(U8 val, DisplayBase display_base);
 	void BuildIntMask(U8 val, DisplayBase display_base);
@@ -93,7 +93,7 @@ protected: /* Methods */
 	void ExportProcessDataToFile(const char* file, DisplayBase display_base);
 
 	void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);
-	void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str);
+	void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str, DisplayBase display_base);
 };
 
 #endif /* ABCC_SPI_ANALYZER_RESULTS_H */
