@@ -2424,6 +2424,7 @@ NotifEvent_t GetErrorRspString(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 val,
 		{
 			if (asErrorNameTables[i].object_num == obj)
 			{
+				objFound = true;
 				GetObjSpecificErrString(
 					val,
 					str,
