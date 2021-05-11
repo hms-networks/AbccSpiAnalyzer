@@ -719,7 +719,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			default:
 				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
 				notification = NotifEvent::Alert;
-				StringBuilder("UNKOWN", numberStr, "Internal Error: Unknown State", notification);
+				StringBuilder("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
 				break;
 			}
 		}
@@ -1023,7 +1023,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 			default:
 				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
 				notification = NotifEvent::Alert;
-				StringBuilder("UNKOWN", numberStr, "Internal Error: Unknown State", notification);
+				StringBuilder("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
 				break;
 			}
 		}
