@@ -89,10 +89,6 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mAnybusStatusIndexing(true),
 	mApplStatusIndexing(true),
 	mAdvSettingsPath(""),
-	mClockingAlertLimit(-1),
-	m4WireOn3Channels(false),
-	m3WireOn4Channels(false),
-	mExportDelimiter(","),
 	mChangeID(0)
 {
 	SetDefaultAdvancedSettings();
@@ -545,14 +541,15 @@ bool SpiAnalyzerSettings::ParseAdvancedSettingsFile()
 	return settingsValid;
 }
 
-void SpiAnalyzerSettings::SetSettingError( const std::string &setting_name,
-                                           const std::string &error_text )
+void SpiAnalyzerSettings::SetSettingError(
+	const std::string &setting_name,
+	const std::string &error_text)
 {
-   std::string s = "";
+	std::string s = "";
 
-   s += setting_name + " : " + error_text;
+	s += setting_name + " : " + error_text;
 
-   SetErrorText( s.c_str() );
+	SetErrorText(s.c_str());
 }
 
 bool SpiAnalyzerSettings::SetSettingsFromInterfaces()

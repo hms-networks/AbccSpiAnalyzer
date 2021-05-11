@@ -172,9 +172,9 @@ protected: /* Methods */
 	void UpdateFileTransferStateMachine();
 
 	void CreateFileInstance(ABP_MsgType* msg_ptr, MessageType message_type);
-	void FileOpen(ABP_MsgType* msg_ptr, MessageType message_type, CHAR* file_name, UINT8 file_name_length);
+	void FileOpen(ABP_MsgType* msg_ptr, MessageType message_type, const CHAR* file_name, UINT8 file_name_length);
 	void GetFileSize(ABP_MsgType* msg_ptr, MessageType message_type);
-	void FileRead(ABP_MsgType* msg_ptr, MessageType message_type, CHAR* file_data, UINT32 file_data_length);
+	void FileRead(ABP_MsgType* msg_ptr, MessageType message_type, const CHAR* file_data, UINT32 file_data_length);
 	void FileClose(ABP_MsgType* msg_ptr, MessageType message_type, UINT32 file_size);
 	void DeleteFileInstance(ABP_MsgType* msg_ptr, MessageType message_type);
 

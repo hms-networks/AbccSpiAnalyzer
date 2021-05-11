@@ -519,9 +519,8 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 	{
 		// Add sample markers to the results
 		const AnalyzerResults::MarkerType mArrowMarker = AnalyzerResults::UpArrow;
-		U32 count = (U32)mArrowLocations.size();
 
-		for (U32 bitIndex = 0; bitIndex < count; bitIndex++)
+		for (size_t bitIndex = 0; bitIndex < mArrowLocations.size(); bitIndex++)
 		{
 			mResults->AddMarker(mArrowLocations[bitIndex], mArrowMarker, mSettings->mClockChannel);
 		}
@@ -1518,14 +1517,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 	case AbccMisoStates::SpiStatus:
 		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
-			if ((mMisoVars.lFrameData & ABP_SPI_STATUS_NEW_PD) == ABP_SPI_STATUS_NEW_PD)
-			{
-				mMisoVars.fNewRdPd = true;
-			}
-			else
-			{
-				mMisoVars.fNewRdPd = false;
-			}
+			mMisoVars.fNewRdPd = ((mMisoVars.lFrameData & ABP_SPI_STATUS_NEW_PD) == ABP_SPI_STATUS_NEW_PD);
 
 			if ((mMisoVars.lFrameData & (ABP_SPI_STATUS_LAST_FRAG | ABP_SPI_STATUS_M)) == ABP_SPI_STATUS_M)
 			{
@@ -1698,14 +1690,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 		mMisoVars.dwByteCnt = 0;
 	}
 
-	if (mMisoVars.eState == AbccMisoStates::Idle)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (mMisoVars.eState == AbccMisoStates::Idle);
 }
 
 bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionStatus acquisition_status, U64 mosi_data, S64 first_sample)
@@ -1776,14 +1761,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	case AbccMosiStates::SpiControl:
 		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if ((mMosiVars.lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID)
-			{
-				mMosiVars.fWrPdValid = true;
-			}
-			else
-			{
-				mMosiVars.fWrPdValid = false;
-			}
+			mMosiVars.fWrPdValid = ((mMosiVars.lFrameData & ABP_SPI_CTRL_WRPD_VALID) == ABP_SPI_CTRL_WRPD_VALID);
 
 			if ((mMosiVars.lFrameData & (ABP_SPI_CTRL_LAST_FRAG | ABP_SPI_CTRL_M)) == ABP_SPI_CTRL_M)
 			{
@@ -1997,14 +1975,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 		mMosiVars.dwByteCnt = 0;
 	}
 
-	if (mMosiVars.eState == AbccMosiStates::Idle)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (mMosiVars.eState == AbccMosiStates::Idle);
 }
 
 bool SpiAnalyzer::RunAbccMisoMsgSubStateMachine(StateOperation operation, bool* add_frame_ptr, AbccMisoStates::Enum* substate_ptr)

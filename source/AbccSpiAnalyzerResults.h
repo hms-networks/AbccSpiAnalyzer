@@ -51,9 +51,9 @@ protected: /* Enums, Types, and Classes */
 
 	typedef union AbccSpiStatesUnion
 	{
-		U8						bState;
-		AbccMisoStates::Enum	eMiso;
-		AbccMosiStates::Enum	eMosi;
+		U8 bState;
+		AbccMisoStates::Enum eMiso;
+		AbccMosiStates::Enum eMosi;
 	} AbccSpiStatesUnion_t;
 
 protected:  /* Members */
@@ -75,18 +75,18 @@ protected: /* Methods */
 	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
 	void TableBuilder(SpiChannel_t channel, const char* text, NotifEvent_t notification);
 
-	void BuildSpiCtrlString(U8 val, DisplayBase display_base);
-	void BuildSpiStsString(U8 val, DisplayBase display_base);
-	bool BuildCmdString(U8 val, U8 obj, DisplayBase display_base);
-	void BuildErrorRsp(U8 val, DisplayBase display_base);
-	void BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 val, U8 obj, DisplayBase display_base);
-	void BuildAbccStatus(U8 val, DisplayBase display_base);
-	void BuildApplStatus(U8 val, DisplayBase display_base);
-	void BuildIntMask(U8 val, DisplayBase display_base);
-	void BuildObjectString(U8 val, DisplayBase display_base);
+	void BuildSpiCtrlString(U8 spi_control, DisplayBase display_base);
+	void BuildSpiStsString(U8 spi_status, DisplayBase display_base);
+	bool BuildCmdString(U8 command, U8 obj, DisplayBase display_base);
+	void BuildErrorRsp(U8 error_code, DisplayBase display_base);
+	void BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 error_code, U8 obj, DisplayBase display_base);
+	void BuildAbccStatus(U8 abcc_status, DisplayBase display_base);
+	void BuildApplStatus(U8 appl_status, DisplayBase display_base);
+	void BuildIntMask(U8 int_mask, DisplayBase display_base);
+	void BuildObjectString(U8 object_num, DisplayBase display_base);
 
-	void BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base);
-	void BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAccessMode_t access_mode, DisplayBase display_base);
+	void BuildInstString(U8 nw_type_idx, U8 obj, U16 inst, DisplayBase display_base);
+	void BuildAttrString(const MsgHeaderInfo_t* msg_header_ptr, U16 attr, AttributeAccessMode_t access_mode, DisplayBase display_base);
 
 	void ExportAllFramesToFile(const char* file, DisplayBase display_base);
 	void ExportMessageDataToFile(const char* file, DisplayBase display_base);

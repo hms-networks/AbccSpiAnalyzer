@@ -57,7 +57,6 @@ def _build() -> None:
     global platform_64bit
 
     dylib_ext = ""
-    arch = ""
 
     if platform.system().lower() == "windows":
         windows_platform = True

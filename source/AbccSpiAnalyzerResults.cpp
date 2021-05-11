@@ -244,6 +244,7 @@ void SpiAnalyzerResults::TableBuilder(SpiChannel_t channel, const char* text, No
 	{
 		prefix = &misoPrefix[0];
 	}
+
 	if (notification)
 	{
 		SNPRINTF(str, sizeof(str), "%s!%s", prefix, text);
@@ -256,50 +257,50 @@ void SpiAnalyzerResults::TableBuilder(SpiChannel_t channel, const char* text, No
 	AddTabularText(str);
 }
 
-bool SpiAnalyzerResults::BuildCmdString(U8 val, U8 obj, DisplayBase display_base)
+bool SpiAnalyzerResults::BuildCmdString(U8 command, U8 obj, DisplayBase display_base)
 {
 	bool errorRspMsg;
-	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetCmdString(val, obj, &str[0], sizeof(str), display_base);
+	NotifEvent_t notification = GetCmdString(command, obj, verboseStr, sizeof(verboseStr), display_base);
 
-	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Command), numberStr, sizeof(numberStr), BaseType::Numeric);
+	GetNumberString(command, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Command), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-	if ((val & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
+	if ((command & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 	{
 		errorRspMsg = true;
-		StringBuilder("ERR_RSP", numberStr, str, NotifEvent::Alert);
+		StringBuilder("ERR_RSP", numberStr, verboseStr, NotifEvent::Alert);
 	}
 	else
 	{
 		errorRspMsg = false;
-		if ((val & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
+		if ((command & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
 		{
-			StringBuilder("CMD", numberStr, str, notification);
+			StringBuilder("CMD", numberStr, verboseStr, notification);
 		}
 		else
 		{
-			StringBuilder("RSP", numberStr, str, notification);
+			StringBuilder("RSP", numberStr, verboseStr, notification);
 		}
 	}
 
 	return errorRspMsg;
 }
 
-void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 inst, DisplayBase display_base)
 {
-	char verbose_str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = NotifEvent::None;
-	bool objFound = true;
+	bool instFound = true;
 
-	objFound = GetInstString(nw_type_idx, obj, val, verbose_str, sizeof(verbose_str), &notification, display_base);
+	instFound = GetInstString(nw_type_idx, obj, inst, verboseStr, sizeof(verboseStr), &notification, display_base);
 
-	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
+	GetNumberString(inst, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-	if (objFound)
+	if (instFound)
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, verbose_str, notification);
+		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, verboseStr, notification);
 	}
 	else
 	{
@@ -307,20 +308,19 @@ void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 val, Displa
 	}
 }
 
-void SpiAnalyzerResults::BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAccessMode_t access_mode, DisplayBase display_base)
+void SpiAnalyzerResults::BuildAttrString(const MsgHeaderInfo_t* msg_header_ptr, U16 attr, AttributeAccessMode_t access_mode, DisplayBase display_base)
 {
-	char verbose_str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = NotifEvent::None;
-	bool objFound = true;
+	bool attrFound = true;
 
-	objFound = GetAttrString(obj, inst, val, verbose_str, sizeof(verbose_str), access_mode, &notification, display_base);
+	attrFound = GetAttrString(msg_header_ptr->obj, msg_header_ptr->inst, attr, verboseStr, sizeof(verboseStr), access_mode, &notification, display_base);
+	GetNumberString(attr, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
 
-	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::CommandExtension), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-	if (objFound)
+	if (attrFound)
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, verbose_str, notification);
+		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, verboseStr, notification);
 	}
 	else
 	{
@@ -328,48 +328,48 @@ void SpiAnalyzerResults::BuildAttrString(U8 obj, U16 inst, U16 val, AttributeAcc
 	}
 }
 
-void SpiAnalyzerResults::BuildObjectString(U8 val, DisplayBase display_base)
-{
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetObjectString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Object), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Object), numberStr, str, notification);
-}
-
-void SpiAnalyzerResults::BuildSpiCtrlString(U8 val, DisplayBase display_base)
-{
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetSpiCtrlString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::SpiControl), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::SpiControl), numberStr, str, notification);
-}
-
-void SpiAnalyzerResults::BuildSpiStsString(U8 val, DisplayBase display_base)
-{
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetSpiStsString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::SpiStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::SpiStatus), numberStr, str, notification);
-}
-
-void SpiAnalyzerResults::BuildErrorRsp(U8 val, DisplayBase display_base)
-{
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetErrorRspString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder("ERR_CODE", numberStr, str, notification);
-}
-
-void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildObjectString(U8 object_num, DisplayBase display_base)
 {
 	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetErrorRspString(nw_spec_err, nw_type_idx, obj, val, verboseStr, sizeof(verboseStr), display_base);
-	GetNumberString(val, display_base, SIZE_IN_BITS(val), numberStr, sizeof(numberStr), BaseType::Numeric);
+	NotifEvent_t notification = GetObjectString(object_num, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(object_num, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Object), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Object), numberStr, verboseStr, notification);
+}
+
+void SpiAnalyzerResults::BuildSpiCtrlString(U8 spi_control, DisplayBase display_base)
+{
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	NotifEvent_t notification = GetSpiCtrlString(spi_control, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(spi_control, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::SpiControl), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::SpiControl), numberStr, verboseStr, notification);
+}
+
+void SpiAnalyzerResults::BuildSpiStsString(U8 spi_status, DisplayBase display_base)
+{
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	NotifEvent_t notification = GetSpiStsString(spi_status, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(spi_status, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::SpiStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::SpiStatus), numberStr, verboseStr, notification);
+}
+
+void SpiAnalyzerResults::BuildErrorRsp(U8 error_code, DisplayBase display_base)
+{
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	NotifEvent_t notification = GetErrorRspString(error_code, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(error_code, display_base, SIZE_IN_BITS(error_code), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder("ERR_CODE", numberStr, verboseStr, notification);
+}
+
+void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 error_code, DisplayBase display_base)
+{
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	NotifEvent_t notification = GetErrorRspString(nw_spec_err, nw_type_idx, obj, error_code, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(error_code, display_base, SIZE_IN_BITS(error_code), numberStr, sizeof(numberStr), BaseType::Numeric);
 
 	if (nw_spec_err)
 	{
@@ -381,32 +381,31 @@ void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj,
 	}
 }
 
-void SpiAnalyzerResults::BuildIntMask(U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildIntMask(U8 int_mask, DisplayBase display_base)
 {
-	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetIntMaskString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::InterruptMask), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::InterruptMask), numberStr, str, notification);
+	NotifEvent_t notification = GetIntMaskString(int_mask, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(int_mask, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::InterruptMask), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::InterruptMask), numberStr, verboseStr, notification);
 }
 
-void SpiAnalyzerResults::BuildAbccStatus(U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildAbccStatus(U8 abcc_status, DisplayBase display_base)
 {
-	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = GetAbccStatusString(val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::AnybusStatus), numberStr, str, notification);
+	NotifEvent_t notification = GetAbccStatusString(abcc_status, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(abcc_status, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::AnybusStatus), numberStr, verboseStr, notification);
 }
 
-void SpiAnalyzerResults::BuildApplStatus(U8 val, DisplayBase display_base)
+void SpiAnalyzerResults::BuildApplStatus(U8 appl_status, DisplayBase display_base)
 {
-	char str[FORMATTED_STRING_BUFFER_SIZE];
+	char verboseStr[FORMATTED_STRING_BUFFER_SIZE];
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	/* Note ABCC documentation shows U16 datatype for status code, but SPI telegram is U8 */
-	NotifEvent_t notification = GetApplStsString((U8)val, &str[0], sizeof(str), display_base);
-	GetNumberString(val, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::ApplicationStatus), numberStr, str, notification);
+	NotifEvent_t notification = GetApplStsString(appl_status, verboseStr, sizeof(verboseStr), display_base);
+	GetNumberString(appl_status, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
+	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::ApplicationStatus), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, DisplayBase display_base)
@@ -512,10 +511,7 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 				{
 					BaseType type;
 
-					if(((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
-					   ((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+					if (IsAttributeCmd(info->msgHeader.cmd))
 					{
 						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 					}
@@ -600,13 +596,11 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
 				if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
 				{
-					MsgHeaderInfo_t* psMsgHdr = (MsgHeaderInfo_t*)&frame.mData2;
-					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, AttributeAccessMode::Normal, display_base);
+					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Normal, display_base);
 				}
 				else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
 				{
-					MsgHeaderInfo_t* psMsgHdr = (MsgHeaderInfo_t*)&frame.mData2;
-					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, AttributeAccessMode::Indexed, display_base);
+					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Indexed, display_base);
 				}
 				else
 				{
@@ -914,13 +908,11 @@ void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
 				if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
 				{
-					MsgHeaderInfo_t* psMsgHdr = (MsgHeaderInfo_t*)&frame.mData2;
-					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, AttributeAccessMode::Normal, display_base);
+					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Normal, display_base);
 				}
 				else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
 				{
-					MsgHeaderInfo_t* psMsgHdr = (MsgHeaderInfo_t*)&frame.mData2;
-					BuildAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, AttributeAccessMode::Indexed, display_base);
+					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Indexed, display_base);
 				}
 				else
 				{
@@ -1368,7 +1360,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMosiStates::ApplicationStatus:
 					{
 						mosiAppStatReached = true;
-						GetApplStsString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetApplStsString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
@@ -1382,7 +1374,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					}
 					case AbccMosiStates::MessageField_Object:
 					{
-						GetObjectString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssMosiTail << CSV_DELIMITER << dataStr;
 						addLastMosiMsgHeader = false;
 						break;
@@ -1403,7 +1395,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					}
 					case AbccMosiStates::MessageField_Command:
 					{
-						GetCmdString((U8)frame.mData1, (U8)frame.mData2, &dataStr[0], sizeof(dataStr), display_base);
+						GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
 
 						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 						{
@@ -1527,7 +1519,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 
 							if (info->msgDataCnt == 0)
 							{
-								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 							}
 							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
 							{
@@ -1550,10 +1542,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						{
 							BaseType type;
 
-							if (((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_GET_INDEXED_ATTR) ||
-								((ABP_MsgCmdType)(info->msgHeader.cmd & ABP_MSG_HEADER_CMD_BITS) == ABP_CMD_SET_INDEXED_ATTR))
+							if (IsAttributeCmd(info->msgHeader.cmd))
 							{
 								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
 							}
@@ -1599,7 +1588,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					case AbccMisoStates::AnybusStatus:
 					{
 						misoAnbStatReached = true;
-						GetAbccStatusString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetAbccStatusString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
@@ -1654,7 +1643,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					}
 					case AbccMisoStates::MessageField_Object:
 					{
-						GetObjectString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssMisoTail << CSV_DELIMITER << dataStr;
 						addLastMisoMsgHeader = false;
 						break;
@@ -1675,7 +1664,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 					}
 					case AbccMisoStates::MessageField_Command:
 					{
-						GetCmdString((U8)frame.mData1, (U8)frame.mData2, &dataStr[0], sizeof(dataStr), display_base);
+						GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
 
 						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 						{
@@ -1799,7 +1788,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 
 							if (info->msgDataCnt == 0)
 							{
-								GetErrorRspString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+								GetErrorRspString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 							}
 							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
 							{
@@ -2035,7 +2024,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					case AbccMosiStates::ApplicationStatus:
 					{
 						mosiAppStatReached = true;
-						GetApplStsString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetApplStsString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
@@ -2069,7 +2058,7 @@ void SpiAnalyzerResults::ExportProcessDataToFile(const char* file, DisplayBase d
 					case AbccMisoStates::AnybusStatus:
 					{
 						misoAnbStatReached = true;
-						GetAbccStatusString((U8)frame.mData1, &dataStr[0], sizeof(dataStr), display_base);
+						GetAbccStatusString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
 						ssSharedBody << CSV_DELIMITER << dataStr;
 						break;
 					}
@@ -2230,9 +2219,9 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 	{
 		if (frame.HasFlag(SPI_ERROR_FLAG))
 		{
-			/* These types of errors effect the bus as a whole and are not
-			** specific to a MISO/MOSI channel. For compatibility, only
-			** show one for tabular text */
+			// These types of errors affect the bus as a whole and are not
+			// specific to a MISO/MOSI channel. For compatibility, only
+			// show one for tabular text.
 			if (IS_MISO_FRAME(frame))
 			{
 				switch (frame.mType)
@@ -2263,7 +2252,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				}
 				else if (frame.mType == AbccMosiStates::ApplicationStatus)
 				{
-					/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 					if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 					{
 						AddTabularText("!Application Status: ", str);
@@ -2295,7 +2283,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 				{
 					char tabText[FORMATTED_STRING_BUFFER_SIZE];
 					NotifEvent_t notification = NotifEvent::None;
-					if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
+					if (GetAbccStatusString((U8)frame.mData1, str, sizeof(str), display_base))
 					{
 						notification = NotifEvent::Alert;
 					}
@@ -2360,7 +2348,6 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		{
 			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 			{
-				/* Note ABCC documentation show U16 data type of status code, but SPI telegram is U8 */
 				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
 					AddTabularText("!Application Status: ", str);
@@ -2380,7 +2367,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 		{
 			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
 			{
-				if (GetAbccStatusString((U8)frame.mData1, &str[0], sizeof(str), display_base))
+				if (GetAbccStatusString((U8)frame.mData1, str, sizeof(str), display_base))
 				{
 					AddTabularText("!Anybus Status: ", str);
 				}
@@ -2455,7 +2442,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			case AbccMisoStates::MessageField_Object:
 				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
 				{
-					NotifEvent_t notification = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
+					NotifEvent_t notification = GetObjectString((U8)frame.mData1, str, sizeof(str), display_base);
 
 					if (notification == NotifEvent::Alert)
 					{
@@ -2511,7 +2498,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
 				{
-					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[0], sizeof(str), display_base);
+					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, str, sizeof(str), display_base);
 
 					if ((mMsgErrorRspFlag[SpiChannel::MISO] == true) || (notification == NotifEvent::Alert))
 					{
@@ -2677,29 +2664,29 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						if (mMsgErrorRspFlag[SpiChannel::MISO])
 						{
 							AddTabularText(MISO_TAG_STR, "!",
-										mMsgObjStr[SpiChannel::MISO],
-										mMsgInstStr[SpiChannel::MISO],
-										mMsgCmdStr[SpiChannel::MISO],
-										mMsgExtStr[SpiChannel::MISO]);
+								mMsgObjStr[SpiChannel::MISO],
+								mMsgInstStr[SpiChannel::MISO],
+								mMsgCmdStr[SpiChannel::MISO],
+								mMsgExtStr[SpiChannel::MISO]);
 						}
 						else
 						{
 							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 							{
 								AddTabularText(MISO_TAG_STR,
-											mMsgObjStr[SpiChannel::MISO],
-											mMsgInstStr[SpiChannel::MISO],
-											mMsgCmdStr[SpiChannel::MISO],
-											mMsgExtStr[SpiChannel::MISO],
-											"++");
+									mMsgObjStr[SpiChannel::MISO],
+									mMsgInstStr[SpiChannel::MISO],
+									mMsgCmdStr[SpiChannel::MISO],
+									mMsgExtStr[SpiChannel::MISO],
+									"++");
 							}
 							else
 							{
 								AddTabularText(MISO_TAG_STR,
-											mMsgObjStr[SpiChannel::MISO],
-											mMsgInstStr[SpiChannel::MISO],
-											mMsgCmdStr[SpiChannel::MISO],
-											mMsgExtStr[SpiChannel::MISO]);
+									mMsgObjStr[SpiChannel::MISO],
+									mMsgInstStr[SpiChannel::MISO],
+									mMsgCmdStr[SpiChannel::MISO],
+									mMsgExtStr[SpiChannel::MISO]);
 							}
 						}
 					}
@@ -2855,7 +2842,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			case AbccMosiStates::MessageField_Object:
 				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
 				{
-					NotifEvent_t notification = GetObjectString((U8)frame.mData1, &str[0], sizeof(str), display_base);
+					NotifEvent_t notification = GetObjectString((U8)frame.mData1, str, sizeof(str), display_base);
 
 					if (notification == NotifEvent::Alert)
 					{
@@ -2911,7 +2898,7 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
 				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
 				{
-					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, &str[0], sizeof(str), display_base);
+					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, str, sizeof(str), display_base);
 
 					if ((mMsgErrorRspFlag[SpiChannel::MOSI] == true) || (notification == NotifEvent::Alert))
 					{
@@ -3077,29 +3064,29 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 						if (mMsgErrorRspFlag[SpiChannel::MOSI])
 						{
 							AddTabularText(MOSI_TAG_STR, "!",
-										mMsgObjStr[SpiChannel::MOSI],
-										mMsgInstStr[SpiChannel::MOSI],
-										mMsgCmdStr[SpiChannel::MOSI],
-										mMsgExtStr[SpiChannel::MOSI]);
+								mMsgObjStr[SpiChannel::MOSI],
+								mMsgInstStr[SpiChannel::MOSI],
+								mMsgCmdStr[SpiChannel::MOSI],
+								mMsgExtStr[SpiChannel::MOSI]);
 						}
 						else
 						{
 							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
 							{
 								AddTabularText(MOSI_TAG_STR,
-											mMsgObjStr[SpiChannel::MOSI],
-											mMsgInstStr[SpiChannel::MOSI],
-											mMsgCmdStr[SpiChannel::MOSI],
-											mMsgExtStr[SpiChannel::MOSI],
-											"++");
+									mMsgObjStr[SpiChannel::MOSI],
+									mMsgInstStr[SpiChannel::MOSI],
+									mMsgCmdStr[SpiChannel::MOSI],
+									mMsgExtStr[SpiChannel::MOSI],
+									"++");
 							}
 							else
 							{
 								AddTabularText(MOSI_TAG_STR,
-											mMsgObjStr[SpiChannel::MOSI],
-											mMsgInstStr[SpiChannel::MOSI],
-											mMsgCmdStr[SpiChannel::MOSI],
-											mMsgExtStr[SpiChannel::MOSI]);
+									mMsgObjStr[SpiChannel::MOSI],
+									mMsgInstStr[SpiChannel::MOSI],
+									mMsgCmdStr[SpiChannel::MOSI],
+									mMsgExtStr[SpiChannel::MOSI]);
 							}
 						}
 					}

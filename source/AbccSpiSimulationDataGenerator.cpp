@@ -832,7 +832,7 @@ void SpiSimulationDataGenerator::OutputByte_CPOL1_CPHA1(U64 mosi_data, U64 miso_
 	}
 }
 
-void SpiSimulationDataGenerator::CreateFileInstance(ABP_MsgType *msg_ptr, MessageType message_type)
+void SpiSimulationDataGenerator::CreateFileInstance(ABP_MsgType* msg_ptr, MessageType message_type)
 {
 	msg_ptr->sHeader.bDestObj = ABP_OBJ_NUM_AFSI;
 	msg_ptr->sHeader.iInstance = 0x0000;
@@ -840,7 +840,7 @@ void SpiSimulationDataGenerator::CreateFileInstance(ABP_MsgType *msg_ptr, Messag
 	msg_ptr->sHeader.bCmdExt0 = 0x00;
 	msg_ptr->sHeader.bCmdExt1 = 0x00;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.iDataSize = 0;
@@ -854,7 +854,7 @@ void SpiSimulationDataGenerator::CreateFileInstance(ABP_MsgType *msg_ptr, Messag
 	}
 }
 
-void SpiSimulationDataGenerator::FileOpen(ABP_MsgType* msg_ptr, MessageType message_type, CHAR* file_name, UINT8 file_name_length)
+void SpiSimulationDataGenerator::FileOpen(ABP_MsgType* msg_ptr, MessageType message_type, const CHAR* file_name, UINT8 file_name_length)
 {
 	msg_ptr->sHeader.bDestObj = ABP_OBJ_NUM_AFSI;
 	msg_ptr->sHeader.iInstance = (U16)FILE_INSTANCE_TO_USE;
@@ -862,7 +862,7 @@ void SpiSimulationDataGenerator::FileOpen(ABP_MsgType* msg_ptr, MessageType mess
 	msg_ptr->sHeader.bCmdExt0 = 0x00; // Read only mode
 	msg_ptr->sHeader.bCmdExt1 = 0x00;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.bCmd |= ABP_MSG_HEADER_C_BIT;
@@ -883,7 +883,7 @@ void SpiSimulationDataGenerator::GetFileSize(ABP_MsgType* msg_ptr, MessageType m
 	msg_ptr->sHeader.bCmdExt0 = ABP_FSI_IA_FILE_SIZE;
 	msg_ptr->sHeader.bCmdExt1 = 0x00;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.bCmd |= ABP_MSG_HEADER_C_BIT;
@@ -897,13 +897,13 @@ void SpiSimulationDataGenerator::GetFileSize(ABP_MsgType* msg_ptr, MessageType m
 	}
 }
 
-void SpiSimulationDataGenerator::FileRead(ABP_MsgType* msg_ptr, MessageType message_type, CHAR* file_data, UINT32 file_data_length)
+void SpiSimulationDataGenerator::FileRead(ABP_MsgType* msg_ptr, MessageType message_type, const CHAR* file_data, UINT32 file_data_length)
 {
 	msg_ptr->sHeader.bDestObj = ABP_OBJ_NUM_AFSI;
 	msg_ptr->sHeader.iInstance = (U16)FILE_INSTANCE_TO_USE;
 	msg_ptr->sHeader.bCmd = ABP_FSI_CMD_FILE_READ;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.bCmd |= ABP_MSG_HEADER_C_BIT;
@@ -935,7 +935,7 @@ void SpiSimulationDataGenerator::FileClose(ABP_MsgType* msg_ptr, MessageType mes
 	msg_ptr->sHeader.bCmdExt0 = 0;
 	msg_ptr->sHeader.bCmdExt1 = 0;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.bCmd |= ABP_MSG_HEADER_C_BIT;
@@ -948,7 +948,7 @@ void SpiSimulationDataGenerator::FileClose(ABP_MsgType* msg_ptr, MessageType mes
 	}
 }
 
-void SpiSimulationDataGenerator::DeleteFileInstance(ABP_MsgType *msg_ptr, MessageType message_type)
+void SpiSimulationDataGenerator::DeleteFileInstance(ABP_MsgType* msg_ptr, MessageType message_type)
 {
 	msg_ptr->sHeader.bDestObj = ABP_OBJ_NUM_AFSI;
 	msg_ptr->sHeader.iInstance = 0x0000;
@@ -957,7 +957,7 @@ void SpiSimulationDataGenerator::DeleteFileInstance(ABP_MsgType *msg_ptr, Messag
 	msg_ptr->sHeader.bCmdExt1 = 0x00;
 	msg_ptr->sHeader.iDataSize = 0x0000;
 
-	switch(message_type)
+	switch (message_type)
 	{
 	case MessageType::Command:
 		msg_ptr->sHeader.bCmd |= ABP_MSG_HEADER_C_BIT;
@@ -992,7 +992,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 	case SimulationState::FileOpenCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
-		FileOpen(&mMisoMsgData, MessageType::Command, (CHAR*)&filename[0], sizeof(filename) - 1);
+		FileOpen(&mMisoMsgData, MessageType::Command, filename, sizeof(filename) - 1);
 		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileOpenResponse:
@@ -1022,7 +1022,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 	case SimulationState::FileReadResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
-		FileRead(&mMosiMsgData, MessageType::Response, (CHAR*)&fileData[0], sizeof(fileData) - 1);
+		FileRead(&mMosiMsgData, MessageType::Response, fileData, sizeof(fileData) - 1);
 		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileCloseCommand:

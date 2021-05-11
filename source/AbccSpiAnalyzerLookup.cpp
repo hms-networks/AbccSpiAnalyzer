@@ -2699,7 +2699,7 @@ bool GetInstString(U8 /* nw_type_idx */, U8 obj, U16 val, char* str, U16 max_str
 				objFound = true;
 				*notif_ptr = GetNamedInstString(
 					(U8)val,
-					&str[0],
+					str,
 					max_str_len,
 					display_base,
 					asNcInstNameTables[i].inst_names,
