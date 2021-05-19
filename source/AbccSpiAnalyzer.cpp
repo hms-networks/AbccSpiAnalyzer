@@ -464,12 +464,12 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			mCurrentSample = mClock->GetSampleNumber();
 			ProcessSample(mMosi, mosiResult, mSettings->mMosiChannel);
 			ProcessSample(mMiso, misoResult, mSettings->mMisoChannel);
-		}
 
-		if (bitIndex == 0)
-		{
-			// Latch the first sample point in the byte
-			*first_sample_ptr = mClock->GetSampleNumber();
+			if (bitIndex == 0)
+			{
+				// Latch the first sample point in the byte
+				*first_sample_ptr = mClock->GetSampleNumber();
+			}
 		}
 
 		if (IS_3WIRE_MODE())
@@ -510,6 +510,12 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 			mCurrentSample = mClock->GetSampleNumber();
 			ProcessSample(mMosi, mosiResult, mSettings->mMosiChannel);
 			ProcessSample(mMiso, misoResult, mSettings->mMisoChannel);
+
+			if (bitIndex == 0)
+			{
+				// Latch the first sample point in the byte
+				*first_sample_ptr = mClock->GetSampleNumber();
+			}
 		}
 
 		mArrowLocations.push_back(mCurrentSample);
