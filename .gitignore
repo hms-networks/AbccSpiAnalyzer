@@ -9,6 +9,10 @@ debug/Logic/
 .vs
 *.user
 
+# Ignore XCode (macOS) specific artifacts
+.DS_Store
+xcuserdata/
+
 # Ignore build artifacts
 release/
 Debug/
