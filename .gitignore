@@ -4,40 +4,15 @@ doc/~*
 # Ignore debug version of Logic software
 debug/Logic/
 
-# Ignore Visual Studio (Code) Artifacts
+# Ignore Visual Studio (Code) artifacts
 .vscode
 .vs
-
-# Ignore release directory
-release/
-
-# Ignore Build Artifacts
-plugins/*
-project/*/Win32/
-project/*/x64/
-*.aps
-*.db
-*.exp
-*.idb
-*.ilk
-*.iobj
-*.ipch
-*.ipdb
-*.lastbuildstate
-*.log
-*.o
-*.obj
-*.opendb
-*.opensdf
-*.pdb
-*.res
-*.sdf
-*.suo
-*.tlog
 *.user
-*.vcxproj.FileListAbsolute.txt
-RCa22188
 
+# Ignore build artifacts
+release/
+Debug/
+plugins/
 
-
-
+# Ignore pycache
+__pycache__/
