@@ -486,19 +486,24 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 		}
 		else if (WouldAdvancingTheClockToggleEnable())
 		{
+			// There are two potential error cases to check for here.
+			// If in clock idle high mode, and processing the first bit, just
+			// skip the acquisition, these are treated as glitches or aborted
+			// SPI packet transmissions and will be filtered.
+			// The second case is if the processing any bit other than
+			// the last bit in the byte. This indicates some communication
+			// interruption or logical error.
 			if (clkIdleHigh && (bitIndex == 0))
 			{
-				// Advance forward to next transaction
 				AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
 				byteStatus = GetByteStatus::Skip;
+				break;
 			}
-			else
+			else if (bitIndex < (bitsPerTransfer - 1))
 			{
-				// Error: reset everything and return.
 				byteStatus = GetByteStatus::Error;
+				break;
 			}
-
-			break;
 		}
 
 		// Jump to the next clock phase
@@ -1438,7 +1443,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 	// If an error is signaled we jump into IDLE and wait to be reset.
 	// A reset should be logically signaled when CS# is brought HIGH.
 	// This would essentially indicate the begining of a new transaction.
-	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())
+	if ((operation != StateOperation::Reset) && ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive()))
 	{
 		mMisoVars.eState = AbccMisoStates::Idle;
 
@@ -1710,7 +1715,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	// If an error is signaled we jump into IDLE and wait to be reset.
 	// A reset should be logically signaled when CS# is brought HIGH.
 	// This would essentially indicate the begining of a new transaction.
-	if ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive())
+	if ((operation != StateOperation::Reset) && ((acquisition_status == AcquisitionStatus::Error) || !IsEnableActive()))
 	{
 		if (mMosiVars.dwByteCnt == 0)
 		{
