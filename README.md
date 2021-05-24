@@ -107,10 +107,14 @@ git submodule update --init --recursive
 
 To compile the project please ensure the **additional** requirements are met:
 
-> DEPENDENCIES: **Visual Studio 2012** or later *(retargeting project may be necessary)*
+> DEPENDENCIES: **Visual Studio 2019**, other versions may also work
+*(project retargeting may be necessary)*
 
 > NOTE: **Express** or **Community** versions of Visual Studio may require
-additional steps to replace occurrences of `#include "afxres.h"` with `#include "windows.h"`.
+additional steps to replace occurrences of `#include "afxres.h"` with
+`#include "windows.h"` or installation of the Visual C++ MFC package (this can
+be done by modifying the Visual Studio installation and enabling the associated
+feature).
 
 When compiling the project, please ensure that the correct library is linked
 for the Windows OS being used. The VS solutions provided are setup with the
