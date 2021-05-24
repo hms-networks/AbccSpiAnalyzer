@@ -100,24 +100,30 @@ def _msbuild() -> None:
 
     build_error = False
 
-    # Simply call MSBuild for each pre-configured build target in the
-    # pre-configured project.
-    if platform_64bit:
-        command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X64_ARCH]
+    try:
+        # Simply call MSBuild for each pre-configured build target in the
+        # pre-configured project.
+        if platform_64bit:
+            command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X64_ARCH]
+            retcode = subprocess.call(command)
+            build_error |= (retcode != 0)
+
+            command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X64_ARCH]
+            retcode = subprocess.call(command)
+            build_error |= (retcode != 0)
+
+        command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X86_ARCH]
         retcode = subprocess.call(command)
         build_error |= (retcode != 0)
 
-        command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X64_ARCH]
+        command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X86_ARCH]
         retcode = subprocess.call(command)
         build_error |= (retcode != 0)
 
-    command = [MSBUILD_EXE, VS_PROJECT_PATH, RELEASE_TARGET, X86_ARCH]
-    retcode = subprocess.call(command)
-    build_error |= (retcode != 0)
-
-    command = [MSBUILD_EXE, VS_PROJECT_PATH, DEBUG_TARGET, X86_ARCH]
-    retcode = subprocess.call(command)
-    build_error |= (retcode != 0)
+    except FileNotFoundError:
+        print("ERROR: Build for Windows failed. Ensure MSBuild is part of system's \"path\" variable.")
+        print(r'  Example: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin"')
+        build_error = True
 
     exit(build_error)
 
