@@ -289,19 +289,77 @@ void SpiSimulationDataGenerator::InitializeSpiChannels()
 	m3WireMode = (((mEnable == nullptr) && (mSettings->m4WireOn3Channels == false)) || (mSettings->m3WireOn4Channels == true));
 }
 
+U16 SpiSimulationDataGenerator::CalculateNewMessageFragmentation()
+{
+	U16 newMessageLength = mDefaultMsgFragmentationLength;
+	bool processDataActive = (mMisoPacket.anbStat == ABP_ANB_STATE_IDLE) || (mMisoPacket.anbStat == ABP_ANB_STATE_PROCESS_ACTIVE);
+
+	if (mDynamicMsgFragmentationLength && !processDataActive)
+	{
+		bool misoMessage = (mMisoPacket.spiStat & ABP_SPI_STATUS_M);
+		bool mosiMessage = (mMosiPacket.spiCtrl & ABP_SPI_CTRL_M);
+
+		if (mosiMessage)
+		{
+			// Match message size to minimize SPI packet overhead.
+			newMessageLength = mTotalMsgBytesToSend;
+		}
+		else if (misoMessage)
+		{
+			// Only adapt for MISO messages after receiving "message size" field
+			// (i.e. avoid unrealistic prediction of what the module is sending to the host).
+			if (mMessageDataOffset >= sizeof(U16))
+			{
+				U16 remainingMessageDataBytes = 0;
+
+				// Match "remaining" message bytes to minimize SPI packet overhead.
+				if (mTotalMsgBytesToSend > mMessageDataOffset)
+				{
+					remainingMessageDataBytes = mTotalMsgBytesToSend - mMessageDataOffset;
+				}
+
+				newMessageLength = remainingMessageDataBytes;
+			}
+		}
+	}
+
+	return newMessageLength;
+}
+
 void SpiSimulationDataGenerator::UpdatePacketDynamicFormat(U16 message_data_field_length, U16 process_data_field_length)
 {
+	const U16 maxMessageLength = 1524;
 	const U16 mosiHeaderBytes = 8;
 	const U16 mosiTrailingBytes = 6;
 	const U16 misoHeaderBytes = 10;
 
-	if (message_data_field_length > mDefaultMsgFragmentationLength)
+	// Adjust size to be whole words.
+	if (message_data_field_length % sizeof(U16))
 	{
-		mMsgFragmentationLength = mDefaultMsgFragmentationLength;
+		message_data_field_length++;
+	}
+
+	if (mDynamicMsgFragmentationLength)
+	{
+		if (message_data_field_length > maxMessageLength)
+		{
+			mMsgFragmentationLength = maxMessageLength;
+		}
+		else
+		{
+			mMsgFragmentationLength = message_data_field_length;
+		}
 	}
 	else
 	{
-		mMsgFragmentationLength = message_data_field_length;
+		if (message_data_field_length > mDefaultMsgFragmentationLength)
+		{
+			mMsgFragmentationLength = mDefaultMsgFragmentationLength;
+		}
+		else
+		{
+			mMsgFragmentationLength = message_data_field_length;
+		}
 	}
 
 	mMosiProcessDataPtr = mMosiPacket.msgData + mMsgFragmentationLength;
@@ -341,8 +399,7 @@ void SpiSimulationDataGenerator::UpdateProcessData()
 
 bool SpiSimulationDataGenerator::UpdateMessageData(U8* mosi_msg_data_source, U8* miso_msg_data_source)
 {
-	const U16 msgHeaderSize = static_cast<U16>(sizeof(ABP_MsgHeaderType));
-	bool lastFragment = (mMessageDataOffset + mMsgFragmentationLength) >= (mTotalMsgDataBytesToSend + msgHeaderSize);
+	bool lastFragment = (mMessageDataOffset + mMsgFragmentationLength) >= mTotalMsgBytesToSend;
 
 	mMosiPacket.msgLen = mMsgFragmentationLength >> 1;
 
@@ -484,12 +541,12 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 		switch (mLogFileMessageType)
 		{
 		case MessageReturnType::StateChange:
-			mTotalMsgDataBytesToSend = 0;
+			mTotalMsgBytesToSend = mDefaultMsgFragmentationLength;
 			break;
 
 		case MessageReturnType::Tx:
 			mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
-			mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+			mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize + MSG_HEADER_SIZE;
 			break;
 
 		case MessageReturnType::Rx:
@@ -497,18 +554,18 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 			pMosiData = (U8*)&mMisoMsgData;
 			pMisoData = (U8*)&mMosiMsgData;
 			mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
-			mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+			mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize + MSG_HEADER_SIZE;
 			break;
 
 		case MessageReturnType::TxError:
 			// Parsing error occurred, produce a CRC error to help indicate this to the user.
-			mTotalMsgDataBytesToSend = 0;
+			mTotalMsgBytesToSend = mDefaultMsgFragmentationLength;
 			mosiCrcError = true;
 			break;
 
 		case MessageReturnType::RxError:
 			// Parsing error occurred, produce a CRC error to help indicate this to the user.
-			mTotalMsgDataBytesToSend = 0;
+			mTotalMsgBytesToSend = mDefaultMsgFragmentationLength;
 			misoCrcError = true;
 			break;
 
@@ -594,20 +651,10 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 
 	if (continueSimulation)
 	{
-		// ACTUAL FRAGMENTATION LENGTH IS THE "MAX" of MOSI and MISO requested fragmentation sizes
-		// Adapt fragmentation length for MOSI messages such that:
-		// -- MAX FRAG LENGTH IS NOT EXCEEDED
-		// -- LAST FRAGMENT HAS NO PADDED MSG DATA BYTES
-		// -- DEFAULT FRAGMENTATION IS USED IF IN IDLE or PROCESS ACTIVE
-		// Adapt fragmentation length for MISO messages such that:
-		// -- FIRST FRAGMENT USES DEFAULT SIZE (in real world application, fragmentation length cannot be determined until the MISO message header has been received)
-		// -- NEXT FRAGMENTS DO NOT EXCEEDED MAX FRAG LENGTH
-		// -- LAST FRAGMENT HAS NO PADDED MSG DATA BYTES
-		// -- DEFAULT FRAGMENTATION IS USED IF IN IDLE or PROCESS ACTIVE
-		//if (mDynamicMsgFragmentationLength)
-		//{
-		//	UpdatePacketDynamicFormat(mTotalMsgDataBytesToSend, ABCC_CFG_MAX_PROCESS_DATA_SIZE);
-		//}
+		if (mDynamicMsgFragmentationLength)
+		{
+			UpdatePacketDynamicFormat(CalculateNewMessageFragmentation(), ABCC_CFG_MAX_PROCESS_DATA_SIZE);
+		}
 
 		bool lastFragment = UpdateMessageData(&pMosiData[mMessageDataOffset], &pMisoData[mMessageDataOffset]);
 		UpdateCrc32(mosiCrcError, misoCrcError);
@@ -712,6 +759,7 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 			{
 				mAbortTransfer = false;
 				mMessageDataOffset = 0;
+				mTotalMsgBytesToSend = 0;
 
 				if (!mLogFileSimulation)
 				{
@@ -981,79 +1029,79 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		CreateFileInstance(&mMisoMsgData, MessageType::Command);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::CreateInstanceResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		CreateFileInstance(&mMosiMsgData, MessageType::Response);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileOpenCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		FileOpen(&mMisoMsgData, MessageType::Command, filename, sizeof(filename) - 1);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileOpenResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		FileOpen(&mMosiMsgData, MessageType::Response, nullptr, 0);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::GetFileSizeCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		GetFileSize(&mMisoMsgData, MessageType::Command);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::GetFileSizeResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		GetFileSize(&mMosiMsgData, MessageType::Response);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileReadCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		FileRead(&mMisoMsgData, MessageType::Command, nullptr, 0);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileReadResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		FileRead(&mMosiMsgData, MessageType::Response, fileData, sizeof(fileData) - 1);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileCloseCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		FileClose(&mMisoMsgData, MessageType::Command, 0);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::FileCloseResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		FileClose(&mMosiMsgData, MessageType::Response, sizeof(fileData) - 1);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::DeleteInstanceCommand:
 		mMisoPacket.spiStat |= ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
 		DeleteFileInstance(&mMisoMsgData, MessageType::Command);
-		mTotalMsgDataBytesToSend = mMisoMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMisoMsgData.sHeader.iDataSize;
 		break;
 	case SimulationState::DeleteInstanceResponse:
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl |= ABP_SPI_CTRL_M;
 		DeleteFileInstance(&mMosiMsgData, MessageType::Response);
-		mTotalMsgDataBytesToSend = mMosiMsgData.sHeader.iDataSize;
+		mTotalMsgBytesToSend = mMosiMsgData.sHeader.iDataSize;
 		break;
 	default:
 		/* no message */
 		mMisoPacket.spiStat &= ~ABP_SPI_STATUS_M;
 		mMosiPacket.spiCtrl &= ~ABP_SPI_CTRL_M;
-		mTotalMsgDataBytesToSend = 0;
+		mTotalMsgBytesToSend = 0;
 		break;
 	}
 
@@ -1064,7 +1112,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 		mMosiMsgData.sHeader.bCmd |= ABP_MSG_HEADER_E_BIT;
 		mMosiMsgData.abData[0] = ABP_ERR_GENERAL_ERROR;
 		mMosiMsgData.sHeader.iDataSize = 1;
-		mTotalMsgDataBytesToSend = MSG_HEADER_SIZE + 1;
+		mTotalMsgBytesToSend = MSG_HEADER_SIZE + 1;
 
 		// Jump back to specific states to simulate the ABCC closing down the file instance correctly, as needed
 		switch (static_cast<SimulationState>(mMsgCmdRespState))
@@ -1107,7 +1155,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 		mMosiMsgData.sHeader.bCmd &= ~ABP_MSG_HEADER_E_BIT;
 
 		// Add in the message header size
-		mTotalMsgDataBytesToSend += MSG_HEADER_SIZE;
+		mTotalMsgBytesToSend += MSG_HEADER_SIZE;
 	}
 }
 

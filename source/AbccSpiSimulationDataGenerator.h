@@ -130,7 +130,7 @@ protected: /* Members */
 	U16 mDefaultMsgFragmentationLength;
 	U16 mMsgFragmentationLength;
 	U16 mMessageDataOffset;
-	U16 mTotalMsgDataBytesToSend;
+	U16 mTotalMsgBytesToSend;
 
 	/* Counter is conveyed in process data during log file simulation. */
 	U32 mMessageCount;
@@ -178,6 +178,7 @@ protected: /* Methods */
 	void FileClose(ABP_MsgType* msg_ptr, MessageType message_type, UINT32 file_size);
 	void DeleteFileInstance(ABP_MsgType* msg_ptr, MessageType message_type);
 
+	U16 CalculateNewMessageFragmentation();
 	void UpdatePacketDynamicFormat(U16 message_data_field_length, U16 process_data_field_length);
 	void UpdateProcessData();
 	bool UpdateMessageData(U8* mosi_msg_data_source, U8* miso_msg_data_source);

@@ -100,11 +100,13 @@
 
 		<!-- Configures the message data length field. {size} = 0: 8 words (default),
 		0 < {size} <= 762: fixed message data length, {size} < 0: dynamic mode. When in SETUP,
-		NW_INIT, or WAIT_PROCESS, "dynamic mode" will dynamically adapt the message field length based
-		on the number of bytes being sent by the host; if the host does not need to send any data the
-		absolute value of {size} will be used for the message data length field for communicating any
-		data that the ABCC needs to send to the host. While in IDLE or PROCESS_ACTIVE the message data
-		length will be set to the absolute value of {size}. -->
+		NW_INIT, or WAIT_PROCESS, "dynamic mode" will adapt the message field length based on the
+		number of message data bytes the host is requesting to send effectively avoiding
+		SPI message fragmentation. If the host is not trying to send a message then the message
+		channel will default to the absolute value of {size}. While in IDLE or PROCESS_ACTIVE the
+		message data length will be set to the absolute value of {size}. When receiving a
+		message from the module, the message will be adjusted, if necessary to limit SPI
+		message fragmentation. -->
 		<SpiMessageDataLength>0</SpiMessageDataLength>
 	</Setting>
 
