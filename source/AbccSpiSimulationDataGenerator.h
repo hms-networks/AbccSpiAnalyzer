@@ -127,10 +127,10 @@ protected: /* Members */
 
 	/* SPI fragmentation state variables */
 	bool mDynamicMsgFragmentationLength;
-	U16 mMaxMsgFragmentationLength;
+	U16 mDefaultMsgFragmentationLength;
 	U16 mMsgFragmentationLength;
-	U32 mMessageDataOffset;
-	U32 mTotalMsgDataBytesToSend;
+	U16 mMessageDataOffset;
+	U16 mTotalMsgDataBytesToSend;
 
 	/* Counter is conveyed in process data during log file simulation. */
 	U32 mMessageCount;

@@ -135,8 +135,8 @@ void SpiSimulationDataGenerator::Initialize(U32 simulation_sample_rate, SpiAnaly
 	mIncrementingValue = 0;
 
 	mDynamicMsgFragmentationLength = (mSettings->mSimulateMsgDataLength < 0);
-	mMaxMsgFragmentationLength = static_cast<U16>(std::abs(mSettings->mSimulateMsgDataLength)) << 1;
-	UpdatePacketDynamicFormat(mMaxMsgFragmentationLength, ABCC_CFG_MAX_PROCESS_DATA_SIZE);
+	mDefaultMsgFragmentationLength = static_cast<U16>(std::abs(mSettings->mSimulateMsgDataLength)) << 1;
+	UpdatePacketDynamicFormat(mDefaultMsgFragmentationLength, ABCC_CFG_MAX_PROCESS_DATA_SIZE);
 }
 
 U32 SpiSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channels)
@@ -295,9 +295,9 @@ void SpiSimulationDataGenerator::UpdatePacketDynamicFormat(U16 message_data_fiel
 	const U16 mosiTrailingBytes = 6;
 	const U16 misoHeaderBytes = 10;
 
-	if (message_data_field_length > mMaxMsgFragmentationLength)
+	if (message_data_field_length > mDefaultMsgFragmentationLength)
 	{
-		mMsgFragmentationLength = mMaxMsgFragmentationLength;
+		mMsgFragmentationLength = mDefaultMsgFragmentationLength;
 	}
 	else
 	{
@@ -341,7 +341,7 @@ void SpiSimulationDataGenerator::UpdateProcessData()
 
 bool SpiSimulationDataGenerator::UpdateMessageData(U8* mosi_msg_data_source, U8* miso_msg_data_source)
 {
-	const U32 msgHeaderSize = static_cast<U32>(sizeof(ABP_MsgHeaderType));
+	const U16 msgHeaderSize = static_cast<U16>(sizeof(ABP_MsgHeaderType));
 	bool lastFragment = (mMessageDataOffset + mMsgFragmentationLength) >= (mTotalMsgDataBytesToSend + msgHeaderSize);
 
 	mMosiPacket.msgLen = mMsgFragmentationLength >> 1;
