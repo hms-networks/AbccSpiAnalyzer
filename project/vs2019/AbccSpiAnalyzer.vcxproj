@@ -176,6 +176,7 @@
     <ClCompile Include="..\..\source\AbccCrc.cpp" />
     <ClCompile Include="..\..\source\AbccLogFileParser.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzer.cpp" />
+    <ClCompile Include="..\..\source\AbccSpiAnalyzerHelpers.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzerLookup.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzerResults.cpp" />
     <ClCompile Include="..\..\source\AbccSpiAnalyzerSettings.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="..\..\source\AbccCrc.h" />
     <ClInclude Include="..\..\source\AbccLogFileParser.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzer.h" />
+    <ClInclude Include="..\..\source\AbccSpiAnalyzerHelpers.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerLookup.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerResults.h" />
     <ClInclude Include="..\..\source\AbccSpiAnalyzerSettings.h" />

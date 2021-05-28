@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D031B4A266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D031B48266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.cpp */; };
+		2D031B4B266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D031B49266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.h */; };
 		2D910416263B4A0F00E81C01 /* AbccSpiAnalyzerVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D9103D5263B4A0E00E81C01 /* AbccSpiAnalyzerVersion.h */; };
 		2D910417263B4A0F00E81C01 /* AbccSpiAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D9103D6263B4A0E00E81C01 /* AbccSpiAnalyzer.h */; };
 		2D910418263B4A0F00E81C01 /* AbccSpiMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D9103D7263B4A0E00E81C01 /* AbccSpiMetadata.h */; };
@@ -81,6 +83,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2D031B48266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbccSpiAnalyzerHelpers.cpp; sourceTree = "<group>"; };
+		2D031B49266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbccSpiAnalyzerHelpers.h; sourceTree = "<group>"; };
 		2D9103C6263B3F9300E81C01 /* libAbccSpiAnalyzer.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libAbccSpiAnalyzer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D9103D0263B40EA00E81C01 /* libAnalyzer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libAnalyzer.dylib; path = ../../sdk/release/lib/libAnalyzer.dylib; sourceTree = "<group>"; };
 		2D9103D5263B4A0E00E81C01 /* AbccSpiAnalyzerVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbccSpiAnalyzerVersion.h; sourceTree = "<group>"; };
@@ -198,6 +202,8 @@
 		2D9103D4263B4A0E00E81C01 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				2D031B48266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.cpp */,
+				2D031B49266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.h */,
 				2D9103D5263B4A0E00E81C01 /* AbccSpiAnalyzerVersion.h */,
 				2D9103D6263B4A0E00E81C01 /* AbccSpiAnalyzer.h */,
 				2D9103D7263B4A0E00E81C01 /* AbccSpiMetadata.h */,
@@ -334,6 +340,7 @@
 				2D910441263B4A0F00E81C01 /* abp_sync.h in Headers */,
 				2D91045F263B4AC600E81C01 /* SimulationChannelDescriptor.h in Headers */,
 				2D91042A263B4A0F00E81C01 /* abp_dpv1.h in Headers */,
+				2D031B4B266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.h in Headers */,
 				2D91043E263B4A0F00E81C01 /* abp_epl.h in Headers */,
 				2D910461263B4AC600E81C01 /* Analyzer.h in Headers */,
 				2D910439263B4A0F00E81C01 /* abp_soc.h in Headers */,
@@ -429,6 +436,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D910450263B4A0F00E81C01 /* AbccSpiAnalyzerResults.cpp in Sources */,
+				2D031B4A266132DE00D73CB3 /* AbccSpiAnalyzerHelpers.cpp in Sources */,
 				2D91044E263B4A0F00E81C01 /* AbccSpiAnalyzerSettings.cpp in Sources */,
 				2D910419263B4A0F00E81C01 /* AbccSpiAnalyzerLookup.cpp in Sources */,
 				2D91044B263B4A0F00E81C01 /* AbccCrc.cpp in Sources */,

@@ -14,7 +14,6 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <algorithm>
 #include <cctype>
 #include <locale>
 
@@ -23,6 +22,7 @@
 #include "AbccSpiAnalyzerSettings.h"
 #include "AnalyzerHelpers.h"
 #include "AbccSpiAnalyzerTypes.h"
+#include "AbccSpiAnalyzerHelpers.h"
 
 /* Anytime behavior or definition of settings change where some level of
 ** incompatibility is introduced, increment this counter. This should be
@@ -68,11 +68,6 @@ bool operator>> (SimpleArchive &archive, std::string &value)
 	value.assign(temp);
 	return true;
 }
-
-/* Forward declarations */
-static inline void TrimLeft(std::string &s);
-static inline void TrimRight(std::string &s);
-static inline void TrimString(std::string &s);
 
 SpiAnalyzerSettings::SpiAnalyzerSettings()
 	: mMosiChannel(UNDEFINED_CHANNEL),
@@ -730,46 +725,4 @@ U8 SpiAnalyzerSettings::SaveSettingChangeID()
 {
 	mChangeID++;
 	return mChangeID;
-}
-
-/*******************************************************************************
-** Static helper routines
-********************************************************************************
-*/
-
-/* Trim from start (in place) */
-static inline void TrimLeft(std::string &s)
-{
-	s.erase(
-		s.begin(),
-		std::find_if(
-			s.begin(),
-			s.end(),
-			[](int ch) {
-				return !std::isspace(ch);
-			}
-		)
-	);
-}
-
-/* Trim from end (in place) */
-static inline void TrimRight(std::string &s)
-{
-	s.erase(
-		std::find_if(
-			s.rbegin(),
-			s.rend(),
-			[](int ch) {
-				return !std::isspace(ch);
-			}
-		).base(),
-		s.end()
-	);
-}
-
-/* Trim from both ends (in place) */
-static inline void TrimString(std::string &s)
-{
-	TrimLeft(s);
-	TrimRight(s);
 }

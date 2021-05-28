@@ -19,23 +19,7 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 #include "AbccLogFileParser.h"
-
-static inline void StringReplace(std::string& line, const char search_ch, const char replace_ch)
-{
-	size_t offset = 0;
-
-	while (true)
-	{
-		offset = line.find(search_ch, offset);
-
-		if (offset == std::string::npos)
-		{
-			break;
-		}
-
-		line[offset++] = replace_ch;
-	}
-}
+#include "AbccSpiAnalyzerHelpers.h"
 
 AbccLogFileParser::AbccLogFileParser(const std::string& filepath, const ABP_AnbStateType state)
 {
@@ -260,6 +244,8 @@ bool AbccLogFileParser::ParseMessage(ABP_MsgType& message)
 				// Tokenize the substring and parse each as a hexadecimal integer
 				while (getline(ss, token, delim))
 				{
+					TrimString(token);
+
 					if (token.length() == 0)
 					{
 						continue;
