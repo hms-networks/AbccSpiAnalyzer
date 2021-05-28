@@ -129,7 +129,7 @@ protected: /* Members */
 	bool mDynamicMsgFragmentationLength;
 	U16 mDefaultMsgFragmentationLength;
 	U16 mMsgFragmentationLength;
-	U16 mMessageDataOffset;
+	U16 mMessageFieldOffset;
 	U16 mTotalMsgBytesToSend;
 
 	/* Counter is conveyed in process data during log file simulation. */

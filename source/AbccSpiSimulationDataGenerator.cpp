@@ -84,7 +84,7 @@ inline void SpiSimulationDataGenerator::SetMosiObjectSpecificError(U8 error_code
 SpiSimulationDataGenerator::SpiSimulationDataGenerator()
 {
 	mMsgCmdRespState = (U16)SimulationState::SizeOfEnum;
-	mMessageDataOffset = 0;
+	mMessageFieldOffset = 0;
 	mMessageCount = 0;
 	mLogFileSimulation = false;
 	mClockIdleMode = ClockIdleMode::Auto;
@@ -308,14 +308,14 @@ U16 SpiSimulationDataGenerator::CalculateNewMessageFragmentation()
 		{
 			// Only adapt for MISO messages after receiving "message size" field
 			// (i.e. avoid unrealistic prediction of what the module is sending to the host).
-			if (mMessageDataOffset >= sizeof(U16))
+			if (mMessageFieldOffset >= sizeof(U16))
 			{
 				U16 remainingMessageDataBytes = 0;
 
 				// Match "remaining" message bytes to minimize SPI packet overhead.
-				if (mTotalMsgBytesToSend > mMessageDataOffset)
+				if (mTotalMsgBytesToSend > mMessageFieldOffset)
 				{
-					remainingMessageDataBytes = mTotalMsgBytesToSend - mMessageDataOffset;
+					remainingMessageDataBytes = mTotalMsgBytesToSend - mMessageFieldOffset;
 				}
 
 				newMessageLength = remainingMessageDataBytes;
@@ -399,7 +399,7 @@ void SpiSimulationDataGenerator::UpdateProcessData()
 
 bool SpiSimulationDataGenerator::UpdateMessageData(U8* mosi_msg_data_source, U8* miso_msg_data_source)
 {
-	bool lastFragment = (mMessageDataOffset + mMsgFragmentationLength) >= mTotalMsgBytesToSend;
+	bool lastFragment = (mMessageFieldOffset + mMsgFragmentationLength) >= mTotalMsgBytesToSend;
 
 	mMosiPacket.msgLen = mMsgFragmentationLength >> 1;
 
@@ -519,7 +519,7 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 		// In this simulation, only one channel will have a valid message
 		// at a time.
 
-		if (mMessageDataOffset == 0)
+		if (mMessageFieldOffset == 0)
 		{
 			mLogFileMessageType = mLogFileParser->GetNextMessage(mMosiMsgData);
 
@@ -656,7 +656,7 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 			UpdatePacketDynamicFormat(CalculateNewMessageFragmentation(), ABCC_CFG_MAX_PROCESS_DATA_SIZE);
 		}
 
-		bool lastFragment = UpdateMessageData(&pMosiData[mMessageDataOffset], &pMisoData[mMessageDataOffset]);
+		bool lastFragment = UpdateMessageData(&pMosiData[mMessageFieldOffset], &pMisoData[mMessageFieldOffset]);
 		UpdateCrc32(mosiCrcError, misoCrcError);
 
 		currentClockIdleMode = (mClock->GetCurrentBitState() == BitState::BIT_HIGH) ?
@@ -750,7 +750,7 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 		{
 			// Update toggle bit
 			mToggleBit ^= ABP_SPI_CTRL_T;
-			mMessageDataOffset += mMsgFragmentationLength;
+			mMessageFieldOffset += mMsgFragmentationLength;
 
 			// Check if full message has been sent, if so update the
 			// state of the file transfer state machine, and reset
@@ -758,7 +758,7 @@ bool SpiSimulationDataGenerator::CreateSpiTransaction()
 			if (lastFragment || mAbortTransfer)
 			{
 				mAbortTransfer = false;
-				mMessageDataOffset = 0;
+				mMessageFieldOffset = 0;
 				mTotalMsgBytesToSend = 0;
 
 				if (!mLogFileSimulation)
@@ -1107,7 +1107,7 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 
 	if ((msg_response_type == MessageResponseType::Error) &&
 		((mMsgCmdRespState % 2) != 0) &&
-		(mMessageDataOffset <= MSG_HEADER_SIZE))
+		(mMessageFieldOffset <= MSG_HEADER_SIZE))
 	{
 		mMosiMsgData.sHeader.bCmd |= ABP_MSG_HEADER_E_BIT;
 		mMosiMsgData.abData[0] = ABP_ERR_GENERAL_ERROR;
@@ -1130,13 +1130,13 @@ void SpiSimulationDataGenerator::RunFileTransferStateMachine(MessageResponseType
 		case SimulationState::GetFileSizeResponse:
 			// Transition to the end of 'file read', to enter 'file close'
 			mAbortTransfer = true;
-			mMessageDataOffset = 0;
+			mMessageFieldOffset = 0;
 			mMsgCmdRespState = (U16)SimulationState::FileReadResponse;
 			break;
 		case SimulationState::FileReadResponse:
 			// Abort remaining 'file read' and continue with closing down the file.
 			mAbortTransfer = true;
-			mMessageDataOffset = 0;
+			mMessageFieldOffset = 0;
 			SetMosiObjectSpecificError(ABP_FSI_ERR_FILE_COPY_OPEN_READ_FAILED);
 			break;
 		case SimulationState::FileCloseResponse:
