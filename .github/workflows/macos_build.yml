@@ -19,18 +19,10 @@ jobs:
       env:
         cache-name: cache-submodules
       with:
-        path: .git/modules/sdk
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
-
-    - name: Cache SDK
-      id: cache-sdk
-      if: steps.cache-submodules.outputs.cache-hit == 'true'
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-sdk
-      with:
-        path: ./sdk
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('.gitmodules') }}
+        path: |
+          .git/modules/sdk
+          ./sdk
+        key: ${{ runner.os }}-${{ env.cache-name }}-v1-${{ hashFiles('.gitmodules') }}
 
     - name: Checkout submodules
       if: steps.cache-submodules.outputs.cache-hit != 'true'
