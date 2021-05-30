@@ -97,6 +97,7 @@
 		<!-- SPI register data size (in bits). This parameter represents the underlying SPI
 		controller register data size and is used to determine when to apply "SpiByteGapNs".
 		This value must be 8 or 16 bits; other values or parsing errors will default to 8 bits. -->
+		<SpiDataSize>0</SpiDataSize>
 
 		<!-- Configures the message data length field. {size} = 0: 8 words (default),
 		0 < {size} <= 762: fixed message data length, {size} < 0: dynamic mode. When in SETUP,
