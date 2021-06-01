@@ -3,8 +3,8 @@
 *******************************************************************************
 **
 **       File: AbccSpiAnalyzer.cpp
-**    Summary: DLL-Analyzer source
-**     Author: Jon Carrier
+**    Summary: Responsible for processing the raw samples and converting the
+**             sampled data into frame and packets.
 **
 *******************************************************************************
 ******************************************************************************/

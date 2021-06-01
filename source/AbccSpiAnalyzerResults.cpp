@@ -3,8 +3,8 @@
 *******************************************************************************
 **
 **       File: AbccSpiAnalyzerResults.cpp
-**    Summary: DLL-Results source
-**     Author: Jon Carrier
+**    Summary: Handles various tasks for converting frame and packet data into
+**             bubble-text, tabular-text, and exported CSV files.
 **
 *******************************************************************************
 ******************************************************************************/

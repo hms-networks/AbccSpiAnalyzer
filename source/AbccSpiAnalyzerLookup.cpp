@@ -3,8 +3,8 @@
 *******************************************************************************
 **
 **       File: AbccSpiAnalyzerLookup.h
-**    Summary: Lookup Table routines for DLL-Results
-**     Author: Jon Carrier
+**    Summary: Primarily contains lookup table routines for converting various
+**             information into verbose information.
 **
 *******************************************************************************
 ******************************************************************************/

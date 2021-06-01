@@ -3,8 +3,7 @@
 *******************************************************************************
 **
 **       File: AbccSpiAnalyzerDataGenerator.cpp
-**    Summary: DLL-DataGenerator source
-**     Author: Jon Carrier
+**    Summary: Handles simulation of ABCC SPI communication.
 **
 *******************************************************************************
 ******************************************************************************/

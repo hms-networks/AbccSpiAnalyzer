@@ -3,8 +3,7 @@
 *******************************************************************************
 **
 **       File: AbccCrc.cpp
-**    Summary: ABCC Crc-Unit source. Uses ABCC40 defined CRC algorithms.
-**     Author: Jon Carrier
+**    Summary: ABCC Crc-Unit. Uses ABCC40 defined CRC algorithms.
 **
 *******************************************************************************
 ******************************************************************************/

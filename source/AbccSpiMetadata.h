@@ -3,8 +3,7 @@
 *******************************************************************************
 **
 **       File: AbccSpiMetadata.cpp
-**    Summary: Metadata for the compiled library file
-**     Author: Jon Carrier
+**    Summary: Metadata for the compiled library file.
 **
 *******************************************************************************
 ******************************************************************************/
