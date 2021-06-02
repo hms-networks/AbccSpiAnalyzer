@@ -1604,7 +1604,7 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 			{
 				if (!RunAbccMisoMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 				{
-					// Error, transition to ilde and wait for reset
+					// Error, transition to idle and wait for reset
 					mMisoVars.eState = AbccMisoStates::Idle;
 				}
 			}
@@ -1882,7 +1882,7 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			{
 				if (!RunAbccMosiMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 				{
-					// Error, transition to ilde and wait for reset
+					// Error, transition to idle and wait for reset
 					mMosiVars.eState = AbccMosiStates::Idle;
 				}
 			}

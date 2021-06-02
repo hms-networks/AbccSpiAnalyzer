@@ -1173,7 +1173,7 @@ void SpiAnalyzerResults::AppendCsvSafeString(std::stringstream &ss_csv_data, cha
 
 	// The first two cases below are to reverse the Saleae Logic SDK's handling
 	// of the 'space' and 'comma' ASCII characters. In this case the plugin will
-	// escape the characters only is necessary based on the state of the
+	// escape the characters only if necessary based on the state of the
 	// CSV delimiter.
 
 	if (csvStr.find("COMMA") != std::string::npos)

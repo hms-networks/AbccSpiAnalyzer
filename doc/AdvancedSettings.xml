@@ -40,7 +40,7 @@
 	text entry when clicking on a "Decoded Protocols" entry for a frame less than 8 samples.
 	Currently, this workaround is only applicable for error frames; any error frame less than 8
 	samples will be expanded to 8 samples to restore the linkage. This feature could have
-	undesirable side effects in rare circumstances. In case of abnormal behavior it may be necessary
+	undesirable side effects in rare circumstances. In case of abnormal behavior, it may be necessary
 	to disable this feature. -->
 	<Setting name="expand-bit-frames">1</Setting>
 
@@ -99,14 +99,14 @@
 		This value must be 8 or 16 bits; other values or parsing errors will default to 8 bits. -->
 		<SpiDataSize>0</SpiDataSize>
 
-		<!-- Configures the message data length field. {size} = 0: 8 words (default),
+		<!-- Configures the message data length field (in words). {size} = 0: 8 words (default),
 		0 < {size} <= 762: fixed message data length, {size} < 0: dynamic mode. When in SETUP,
 		NW_INIT, or WAIT_PROCESS, "dynamic mode" will adapt the message field length based on the
 		number of message data bytes the host is requesting to send effectively avoiding
-		SPI message fragmentation. If the host is not trying to send a message then the message
+		SPI message fragmentation. If the host is not trying to send a message, then the message
 		channel will default to the absolute value of {size}. While in IDLE or PROCESS_ACTIVE the
 		message data length will be set to the absolute value of {size}. When receiving a
-		message from the module, the message will be adjusted, if necessary to limit SPI
+		message from the module, the message will be adjusted, if necessary, to limit SPI
 		message fragmentation. -->
 		<SpiMessageDataLength>0</SpiMessageDataLength>
 	</Setting>

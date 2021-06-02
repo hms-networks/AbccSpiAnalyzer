@@ -28,7 +28,7 @@
 ** This flag is field-specific.
 ** This flag is relevant for the following fields:
 **   - SPI_CTL: signals a toggle error (retransmission event)
-**   - ANB_STS: signals a Anybus status changed event
+**   - ANB_STS: signals an Anybus status changed event
 **   - SPI_STS: signals a toggle error (retransmission event)
 **   - APP_STS: signals an application status changed event
 **   - MD_SIZE: signals that the value in this field is out-of-spec
