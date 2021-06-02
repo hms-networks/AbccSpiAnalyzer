@@ -16,7 +16,11 @@
 #include "AbccSpiAnalyzerTypes.h"
 
 #ifndef FORMATTED_STRING_BUFFER_SIZE
-#define FORMATTED_STRING_BUFFER_SIZE		256
+#define FORMATTED_STRING_BUFFER_SIZE 256
+#endif
+
+#ifndef NUM_DATA_CHANNELS
+#define NUM_DATA_CHANNELS 2
 #endif
 
 enum class ErrorEvent : U32
@@ -60,20 +64,20 @@ protected:  /* Members */
 
 	SpiAnalyzerSettings* mSettings;
 	SpiAnalyzer* mAnalyzer;
-	char mMsgSizeStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char mMsgSrcStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char mMsgObjStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char mMsgInstStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char mMsgCmdStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	char mMsgExtStr[2][FORMATTED_STRING_BUFFER_SIZE];
-	bool mMsgValidFlag[2];
-	bool mMsgErrorRspFlag[2];
+	char mMsgSizeStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgSrcStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgObjStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgInstStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgCmdStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	char mMsgExtStr[NUM_DATA_CHANNELS][FORMATTED_STRING_BUFFER_SIZE];
+	bool mMsgValidFlag[NUM_DATA_CHANNELS];
+	bool mMsgErrorRspFlag[NUM_DATA_CHANNELS];
 
 protected: /* Methods */
 
-	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification);
-	void StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority);
-	void TableBuilder(SpiChannel_t channel, const char* text, NotifEvent_t notification);
+	void WriteBubbleText(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority = DisplayPriority::Tag);
+	void WriteTabularText(SpiChannel_t channel, const char* text, NotifEvent_t notification);
+	void FormatTabularTextBuffer(char* buffer, size_t buffer_size, const char* tag, const char* text, NotifEvent_t notification);
 
 	void BuildSpiCtrlString(U8 spi_control, DisplayBase display_base);
 	void BuildSpiStsString(U8 spi_status, DisplayBase display_base);
@@ -92,8 +96,54 @@ protected: /* Methods */
 	void ExportMessageDataToFile(const char* file, DisplayBase display_base);
 	void ExportProcessDataToFile(const char* file, DisplayBase display_base);
 
+	void BufferCsvMessageMsgEntry(
+		Frame& frame,
+		std::stringstream& ss_csv_data,
+		bool& align_msg_fields,
+		DisplayBase display_base);
+
+	void BufferCsvMessageMisoEntry(
+		U32 sample_rate,
+		U64 trigger_sample,
+		U64 packet_id,
+		Frame& frame,
+		std::stringstream& ss_csv_head,
+		std::stringstream& ss_csv_body,
+		std::stringstream& ss_csv_tail,
+		ErrorEvent& mosi_event,
+		ErrorEvent& miso_event,
+		bool& fragmentation,
+		bool& anb_stat_reached,
+		bool& align_msg_fields,
+		bool& add_entry,
+		DisplayBase display_base);
+
+	void BufferCsvMessageMosiEntry(
+		U32 sample_rate,
+		U64 trigger_sample,
+		U64 packet_id,
+		Frame &frame,
+		std::stringstream &ss_csv_head,
+		std::stringstream &ss_csv_body,
+		std::stringstream &ss_csv_tail,
+		ErrorEvent &mosi_event,
+		ErrorEvent &miso_event,
+		bool &fragmentation,
+		bool &app_stat_reached,
+		bool &align_msg_fields,
+		bool &add_entry,
+		DisplayBase display_base );
+
 	void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);
 	void AppendCsvSafeString(std::stringstream &ss_csv_data, char* input_data_str, DisplayBase display_base);
+
+	void GenerateMessageTabularText(SpiChannel_t channel, Frame &frame, DisplayBase display_base);
+	void GenerateMisoTabularText(U64 frame_index, Frame &frame, DisplayBase display_base);
+	void GenerateMosiTabularText(U64 frame_index, Frame &frame, DisplayBase display_base);
+
+	void GenerateMessageBubbleText(Frame &frame, DisplayBase display_base);
+	void GenerateMisoBubbleText(Frame &frame, DisplayBase display_base);
+	void GenerateMosiBubbleText(Frame &frame, DisplayBase display_base);
 };
 
 #endif /* ABCC_SPI_ANALYZER_RESULTS_H */

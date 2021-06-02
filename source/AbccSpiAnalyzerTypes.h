@@ -63,7 +63,8 @@ typedef enum NotifEvent {
 /* Enum for indicating which SPI channel to operate on */
 typedef enum SpiChannel {
 	MOSI,
-	MISO
+	MISO,
+	NotSpecified
 } SpiChannel_t;
 
 typedef enum AttributeAccessMode {
@@ -90,6 +91,8 @@ namespace AbccMosiStates
 		ProcessDataLength,
 		ApplicationStatus,
 		InterruptMask,
+
+		// NOTE: Alignment of MOSI/MISO MessageField Enums must be maintained for shared logic to work.
 		MessageField,
 		MessageField_Size,
 		MessageField_Reserved1,
@@ -100,6 +103,7 @@ namespace AbccMosiStates
 		MessageField_Reserved2,
 		MessageField_CommandExtension,
 		MessageField_Data,
+
 		WriteProcessData,
 		Crc32,
 		Pad,
@@ -118,6 +122,8 @@ namespace AbccMisoStates
 		AnybusStatus,
 		SpiStatus,
 		NetworkTime,
+
+		// NOTE: Alignment of MOSI/MISO MessageField Enums must be maintained for shared logic to work.
 		MessageField,
 		MessageField_Size,
 		MessageField_Reserved1,
@@ -128,6 +134,7 @@ namespace AbccMisoStates
 		MessageField_Reserved2,
 		MessageField_CommandExtension,
 		MessageField_Data,
+
 		ReadProcessData,
 		Crc32,
 		MessageField_DataNotValid

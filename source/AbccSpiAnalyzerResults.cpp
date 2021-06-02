@@ -23,24 +23,24 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#define IS_MISO_FRAME(frame)	(!frame.HasFlag(SPI_MOSI_FLAG))
-#define IS_MOSI_FRAME(frame)	(frame.HasFlag(SPI_MOSI_FLAG))
+#define IS_MISO_FRAME(frame)  (!frame.HasFlag(SPI_MOSI_FLAG))
+#define IS_MOSI_FRAME(frame)  (frame.HasFlag(SPI_MOSI_FLAG))
 
-#define MOSI_TAG_STR			"MOSI-"
-#define MISO_TAG_STR			"MISO-"
+#define MOSI_TAG_STR          "MOSI-"
+#define MISO_TAG_STR          "MISO-"
 
-#define MOSI_STR				"MOSI"
-#define MISO_STR				"MISO"
+#define MOSI_STR              "MOSI"
+#define MISO_STR              "MISO"
 
-#define FIRST_FRAG_STR			"FIRST_FRAGMENT"
-#define FRAGMENT_STR			"FRAGMENT"
-#define LAST_FRAG_STR			"LAST_FRAGMENT"
+#define FIRST_FRAG_STR        "FIRST_FRAGMENT"
+#define FRAGMENT_STR          "FRAGMENT"
+#define LAST_FRAG_STR         "LAST_FRAGMENT"
 
-#define ERROR_RESPONSE_STR		" (ERR_RSP)"
-#define RESPONSE_STR			" (RSP)"
-#define COMMAND_STR				" (CMD)"
+#define ERROR_RESPONSE_STR    " (ERR_RSP)"
+#define RESPONSE_STR          " (RSP)"
+#define COMMAND_STR           " (CMD)"
 
-#define CSV_DELIMITER			mSettings->mExportDelimiter
+#define CSV_DELIMITER         mSettings->mExportDelimiter
 
 #ifdef _DEBUG
 /* Dummy macros, the old SDK does not support these */
@@ -69,12 +69,7 @@ SpiAnalyzerResults::~SpiAnalyzerResults()
 {
 }
 
-void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification)
-{
-	StringBuilder(tag, value, verbose, notification, DisplayPriority::Tag);
-}
-
-void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority)
+void SpiAnalyzerResults::WriteBubbleText(const char* tag, const char* value, const char* verbose, NotifEvent_t notification, DisplayPriority disp_priority)
 {
 	const char alertStr[] = "!ALERT - ";
 	U16 strLenValue, strLenVerbose;
@@ -229,20 +224,25 @@ void SpiAnalyzerResults::StringBuilder(const char* tag, const char* value, const
 	}
 }
 
-void SpiAnalyzerResults::TableBuilder(SpiChannel_t channel, const char* text, NotifEvent_t notification)
+void SpiAnalyzerResults::WriteTabularText(SpiChannel_t channel, const char* text, NotifEvent_t notification)
 {
 	char str[FORMATTED_STRING_BUFFER_SIZE];
-	char *prefix;
-	char mosiPrefix[] = MOSI_TAG_STR;
-	char misoPrefix[] = MISO_TAG_STR;
+	const char *prefix;
+	const char mosiPrefix[] = MOSI_TAG_STR;
+	const char misoPrefix[] = MISO_TAG_STR;
+	const char noPrefix[] = "";
 
 	if (channel == SpiChannel::MOSI)
 	{
-		prefix = &mosiPrefix[0];
+		prefix = mosiPrefix;
+	}
+	else if (channel == SpiChannel::MISO)
+	{
+		prefix = misoPrefix;
 	}
 	else
 	{
-		prefix = &misoPrefix[0];
+		prefix = noPrefix;
 	}
 
 	if (notification)
@@ -257,6 +257,18 @@ void SpiAnalyzerResults::TableBuilder(SpiChannel_t channel, const char* text, No
 	AddTabularText(str);
 }
 
+void SpiAnalyzerResults::FormatTabularTextBuffer(char* buffer, size_t buffer_size, const char* tag, const char* text, NotifEvent_t notification)
+{
+	if (notification == NotifEvent::Alert)
+	{
+		SNPRINTF(buffer, buffer_size, "!%s: %s", tag, text);
+	}
+	else
+	{
+		SNPRINTF(buffer, buffer_size, "%s: %s", tag, text);
+	}
+}
+
 bool SpiAnalyzerResults::BuildCmdString(U8 command, U8 obj, DisplayBase display_base)
 {
 	bool errorRspMsg;
@@ -269,18 +281,18 @@ bool SpiAnalyzerResults::BuildCmdString(U8 command, U8 obj, DisplayBase display_
 	if ((command & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 	{
 		errorRspMsg = true;
-		StringBuilder("ERR_RSP", numberStr, verboseStr, NotifEvent::Alert);
+		WriteBubbleText("ERR_RSP", numberStr, verboseStr, NotifEvent::Alert);
 	}
 	else
 	{
 		errorRspMsg = false;
 		if ((command & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
 		{
-			StringBuilder("CMD", numberStr, verboseStr, notification);
+			WriteBubbleText("CMD", numberStr, verboseStr, notification);
 		}
 		else
 		{
-			StringBuilder("RSP", numberStr, verboseStr, notification);
+			WriteBubbleText("RSP", numberStr, verboseStr, notification);
 		}
 	}
 
@@ -300,11 +312,11 @@ void SpiAnalyzerResults::BuildInstString(U8 nw_type_idx, U8 obj, U16 inst, Displ
 
 	if (instFound)
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, verboseStr, notification);
+		WriteBubbleText(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, verboseStr, notification);
 	}
 	else
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, nullptr, NotifEvent::None);
+		WriteBubbleText(GET_MSG_FRAME_TAG(AbccMsgField::Instance), numberStr, nullptr, NotifEvent::None);
 	}
 }
 
@@ -320,11 +332,11 @@ void SpiAnalyzerResults::BuildAttrString(const MsgHeaderInfo_t* msg_header_ptr, 
 
 	if (attrFound)
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, verboseStr, notification);
+		WriteBubbleText(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, verboseStr, notification);
 	}
 	else
 	{
-		StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, nullptr, NotifEvent::None);
+		WriteBubbleText(GET_MSG_FRAME_TAG(AbccMsgField::CommandExtension), numberStr, nullptr, NotifEvent::None);
 	}
 }
 
@@ -334,7 +346,7 @@ void SpiAnalyzerResults::BuildObjectString(U8 object_num, DisplayBase display_ba
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetObjectString(object_num, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(object_num, display_base, GET_MSG_FRAME_BITSIZE(AbccMsgField::Object), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MSG_FRAME_TAG(AbccMsgField::Object), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MSG_FRAME_TAG(AbccMsgField::Object), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildSpiCtrlString(U8 spi_control, DisplayBase display_base)
@@ -343,7 +355,7 @@ void SpiAnalyzerResults::BuildSpiCtrlString(U8 spi_control, DisplayBase display_
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetSpiCtrlString(spi_control, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(spi_control, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::SpiControl), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::SpiControl), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MOSI_FRAME_TAG(AbccMosiStates::SpiControl), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildSpiStsString(U8 spi_status, DisplayBase display_base)
@@ -352,7 +364,7 @@ void SpiAnalyzerResults::BuildSpiStsString(U8 spi_status, DisplayBase display_ba
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetSpiStsString(spi_status, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(spi_status, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::SpiStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::SpiStatus), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MISO_FRAME_TAG(AbccMisoStates::SpiStatus), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildErrorRsp(U8 error_code, DisplayBase display_base)
@@ -361,7 +373,7 @@ void SpiAnalyzerResults::BuildErrorRsp(U8 error_code, DisplayBase display_base)
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetErrorRspString(error_code, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(error_code, display_base, SIZE_IN_BITS(error_code), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder("ERR_CODE", numberStr, verboseStr, notification);
+	WriteBubbleText("ERR_CODE", numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj, U8 error_code, DisplayBase display_base)
@@ -373,11 +385,11 @@ void SpiAnalyzerResults::BuildErrorRsp(bool nw_spec_err, U8 nw_type_idx, U8 obj,
 
 	if (nw_spec_err)
 	{
-		StringBuilder("NW_ERR", numberStr, verboseStr, notification);
+		WriteBubbleText("NW_ERR", numberStr, verboseStr, notification);
 	}
 	else
 	{
-		StringBuilder("OBJ_ERR", numberStr, verboseStr, notification);
+		WriteBubbleText("OBJ_ERR", numberStr, verboseStr, notification);
 	}
 }
 
@@ -387,7 +399,7 @@ void SpiAnalyzerResults::BuildIntMask(U8 int_mask, DisplayBase display_base)
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetIntMaskString(int_mask, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(int_mask, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::InterruptMask), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::InterruptMask), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MOSI_FRAME_TAG(AbccMosiStates::InterruptMask), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildAbccStatus(U8 abcc_status, DisplayBase display_base)
@@ -396,7 +408,7 @@ void SpiAnalyzerResults::BuildAbccStatus(U8 abcc_status, DisplayBase display_bas
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetAbccStatusString(abcc_status, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(abcc_status, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::AnybusStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MISO_FRAME_TAG(AbccMisoStates::AnybusStatus), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MISO_FRAME_TAG(AbccMisoStates::AnybusStatus), numberStr, verboseStr, notification);
 }
 
 void SpiAnalyzerResults::BuildApplStatus(U8 appl_status, DisplayBase display_base)
@@ -405,627 +417,554 @@ void SpiAnalyzerResults::BuildApplStatus(U8 appl_status, DisplayBase display_bas
 	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
 	NotifEvent_t notification = GetApplStsString(appl_status, verboseStr, sizeof(verboseStr), display_base);
 	GetNumberString(appl_status, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::ApplicationStatus), numberStr, sizeof(numberStr), BaseType::Numeric);
-	StringBuilder(GET_MOSI_FRAME_TAG(AbccMosiStates::ApplicationStatus), numberStr, verboseStr, notification);
+	WriteBubbleText(GET_MOSI_FRAME_TAG(AbccMosiStates::ApplicationStatus), numberStr, verboseStr, notification);
+}
+
+void SpiAnalyzerResults::GenerateMessageBubbleText(Frame &frame, DisplayBase display_base)
+{
+	NotifEvent_t notification = NotifEvent::None;
+	AbccSpiStatesUnion_t uState;
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char verboseStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+	uState.eMiso = static_cast<AbccMisoStates::Enum>(frame.mType);
+
+	switch (uState.eMiso)
+	{
+		case AbccMisoStates::MessageField_Size:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
+				notification = NotifEvent::Alert;
+			}
+			else
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "%d Bytes", (U16)frame.mData1);
+			}
+
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStr, notification);
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Reserved1:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.mData1 != 0)
+			{
+				notification = NotifEvent::Alert;
+			}
+
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_SourceId:
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
+			break;
+
+		case AbccMisoStates::MessageField_Object:
+			BuildObjectString((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMisoStates::MessageField_Instance:
+			BuildInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, display_base);
+			break;
+
+		case AbccMisoStates::MessageField_Command:
+			BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
+			break;
+
+		case AbccMisoStates::MessageField_Reserved2:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.mData1 != 0)
+			{
+				notification = NotifEvent::Alert;
+			}
+
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_CommandExtension:
+		{
+			U16 cmdExt = static_cast<U16>(frame.mData1);
+			MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
+
+			if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
+			{
+				BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Normal, display_base);
+			}
+			else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
+			{
+				BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Indexed, display_base);
+			}
+			else
+			{
+				const char* verboseStrPtr = verboseStr;
+
+				GetNumberString(cmdExt, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+				SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
+
+				if (segmentation != SegmentationType::None)
+				{
+					bool commandMsg = IsCommandMessage(psMsgHdr);
+					bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
+					U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
+					U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
+					U8 validFlags = 0;
+
+					if (commandMsg)
+					{
+						validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
+					}
+
+					if (segmentationMsg)
+					{
+						validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
+					}
+
+					if (cmdExt1 & ~validFlags)
+					{
+						notification = NotifEvent::Alert;
+						SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
+					}
+					else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
+					{
+						notification = NotifEvent::Alert;
+						SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | Segmentation Aborted", cmdExt0);
+					}
+					else if (segmentationMsg)
+					{
+						cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
+
+						switch (cmdExt1)
+						{
+						case 0:
+							SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | SEGMENT", cmdExt0);
+							break;
+						case ABP_MSG_CMDEXT1_SEG_FIRST:
+							SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | FIRST_SEGMENT", cmdExt0);
+							break;
+						case ABP_MSG_CMDEXT1_SEG_LAST:
+							SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | LAST_SEGMENT", cmdExt0);
+							break;
+						case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
+						default:
+							SNPRINTF(verboseStr, sizeof(verboseStr), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
+							break;
+						}
+					}
+					else
+					{
+						verboseStrPtr = nullptr;
+					}
+				}
+				else
+				{
+					verboseStrPtr = nullptr;
+				}
+
+				WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStrPtr, notification);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField:
+		case AbccMisoStates::MessageField_Data:
+		{
+			MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+			{
+				/* The error response may be composed of one to three bytes.
+				** This payload can represent a common error response,
+				** an object specific error response, or a network specific
+				** error response. */
+
+				if (info->msgDataCnt == 0)
+				{
+					BuildErrorRsp((U8)frame.mData1, display_base);
+				}
+				else
+				{
+					const U16 nwSpecErrCodeOffset = 2;
+					U8 nwTypeIdx = 0;
+					bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+					if (nwSpecificError)
+					{
+						nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+					}
+
+					BuildErrorRsp(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, display_base);
+				}
+			}
+			else
+			{
+				BaseType type;
+				bool exception = false;
+				bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+				bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+				bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
+
+				if (attribute)
+				{
+					type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+				}
+				else
+				{
+					type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
+				}
+
+				if (IS_MISO_FRAME(frame) && firstAttributeByte)
+				{
+					U16 tableIndex;
+
+					if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+					{
+						notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, verboseStr, sizeof(verboseStr), display_base);
+						exception = true;
+					}
+				}
+
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type);
+
+				if (exception)
+				{
+					if (nwObject)
+					{
+						WriteBubbleText("EXC_INFO", numberStr, verboseStr, notification);
+					}
+					else
+					{
+						WriteBubbleText("EXC_CODE", numberStr, verboseStr, notification);
+					}
+				}
+				else
+				{
+					SNPRINTF(verboseStr, sizeof(verboseStr), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
+
+					if (mSettings->mMsgDataPriority == DisplayPriority::Value)
+					{
+						/* Conditionally trim the leading 0x specifier */
+						U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
+						WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], verboseStr, notification, DisplayPriority::Value);
+					}
+					else
+					{
+						WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStr, notification);
+					}
+				}
+
+			}
+
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
+void SpiAnalyzerResults::GenerateMisoBubbleText(Frame &frame, DisplayBase display_base)
+{
+	NotifEvent_t notification = NotifEvent::None;
+	AbccSpiStatesUnion_t uState;
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char verboseStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+	uState.eMiso = static_cast<AbccMisoStates::Enum>(frame.mType);
+
+	switch (uState.eMiso)
+	{
+		case AbccMisoStates::Idle:
+			break;
+
+		case AbccMisoStates::Reserved1:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.mData1 != 0)
+			{
+				notification = NotifEvent::Alert;
+			}
+
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
+
+			break;
+		}
+
+		case AbccMisoStates::Reserved2:
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
+			break;
+
+		case AbccMisoStates::LedStatus:
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+			notification = GetLedStatusString((U16)frame.mData1, verboseStr, sizeof(verboseStr), display_base);
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStr, notification);
+			break;
+
+		case AbccMisoStates::AnybusStatus:
+			BuildAbccStatus((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMisoStates::SpiStatus:
+			BuildSpiStsString((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMisoStates::NetworkTime:
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
+			break;
+
+		case AbccMisoStates::MessageField_Size:
+		case AbccMisoStates::MessageField_Reserved1:
+		case AbccMisoStates::MessageField_SourceId:
+		case AbccMisoStates::MessageField_Object:
+		case AbccMisoStates::MessageField_Instance:
+		case AbccMisoStates::MessageField_Command:
+		case AbccMisoStates::MessageField_Reserved2:
+		case AbccMisoStates::MessageField_CommandExtension:
+		case AbccMisoStates::MessageField:
+		case AbccMisoStates::MessageField_Data:
+			GenerateMessageBubbleText(frame, display_base);
+			break;
+
+		case AbccMisoStates::MessageField_DataNotValid:
+			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::MessageField_Data), numberStr, sizeof(numberStr));
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification, DisplayPriority::Tag);
+			break;
+
+		case AbccMisoStates::ReadProcessData:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+			SNPRINTF(verboseStr, sizeof(verboseStr), " [%s] Byte #%lld ", numberStr, frame.mData2);
+
+			if (mSettings->mProcessDataPriority == DisplayPriority::Value)
+			{
+				/* Conditionally trim the leading 0x specifier */
+				U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
+				WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], verboseStr, notification, DisplayPriority::Value);
+			}
+			else
+			{
+				WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStr, notification);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::Crc32:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1), (U32)(frame.mData2));
+				notification = NotifEvent::Alert;
+			}
+			else
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1), (U32)(frame.mData2));
+			}
+
+			WriteBubbleText(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, verboseStr, notification);
+			break;
+		}
+
+		default:
+			GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
+			notification = NotifEvent::Alert;
+			WriteBubbleText("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
+			break;
+	}
+}
+
+void SpiAnalyzerResults::GenerateMosiBubbleText(Frame &frame, DisplayBase display_base)
+{
+	NotifEvent_t notification = NotifEvent::None;
+	AbccSpiStatesUnion_t uState;
+	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+	char verboseStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+	uState.eMosi = (AbccMosiStates::Enum)frame.mType;
+
+	switch (uState.eMosi)
+	{
+		case AbccMosiStates::Idle:
+			break;
+
+		case AbccMosiStates::SpiControl:
+			BuildSpiCtrlString((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMosiStates::Reserved1:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.mData1 != 0)
+			{
+				notification = NotifEvent::Alert;
+			}
+
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
+
+			break;
+		}
+
+		case AbccMosiStates::MessageLength:
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+			SNPRINTF(verboseStr, sizeof(verboseStr), "%d Words", (U16)frame.mData1);
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, verboseStr, notification);
+			break;
+
+		case AbccMosiStates::ProcessDataLength:
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+			SNPRINTF(verboseStr, sizeof(verboseStr), "%d Words", (U16)frame.mData1);
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, verboseStr, notification);
+			break;
+
+		case AbccMosiStates::ApplicationStatus:
+			BuildApplStatus((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMosiStates::InterruptMask:
+			BuildIntMask((U8)frame.mData1, display_base);
+			break;
+
+		case AbccMosiStates::MessageField_Size:
+		case AbccMosiStates::MessageField_Reserved1:
+		case AbccMosiStates::MessageField_SourceId:
+		case AbccMosiStates::MessageField_Object:
+		case AbccMosiStates::MessageField_Instance:
+		case AbccMosiStates::MessageField_Command:
+		case AbccMosiStates::MessageField_Reserved2:
+		case AbccMosiStates::MessageField_CommandExtension:
+		case AbccMosiStates::MessageField:
+		case AbccMosiStates::MessageField_Data:
+			GenerateMessageBubbleText(frame, display_base);
+			break;
+
+		case AbccMosiStates::MessageField_DataNotValid:
+			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr));
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification, DisplayPriority::Tag);
+			break;
+
+		case AbccMosiStates::WriteProcessData:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+			SNPRINTF(verboseStr, sizeof(verboseStr), " [%s] Byte #%lld ", numberStr, frame.mData2);
+
+			if (mSettings->mProcessDataPriority == DisplayPriority::Value)
+			{
+				/* Conditionally trim the leading 0x specifier */
+				U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
+				WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), &numberStr[offset], verboseStr, notification, DisplayPriority::Value);
+			}
+			else
+			{
+				WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, verboseStr, notification);
+			}
+
+			break;
+		}
+
+		case AbccMosiStates::Crc32:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
+				notification = NotifEvent::Alert;
+			}
+			else
+			{
+				SNPRINTF(verboseStr, sizeof(verboseStr), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
+			}
+
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, verboseStr, notification);
+
+			break;
+		}
+
+		case AbccMosiStates::Pad:
+		{
+			GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
+
+			if (frame.mData1 != 0)
+			{
+				notification = NotifEvent::Alert;
+			}
+
+			WriteBubbleText(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
+
+			break;
+		}
+
+		default:
+			GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
+			notification = NotifEvent::Alert;
+			WriteBubbleText("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
+			break;
+	}
 }
 
 void SpiAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, DisplayBase display_base)
 {
 	ClearResultStrings();
-	char numberStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	char str[FORMATTED_STRING_BUFFER_SIZE];
-	NotifEvent_t notification = NotifEvent::None;
 	Frame frame = GetFrame(frame_index);
 	AbccSpiStatesUnion_t uState;
 	uState.eMosi = (AbccMosiStates::Enum)frame.mType;
 
 	if (frame.HasFlag(SPI_ERROR_FLAG))
 	{
-		notification = NotifEvent::Alert;
+		NotifEvent_t notification = NotifEvent::Alert;
+
 		switch (frame.mType)
 		{
-		case AbccSpiError::Fragmentation:
-			if ((IS_MISO_FRAME(frame) && (channel == mSettings->mMisoChannel)) ||
-				(IS_MOSI_FRAME(frame) && (channel == mSettings->mMosiChannel)))
+			case AbccSpiError::Fragmentation:
 			{
-				StringBuilder("FRAGMENT", nullptr, "Fragmented ABCC SPI Packet.", notification);
+				if ((IS_MISO_FRAME(frame) && (channel == mSettings->mMisoChannel)) ||
+					(IS_MOSI_FRAME(frame) && (channel == mSettings->mMosiChannel)))
+				{
+					WriteBubbleText("FRAGMENT", nullptr, "Fragmented ABCC SPI Packet.", notification);
+				}
+
+				break;
 			}
 
-			break;
-		case AbccSpiError::EndOfTransfer:
-			StringBuilder("CLOCKING", nullptr, "ABCC SPI Clocking. The analyzer expects one transaction per 'Active Enable' phase.", notification);
-			break;
-		case AbccSpiError::Generic:
-		default:
-			StringBuilder("ERROR", nullptr, "ABCC SPI Error.", notification);
-			break;
+			case AbccSpiError::EndOfTransfer:
+				WriteBubbleText("CLOCKING", nullptr, "ABCC SPI Clocking. The analyzer expects one transaction per 'Active Enable' phase.", notification);
+				break;
+
+			case AbccSpiError::Generic:
+			default:
+				WriteBubbleText("ERROR", nullptr, "ABCC SPI Error.", notification);
+				break;
 		}
 	}
 	else
 	{
 		if ((channel == mSettings->mMosiChannel) && IS_MOSI_FRAME(frame))
 		{
-			switch (uState.eMosi)
-			{
-			case AbccMosiStates::Idle:
-				break;
-			case AbccMosiStates::SpiControl:
-				BuildSpiCtrlString((U8)frame.mData1, display_base);
-				break;
-			case AbccMosiStates::Reserved1:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
-				break;
-			case AbccMosiStates::MessageLength:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-				break;
-			case AbccMosiStates::ProcessDataLength:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-				SNPRINTF(str, sizeof(str), "%d Words", (U16)frame.mData1);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-				break;
-			case AbccMosiStates::ApplicationStatus:
-				BuildApplStatus((U8)frame.mData1, display_base);
-				break;
-			case AbccMosiStates::InterruptMask:
-				BuildIntMask((U8)frame.mData1, display_base);
-				break;
-			case AbccMosiStates::MessageField:
-			case AbccMosiStates::MessageField_Data:
-			{
-				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					/* The error response may be composed of one to three bytes.
-					** This payload can represent a common error response,
-					** an object specific error response, or a network specific
-					** error response. */
-
-					if (info->msgDataCnt == 0)
-					{
-						BuildErrorRsp((U8)frame.mData1, display_base);
-					}
-					else
-					{
-						const U16 nwSpecErrCodeOffset = 2;
-						U8 nwTypeIdx = 0;
-						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-						if (nwSpecificError)
-						{
-							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-						}
-
-						BuildErrorRsp(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, display_base);
-					}
-				}
-				else
-				{
-					BaseType type;
-
-					if (IsAttributeCmd(info->msgHeader.cmd))
-					{
-						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-					}
-					else
-					{
-						type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
-					}
-
-					GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), type);
-					SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
-
-					if (mSettings->mMsgDataPriority == DisplayPriority::Value)
-					{
-						/* Conditionally trim the leading 0x specifier */
-						U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
-						StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), &numberStr[offset], str, notification, DisplayPriority::Value);
-					}
-					else
-					{
-						StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-					}
-				}
-
-				break;
-			}
-			case AbccMosiStates::MessageField_DataNotValid:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMosiStates::MessageField_Data), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification, DisplayPriority::Tag);
-				break;
-			case AbccMosiStates::MessageField_Size:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
-					notification = NotifEvent::Alert;
-				}
-				else
-				{
-					SNPRINTF(str, sizeof(str), "%d Bytes", (U16)frame.mData1);
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-				break;
-			case AbccMosiStates::MessageField_Reserved1:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
-				break;
-			case AbccMosiStates::MessageField_SourceId:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
-				break;
-			case AbccMosiStates::MessageField_Object:
-				BuildObjectString((U8)frame.mData1, display_base);
-				break;
-			case AbccMosiStates::MessageField_Instance:
-				BuildInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, display_base);
-				break;
-			case AbccMosiStates::MessageField_Command:
-				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
-				break;
-			case AbccMosiStates::MessageField_Reserved2:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, "Reserved", notification);
-				break;
-			case AbccMosiStates::MessageField_CommandExtension:
-			{
-				U16 cmdExt = static_cast<U16>(frame.mData1);
-				MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-
-				if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-				{
-					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Normal, display_base);
-				}
-				else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-				{
-					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Indexed, display_base);
-				}
-				else
-				{
-					const char* dataStr = str;
-
-					GetNumberString(cmdExt, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-					SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-					if (segmentation != SegmentationType::None)
-					{
-						bool commandMsg = IsCommandMessage(psMsgHdr);
-						bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-						U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
-						U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-						U8 validFlags = 0;
-
-						notification = NotifEvent::None;
-
-						if (commandMsg)
-						{
-							validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-						}
-
-						if (segmentationMsg)
-						{
-							validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-						}
-
-						if (cmdExt1 & ~validFlags)
-						{
-							notification = NotifEvent::Alert;
-							SNPRINTF(str, sizeof(str), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
-						}
-						else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-						{
-							notification = NotifEvent::Alert;
-							SNPRINTF(str, sizeof(str), "0x%02X | Segmentation Aborted", cmdExt0);
-						}
-						else if (segmentationMsg)
-						{
-							cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-							switch (cmdExt1)
-							{
-							case 0:
-								SNPRINTF(str, sizeof(str), "0x%02X | SEGMENT", cmdExt0);
-								break;
-							case ABP_MSG_CMDEXT1_SEG_FIRST:
-								SNPRINTF(str, sizeof(str), "0x%02X | FIRST_SEGMENT", cmdExt0);
-								break;
-							case ABP_MSG_CMDEXT1_SEG_LAST:
-								SNPRINTF(str, sizeof(str), "0x%02X | LAST_SEGMENT", cmdExt0);
-								break;
-							case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-							default:
-								SNPRINTF(str, sizeof(str), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
-								break;
-							}
-						}
-						else
-						{
-							dataStr = nullptr;
-						}
-					}
-					else
-					{
-						dataStr = nullptr;
-					}
-
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, dataStr, notification);
-				}
-
-				break;
-			}
-			case AbccMosiStates::WriteProcessData:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
-
-				if (mSettings->mProcessDataPriority == DisplayPriority::Value)
-				{
-					/* Conditionally trim the leading 0x specifier */
-					U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), &numberStr[offset], str, notification, DisplayPriority::Value);
-				}
-				else
-				{
-					StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-				}
-
-				break;
-			case AbccMosiStates::Crc32:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
-				{
-					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-					notification = NotifEvent::Alert;
-				}
-				else
-				{
-					SNPRINTF(str, sizeof(str), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1 & 0xFFFFFFFF), (U32)(frame.mData2 & 0xFFFFFFFF));
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, str, notification);
-				break;
-			case AbccMosiStates::Pad:
-				GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(uState.eMosi), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MOSI_FRAME_TAG(uState.eMosi), numberStr, nullptr, notification);
-				break;
-			default:
-				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
-				notification = NotifEvent::Alert;
-				StringBuilder("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
-				break;
-			}
+			GenerateMosiBubbleText(frame, display_base);
 		}
 		else if ((channel == mSettings->mMisoChannel) && IS_MISO_FRAME(frame))
 		{
-			switch (uState.eMiso)
-			{
-			case AbccMisoStates::Idle:
-				break;
-			case AbccMisoStates::Reserved1:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
-				break;
-			case AbccMisoStates::Reserved2:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
-				break;
-			case AbccMisoStates::LedStatus:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-				notification = GetLedStatusString((U16)frame.mData1, str, sizeof(str), display_base);
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
-				break;
-			case AbccMisoStates::AnybusStatus:
-				BuildAbccStatus((U8)frame.mData1, display_base);
-				break;
-			case AbccMisoStates::SpiStatus:
-				BuildSpiStsString((U8)frame.mData1, display_base);
-				break;
-			case AbccMisoStates::NetworkTime:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
-				break;
-			case AbccMisoStates::MessageField:
-			case AbccMisoStates::MessageField_Data:
-			{
-				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					/* The error response may be composed of one to three bytes.
-					** This payload can represent a common error response,
-					** an object specific error response, or a network specific
-					** error response. */
-
-					if (info->msgDataCnt == 0)
-					{
-						BuildErrorRsp((U8)frame.mData1, display_base);
-					}
-					else
-					{
-						const U16 nwSpecErrCodeOffset = 2;
-						U8 nwTypeIdx = 0;
-						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-						if (nwSpecificError)
-						{
-							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-						}
-
-						BuildErrorRsp(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, display_base);
-					}
-				}
-				else
-				{
-					BaseType type;
-					bool exception = false;
-					bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
-					bool attribute = IsAttributeCmd(info->msgHeader.cmd);
-					bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
-
-					if (attribute)
-					{
-						type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-					}
-					else
-					{
-						type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
-					}
-
-					if (firstAttributeByte)
-					{
-						U16 tableIndex;
-
-						if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
-						{
-							notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, str, sizeof(str), display_base);
-							exception = true;
-						}
-					}
-
-					GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), type);
-
-					if (exception)
-					{
-						if (nwObject)
-						{
-							StringBuilder("EXC_INFO", numberStr, str, notification);
-						}
-						else
-						{
-							StringBuilder("EXC_CODE", numberStr, str, notification);
-						}
-					}
-					else
-					{
-						SNPRINTF(str, sizeof(str), " [%s] Byte #%d ", numberStr, info->msgDataCnt);
-
-						if (mSettings->mMsgDataPriority == DisplayPriority::Value)
-						{
-							/* Conditionally trim the leading 0x specifier */
-							U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
-							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], str, notification, DisplayPriority::Value);
-						}
-						else
-						{
-							StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
-						}
-					}
-
-				}
-
-				break;
-			}
-			case AbccMisoStates::MessageField_DataNotValid:
-				AnalyzerHelpers::GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(AbccMisoStates::MessageField_Data), numberStr, sizeof(numberStr));
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification, DisplayPriority::Tag);
-				break;
-			case AbccMisoStates::MessageField_Size:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					SNPRINTF(str, sizeof(str), "%d Bytes, Exceeds Maximum Size of %d", (U16)frame.mData1, ABP_MAX_MSG_DATA_BYTES);
-					notification = NotifEvent::Alert;
-				}
-				else
-				{
-					SNPRINTF(str, sizeof(str), "%d Bytes", (U16)frame.mData1);
-				}
-
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
-				break;
-			case AbccMisoStates::MessageField_Reserved1:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
-				break;
-			case AbccMisoStates::MessageField_SourceId:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, nullptr, notification);
-				break;
-			case AbccMisoStates::MessageField_Object:
-				BuildObjectString((U8)frame.mData1, display_base);
-				break;
-			case AbccMisoStates::MessageField_Instance:
-				BuildInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, display_base);
-				break;
-			case AbccMisoStates::MessageField_Command:
-				BuildCmdString((U8)frame.mData1, (U8)frame.mData2, display_base);
-				break;
-			case AbccMisoStates::MessageField_Reserved2:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.mData1 != 0)
-				{
-					notification = NotifEvent::Alert;
-				}
-
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, "Reserved", notification);
-				break;
-			case AbccMisoStates::MessageField_CommandExtension:
-			{
-				U16 cmdExt = static_cast<U16>(frame.mData1);
-				MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-
-				if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-				{
-					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Normal, display_base);
-				}
-				else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-				{
-					BuildAttrString(psMsgHdr, cmdExt, AttributeAccessMode::Indexed, display_base);
-				}
-				else
-				{
-					const char* dataStr = str;
-
-					GetNumberString(cmdExt, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-					SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-					if (segmentation != SegmentationType::None)
-					{
-						bool commandMsg = IsCommandMessage(psMsgHdr);
-						bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-						U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
-						U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-						U8 validFlags = 0;
-
-						notification = NotifEvent::None;
-
-						if (commandMsg)
-						{
-							validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-						}
-
-						if (segmentationMsg)
-						{
-							validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-						}
-
-						if (cmdExt1 & ~validFlags)
-						{
-							notification = NotifEvent::Alert;
-							SNPRINTF(str, sizeof(str), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
-						}
-						else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-						{
-							notification = NotifEvent::Alert;
-							SNPRINTF(str, sizeof(str), "0x%02X | Segmentation Aborted", cmdExt0);
-						}
-						else if (segmentationMsg)
-						{
-							cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-							switch (cmdExt1)
-							{
-							case 0:
-								SNPRINTF(str, sizeof(str), "0x%02X | SEGMENT", cmdExt0);
-								break;
-							case ABP_MSG_CMDEXT1_SEG_FIRST:
-								SNPRINTF(str, sizeof(str), "0x%02X | FIRST_SEGMENT", cmdExt0);
-								break;
-							case ABP_MSG_CMDEXT1_SEG_LAST:
-								SNPRINTF(str, sizeof(str), "0x%02X | LAST_SEGMENT", cmdExt0);
-								break;
-							case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-							default:
-								SNPRINTF(str, sizeof(str), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
-								break;
-							}
-						}
-						else
-						{
-							dataStr = nullptr;
-						}
-					}
-					else
-					{
-						dataStr = nullptr;
-					}
-
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, dataStr, notification);
-				}
-
-				break;
-			}
-			case AbccMisoStates::ReadProcessData:
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-				SNPRINTF(str, sizeof(str), " [%s] Byte #%lld ", numberStr, frame.mData2);
-
-				if (mSettings->mProcessDataPriority == DisplayPriority::Value)
-				{
-					/* Conditionally trim the leading 0x specifier */
-					U8 offset = (display_base == DisplayBase::Hexadecimal) ? 2 : 0;
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), &numberStr[offset], str, notification, DisplayPriority::Value);
-				}
-				else
-				{
-					StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
-				}
-
-				break;
-			case AbccMisoStates::Crc32:
-			{
-				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(uState.eMiso), numberStr, sizeof(numberStr), BaseType::Numeric);
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG) && frame.HasFlag(DISPLAY_AS_ERROR_FLAG))
-				{
-					SNPRINTF(str, sizeof(str), "ERROR - Received 0x%08X != Calculated 0x%08X", (U32)(frame.mData1), (U32)(frame.mData2));
-					notification = NotifEvent::Alert;
-				}
-				else
-				{
-					SNPRINTF(str, sizeof(str), "Received 0x%08X == Calculated 0x%08X", (U32)(frame.mData1), (U32)(frame.mData2));
-				}
-
-				StringBuilder(GET_MISO_FRAME_TAG(uState.eMiso), numberStr, str, notification);
-				break;
-			}
-			default:
-				GetNumberString(frame.mData1, display_base, 8, numberStr, sizeof(numberStr), BaseType::Numeric);
-				notification = NotifEvent::Alert;
-				StringBuilder("UNKNOWN", numberStr, "Internal Error: Unknown State", notification);
-				break;
-			}
+			GenerateMisoBubbleText(frame, display_base);
 		}
 	}
 }
@@ -1235,6 +1174,478 @@ void SpiAnalyzerResults::AppendCsvSafeString(std::stringstream &ss_csv_data, cha
 	}
 }
 
+void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
+	Frame& frame,
+	std::stringstream& ss_csv_data,
+	bool& align_msg_fields,
+	DisplayBase display_base)
+{
+	char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+	// NOTE: AbccMosiStates and AbccMisoStates are assumed to have aligned
+	// values for AbccMosiStates::MessageField* and AbccMisoStates::MessageField*.
+	// This means only one of the enums will be used for the cases defined below.
+
+	switch (frame.mType)
+	{
+	case AbccMisoStates::MessageField_Size:
+	case AbccMisoStates::MessageField_SourceId:
+	{
+		GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
+		ss_csv_data << CSV_DELIMITER << dataStr;
+		align_msg_fields = false;
+		break;
+	}
+
+	case AbccMisoStates::MessageField_Object:
+	{
+		GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+		ss_csv_data << CSV_DELIMITER << dataStr;
+		align_msg_fields = false;
+		break;
+	}
+
+	case AbccMisoStates::MessageField_Instance:
+	{
+		NotifEvent_t notification = NotifEvent::None;
+		bool found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, dataStr, sizeof(dataStr), &notification, display_base);
+
+		if (!found)
+		{
+			SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
+		}
+
+		ss_csv_data << CSV_DELIMITER << dataStr;
+		align_msg_fields = false;
+
+		break;
+	}
+
+	case AbccMisoStates::MessageField_Command:
+	{
+		GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
+
+		if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
+		{
+			ss_csv_data << CSV_DELIMITER << dataStr << ERROR_RESPONSE_STR;
+		}
+		else
+		{
+			if (((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
+			{
+				ss_csv_data << CSV_DELIMITER << dataStr << COMMAND_STR;
+			}
+			else
+			{
+				ss_csv_data << CSV_DELIMITER << dataStr << RESPONSE_STR;
+			}
+		}
+
+		align_msg_fields = false;
+
+		break;
+	}
+
+	case AbccMisoStates::MessageField_CommandExtension:
+	{
+		NotifEvent_t notification = NotifEvent::None;
+		DisplayBase displayBase = DisplayBase::Hexadecimal;
+		U16 cmdExt = static_cast<U16>(frame.mData1);
+		MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
+
+		if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
+		{
+			GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Normal, &notification, displayBase);
+		}
+		else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
+		{
+			GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Indexed, &notification, displayBase);
+		}
+		else
+		{
+			SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
+
+			if (segmentation != SegmentationType::None)
+			{
+				bool commandMsg = IsCommandMessage(psMsgHdr);
+				bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
+				U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
+				U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
+				U8 validFlags = 0;
+
+				notification = NotifEvent::None;
+
+				if (commandMsg)
+				{
+					validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
+				}
+
+				if (segmentationMsg)
+				{
+					validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
+				}
+
+				if (cmdExt1 & ~validFlags)
+				{
+					notification = NotifEvent::Alert;
+					SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
+				}
+				else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
+				{
+					notification = NotifEvent::Alert;
+					SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Aborted", cmdExt0);
+				}
+				else if (segmentationMsg)
+				{
+					cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
+
+					switch (cmdExt1)
+					{
+					case 0:
+						SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | SEGMENT", cmdExt0);
+						break;
+					case ABP_MSG_CMDEXT1_SEG_FIRST:
+						SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT", cmdExt0);
+						break;
+					case ABP_MSG_CMDEXT1_SEG_LAST:
+						SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | LAST_SEGMENT", cmdExt0);
+						break;
+					case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
+					default:
+						SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
+						break;
+					}
+				}
+				else
+				{
+					// Message relates to segmentation but is either a command for
+					// "segmented response" or a response to a "segmented command".
+					GetNumberString(cmdExt, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
+				}
+			}
+			else
+			{
+				GetNumberString(cmdExt, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
+			}
+		}
+
+		ss_csv_data << CSV_DELIMITER << dataStr;
+		align_msg_fields = false;
+
+		break;
+	}
+
+	case AbccMisoStates::MessageField_Data:
+	case AbccMisoStates::MessageField:
+	{
+		MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
+		if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+		{
+			const U16 nwSpecErrCodeOffset = 2;
+
+			/* The error response may be composed of one to three bytes.
+			** This payload can represent a common error response,
+			** an object specific error response, or a network specific
+			** error response. */
+
+			if (info->msgDataCnt == 0)
+			{
+				GetErrorRspString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+			}
+			else if (info->msgDataCnt <= nwSpecErrCodeOffset)
+			{
+				U8 nwTypeIdx = 0;
+				bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+				if (nwSpecificError)
+				{
+					nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+				}
+
+				GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+
+				// Explicitly set display_base to ASCII to ensure proper escaping
+				// is performed when calling AppendCsvSafeString().
+				display_base = DisplayBase::ASCII;
+			}
+		}
+		else
+		{
+			BaseType type;
+			bool exception = false;
+			bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+			bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
+
+			if (attribute)
+			{
+				type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
+			}
+			else
+			{
+				type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
+			}
+
+			if (IS_MISO_FRAME(frame) && firstAttributeByte)
+			{
+				bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+				U16 tableIndex;
+
+				if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+				{
+					GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+
+					// Explicitly set display_base to ASCII to ensure proper escaping
+					// is performed when calling AppendCsvSafeString().
+					display_base = DisplayBase::ASCII;
+					exception = true;
+				}
+			}
+
+			if (!exception)
+			{
+				GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
+			}
+		}
+
+		if (align_msg_fields)
+		{
+			ss_csv_data << CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER;
+			align_msg_fields = false;
+		}
+
+		AppendCsvSafeString(ss_csv_data, dataStr, display_base);
+
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void SpiAnalyzerResults::BufferCsvMessageMisoEntry(
+	U32 sample_rate,
+	U64 trigger_sample,
+	U64 packet_id,
+	Frame& frame,
+	std::stringstream& ss_csv_head,
+	std::stringstream& ss_csv_body,
+	std::stringstream& ss_csv_tail,
+	ErrorEvent& mosi_event,
+	ErrorEvent& miso_event,
+	bool& fragmentation,
+	bool& anb_stat_reached,
+	bool& align_msg_fields,
+	bool& add_entry,
+	DisplayBase display_base)
+{
+	switch (frame.mType)
+	{
+	case AbccSpiError::Fragmentation:
+		miso_event = ErrorEvent::SpiFragmentationError;
+		break;
+
+	case AbccMisoStates::AnybusStatus:
+	{
+		char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+		anb_stat_reached = true;
+		GetAbccStatusString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+		ss_csv_body << CSV_DELIMITER << dataStr;
+
+		break;
+	}
+
+	case AbccMisoStates::SpiStatus:
+	{
+		bool message = ((frame.mData1 & ABP_SPI_STATUS_M) != 0);
+
+		if (message)
+		{
+			char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+			/* Add in the timestamp, packet ID, and Anybus state */
+			AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+			ss_csv_head << std::endl
+				<< MISO_STR + CSV_DELIMITER << timeStr << CSV_DELIMITER << packet_id;
+			add_entry = true;
+		}
+
+		ss_csv_tail << CSV_DELIMITER;
+
+		if (message)
+		{
+			if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
+			{
+				if (fragmentation)
+				{
+					ss_csv_tail << LAST_FRAG_STR;
+					fragmentation = false;
+				}
+			}
+			else
+			{
+				if (!fragmentation)
+				{
+					fragmentation = true;
+					ss_csv_tail << FIRST_FRAG_STR;
+				}
+				else
+				{
+					ss_csv_tail << FRAGMENT_STR;
+				}
+			}
+		}
+
+		break;
+	}
+
+	case AbccMisoStates::MessageField_Size:
+	case AbccMisoStates::MessageField_SourceId:
+	case AbccMisoStates::MessageField_Object:
+	case AbccMisoStates::MessageField_Instance:
+	case AbccMisoStates::MessageField_Command:
+	case AbccMisoStates::MessageField_CommandExtension:
+	case AbccMisoStates::MessageField_Data:
+	case AbccMisoStates::MessageField:
+		BufferCsvMessageMsgEntry(
+			frame,
+			ss_csv_tail,
+			align_msg_fields,
+			display_base);
+
+		break;
+
+	case AbccMisoStates::Crc32:
+	{
+		if ((U32)frame.mData1 != (U32)frame.mData2)
+		{
+			miso_event = ErrorEvent::CrcError;
+			mosi_event = ErrorEvent::CrcError;
+		}
+
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void SpiAnalyzerResults::BufferCsvMessageMosiEntry(
+	U32 sample_rate,
+	U64 trigger_sample,
+	U64 packet_id,
+	Frame &frame,
+	std::stringstream &ss_csv_head,
+	std::stringstream &ss_csv_body,
+	std::stringstream &ss_csv_tail,
+	ErrorEvent &mosi_event,
+	ErrorEvent &miso_event,
+	bool &fragmentation,
+	bool &app_stat_reached,
+	bool &add_last_msg_header,
+	bool &add_entry,
+	DisplayBase display_base)
+{
+	switch (frame.mType)
+	{
+		case AbccSpiError::Fragmentation:
+			mosi_event = ErrorEvent::SpiFragmentationError;
+			break;
+
+		case AbccMosiStates::SpiControl:
+		{
+			char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+			bool message = ((frame.mData1 & ABP_SPI_CTRL_M) != 0);
+
+			if (message)
+			{
+				/* Add in the timestamp, packet ID */
+				AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
+				ss_csv_head << std::endl
+							<< MOSI_STR + CSV_DELIMITER << timeStr << CSV_DELIMITER << packet_id;
+				add_entry = true;
+			}
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+			{
+				mosi_event = ErrorEvent::RetransmitWarning;
+				miso_event = ErrorEvent::RetransmitWarning;
+			}
+
+			ss_csv_tail << CSV_DELIMITER;
+
+			if (message)
+			{
+				if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
+				{
+					if (fragmentation)
+					{
+						ss_csv_tail << LAST_FRAG_STR;
+						fragmentation = false;
+					}
+				}
+				else
+				{
+					if (!fragmentation)
+					{
+						fragmentation = true;
+						ss_csv_tail << FIRST_FRAG_STR;
+					}
+					else
+					{
+						ss_csv_tail << FRAGMENT_STR;
+					}
+				}
+			}
+
+			break;
+		}
+
+		case AbccMosiStates::ApplicationStatus:
+		{
+			char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
+
+			app_stat_reached = true;
+			GetApplStsString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+			ss_csv_body << CSV_DELIMITER << dataStr;
+
+			break;
+		}
+
+		case AbccMosiStates::MessageField_Size:
+		case AbccMosiStates::MessageField_SourceId:
+		case AbccMosiStates::MessageField_Object:
+		case AbccMosiStates::MessageField_Instance:
+		case AbccMosiStates::MessageField_Command:
+		case AbccMosiStates::MessageField_CommandExtension:
+		case AbccMosiStates::MessageField_Data:
+		case AbccMosiStates::MessageField:
+			BufferCsvMessageMsgEntry(
+				frame,
+				ss_csv_tail,
+				add_last_msg_header,
+				display_base);
+
+			break;
+
+		case AbccMosiStates::Crc32:
+		{
+			if ((U32)frame.mData1 != (U32)frame.mData2)
+			{
+				mosi_event = ErrorEvent::CrcError;
+			}
+
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
 void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase display_base)
 {
 	std::stringstream ssMosiHead;
@@ -1242,12 +1653,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 	std::stringstream ssMisoTail;
 	std::stringstream ssMosiTail;
 	std::stringstream ssSharedBody;
-	char timeStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	char dataStr[DISPLAY_NUMERIC_STRING_BUFFER_SIZE];
-	bool addMosiEntry;
-	bool addMisoEntry;
-	bool addLastMosiMsgHeader;
-	bool addLastMisoMsgHeader;
+
 	bool mosiFragmentation = false;
 	bool misoFragmentation = false;
 	bool mosiPreviousFragState = false;
@@ -1290,11 +1696,10 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 			ErrorEvent misoEvent = ErrorEvent::None;
 			bool mosiAppStatReached = false;
 			bool misoAnbStatReached = false;
-
-			addMosiEntry = false;
-			addMisoEntry = false;
-			addLastMosiMsgHeader = true;
-			addLastMisoMsgHeader = true;
+			bool addLastMosiMsgHeader = true;
+			bool addLastMisoMsgHeader = true;
+			bool addMosiEntry = false;
+			bool addMisoEntry = false;
 
 			GetFramesContainedInPacket(packetId, &firstFrameId, &lastFrameId);
 
@@ -1303,571 +1708,42 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 			for (U64 frameId = firstFrameId; frameId <= lastFrameId; frameId++)
 			{
 				Frame frame = GetFrame(frameId);
+
 				if (IS_MOSI_FRAME(frame))
 				{
-					switch (frame.mType)
-					{
-					case AbccSpiError::Fragmentation:
-						mosiEvent = ErrorEvent::SpiFragmentationError;
-						break;
-					case AbccMosiStates::SpiControl:
-					{
-						bool message = ((frame.mData1 & ABP_SPI_CTRL_M) != 0);
-
-						if (message)
-						{
-							/* Add in the timestamp, packet ID */
-							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMosiHead << std::endl
-									   << MOSI_STR + CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
-							addMosiEntry = true;
-						}
-
-						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-						{
-							mosiEvent = ErrorEvent::RetransmitWarning;
-							misoEvent = ErrorEvent::RetransmitWarning;
-						}
-
-						ssMosiTail << CSV_DELIMITER;
-
-						if (message)
-						{
-							if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
-							{
-								if (mosiFragmentation)
-								{
-									ssMosiTail << LAST_FRAG_STR;
-									mosiFragmentation = false;
-								}
-							}
-							else
-							{
-								if (!mosiFragmentation)
-								{
-									mosiFragmentation = true;
-									ssMosiTail << FIRST_FRAG_STR;
-								}
-								else
-								{
-									ssMosiTail << FRAGMENT_STR;
-								}
-							}
-						}
-
-						break;
-					}
-					case AbccMosiStates::ApplicationStatus:
-					{
-						mosiAppStatReached = true;
-						GetApplStsString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-						ssSharedBody << CSV_DELIMITER << dataStr;
-						break;
-					}
-					case AbccMosiStates::MessageField_Size:
-					case AbccMosiStates::MessageField_SourceId:
-					{
-						GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-						ssMosiTail << CSV_DELIMITER << dataStr;
-						addLastMosiMsgHeader = false;
-						break;
-					}
-					case AbccMosiStates::MessageField_Object:
-					{
-						GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-						ssMosiTail << CSV_DELIMITER << dataStr;
-						addLastMosiMsgHeader = false;
-						break;
-					}
-					case AbccMosiStates::MessageField_Instance:
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						bool found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, dataStr, sizeof(dataStr), &notification, display_base);
-
-						if (!found)
-						{
-							SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
-						}
-
-						ssMosiTail << CSV_DELIMITER << dataStr;
-						addLastMosiMsgHeader = false;
-						break;
-					}
-					case AbccMosiStates::MessageField_Command:
-					{
-						GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
-
-						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
-						{
-							ssMosiTail << CSV_DELIMITER << dataStr << ERROR_RESPONSE_STR;
-						}
-						else
-						{
-							if (((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
-							{
-								ssMosiTail << CSV_DELIMITER << dataStr << COMMAND_STR;
-							}
-							else
-							{
-								ssMosiTail << CSV_DELIMITER << dataStr << RESPONSE_STR;
-							}
-						}
-
-						addLastMosiMsgHeader = false;
-						break;
-					}
-					case AbccMosiStates::MessageField_CommandExtension:
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						DisplayBase displayBase = DisplayBase::Hexadecimal;
-						U16 cmdExt = static_cast<U16>(frame.mData1);
-						MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-
-						if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Normal, &notification, displayBase);
-						}
-						else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Indexed, &notification, displayBase);
-						}
-						else
-						{
-							SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-							if (segmentation != SegmentationType::None)
-							{
-								bool commandMsg = IsCommandMessage(psMsgHdr);
-								bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-								U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
-								U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-								U8 validFlags = 0;
-
-								notification = NotifEvent::None;
-
-								if (commandMsg)
-								{
-									validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-								}
-
-								if (segmentationMsg)
-								{
-									validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-								}
-
-								if (cmdExt1 & ~validFlags)
-								{
-									notification = NotifEvent::Alert;
-									SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
-								}
-								else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-								{
-									notification = NotifEvent::Alert;
-									SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Aborted", cmdExt0);
-								}
-								else if (segmentationMsg)
-								{
-									cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-									switch (cmdExt1)
-									{
-									case 0:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | SEGMENT", cmdExt0);
-										break;
-									case ABP_MSG_CMDEXT1_SEG_FIRST:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT", cmdExt0);
-										break;
-									case ABP_MSG_CMDEXT1_SEG_LAST:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | LAST_SEGMENT", cmdExt0);
-										break;
-									case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-									default:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
-										break;
-									}
-								}
-								else
-								{
-									// Message relates to segmentation but is either a command for
-									// "segmented response" or a response to a "segmented command".
-									GetNumberString(cmdExt, displayBase, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-								}
-							}
-							else
-							{
-								GetNumberString(cmdExt, displayBase, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-							}
-						}
-
-						ssMosiTail << CSV_DELIMITER << dataStr;
-						addLastMosiMsgHeader = false;
-						break;
-					}
-					case AbccMosiStates::MessageField_Data:
-					case AbccMosiStates::MessageField:
-					{
-						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-						{
-							const U16 nwSpecErrCodeOffset = 2;
-
-							/* The error response may be composed of one to three bytes.
-							** This payload can represent a common error response,
-							** an object specific error response, or a network specific
-							** error response. */
-
-							if (info->msgDataCnt == 0)
-							{
-								GetErrorRspString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-							}
-							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
-							{
-								U8 nwTypeIdx = 0;
-								bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-								if (nwSpecificError)
-								{
-									nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-								}
-
-								GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-
-								// Explicitly set display_base to ASCII to ensure proper escaping
-								// is performed when calling AppendCsvSafeString().
-								display_base = DisplayBase::ASCII;
-							}
-						}
-						else
-						{
-							BaseType type;
-
-							if (IsAttributeCmd(info->msgHeader.cmd))
-							{
-								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-							}
-							else
-							{
-								type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
-							}
-
-							GetNumberString(frame.mData1, display_base, GET_MOSI_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
-						}
-
-						if (addLastMosiMsgHeader)
-						{
-							ssMosiTail << CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER;
-							addLastMosiMsgHeader = false;
-						}
-
-						AppendCsvSafeString(ssMosiTail, dataStr, display_base);
-
-						break;
-					}
-					case AbccMosiStates::Crc32:
-					{
-						if ((U32)frame.mData1 != (U32)frame.mData2)
-						{
-							mosiEvent = ErrorEvent::CrcError;
-						}
-
-						break;
-					}
-					default:
-						break;
-					}
+					BufferCsvMessageMosiEntry(
+						sampleRate,
+						triggerSample,
+						packetId,
+						frame,
+						ssMosiHead,
+						ssSharedBody,
+						ssMosiTail,
+						mosiEvent,
+						misoEvent,
+						mosiFragmentation,
+						mosiAppStatReached,
+						addLastMosiMsgHeader,
+						addMosiEntry,
+						display_base);
 				}
 				else
 				{
-					/* MISO Frame */
-					switch (frame.mType)
-					{
-					case AbccSpiError::Fragmentation:
-						misoEvent = ErrorEvent::SpiFragmentationError;
-						break;
-					case AbccMisoStates::AnybusStatus:
-					{
-						misoAnbStatReached = true;
-						GetAbccStatusString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-						ssSharedBody << CSV_DELIMITER << dataStr;
-						break;
-					}
-					case AbccMisoStates::SpiStatus:
-					{
-						bool message = ((frame.mData1 & ABP_SPI_STATUS_M) != 0);
-
-						if (message)
-						{
-							/* Add in the timestamp, packet ID, and Anybus state */
-							AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, triggerSample, sampleRate, timeStr, DISPLAY_NUMERIC_STRING_BUFFER_SIZE);
-							ssMisoHead << std::endl
-									   << MISO_STR + CSV_DELIMITER << timeStr << CSV_DELIMITER << packetId;
-							addMisoEntry = true;
-						}
-
-						ssMisoTail << CSV_DELIMITER;
-
-						if (message)
-						{
-							if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
-							{
-								if (misoFragmentation)
-								{
-									ssMisoTail << LAST_FRAG_STR;
-									misoFragmentation = false;
-								}
-							}
-							else
-							{
-								if (!misoFragmentation)
-								{
-									misoFragmentation = true;
-									ssMisoTail << FIRST_FRAG_STR;
-								}
-								else
-								{
-									ssMisoTail << FRAGMENT_STR;
-								}
-							}
-						}
-
-						break;
-					}
-					case AbccMisoStates::MessageField_Size:
-					case AbccMisoStates::MessageField_SourceId:
-					{
-						GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-						ssMisoTail << CSV_DELIMITER << dataStr;
-						addLastMisoMsgHeader = false;
-						break;
-					}
-					case AbccMisoStates::MessageField_Object:
-					{
-						GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-						ssMisoTail << CSV_DELIMITER << dataStr;
-						addLastMisoMsgHeader = false;
-						break;
-					}
-					case AbccMisoStates::MessageField_Instance:
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						bool found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, dataStr, sizeof(dataStr), &notification, display_base);
-
-						if (!found)
-						{
-							SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
-						}
-
-						ssMisoTail << CSV_DELIMITER << dataStr;
-						addLastMisoMsgHeader = false;
-						break;
-					}
-					case AbccMisoStates::MessageField_Command:
-					{
-						GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
-
-						if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
-						{
-							ssMisoTail << CSV_DELIMITER << dataStr << ERROR_RESPONSE_STR;
-						}
-						else
-						{
-							if (((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT) == ABP_MSG_HEADER_C_BIT)
-							{
-								ssMisoTail << CSV_DELIMITER << dataStr << COMMAND_STR;
-							}
-							else
-							{
-								ssMisoTail << CSV_DELIMITER << dataStr << RESPONSE_STR;
-							}
-						}
-
-						addLastMisoMsgHeader = false;
-						break;
-					}
-					case AbccMisoStates::MessageField_CommandExtension:
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						DisplayBase displayBase = DisplayBase::Hexadecimal;
-						U16 cmdExt = static_cast<U16>(frame.mData1);
-						MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-
-						if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Normal, &notification, displayBase);
-						}
-						else if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, dataStr, sizeof(dataStr), AttributeAccessMode::Indexed, &notification, displayBase);
-						}
-						else
-						{
-							SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-							if (segmentation != SegmentationType::None)
-							{
-								bool commandMsg = IsCommandMessage(psMsgHdr);
-								bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-								U8 cmdExt0 = (cmdExt >> 0) & 0xFF;
-								U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-								U8 validFlags = 0;
-
-								notification = NotifEvent::None;
-
-								if (commandMsg)
-								{
-									validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-								}
-
-								if (segmentationMsg)
-								{
-									validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-								}
-
-								if (cmdExt1 & ~validFlags)
-								{
-									notification = NotifEvent::Alert;
-									SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Unknown (0x%02X)", cmdExt0, cmdExt1);
-								}
-								else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-								{
-									notification = NotifEvent::Alert;
-									SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | Segmentation Aborted", cmdExt0);
-								}
-								else if (segmentationMsg)
-								{
-									cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-									switch (cmdExt1)
-									{
-									case 0:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | SEGMENT", cmdExt0);
-										break;
-									case ABP_MSG_CMDEXT1_SEG_FIRST:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT", cmdExt0);
-										break;
-									case ABP_MSG_CMDEXT1_SEG_LAST:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | LAST_SEGMENT", cmdExt0);
-										break;
-									case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-									default:
-										SNPRINTF(dataStr, sizeof(dataStr), "0x%02X | FIRST_SEGMENT | LAST_SEGMENT", cmdExt0);
-										break;
-									}
-								}
-								else
-								{
-									// Message relates to segmentation but is either a command for
-									// "segmented response" or a response to a "segmented command".
-									GetNumberString(cmdExt, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-								}
-							}
-							else
-							{
-								GetNumberString(cmdExt, displayBase, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
-							}
-						}
-
-						ssMisoTail << CSV_DELIMITER << dataStr;
-						addLastMisoMsgHeader = false;
-						break;
-					}
-					case AbccMisoStates::MessageField_Data:
-					case AbccMisoStates::MessageField:
-					{
-						MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-						if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-						{
-							const U16 nwSpecErrCodeOffset = 2;
-
-							/* The error response may be composed of one to three bytes.
-							** This payload can represent a common error response,
-							** an object specific error response, or a network specific
-							** error response. */
-
-							if (info->msgDataCnt == 0)
-							{
-								GetErrorRspString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-							}
-							else if (info->msgDataCnt <= nwSpecErrCodeOffset)
-							{
-								U8 nwTypeIdx = 0;
-								bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-								if (nwSpecificError)
-								{
-									nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-								}
-
-								GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-
-								// Explicitly set display_base to ASCII to ensure proper escaping
-								// is performed when calling AppendCsvSafeString().
-								display_base = DisplayBase::ASCII;
-							}
-						}
-						else
-						{
-							BaseType type;
-							bool exception = false;
-							bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
-							bool attribute = IsAttributeCmd(info->msgHeader.cmd);
-							bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
-
-							if (attribute)
-							{
-								type = GetAttrBaseType(info->msgHeader.obj, info->msgHeader.inst, (U8)info->msgHeader.cmdExt);
-							}
-							else
-							{
-								type = GetCmdBaseType(info->msgHeader.obj, info->msgHeader.cmd);
-							}
-
-							if (firstAttributeByte)
-							{
-								U16 tableIndex;
-
-								if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
-								{
-									GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
-
-									// Explicitly set display_base to ASCII to ensure proper escaping
-									// is performed when calling AppendCsvSafeString().
-									display_base = DisplayBase::ASCII;
-									exception = true;
-								}
-							}
-
-							if (!exception)
-							{
-								GetNumberString(frame.mData1, display_base, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), type);
-							}
-						}
-
-						if (addLastMisoMsgHeader)
-						{
-							ssMisoTail << CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER;
-							addLastMisoMsgHeader = false;
-						}
-
-						AppendCsvSafeString(ssMisoTail, dataStr, display_base);
-
-						break;
-					}
-					case AbccMisoStates::Crc32:
-					{
-						if ((U32)frame.mData1 != (U32)frame.mData2)
-						{
-							misoEvent = ErrorEvent::CrcError;
-							mosiEvent = ErrorEvent::CrcError;
-						}
-
-						break;
-					}
-					default:
-						break;
-					}
+					 BufferCsvMessageMisoEntry(
+						sampleRate,
+						triggerSample,
+						packetId,
+						frame,
+						ssMisoHead,
+						ssSharedBody,
+						ssMisoTail,
+						mosiEvent,
+						misoEvent,
+						misoFragmentation,
+						misoAnbStatReached,
+						addLastMisoMsgHeader,
+						addMisoEntry,
+						display_base);
 				}
 			}
 
@@ -2208,12 +2084,633 @@ U64 SpiAnalyzerResults::GetFrameIdOfAbccFieldContainedInPacket(U64 packet_index,
 	return frameIndex;
 }
 
+void SpiAnalyzerResults::GenerateMessageTabularText(SpiChannel_t channel, Frame &frame, DisplayBase display_base)
+{
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+
+	// NOTE: AbccMosiStates and AbccMisoStates are assumed to have aligned
+	// values for AbccMosiStates::MessageField* and AbccMisoStates::MessageField*.
+	// This means only one of the enums will be used for the cases defined below.
+
+	switch (frame.mType)
+	{
+		case AbccMisoStates::MessageField_Size:
+		{
+			bool sizeError = frame.HasFlag(SPI_PROTO_EVENT_FLAG);
+
+			if (sizeError && mSettings->mErrorIndexing)
+			{
+				WriteTabularText(channel, "Message Size: Exceeds Maximum", NotifEvent::Alert);
+			}
+			else
+			{
+				if (sizeError)
+				{
+					SNPRINTF(mMsgSizeStr[channel], sizeof(mMsgSizeStr[channel]), "!Size: %u Bytes", (U16)frame.mData1);
+				}
+				else
+				{
+					SNPRINTF(mMsgSizeStr[channel], sizeof(mMsgSizeStr[channel]), "Size: %u Bytes", (U16)frame.mData1);
+				}
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_SourceId:
+		{
+			SNPRINTF(mMsgSrcStr[channel], sizeof(mMsgSrcStr[channel]), "Source ID: %d (0x%02X)", (U8)frame.mData1, (U8)frame.mData1);
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Object:
+		{
+			if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
+			{
+				NotifEvent_t notification = GetObjectString((U8)frame.mData1, str, sizeof(str), display_base);
+
+				if (notification == NotifEvent::Alert)
+				{
+					SNPRINTF(mMsgObjStr[channel], sizeof(mMsgObjStr[channel]), "!Object: %s", str);
+				}
+				else
+				{
+					SNPRINTF(mMsgObjStr[channel], sizeof(mMsgObjStr[channel]), "Object: %s", str);
+				}
+			}
+			else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
+			{
+				SNPRINTF(mMsgObjStr[channel], sizeof(mMsgObjStr[channel]), "Obj {%02X:", (U8)frame.mData1);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Instance:
+		{
+			if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
+			{
+				bool found = false;
+				NotifEvent_t notification = NotifEvent::None;
+				found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, str, sizeof(str), &notification, display_base);
+
+				if (!found)
+				{
+					SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
+				}
+
+				if (notification)
+				{
+					SNPRINTF(mMsgInstStr[channel], sizeof(mMsgInstStr[channel]), "!Instance: %s", str);
+				}
+				else
+				{
+					SNPRINTF(mMsgInstStr[channel], sizeof(mMsgInstStr[channel]), "Instance: %s", str);
+				}
+			}
+			else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
+			{
+				SNPRINTF(mMsgInstStr[channel], sizeof(mMsgInstStr[channel]), "%04Xh}", (U16)frame.mData1);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Command:
+		{
+			mMsgErrorRspFlag[channel] = ((frame.mData1 & ABP_MSG_HEADER_E_BIT) != 0);
+
+			if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
+			{
+				NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, str, sizeof(str), display_base);
+
+				if ((mMsgErrorRspFlag[channel] == true) || (notification == NotifEvent::Alert))
+				{
+					if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
+					{
+						SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), "!Command: %s", str);
+					}
+					else
+					{
+						SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), "!Response: %s", str);
+					}
+				}
+				else
+				{
+					if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
+					{
+						SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), "Command: %s", str);
+					}
+					else
+					{
+						SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), "Response: %s", str);
+					}
+				}
+			}
+			else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
+			{
+				if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
+				{
+					SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), ", Cmd {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
+				}
+				else
+				{
+					SNPRINTF(mMsgCmdStr[channel], sizeof(mMsgCmdStr[channel]), ", Rsp {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
+				}
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_CommandExtension:
+		{
+			if (mMsgValidFlag[channel])
+			{
+				U16 cmdExt = static_cast<U16>(frame.mData1);
+
+				if ((mSettings->mMessageSrcIdIndexing) ||
+					(mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
+				{
+					const char misoMsgBanner[] = "-----MISO MESSAGE-----";
+					const char mosiMsgBanner[] = "-----MOSI MESSAGE-----";
+					const char* msgBanner = (channel == SpiChannel::MISO) ? misoMsgBanner : mosiMsgBanner;
+
+					AddTabularText(msgBanner);
+				}
+
+				if (mSettings->mMessageSrcIdIndexing)
+				{
+					WriteTabularText(channel, mMsgSrcStr[channel], NotifEvent::None);
+				}
+
+				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
+				{
+					NotifEvent_t notification = NotifEvent::None;
+					MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
+					bool found = false;
+
+					if (IsIndexedAttributeCmd(psMsgHdr->cmd))
+					{
+						found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Indexed, &notification, display_base);
+					}
+					else if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
+					{
+						found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Normal, &notification, display_base);
+					}
+
+					if (!found)
+					{
+						/* For consistency with Source ID and Instance, only use hex format */
+						SNPRINTF(str, sizeof(str), "%d (0x%04X)", cmdExt, cmdExt);
+					}
+
+					if (notification == NotifEvent::Alert)
+					{
+						SNPRINTF(mMsgExtStr[channel], sizeof(mMsgExtStr[channel]), "!Extension: %s", str);
+					}
+					else
+					{
+						SNPRINTF(mMsgExtStr[channel], sizeof(mMsgExtStr[channel]), "Extension: %s", str);
+					}
+
+					WriteTabularText(channel, mMsgSizeStr[channel], NotifEvent::None);
+					WriteTabularText(channel, mMsgObjStr[channel], NotifEvent::None);
+					WriteTabularText(channel, mMsgInstStr[channel], NotifEvent::None);
+					WriteTabularText(channel, mMsgCmdStr[channel], NotifEvent::None);
+					WriteTabularText(channel, mMsgExtStr[channel], NotifEvent::None);
+
+					SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
+
+					if (segmentation != SegmentationType::None)
+					{
+						bool addSegment = true;
+						bool commandMsg = IsCommandMessage(psMsgHdr);
+						bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
+						U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
+						U8 validFlags = 0;
+
+						notification = NotifEvent::None;
+
+						if (commandMsg)
+						{
+							validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
+						}
+
+						if (segmentationMsg)
+						{
+							validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
+						}
+
+						if (cmdExt1 & ~validFlags)
+						{
+							notification = NotifEvent::Alert;
+							SNPRINTF(str, sizeof(str), "Segmentation Unknown (0x%02X).", cmdExt1);
+						}
+						else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
+						{
+							notification = NotifEvent::Alert;
+							SNPRINTF(str, sizeof(str), "%s", "Segmentation Aborted.");
+						}
+						else if (segmentationMsg)
+						{
+							cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
+
+							switch (cmdExt1)
+							{
+							case 0:
+								SNPRINTF(str, sizeof(str), "%s", "Segment; More Follow.");
+								break;
+							case ABP_MSG_CMDEXT1_SEG_FIRST:
+								SNPRINTF(str, sizeof(str), "%s", "First Segment; More Follow.");
+								break;
+							case ABP_MSG_CMDEXT1_SEG_LAST:
+								SNPRINTF(str, sizeof(str), "%s", "Last Segment.");
+								break;
+							case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
+							default:
+								addSegment = false;
+								break;
+							}
+						}
+						else
+						{
+							addSegment = false;
+						}
+
+						if (addSegment)
+						{
+							WriteTabularText(channel, str, notification);
+						}
+					}
+
+					if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
+					{
+						WriteTabularText(channel, "First Fragment; More Follow.", NotifEvent::None);
+					}
+				}
+				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
+				{
+					const char misoTag[] = MISO_TAG_STR;
+					const char mosiTag[] = MOSI_TAG_STR;
+					const char* tag = (channel == SpiChannel::MISO) ? misoTag : mosiTag;
+
+					SNPRINTF(mMsgExtStr[channel], sizeof(mMsgExtStr[channel]), "%04Xh}", cmdExt);
+
+					if (mMsgErrorRspFlag[channel])
+					{
+						AddTabularText(tag, "!",
+							mMsgObjStr[channel],
+							mMsgInstStr[channel],
+							mMsgCmdStr[channel],
+							mMsgExtStr[channel]);
+					}
+					else
+					{
+						if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
+						{
+							AddTabularText(tag,
+								mMsgObjStr[channel],
+								mMsgInstStr[channel],
+								mMsgCmdStr[channel],
+								mMsgExtStr[channel],
+								"++");
+						}
+						else
+						{
+							AddTabularText(tag,
+								mMsgObjStr[channel],
+								mMsgInstStr[channel],
+								mMsgCmdStr[channel],
+								mMsgExtStr[channel]);
+						}
+					}
+				}
+
+				return;
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Data:
+		{
+			NotifEvent_t notification = NotifEvent::None;
+			MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+			{
+				const U16 nwSpecErrCodeOffset = 2;
+				char errorStr[FORMATTED_STRING_BUFFER_SIZE];
+
+				// The error response may be composed of one to three bytes.
+				// This payload can represent a common error response,
+				// an object specific error response, or a network specific
+				// error response.
+
+				if (info->msgDataCnt == 0)
+				{
+					notification = GetErrorRspString((U8)frame.mData1, str, sizeof(str), display_base);
+					SNPRINTF(errorStr, sizeof(errorStr), "Error Code: %s", str);
+					WriteTabularText(channel, errorStr, notification);
+				}
+				else if (info->msgDataCnt <= nwSpecErrCodeOffset)
+				{
+					U8 nwTypeIdx = 0;
+					bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
+
+					if (nwSpecificError)
+					{
+						nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
+					}
+
+					notification = GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, str, sizeof(str), display_base);
+
+					if (nwSpecificError)
+					{
+						SNPRINTF(errorStr, sizeof(errorStr), "Network Error: %s", str);
+					}
+					else
+					{
+						SNPRINTF(errorStr, sizeof(errorStr), "Object Error: %s", str);
+					}
+
+					WriteTabularText(channel, errorStr, notification);
+				}
+			}
+			else if (channel == SpiChannel::MISO)
+			{
+				bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
+				bool exception = false;
+				bool attribute = IsAttributeCmd(info->msgHeader.cmd);
+				bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
+
+				if (firstAttributeByte)
+				{
+					U16 tableIndex;
+
+					if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
+					{
+						notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, str, sizeof(str), display_base);
+						exception = true;
+					}
+				}
+
+				if (exception)
+				{
+					char excepStr[FORMATTED_STRING_BUFFER_SIZE];
+
+					if (nwObject)
+					{
+						SNPRINTF(excepStr, sizeof(excepStr), "Exception Info: %s", str);
+						WriteTabularText(channel, excepStr, notification);
+					}
+					else
+					{
+						SNPRINTF(excepStr, sizeof(excepStr), "Exception Code: %s", str);
+						WriteTabularText(channel, excepStr, notification);
+					}
+				}
+			}
+
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
+void SpiAnalyzerResults::GenerateMosiTabularText(U64 frame_index, Frame &frame, DisplayBase display_base)
+{
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+
+	switch (frame.mType)
+	{
+		case AbccMosiStates::ApplicationStatus:
+		{
+			bool statusChanged = frame.HasFlag(SPI_PROTO_EVENT_FLAG);
+
+			if (statusChanged)
+			{
+				char appStsStr[FORMATTED_STRING_BUFFER_SIZE];
+				NotifEvent_t notification = GetApplStsString((U8)frame.mData1, appStsStr, sizeof(appStsStr), display_base);
+				bool addEntry = mSettings->mApplStatusIndexing || ((notification == NotifEvent::Alert) && mSettings->mErrorIndexing);
+
+				if (addEntry)
+				{
+					SNPRINTF(str, sizeof(str), "Application Status: %s", appStsStr);
+					WriteTabularText(SpiChannel::NotSpecified, str, notification);
+				}
+			}
+
+			break;
+		}
+
+		case AbccMosiStates::SpiControl:
+		{
+			mMsgValidFlag[SpiChannel::MOSI] = ((frame.mData1 & ABP_SPI_CTRL_M) != 0);
+
+			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+			{
+				if (frame_index != 0)
+				{
+					WriteTabularText(SpiChannel::MOSI, "{Message Retransmit}", NotifEvent::None);
+					return;
+				}
+			}
+			else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
+			{
+				/* Fragmentation is in progress */
+				if (frame.mData1 & ABP_SPI_CTRL_M)
+				{
+					if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
+					{
+						/* Last fragment */
+						WriteTabularText(SpiChannel::MOSI, "{Message Fragment}", NotifEvent::None);
+					}
+					else
+					{
+						/* More fragments follow */
+						WriteTabularText(SpiChannel::MOSI, "{Message Fragment}++", NotifEvent::None);
+					}
+				}
+
+				return;
+			}
+
+			break;
+		}
+
+		case AbccMosiStates::MessageField_Size:
+		case AbccMosiStates::MessageField_SourceId:
+		case AbccMosiStates::MessageField_Object:
+		case AbccMosiStates::MessageField_Instance:
+		case AbccMosiStates::MessageField_Command:
+		case AbccMosiStates::MessageField_CommandExtension:
+		case AbccMosiStates::MessageField_Data:
+		{
+			/* Since tabular text is sequentially processed and indexed,
+			** buffer the "Object", "Instance", "Cmd", and "Ext";
+			** then add as a single text entry. */
+			if (mSettings->mMessageIndexingVerbosityLevel != MessageIndexing::Disabled)
+			{
+				GenerateMessageTabularText(SpiChannel::MOSI, frame, display_base);
+			}
+
+			break;
+		}
+
+		case AbccMosiStates::Crc32:
+		{
+			bool crcError = frame.HasFlag(SPI_PROTO_EVENT_FLAG);
+
+			if (crcError && mSettings->mErrorIndexing)
+			{
+				WriteTabularText(SpiChannel::MOSI, "CRC32", NotifEvent::Alert);
+			}
+
+			break;
+		}
+
+		default:
+			break;
+
+	}
+
+}
+
+void SpiAnalyzerResults::GenerateMisoTabularText(U64 frame_index, Frame &frame, DisplayBase display_base)
+{
+	char str[FORMATTED_STRING_BUFFER_SIZE];
+
+	switch (frame.mType)
+	{
+		case AbccMisoStates::NetworkTime:
+		{
+			bool addEntry;
+
+			switch (mSettings->mTimestampIndexing)
+			{
+				case TimestampIndexing::AllPackets:
+					addEntry = true;
+					break;
+
+				case TimestampIndexing::WriteProcessDataValid:
+					addEntry = ((NetworkTimeInfo_t*)&frame.mData2)->wrPdValid;
+					break;
+
+				case TimestampIndexing::NewReadProcessData:
+					addEntry = ((NetworkTimeInfo_t*)&frame.mData2)->newRdPd;
+					break;
+
+				default:
+				case TimestampIndexing::Disabled:
+					addEntry = false;
+					break;
+			}
+
+			if (addEntry)
+			{
+				U64 packetId = GetPacketContainingFrame(frame_index);
+				U32 delta = ((NetworkTimeInfo_t*)&frame.mData2)->deltaTime;
+				SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, delta);
+				AddTabularText("Time: ", str);
+				SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
+				AddTabularText(str);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::AnybusStatus:
+		{
+			bool statusChanged = frame.HasFlag(SPI_PROTO_EVENT_FLAG);
+			char anbSts[FORMATTED_STRING_BUFFER_SIZE];
+			NotifEvent_t notification = GetAbccStatusString((U8)frame.mData1, anbSts, sizeof(anbSts), display_base);
+			bool addEntry = statusChanged && (mSettings->mAnybusStatusIndexing || ((notification == NotifEvent::Alert) && mSettings->mErrorIndexing));
+
+			if (addEntry)
+			{
+				SNPRINTF(str, sizeof(str), "Anybus Status: (%s)", anbSts);
+				WriteTabularText(SpiChannel::MISO, str, notification);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::SpiStatus:
+		{
+			if (mSettings->mMessageIndexingVerbosityLevel != MessageIndexing::Disabled)
+			{
+				mMsgValidFlag[SpiChannel::MISO] = ((frame.mData1 & ABP_SPI_STATUS_M) != 0);
+
+				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
+				{
+					WriteTabularText(SpiChannel::MISO, "{Write Message Buffer Full}", NotifEvent::None);
+				}
+				else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
+				{
+					/* Fragmentation is in progress */
+					if (frame.mData1 & ABP_SPI_STATUS_M)
+					{
+						if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
+						{
+							/* Last fragment */
+							WriteTabularText(SpiChannel::MISO, "{Message Fragment}", NotifEvent::None);
+						}
+						else
+						{
+							/* More fragments follow */
+							WriteTabularText(SpiChannel::MISO, "{Message Fragment}++", NotifEvent::None);
+						}
+					}
+				}
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::MessageField_Size:
+		case AbccMisoStates::MessageField_SourceId:
+		case AbccMisoStates::MessageField_Object:
+		case AbccMisoStates::MessageField_Instance:
+		case AbccMisoStates::MessageField_Command:
+		case AbccMisoStates::MessageField_CommandExtension:
+		case AbccMisoStates::MessageField_Data:
+		{
+			/* Since tabular text is sequentially processed and indexed,
+			** buffer the "Object", "Instance", "Cmd", and "Ext";
+			** then add as a single text entry. */
+			if (mSettings->mMessageIndexingVerbosityLevel != MessageIndexing::Disabled)
+			{
+				GenerateMessageTabularText(SpiChannel::MISO, frame, display_base);
+			}
+
+			break;
+		}
+
+		case AbccMisoStates::Crc32:
+		{
+			bool crcError = frame.HasFlag(SPI_PROTO_EVENT_FLAG);
+
+			if (crcError && mSettings->mErrorIndexing)
+			{
+				WriteTabularText(SpiChannel::MISO, "CRC32", NotifEvent::Alert);
+			}
+
+			break;
+		}
+
+		default:
+			break;
+
+	}
+}
+
 void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase display_base)
 {
 	ClearTabularText();
-	U64 packetId = GetPacketContainingFrame(frame_index);
 	Frame frame = GetFrame(frame_index);
-	char str[FORMATTED_STRING_BUFFER_SIZE];
 
 	if (mSettings->mErrorIndexing)
 	{
@@ -2226,927 +2723,30 @@ void SpiAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 			{
 				switch (frame.mType)
 				{
-				case AbccSpiError::Fragmentation:
-					AddTabularText("!FRAGMENT: ABCC SPI Packet is Fragmented");
-					break;
-				case AbccSpiError::EndOfTransfer:
-					AddTabularText("!CLOCKING: Unexpected ABCC SPI Clocking Behavior");
-					break;
-				case AbccSpiError::Generic:
-				default:
-					AddTabularText("!ERROR: General Error in ABCC SPI Communication");
-					break;
+					case AbccSpiError::Fragmentation:
+						WriteTabularText(SpiChannel::NotSpecified, "FRAGMENT: ABCC SPI Packet is Fragmented", NotifEvent::Alert);
+						break;
+					case AbccSpiError::EndOfTransfer:
+						WriteTabularText(SpiChannel::NotSpecified, "CLOCKING: Unexpected ABCC SPI Clocking Behavior", NotifEvent::Alert);
+						break;
+					case AbccSpiError::Generic:
+					default:
+						WriteTabularText(SpiChannel::NotSpecified, "ERROR: General Error in ABCC SPI Communication", NotifEvent::Alert);
+						break;
 				}
 			}
+
 			return;
 		}
-
-		if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-		{
-			if (IS_MOSI_FRAME(frame))
-			{
-				if (frame.mType == AbccMisoStates::Crc32)
-				{
-					TableBuilder(SpiChannel::MOSI, "CRC32", NotifEvent::Alert);
-					return;
-				}
-				else if (frame.mType == AbccMosiStates::ApplicationStatus)
-				{
-					if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
-					{
-						AddTabularText("!Application Status: ", str);
-						return;
-					}
-					else
-					{
-						if (mSettings->mApplStatusIndexing)
-						{
-							AddTabularText("Application Status: ", str);
-							return;
-						}
-					}
-				}
-				else if (frame.mType == AbccMosiStates::MessageField_Size)
-				{
-					TableBuilder(SpiChannel::MOSI, "Message Size: Exceeds Maximum", NotifEvent::Alert);
-					return;
-				}
-			}
-			else /* MISO Frame */
-			{
-				if (frame.mType == AbccMisoStates::Crc32)
-				{
-					TableBuilder(SpiChannel::MISO, "CRC32", NotifEvent::Alert);
-					return;
-				}
-				else if (frame.mType == AbccMisoStates::AnybusStatus)
-				{
-					char tabText[FORMATTED_STRING_BUFFER_SIZE];
-					NotifEvent_t notification = NotifEvent::None;
-					if (GetAbccStatusString((U8)frame.mData1, str, sizeof(str), display_base))
-					{
-						notification = NotifEvent::Alert;
-					}
-
-					if ((notification == NotifEvent::Alert) || mSettings->mAnybusStatusIndexing)
-					{
-						SNPRINTF(tabText, sizeof(tabText), "Anybus Status: (%s)", str);
-						TableBuilder(SpiChannel::MISO, tabText, notification);
-					}
-					return;
-				}
-				else if (frame.mType == AbccMisoStates::MessageField_Size)
-				{
-					TableBuilder(SpiChannel::MISO, "Message Size: Exceeds Maximum", NotifEvent::Alert);
-					return;
-				}
-			}
-		}
 	}
 
-	if ((frame.mType == AbccMisoStates::NetworkTime) && IS_MISO_FRAME(frame))
+	if (IS_MOSI_FRAME(frame))
 	{
-		bool addEntry = false;
-
-		switch (mSettings->mTimestampIndexing)
-		{
-		case TimestampIndexing::AllPackets:
-			addEntry = true;
-			break;
-		case TimestampIndexing::WriteProcessDataValid:
-			if (((NetworkTimeInfo_t*)&frame.mData2)->wrPdValid)
-			{
-				addEntry = true;
-			}
-			break;
-		case TimestampIndexing::NewReadProcessData:
-			if (((NetworkTimeInfo_t*)&frame.mData2)->newRdPd)
-			{
-				addEntry = true;
-			}
-			break;
-		default:
-		case TimestampIndexing::Disabled:
-			break;
-		}
-
-		if (addEntry)
-		{
-			U32 delta = ((NetworkTimeInfo_t*)&frame.mData2)->deltaTime;
-			SNPRINTF(str, sizeof(str), "0x%08X (Delta: 0x%08X)", (U32)frame.mData1, delta);
-			AddTabularText("Time: ", str);
-			SNPRINTF(str, sizeof(str), "Packet: 0x%016llX", packetId);
-			AddTabularText(str);
-		}
-
-		return;
+		GenerateMosiTabularText(frame_index, frame, display_base);
 	}
-
-	if (mSettings->mApplStatusIndexing)
+	else
 	{
-		if ((frame.mType == AbccMosiStates::ApplicationStatus) && IS_MOSI_FRAME(frame))
-		{
-			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-			{
-				if (GetApplStsString((U8)frame.mData1, str, sizeof(str), display_base))
-				{
-					AddTabularText("!Application Status: ", str);
-				}
-				else
-				{
-					AddTabularText("Application Status: ", str);
-				}
-				return;
-			}
-		}
-	}
-
-	if (mSettings->mAnybusStatusIndexing)
-	{
-		if ((frame.mType == AbccMisoStates::AnybusStatus) && IS_MISO_FRAME(frame))
-		{
-			if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-			{
-				if (GetAbccStatusString((U8)frame.mData1, str, sizeof(str), display_base))
-				{
-					AddTabularText("!Anybus Status: ", str);
-				}
-				else
-				{
-					AddTabularText("Anybus Status: ", str);
-				}
-				return;
-			}
-		}
-	}
-
-	/* Since tabular text is sequentially processed and indexed,
-	** buffer the "Object", "Instance", "Cmd", and "Ext";
-	** then add as a single text entry. */
-	if (mSettings->mMessageIndexingVerbosityLevel != MessageIndexing::Disabled)
-	{
-		if (IS_MISO_FRAME(frame))
-		{
-			switch (frame.mType)
-			{
-			case AbccMisoStates::SpiStatus:
-				if ((frame.mData1 & ABP_SPI_STATUS_M) != 0)
-				{
-					mMsgValidFlag[SpiChannel::MISO] = true;
-				}
-				else
-				{
-					mMsgValidFlag[SpiChannel::MISO] = false;
-				}
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					TableBuilder(SpiChannel::MISO, "{Write Message Buffer Full}", NotifEvent::None);
-					return;
-				}
-				else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-				{
-					/* Fragmentation is in progress */
-					if (frame.mData1 & ABP_SPI_STATUS_M)
-					{
-						if (frame.mData1 & ABP_SPI_STATUS_LAST_FRAG)
-						{
-							/* Last fragment */
-							TableBuilder(SpiChannel::MISO, "{Message Fragment}", NotifEvent::None);
-						}
-						else
-						{
-							/* More fragments follow */
-							TableBuilder(SpiChannel::MISO, "{Message Fragment}++", NotifEvent::None);
-						}
-					}
-
-					return;
-				}
-
-				break;
-			case AbccMisoStates::MessageField_Size:
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					SNPRINTF(mMsgSizeStr[SpiChannel::MISO], sizeof(mMsgSizeStr[SpiChannel::MISO]), "!Size: %u Bytes", (U16)frame.mData1);
-				}
-				else
-				{
-					SNPRINTF(mMsgSizeStr[SpiChannel::MISO], sizeof(mMsgSizeStr[SpiChannel::MISO]), "Size: %u Bytes", (U16)frame.mData1);
-				}
-
-				break;
-			case AbccMisoStates::MessageField_SourceId:
-				SNPRINTF(mMsgSrcStr[SpiChannel::MISO], sizeof(mMsgSrcStr[SpiChannel::MISO]), "Source ID: %d (0x%02X)", (U8)frame.mData1, (U8)frame.mData1);
-				break;
-			case AbccMisoStates::MessageField_Object:
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					NotifEvent_t notification = GetObjectString((U8)frame.mData1, str, sizeof(str), display_base);
-
-					if (notification == NotifEvent::Alert)
-					{
-						SNPRINTF(mMsgObjStr[SpiChannel::MISO], sizeof(mMsgObjStr[SpiChannel::MISO]), "!Object: %s", str);
-					}
-					else
-					{
-						SNPRINTF(mMsgObjStr[SpiChannel::MISO], sizeof(mMsgObjStr[SpiChannel::MISO]), "Object: %s", str);
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					SNPRINTF(mMsgObjStr[SpiChannel::MISO], sizeof(mMsgObjStr[SpiChannel::MISO]), "Obj {%02X:", (U8)frame.mData1);
-				}
-
-				break;
-			case AbccMisoStates::MessageField_Instance:
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					bool found = false;
-					NotifEvent_t notification = NotifEvent::None;
-					found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, str, sizeof(str), &notification, display_base);
-
-					if (!found)
-					{
-						SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
-					}
-
-					if (notification)
-					{
-						SNPRINTF(mMsgInstStr[SpiChannel::MISO], sizeof(mMsgInstStr[SpiChannel::MISO]), "!Instance: %s", str);
-					}
-					else
-					{
-						SNPRINTF(mMsgInstStr[SpiChannel::MISO], sizeof(mMsgInstStr[SpiChannel::MISO]), "Instance: %s", str);
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					SNPRINTF(mMsgInstStr[SpiChannel::MISO], sizeof(mMsgInstStr[SpiChannel::MISO]), "%04Xh}", (U16)frame.mData1);
-				}
-
-				break;
-			case AbccMisoStates::MessageField_Command:
-				if ((frame.mData1 & ABP_MSG_HEADER_E_BIT) != 0)
-				{
-					mMsgErrorRspFlag[SpiChannel::MISO] = true;
-				}
-				else
-				{
-					mMsgErrorRspFlag[SpiChannel::MISO] = false;
-				}
-
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, str, sizeof(str), display_base);
-
-					if ((mMsgErrorRspFlag[SpiChannel::MISO] == true) || (notification == NotifEvent::Alert))
-					{
-						if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), "!Command: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), "!Response: %s", str);
-						}
-					}
-					else
-					{
-						if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), "Command: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), "Response: %s", str);
-						}
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-					{
-						SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), ", Cmd {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
-					}
-					else
-					{
-						SNPRINTF(mMsgCmdStr[SpiChannel::MISO], sizeof(mMsgCmdStr[SpiChannel::MISO]), ", Rsp {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
-					}
-				}
-
-				break;
-			case AbccMisoStates::MessageField_CommandExtension:
-				if (mMsgValidFlag[SpiChannel::MISO])
-				{
-					U16 cmdExt = static_cast<U16>(frame.mData1);
-
-					if ((mSettings->mMessageSrcIdIndexing) ||
-						(mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
-					{
-						AddTabularText("-----MISO MESSAGE-----");
-					}
-
-					if (mSettings->mMessageSrcIdIndexing)
-					{
-						TableBuilder(SpiChannel::MISO, mMsgSrcStr[SpiChannel::MISO], NotifEvent::None);
-					}
-
-					if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-						bool found = false;
-
-						if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Indexed, &notification, display_base);
-						}
-						else if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Normal, &notification, display_base);
-						}
-
-						if (!found)
-						{
-							/* For consistency with Source ID and Instance, only use hex format */
-							SNPRINTF(str, sizeof(str), "%d (0x%04X)", cmdExt, cmdExt);
-						}
-
-						if (notification == NotifEvent::Alert)
-						{
-							SNPRINTF(mMsgExtStr[SpiChannel::MISO], sizeof(mMsgExtStr[SpiChannel::MISO]), "!Extension: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgExtStr[SpiChannel::MISO], sizeof(mMsgExtStr[SpiChannel::MISO]), "Extension: %s", str);
-						}
-
-						TableBuilder(SpiChannel::MISO, mMsgSizeStr[SpiChannel::MISO], NotifEvent::None);
-						TableBuilder(SpiChannel::MISO, mMsgObjStr[SpiChannel::MISO], NotifEvent::None);
-						TableBuilder(SpiChannel::MISO, mMsgInstStr[SpiChannel::MISO], NotifEvent::None);
-						TableBuilder(SpiChannel::MISO, mMsgCmdStr[SpiChannel::MISO], NotifEvent::None);
-						TableBuilder(SpiChannel::MISO, mMsgExtStr[SpiChannel::MISO], NotifEvent::None);
-
-						SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-						if (segmentation != SegmentationType::None)
-						{
-							bool addSegment = true;
-							bool commandMsg = IsCommandMessage(psMsgHdr);
-							bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-							U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-							U8 validFlags = 0;
-
-							notification = NotifEvent::None;
-
-							if (commandMsg)
-							{
-								validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-							}
-
-							if (segmentationMsg)
-							{
-								validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-							}
-
-							if (cmdExt1 & ~validFlags)
-							{
-								notification = NotifEvent::Alert;
-								SNPRINTF(str, sizeof(str), "Segmentation Unknown (0x%02X).", cmdExt1);
-							}
-							else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-							{
-								notification = NotifEvent::Alert;
-								SNPRINTF(str, sizeof(str), "%s", "Segmentation Aborted.");
-							}
-							else if (segmentationMsg)
-							{
-								cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-								switch (cmdExt1)
-								{
-								case 0:
-									SNPRINTF(str, sizeof(str), "%s", "Next Segment; More Follow.");
-									break;
-								case ABP_MSG_CMDEXT1_SEG_FIRST:
-									SNPRINTF(str, sizeof(str), "%s", "First Segment; More Follow.");
-									break;
-								case ABP_MSG_CMDEXT1_SEG_LAST:
-									SNPRINTF(str, sizeof(str), "%s", "Last Segment.");
-									break;
-								case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-								default:
-									addSegment = false;
-									break;
-								}
-							}
-							else
-							{
-								addSegment = false;
-							}
-
-							if (addSegment)
-							{
-								TableBuilder(SpiChannel::MISO, str, notification);
-							}
-						}
-
-						if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-						{
-							TableBuilder(SpiChannel::MISO, "First Fragment; More Follow.", NotifEvent::None);
-						}
-					}
-					else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-					{
-						SNPRINTF(mMsgExtStr[SpiChannel::MISO], sizeof(mMsgExtStr[SpiChannel::MISO]), "%04Xh}", cmdExt);
-
-						if (mMsgErrorRspFlag[SpiChannel::MISO])
-						{
-							AddTabularText(MISO_TAG_STR, "!",
-								mMsgObjStr[SpiChannel::MISO],
-								mMsgInstStr[SpiChannel::MISO],
-								mMsgCmdStr[SpiChannel::MISO],
-								mMsgExtStr[SpiChannel::MISO]);
-						}
-						else
-						{
-							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-							{
-								AddTabularText(MISO_TAG_STR,
-									mMsgObjStr[SpiChannel::MISO],
-									mMsgInstStr[SpiChannel::MISO],
-									mMsgCmdStr[SpiChannel::MISO],
-									mMsgExtStr[SpiChannel::MISO],
-									"++");
-							}
-							else
-							{
-								AddTabularText(MISO_TAG_STR,
-									mMsgObjStr[SpiChannel::MISO],
-									mMsgInstStr[SpiChannel::MISO],
-									mMsgCmdStr[SpiChannel::MISO],
-									mMsgExtStr[SpiChannel::MISO]);
-							}
-						}
-					}
-
-					return;
-				}
-
-				break;
-			case AbccMisoStates::MessageField_Data:
-			{
-				NotifEvent_t notification = NotifEvent::None;
-				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					const U16 nwSpecErrCodeOffset = 2;
-					char errorStr[FORMATTED_STRING_BUFFER_SIZE];
-
-					// The error response may be composed of one to three bytes.
-					// This payload can represent a common error response,
-					// an object specific error response, or a network specific
-					// error response.
-
-					if (info->msgDataCnt == 0)
-					{
-						notification = GetErrorRspString((U8)frame.mData1, str, sizeof(str), display_base);
-						SNPRINTF(errorStr, sizeof(errorStr), "Error Code: %s", str);
-						TableBuilder(SpiChannel::MISO, errorStr, notification);
-					}
-					else if (info->msgDataCnt <= nwSpecErrCodeOffset)
-					{
-						U8 nwTypeIdx = 0;
-						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-						if (nwSpecificError)
-						{
-							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-						}
-
-						notification = GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, str, sizeof(str), display_base);
-
-						if (nwSpecificError)
-						{
-							SNPRINTF(errorStr, sizeof(errorStr), "Network Error: %s", str);
-						}
-						else
-						{
-							SNPRINTF(errorStr, sizeof(errorStr), "Object Error: %s", str);
-						}
-
-						TableBuilder(SpiChannel::MISO, errorStr, notification);
-					}
-				}
-				else
-				{
-					bool nwObject = (info->msgHeader.obj == ABP_OBJ_NUM_NW);
-					bool exception = false;
-					bool attribute = IsAttributeCmd(info->msgHeader.cmd);
-					bool firstAttributeByte = (attribute && (info->msgDataCnt == 0));
-
-					if (firstAttributeByte)
-					{
-						U16 tableIndex;
-
-						if (GetExceptionTableIndex(nwObject, (U8)mSettings->mNetworkType, &info->msgHeader, &tableIndex))
-						{
-							notification = GetExceptionString(nwObject, tableIndex, (U8)frame.mData1, str, sizeof(str), display_base);
-							exception = true;
-						}
-					}
-
-					if (exception)
-					{
-						char excepStr[FORMATTED_STRING_BUFFER_SIZE];
-
-						if (nwObject)
-						{
-							SNPRINTF(excepStr, sizeof(excepStr), "Exception Info: %s", str);
-							TableBuilder(SpiChannel::MISO, excepStr, notification);
-						}
-						else
-						{
-							SNPRINTF(excepStr, sizeof(excepStr), "Exception Code: %s", str);
-							TableBuilder(SpiChannel::MISO, excepStr, notification);
-						}
-					}
-				}
-
-				break;
-			}
-			default:
-				break;
-			}
-		}
-
-		if (IS_MOSI_FRAME(frame))
-		{
-			switch (frame.mType)
-			{
-			case AbccMosiStates::SpiControl:
-				if ((frame.mData1 & ABP_SPI_CTRL_M) != 0)
-				{
-					mMsgValidFlag[SpiChannel::MOSI] = true;
-				}
-				else
-				{
-					mMsgValidFlag[SpiChannel::MOSI] = false;
-				}
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					if (frame_index != 0)
-					{
-						TableBuilder(SpiChannel::MOSI, "{Message Retransmit}", NotifEvent::None);
-						return;
-					}
-				}
-				else if (frame.HasFlag(SPI_MSG_FRAG_FLAG) && !frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-				{
-					/* Fragmentation is in progress */
-					if (frame.mData1 & ABP_SPI_CTRL_M)
-					{
-						if (frame.mData1 & ABP_SPI_CTRL_LAST_FRAG)
-						{
-							/* Last fragment */
-							TableBuilder(SpiChannel::MOSI, "{Message Fragment}", NotifEvent::None);
-						}
-						else
-						{
-							/* More fragments follow */
-							TableBuilder(SpiChannel::MOSI, "{Message Fragment}++", NotifEvent::None);
-						}
-					}
-
-					return;
-				}
-
-				break;
-			case AbccMisoStates::MessageField_Size:
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					SNPRINTF(mMsgSizeStr[SpiChannel::MOSI], sizeof(mMsgSizeStr[SpiChannel::MOSI]), "!Size: %u Bytes", (U16)frame.mData1);
-				}
-				else
-				{
-					SNPRINTF(mMsgSizeStr[SpiChannel::MOSI], sizeof(mMsgSizeStr[SpiChannel::MOSI]), "Size: %u Bytes", (U16)frame.mData1);
-				}
-
-				break;
-			case AbccMosiStates::MessageField_SourceId:
-				SNPRINTF(mMsgSrcStr[SpiChannel::MOSI], sizeof(mMsgSrcStr[SpiChannel::MOSI]), "Source ID: %d (0x%02X)", (U8)frame.mData1, (U8)frame.mData1);
-				break;
-			case AbccMosiStates::MessageField_Object:
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					NotifEvent_t notification = GetObjectString((U8)frame.mData1, str, sizeof(str), display_base);
-
-					if (notification == NotifEvent::Alert)
-					{
-						SNPRINTF(mMsgObjStr[SpiChannel::MOSI], sizeof(mMsgObjStr[SpiChannel::MOSI]), "!Object: %s", str);
-					}
-					else
-					{
-						SNPRINTF(mMsgObjStr[SpiChannel::MOSI], sizeof(mMsgObjStr[SpiChannel::MOSI]), "Object: %s", str);
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					SNPRINTF(mMsgObjStr[SpiChannel::MOSI], sizeof(mMsgObjStr[SpiChannel::MOSI]), "Obj {%02X:", (U8)frame.mData1);
-				}
-
-				break;
-			case AbccMosiStates::MessageField_Instance:
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					bool found = false;
-					NotifEvent_t notification = NotifEvent::None;
-					found = GetInstString((U8)mSettings->mNetworkType, (U8)frame.mData2, (U16)frame.mData1, str, sizeof(str), &notification, display_base);
-
-					if (!found)
-					{
-						SNPRINTF(str, sizeof(str), "%d (0x%04X)", (U16)frame.mData1, (U16)frame.mData1);
-					}
-
-					if (notification)
-					{
-						SNPRINTF(mMsgInstStr[SpiChannel::MOSI], sizeof(mMsgInstStr[SpiChannel::MOSI]), "!Instance: %s", str);
-					}
-					else
-					{
-						SNPRINTF(mMsgInstStr[SpiChannel::MOSI], sizeof(mMsgInstStr[SpiChannel::MOSI]), "Instance: %s", str);
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					SNPRINTF(mMsgInstStr[SpiChannel::MOSI], sizeof(mMsgInstStr[SpiChannel::MOSI]), "%04Xh}", (U16)frame.mData1);
-				}
-
-				break;
-			case AbccMosiStates::MessageField_Command:
-				if ((frame.mData1 & ABP_MSG_HEADER_E_BIT) != 0)
-				{
-					mMsgErrorRspFlag[SpiChannel::MOSI] = true;
-				}
-				else
-				{
-					mMsgErrorRspFlag[SpiChannel::MOSI] = false;
-				}
-
-				if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-				{
-					NotifEvent_t notification = GetCmdString((U8)frame.mData1, (U8)frame.mData2, str, sizeof(str), display_base);
-
-					if ((mMsgErrorRspFlag[SpiChannel::MOSI] == true) || (notification == NotifEvent::Alert))
-					{
-						if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), "!Command: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), "!Response: %s", str);
-						}
-					}
-					else
-					{
-						if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), "Command: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), "Response: %s", str);
-						}
-					}
-				}
-				else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-				{
-					if ((U8)frame.mData1 & ABP_MSG_HEADER_C_BIT)
-					{
-						SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), ", Cmd {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
-					}
-					else
-					{
-						SNPRINTF(mMsgCmdStr[SpiChannel::MOSI], sizeof(mMsgCmdStr[SpiChannel::MOSI]), ", Rsp {%02X:", (U8)(frame.mData1 & ABP_MSG_HEADER_CMD_BITS));
-					}
-				}
-
-				break;
-			case AbccMosiStates::MessageField_CommandExtension:
-				if (mMsgValidFlag[SpiChannel::MOSI])
-				{
-					U16 cmdExt = static_cast<U16>(frame.mData1);
-
-					if ((mSettings->mMessageSrcIdIndexing) ||
-						(mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed))
-					{
-						AddTabularText("-----MOSI MESSAGE-----");
-					}
-
-					if (mSettings->mMessageSrcIdIndexing)
-					{
-						TableBuilder(SpiChannel::MOSI, mMsgSrcStr[SpiChannel::MOSI], NotifEvent::None);
-					}
-
-					if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Detailed)
-					{
-						NotifEvent_t notification = NotifEvent::None;
-						MsgHeaderInfo_t* psMsgHdr = reinterpret_cast<MsgHeaderInfo_t*>(&frame.mData2);
-						bool found = false;
-
-						if (IsIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Indexed, &notification, display_base);
-						}
-						else if (IsNonIndexedAttributeCmd(psMsgHdr->cmd))
-						{
-							found = GetAttrString(psMsgHdr->obj, psMsgHdr->inst, cmdExt, str, sizeof(str), AttributeAccessMode::Normal, &notification, display_base);
-						}
-
-						if (!found)
-						{
-							/* For consistency with Source ID and Instance, only use hex format */
-							SNPRINTF(str, sizeof(str), "%d (0x%04X)", cmdExt, cmdExt);
-						}
-
-						if (notification == NotifEvent::Alert)
-						{
-							SNPRINTF(mMsgExtStr[SpiChannel::MOSI], sizeof(mMsgExtStr[SpiChannel::MOSI]), "!Extension: %s", str);
-						}
-						else
-						{
-							SNPRINTF(mMsgExtStr[SpiChannel::MOSI], sizeof(mMsgExtStr[SpiChannel::MOSI]), "Extension: %s", str);
-						}
-
-						TableBuilder(SpiChannel::MOSI, mMsgSizeStr[SpiChannel::MOSI], NotifEvent::None);
-						TableBuilder(SpiChannel::MOSI, mMsgObjStr[SpiChannel::MOSI], NotifEvent::None);
-						TableBuilder(SpiChannel::MOSI, mMsgInstStr[SpiChannel::MOSI], NotifEvent::None);
-						TableBuilder(SpiChannel::MOSI, mMsgCmdStr[SpiChannel::MOSI], NotifEvent::None);
-						TableBuilder(SpiChannel::MOSI, mMsgExtStr[SpiChannel::MOSI], NotifEvent::None);
-
-						SegmentationType segmentation = GetMessageSegmentationType(psMsgHdr);
-
-						if (segmentation != SegmentationType::None)
-						{
-							bool addSegment = true;
-							bool commandMsg = IsCommandMessage(psMsgHdr);
-							bool segmentationMsg = IsSegmentedMessage(commandMsg, segmentation);
-							U8 cmdExt1 = (cmdExt >> 8) & 0xFF;
-							U8 validFlags = 0;
-
-							notification = NotifEvent::None;
-
-							if (commandMsg)
-							{
-								validFlags |= ABP_MSG_CMDEXT1_SEG_ABORT;
-							}
-
-							if (segmentationMsg)
-							{
-								validFlags |= ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST;
-							}
-
-							if (cmdExt1 & ~validFlags)
-							{
-								notification = NotifEvent::Alert;
-								SNPRINTF(str, sizeof(str), "Segmentation Unknown (0x%02X).", cmdExt1);
-							}
-							else if (cmdExt1 & ABP_MSG_CMDEXT1_SEG_ABORT)
-							{
-								notification = NotifEvent::Alert;
-								SNPRINTF(str, sizeof(str), "%s", "Segmentation Aborted.");
-							}
-							else if (segmentationMsg)
-							{
-								cmdExt1 &= (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST);
-
-								switch (cmdExt1)
-								{
-								case 0:
-									SNPRINTF(str, sizeof(str), "%s", "Segment; More Follow.");
-									break;
-								case ABP_MSG_CMDEXT1_SEG_FIRST:
-									SNPRINTF(str, sizeof(str), "%s", "First Segment; More Follow.");
-									break;
-								case ABP_MSG_CMDEXT1_SEG_LAST:
-									SNPRINTF(str, sizeof(str), "%s", "Last Segment.");
-									break;
-								case (ABP_MSG_CMDEXT1_SEG_FIRST | ABP_MSG_CMDEXT1_SEG_LAST):
-								default:
-									addSegment = false;
-									break;
-								}
-							}
-							else
-							{
-								addSegment = false;
-							}
-
-							if (addSegment)
-							{
-								TableBuilder(SpiChannel::MOSI, str, notification);
-							}
-						}
-
-						if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-						{
-							TableBuilder(SpiChannel::MOSI, "First Fragment; More Follow.", NotifEvent::None);
-						}
-					}
-					else if (mSettings->mMessageIndexingVerbosityLevel == MessageIndexing::Compact)
-					{
-						SNPRINTF(mMsgExtStr[SpiChannel::MOSI], sizeof(mMsgExtStr[SpiChannel::MOSI]), "%04Xh}", cmdExt);
-
-						if (mMsgErrorRspFlag[SpiChannel::MOSI])
-						{
-							AddTabularText(MOSI_TAG_STR, "!",
-								mMsgObjStr[SpiChannel::MOSI],
-								mMsgInstStr[SpiChannel::MOSI],
-								mMsgCmdStr[SpiChannel::MOSI],
-								mMsgExtStr[SpiChannel::MOSI]);
-						}
-						else
-						{
-							if (frame.HasFlag(SPI_MSG_FIRST_FRAG_FLAG))
-							{
-								AddTabularText(MOSI_TAG_STR,
-									mMsgObjStr[SpiChannel::MOSI],
-									mMsgInstStr[SpiChannel::MOSI],
-									mMsgCmdStr[SpiChannel::MOSI],
-									mMsgExtStr[SpiChannel::MOSI],
-									"++");
-							}
-							else
-							{
-								AddTabularText(MOSI_TAG_STR,
-									mMsgObjStr[SpiChannel::MOSI],
-									mMsgInstStr[SpiChannel::MOSI],
-									mMsgCmdStr[SpiChannel::MOSI],
-									mMsgExtStr[SpiChannel::MOSI]);
-							}
-						}
-					}
-
-					return;
-				}
-
-				break;
-			case AbccMosiStates::MessageField_Data:
-			{
-				NotifEvent_t notification = NotifEvent::None;
-				MsgDataFrameData2_t* info = (MsgDataFrameData2_t*)&frame.mData2;
-
-				if (frame.HasFlag(SPI_PROTO_EVENT_FLAG))
-				{
-					const U16 nwSpecErrCodeOffset = 2;
-					char errorStr[FORMATTED_STRING_BUFFER_SIZE];
-
-					// The error response may be composed of one to three bytes.
-					// This payload can represent a common error response,
-					// an object specific error response, or a network specific
-					// error response.
-
-					if (info->msgDataCnt == 0)
-					{
-						notification = GetErrorRspString((U8)frame.mData1, str, sizeof(str), display_base);
-						SNPRINTF(errorStr, sizeof(errorStr), "Error Code: %s", str);
-						TableBuilder(SpiChannel::MISO, errorStr, notification);
-					}
-					else if (info->msgDataCnt <= nwSpecErrCodeOffset)
-					{
-						U8 nwTypeIdx = 0;
-						bool nwSpecificError = (info->msgDataCnt == nwSpecErrCodeOffset);
-
-						if (nwSpecificError)
-						{
-							nwTypeIdx = static_cast<U8>(mSettings->mNetworkType);
-						}
-
-						notification = GetErrorRspString(nwSpecificError, nwTypeIdx, info->msgHeader.obj, (U8)frame.mData1, str, sizeof(str), display_base);
-
-						if (nwSpecificError)
-						{
-							SNPRINTF(errorStr, sizeof(errorStr), "Network Error: %s", str);
-						}
-						else
-						{
-							SNPRINTF(errorStr, sizeof(errorStr), "Object Error: %s", str);
-						}
-
-						TableBuilder(SpiChannel::MISO, errorStr, notification);
-					}
-				}
-
-				break;
-			}
-			default:
-				break;
-			}
-		}
+		GenerateMisoTabularText(frame_index, frame, display_base);
 	}
 }
 
