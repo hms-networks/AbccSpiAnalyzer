@@ -63,8 +63,8 @@ void TrimRight(std::string& s)
 				return !std::isspace(ch);
 			}
 		).base(),
-				s.end()
-				);
+		s.end()
+	);
 }
 
 /*

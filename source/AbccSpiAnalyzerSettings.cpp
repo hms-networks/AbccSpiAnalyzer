@@ -29,6 +29,13 @@
 ** at any point in the commit history. */
 #define SETTINGS_REVISION_STRING "REVISION_00000012"
 
+#define ANALYZER_NAME "AbccSpiAnalyzer"
+
+#define MOSI_CHANNEL_NAME "MOSI"
+#define MISO_CHANNEL_NAME "MISO"
+#define SCLK_CHANNEL_NAME "SCLK"
+#define NSS_CHANNEL_NAME  "NSS"
+
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
 ** into an enum class. For this to work the enum class MUST define a
@@ -88,19 +95,19 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	SetDefaultAdvancedSettings();
 
 	mMosiChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMosiChannelInterface->SetTitleAndTooltip("MOSI", "Master Out, Slave In (Host to Module)");
+	mMosiChannelInterface->SetTitleAndTooltip(MOSI_CHANNEL_NAME, "Master Out, Slave In (Host to Module)");
 	mMosiChannelInterface->SetChannel(mMosiChannel);
 
 	mMisoChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mMisoChannelInterface->SetTitleAndTooltip("MISO", "Master In, Slave Out (Module to Host)");
+	mMisoChannelInterface->SetTitleAndTooltip(MISO_CHANNEL_NAME, "Master In, Slave Out (Module to Host)");
 	mMisoChannelInterface->SetChannel(mMisoChannel);
 
 	mClockChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mClockChannelInterface->SetTitleAndTooltip("SCLK", "SPI Clock");
+	mClockChannelInterface->SetTitleAndTooltip(SCLK_CHANNEL_NAME, "SPI Clock");
 	mClockChannelInterface->SetChannel(mClockChannel);
 
 	mEnableChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
-	mEnableChannelInterface->SetTitleAndTooltip("NSS", "Active Low Slave Select");
+	mEnableChannelInterface->SetTitleAndTooltip(NSS_CHANNEL_NAME, "Active Low Slave Select");
 	mEnableChannelInterface->SetChannel(mEnableChannel);
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed(true);
 
@@ -242,10 +249,10 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddExportExtension(static_cast<U32>(ExportType::MessageData), "Message Data", "csv");
 
 	ClearChannels();
-	AddChannel(mMosiChannel, "MOSI", false);
-	AddChannel(mMisoChannel, "MISO", false);
-	AddChannel(mClockChannel, "SCLK", false);
-	AddChannel(mEnableChannel, "NSS", false);
+	AddChannel(mMosiChannel, MOSI_CHANNEL_NAME, false);
+	AddChannel(mMisoChannel, MISO_CHANNEL_NAME, false);
+	AddChannel(mClockChannel, SCLK_CHANNEL_NAME, false);
+	AddChannel(mEnableChannel, NSS_CHANNEL_NAME, false);
 }
 
 SpiAnalyzerSettings::~SpiAnalyzerSettings()
@@ -280,7 +287,7 @@ void SpiAnalyzerSettings::ParseSimulationSettings(rapidxml::xml_node<>* simulati
 	const char* fifthNode = "SpiPacketGapNs";
 	const char* sixthNode = "SpiByteGapNs";
 	const char* seventhNode = "SpiChipSelectDelayNs";
-	const char* eigthNode = "SpiDataSize";
+	const char* eighthNode = "SpiDataSize";
 	const char* ninthNode = "SpiMessageDataLength";
 
 	rapidxml::xml_node<>* node = simulation_node->first_node(firstNode);
@@ -373,11 +380,11 @@ void SpiAnalyzerSettings::ParseSimulationSettings(rapidxml::xml_node<>* simulati
 		}
 
 		mSimulateChipSelectNs = static_cast<S32>(parsedValue);
-		node = node->next_sibling(eigthNode);
+		node = node->next_sibling(eighthNode);
 	}
 	else
 	{
-		node = simulation_node->first_node(eigthNode);
+		node = simulation_node->first_node(eighthNode);
 	}
 
 	if (node)
@@ -588,30 +595,25 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mAdvSettingsPath               = mAdvancedSettingsInterface->GetText();
 
 	ClearChannels();
-	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel,  "SCLK",   mClockChannel  != UNDEFINED_CHANNEL);
-	AddChannel(mEnableChannel, "NSS",    mEnableChannel != UNDEFINED_CHANNEL);
+	AddChannel(mMosiChannel,   MOSI_CHANNEL_NAME,   mMosiChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mMisoChannel,   MISO_CHANNEL_NAME,   mMisoChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  SCLK_CHANNEL_NAME,   mClockChannel  != UNDEFINED_CHANNEL);
+	AddChannel(mEnableChannel, NSS_CHANNEL_NAME,    mEnableChannel != UNDEFINED_CHANNEL);
 
-	if (!ParseAdvancedSettingsFile())
-	{
-		return false;
-	}
-
-	return true;
+	return ParseAdvancedSettingsFile();
 }
 
 void SpiAnalyzerSettings::LoadSettings(const char* settings)
 {
 	SimpleArchive textArchive;
-	const char* pcPluginName;
-	const char* pcSettingsVersionString;
+	const char* pluginName;
+	const char* settingsVersionString;
 
 	textArchive.SetString(settings);
 
 	/* The first thing in the archive is the name of the protocol analyzer that the data belongs to. */
-	textArchive >> &pcPluginName;
-	if (strcmp(pcPluginName, "AbccSpiAnalyzer") != 0)
+	textArchive >> &pluginName;
+	if (strcmp(pluginName, ANALYZER_NAME) != 0)
 	{
 		AnalyzerHelpers::Assert("AbccSpiAnalyzer: Provided with a settings string that doesn't belong to us.");
 	}
@@ -622,8 +624,8 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	textArchive >> mEnableChannel;
 
 	/* Compare version in archive to what the plugin's "settings" version is */
-	textArchive >> &pcSettingsVersionString;
-	if (strcmp(pcSettingsVersionString, SETTINGS_REVISION_STRING) == 0)
+	textArchive >> &settingsVersionString;
+	if (strcmp(settingsVersionString, SETTINGS_REVISION_STRING) == 0)
 	{
 		textArchive >> mNetworkType;
 		textArchive >> mMessageIndexingVerbosityLevel;
@@ -643,10 +645,10 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 	}
 
 	ClearChannels();
-	AddChannel(mMosiChannel,   "MOSI",   mMosiChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mMisoChannel,   "MISO",   mMisoChannel   != UNDEFINED_CHANNEL);
-	AddChannel(mClockChannel,  "SCLK",   mClockChannel  != UNDEFINED_CHANNEL);
-	AddChannel(mEnableChannel, "NSS",    mEnableChannel != UNDEFINED_CHANNEL);
+	AddChannel(mMosiChannel,   MOSI_CHANNEL_NAME,   mMosiChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mMisoChannel,   MISO_CHANNEL_NAME,   mMisoChannel   != UNDEFINED_CHANNEL);
+	AddChannel(mClockChannel,  SCLK_CHANNEL_NAME,   mClockChannel  != UNDEFINED_CHANNEL);
+	AddChannel(mEnableChannel, NSS_CHANNEL_NAME,    mEnableChannel != UNDEFINED_CHANNEL);
 
 	UpdateInterfacesFromSettings();
 }
@@ -655,7 +657,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 {
 	SimpleArchive textArchive;
 
-	textArchive << "AbccSpiAnalyzer";
+	textArchive << ANALYZER_NAME;
 	textArchive << mMosiChannel;
 	textArchive << mMisoChannel;
 	textArchive << mClockChannel;

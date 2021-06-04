@@ -544,15 +544,9 @@ GetByteStatus SpiAnalyzer::GetByte(U64* mosi_data_ptr, U64* miso_data_ptr, U64* 
 
 bool SpiAnalyzer::NeedsRerun()
 {
-	if (mSettingsChangeID != mSettings->mChangeID)
-	{
-		mSettingsChangeID = mSettings->mChangeID;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	bool settingsChanged = (mSettingsChangeID != mSettings->mChangeID);
+	mSettingsChangeID = mSettings->mChangeID;
+	return settingsChanged;
 }
 
 U32 SpiAnalyzer::GenerateSimulationData(U64 minimum_sample_index, U32 device_sample_rate, SimulationChannelDescriptor** simulation_channels)
