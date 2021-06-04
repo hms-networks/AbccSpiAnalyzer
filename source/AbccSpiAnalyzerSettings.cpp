@@ -27,7 +27,7 @@
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
-#define SETTINGS_REVISION_STRING "REVISION_00000011"
+#define SETTINGS_REVISION_STRING "REVISION_00000012"
 
 /*
 ** Overloads reading the SimpleArchive as a U32 and feeding the result
@@ -639,15 +639,6 @@ void SpiAnalyzerSettings::LoadSettings(const char* settings)
 		textArchive >> mExportDelimiter;
 		textArchive >> mClockingAlertLimit;
 		textArchive >> mExpandBitFrames;
-		textArchive	>> mSimulateLogFilePath;
-		textArchive >> mSimulateLogFileDefaultState;
-		textArchive >> mSimulateClockIdleHigh;
-		textArchive >> mSimulateClockFrequency;
-		textArchive >> mSimulatePacketGapNs;
-		textArchive >> mSimulateByteGapNs;
-		textArchive >> mSimulateChipSelectNs;
-		textArchive >> mSimulateWordMode;
-		textArchive >> mSimulateMsgDataLength;
 		textArchive >> &mAdvSettingsPath;
 	}
 
@@ -685,15 +676,6 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	textArchive << mExportDelimiter.c_str();
 	textArchive << mClockingAlertLimit;
 	textArchive << mExpandBitFrames;
-	textArchive << mSimulateLogFilePath.c_str();
-	textArchive << mSimulateLogFileDefaultState;
-	textArchive << mSimulateClockIdleHigh;
-	textArchive << mSimulateClockFrequency;
-	textArchive << mSimulatePacketGapNs;
-	textArchive << mSimulateByteGapNs;
-	textArchive << mSimulateChipSelectNs;
-	textArchive << mSimulateWordMode;
-	textArchive << mSimulateMsgDataLength;
 	textArchive << mAdvSettingsPath;
 
 	SaveSettingChangeID();
