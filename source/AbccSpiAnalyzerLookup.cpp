@@ -2073,21 +2073,21 @@ static const AttrLookupTable_t* LookupAttrEntry(U8 obj, U16 inst, U8 attr);
 bool GetExceptionTableIndex(bool nw_object, U8 nw_type_idx, const MsgHeaderInfo_t* msg_header, U16* table_index)
 {
 	const U16 unspecifiedNetworkTypeTableIndex = 0xFFFF;
-	bool foundTableEntry = false;
 	const U16 numEntries = sizeof(asExceptionNameTables) / sizeof(ExceptionNameTable_t);
+	const U8 exceptionAttrNum = 7;
+	U8 attribute = static_cast<U8>(msg_header->cmdExt & 0x00FF);
+	bool foundTableEntry = false;
 
-	if (nw_object && nw_type_idx == 0)
+	if (nw_object && (nw_type_idx == 0))
 	{
 		// Network type is unspecified. Return now, and let GetExceptionString() handle this special case.
 		*table_index = unspecifiedNetworkTypeTableIndex;
-		return true;
+		return (attribute == exceptionAttrNum);
 	}
 
 	// Attempt to find matching "exception names" table.
 	for (*table_index = 0; *table_index < numEntries; (*table_index)++)
 	{
-		U8 attribute = static_cast<U8>(msg_header->cmdExt & 0x00FF);
-
 		if (nw_object && (asExceptionNameTables[*table_index].ref_id > 0))
 		{
 			// ref_id represents a network type.
