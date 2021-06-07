@@ -1067,6 +1067,19 @@ void SpiAnalyzerResults::ExportAllFramesToFile(const char* file, DisplayBase dis
 	AnalyzerHelpers::EndFile(f);
 }
 
+void SpiAnalyzerResults::AppendCsvHeaderDelimeters(std::stringstream &ss_csv_data, U8 count, bool& add_header_delims)
+{
+	if (add_header_delims)
+	{
+		for (U8 i = 0U; i < count; i++)
+		{
+			ss_csv_data << CSV_DELIMITER;
+		}
+
+		add_header_delims = false;
+	}
+}
+
 void SpiAnalyzerResults::AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event)
 {
 	ss_csv_head << CSV_DELIMITER;
@@ -1189,7 +1202,6 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 	switch (frame.mType)
 	{
 	case AbccMisoStates::MessageField_Size:
-	case AbccMisoStates::MessageField_SourceId:
 	{
 		GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
 		ss_csv_data << CSV_DELIMITER << dataStr;
@@ -1197,11 +1209,19 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 		break;
 	}
 
+	case AbccMisoStates::MessageField_SourceId:
+	{
+		GetNumberString(frame.mData1, DisplayBase::Decimal, GET_MISO_FRAME_BITSIZE(frame.mType), dataStr, sizeof(dataStr), BaseType::Numeric);
+		AppendCsvHeaderDelimeters(ss_csv_data, 1, align_msg_fields);
+		ss_csv_data << CSV_DELIMITER << dataStr;
+		break;
+	}
+
 	case AbccMisoStates::MessageField_Object:
 	{
 		GetObjectString((U8)frame.mData1, dataStr, sizeof(dataStr), display_base);
+		AppendCsvHeaderDelimeters(ss_csv_data, 2, align_msg_fields);
 		ss_csv_data << CSV_DELIMITER << dataStr;
-		align_msg_fields = false;
 		break;
 	}
 
@@ -1215,8 +1235,8 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 			SNPRINTF(dataStr, sizeof(dataStr), "0x%04X", (U16)frame.mData1);
 		}
 
+		AppendCsvHeaderDelimeters(ss_csv_data, 3, align_msg_fields);
 		ss_csv_data << CSV_DELIMITER << dataStr;
-		align_msg_fields = false;
 
 		break;
 	}
@@ -1224,6 +1244,7 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 	case AbccMisoStates::MessageField_Command:
 	{
 		GetCmdString((U8)frame.mData1, (U8)frame.mData2, dataStr, sizeof(dataStr), display_base);
+		AppendCsvHeaderDelimeters(ss_csv_data, 4, align_msg_fields);
 
 		if (((U8)frame.mData1 & ABP_MSG_HEADER_E_BIT) == ABP_MSG_HEADER_E_BIT)
 		{
@@ -1240,8 +1261,6 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 				ss_csv_data << CSV_DELIMITER << dataStr << RESPONSE_STR;
 			}
 		}
-
-		align_msg_fields = false;
 
 		break;
 	}
@@ -1329,8 +1348,8 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 			}
 		}
 
+		AppendCsvHeaderDelimeters(ss_csv_data, 5, align_msg_fields);
 		ss_csv_data << CSV_DELIMITER << dataStr;
-		align_msg_fields = false;
 
 		break;
 	}
@@ -1408,11 +1427,7 @@ void SpiAnalyzerResults::BufferCsvMessageMsgEntry(
 			}
 		}
 
-		if (align_msg_fields)
-		{
-			ss_csv_data << CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER + CSV_DELIMITER;
-			align_msg_fields = false;
-		}
+		AppendCsvHeaderDelimeters(ss_csv_data, 6, align_msg_fields);
 
 		AppendCsvSafeString(ss_csv_data, dataStr, display_base);
 
@@ -1545,7 +1560,7 @@ void SpiAnalyzerResults::BufferCsvMessageMosiEntry(
 	ErrorEvent &miso_event,
 	bool &fragmentation,
 	bool &app_stat_reached,
-	bool &add_last_msg_header,
+	bool &align_msg_fields,
 	bool &add_entry,
 	DisplayBase display_base)
 {
@@ -1626,7 +1641,7 @@ void SpiAnalyzerResults::BufferCsvMessageMosiEntry(
 			BufferCsvMessageMsgEntry(
 				frame,
 				ss_csv_tail,
-				add_last_msg_header,
+				align_msg_fields,
 				display_base);
 
 			break;
@@ -1696,8 +1711,8 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 			ErrorEvent misoEvent = ErrorEvent::None;
 			bool mosiAppStatReached = false;
 			bool misoAnbStatReached = false;
-			bool addLastMosiMsgHeader = true;
-			bool addLastMisoMsgHeader = true;
+			bool alignMosiMsgFields = true;
+			bool alignMisoMsgFields = true;
 			bool addMosiEntry = false;
 			bool addMisoEntry = false;
 
@@ -1723,7 +1738,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						misoEvent,
 						mosiFragmentation,
 						mosiAppStatReached,
-						addLastMosiMsgHeader,
+						alignMosiMsgFields,
 						addMosiEntry,
 						display_base);
 				}
@@ -1741,7 +1756,7 @@ void SpiAnalyzerResults::ExportMessageDataToFile(const char *file, DisplayBase d
 						misoEvent,
 						misoFragmentation,
 						misoAnbStatReached,
-						addLastMisoMsgHeader,
+						alignMisoMsgFields,
 						addMisoEntry,
 						display_base);
 				}

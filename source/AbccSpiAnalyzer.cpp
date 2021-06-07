@@ -158,8 +158,8 @@ void SpiAnalyzer::WorkerThread()
 						{
 							mMosiVars.eState = AbccMosiStates::SpiControl;
 							mMisoVars.eState = AbccMisoStates::Reserved1;
-							mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
-							mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
+							//mMosiVars.eMsgSubState = AbccMosiStates::MessageField_Size;
+							//mMisoVars.eMsgSubState = AbccMisoStates::MessageField_Size;
 							mMisoVars.oChecksum.Init();
 							mMosiVars.oChecksum.Init();
 							mMisoVars.lFrameData = 0;
@@ -1542,12 +1542,9 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 				// New message and last
 				mMisoVars.fNewMsg = true;
 
-				if (mMisoVars.fFragmentation)
-				{
-					// Message fragmentation ends
-					mMisoVars.fFirstFrag = false;
-					mMisoVars.fLastFrag = true;
-				}
+				// Message fragmentation ends
+				mMisoVars.fLastFrag = true;
+				mMisoVars.fFirstFrag = !mMisoVars.fFragmentation;
 			}
 			else
 			{
@@ -1571,9 +1568,9 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 			{
 				mMisoVars.eState = AbccMisoStates::MessageField;
 
-				if (mMisoVars.fNewMsg)
+				if (mMisoVars.fNewMsg && mMisoVars.fFirstFrag)
 				{
-					RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, &eMsgSubState);
+					RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
 				}
 			}
 			else if (mMisoVars.dwPdLen != 0)
@@ -1589,18 +1586,10 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 	case AbccMisoStates::MessageField:
 		if (mMisoVars.dwByteCnt >= GET_MISO_FRAME_SIZE(mMisoVars.eState))
 		{
-			if (mMisoVars.fFragmentation && !mMisoVars.fFirstFrag)
+			if (!RunAbccMisoMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 			{
-				eMsgSubState = AbccMisoStates::MessageField_Data;
-				addFrame = true;
-			}
-			else
-			{
-				if (!RunAbccMisoMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
-				{
-					// Error, transition to idle and wait for reset
-					mMisoVars.eState = AbccMisoStates::Idle;
-				}
+				// Error, transition to idle and wait for reset
+				mMisoVars.eState = AbccMisoStates::Idle;
 			}
 
 			if (mMisoVars.dwMsgLenCnt == 1)
@@ -1681,6 +1670,11 @@ bool SpiAnalyzer::RunAbccMisoStateMachine(StateOperation operation, AcquisitionS
 		else
 		{
 			ProcessMisoFrame(eMisoState_Current, mMisoVars.lFrameData, mMisoVars.lFramesFirstSample);
+
+			if ((eMisoState_Current == AbccMisoStates::Crc32) && (mMisoVars.fLastFrag && (mMisoVars.dwMsgLenCnt == 0)))
+			{
+				RunAbccMisoMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
+			}
 		}
 
 		// Reset the state variables
@@ -1786,12 +1780,9 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 				// New message and last
 				mMosiVars.fNewMsg = true;
 
-				if (mMosiVars.fFragmentation)
-				{
-					// Message fragmentation ends
-					mMosiVars.fFirstFrag = false;
-					mMosiVars.fLastFrag = true;
-				}
+				// Message fragmentation ends
+				mMosiVars.fLastFrag = true;
+				mMosiVars.fFirstFrag = !mMosiVars.fFragmentation;
 			}
 			else
 			{
@@ -1849,9 +1840,9 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 			{
 				mMosiVars.eState = AbccMosiStates::MessageField;
 
-				if (mMosiVars.fNewMsg)
+				if (mMosiVars.fNewMsg && mMosiVars.fFirstFrag)
 				{
-					RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, &eMsgSubState);
+					RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
 				}
 			}
 			else if (mMosiVars.dwPdLen != 0)
@@ -1867,18 +1858,10 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 	case AbccMosiStates::MessageField:
 		if (mMosiVars.dwByteCnt >= GET_MOSI_FRAME_SIZE(mMosiVars.eState))
 		{
-			if (mMosiVars.fFragmentation && !mMosiVars.fFirstFrag)
+			if (!RunAbccMosiMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
 			{
-				eMsgSubState = AbccMosiStates::MessageField_Data;
-				addFrame = true;
-			}
-			else
-			{
-				if (!RunAbccMosiMsgSubStateMachine(StateOperation::Run, &addFrame, &eMsgSubState))
-				{
-					// Error, transition to idle and wait for reset
-					mMosiVars.eState = AbccMosiStates::Idle;
-				}
+				// Error, transition to idle and wait for reset
+				mMosiVars.eState = AbccMosiStates::Idle;
 			}
 
 			if (mMosiVars.dwMsgLenCnt == 1)
@@ -1966,6 +1949,11 @@ bool SpiAnalyzer::RunAbccMosiStateMachine(StateOperation operation, AcquisitionS
 		else
 		{
 			ProcessMosiFrame(eMosiState_Current, mMosiVars.lFrameData, mMosiVars.lFramesFirstSample);
+
+			if ((eMosiState_Current == AbccMosiStates::Crc32) && (mMosiVars.fLastFrag && (mMosiVars.dwMsgLenCnt == 0)))
+			{
+				RunAbccMosiMsgSubStateMachine(StateOperation::Reset, nullptr, nullptr);
+			}
 		}
 
 		// Reset the state variables
@@ -2209,9 +2197,11 @@ void SpiAnalyzer::RestorePreviousStateVars()
 	mMisoVars.fFirstFrag = mPreviousMisoVars.fFirstFrag;
 	mMisoVars.fLastFrag = mPreviousMisoVars.fLastFrag;
 	mMisoVars.fFragmentation = mPreviousMisoVars.fFragmentation;
+	mMisoVars.eMsgSubState = mPreviousMisoVars.eMsgSubState;
 
 	mMosiVars.wMdCnt = mPreviousMosiVars.wMdCnt;
 	mMosiVars.fFirstFrag = mPreviousMosiVars.fFirstFrag;
 	mMosiVars.fLastFrag = mPreviousMosiVars.fLastFrag;
 	mMosiVars.fFragmentation = mPreviousMosiVars.fFragmentation;
+	mMosiVars.eMsgSubState = mPreviousMosiVars.eMsgSubState;
 }
