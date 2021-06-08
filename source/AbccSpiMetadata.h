@@ -16,11 +16,11 @@
 #endif
 
 #ifndef FILEVERSION_MONTH
-#define FILEVERSION_MONTH					1
+#define FILEVERSION_MONTH					6
 #endif
 
 #ifndef FILEVERSION_DAY
-#define FILEVERSION_DAY						5
+#define FILEVERSION_DAY						8
 #endif
 
 #ifndef FILEVERSION_BUILD

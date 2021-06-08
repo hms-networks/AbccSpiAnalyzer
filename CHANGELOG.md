@@ -1,5 +1,43 @@
 # Changelog
 
+## Version 2021.6.1.1
+
+### Changes
+
+* Code refactoring
+* Added support for ABCC SDK "log file simulation". It is now possible to take
+  a standard SDK log file and simulate SPI messaging in the plugin via
+  the `AdvancedSettings.xml` file. See plugin documentation for more information.
+  NOTE: Some of these new configurable options are also available when using
+  "standard simulation" mode. Example log files have been added to the
+  `./doc/abcc_log_file_examples/` folder.
+* Added support for message segmentation.
+* Added support for enumeration of exception information and codes.
+* Added support for message header fragmentation. Previously it was not possible
+  for the plugin to handle cases where the ABCC message header was split
+  between multiple SPI packets.
+* Improved support for error response reporting. Error response is now included
+  in the exported data and decoded protocols output.
+
+### Fixes
+
+* Resolved static analysis issues.
+* Fixed an issue with byte acquisition logic. If the clock transitions from high
+  to low after the last bit in the byte has already been sampled but before the
+  chip select deasserts, the plugin incorrectly reported this event as an error
+  which in turn caused the SPI packet to be incorrectly marked with an error.
+* Fixed bug regarding object specific errors. This issue resulted in an
+  "Unknown" string entry being reported when it should not have done so.
+* Added workaround setting to `AdvancedSettings.xml` to fix an inherent bug in
+  the Logic software version 1.2.x. Error frames committed by the logic analyzer
+  plugin which span < 8 samples require "expansion" to 8 samples in order for
+  the software to properly establish a link between the decoded protocols entry
+  and the bubble text.
+* Improved CSV character escaping logic when using certain delimiters.
+* Minor spelling fixes.
+
+---
+
 ## Version 2021.1.5.1
 
 ### Changes
@@ -12,6 +50,7 @@
 
 * Resolved static analysis issues.
 
+---
 
 ## Version 2019.07.17.1
 
@@ -27,6 +66,8 @@
   no clocked data.
 * (Issue #24) Fixed the logic behind multi-event markers.
 * Fixed build issue for macOS Mojave.
+
+---
 
 ## Version 2018.10.10.1
 
@@ -81,6 +122,8 @@
   SPI transaction.
 * Fixed various issues with how advanced settings were being handled.
 
+---
+
 ## Version 2018.1.9.1
 
 ### Changes
@@ -112,6 +155,8 @@
   packet may be lost.
 * Resolved various cases where the plugin would crash the software.
 
+---
+
 ## Revision 1.0.0.0 (RC1)
 
 ### Changes
@@ -132,6 +177,8 @@
     * All data is exported in XML format
     * Uses a human readable hierarchical structure to present ABCC SPI packet
       information
+
+---
 
 ## Revision 1.0.0.0 (Beta)
 
