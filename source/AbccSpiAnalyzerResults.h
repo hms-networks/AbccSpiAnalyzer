@@ -132,7 +132,7 @@ protected: /* Methods */
 		bool &app_stat_reached,
 		bool &align_msg_fields,
 		bool &add_entry,
-		DisplayBase display_base );
+		DisplayBase display_base);
 
 	void AppendCsvHeaderDelimeters(std::stringstream &ss_csv_data, U8 count, bool& add_header_delims);
 	void AppendCsvMessageEntry(void* file, std::stringstream &ss_csv_head, std::stringstream &ss_csv_body, std::stringstream &ss_csv_tail, ErrorEvent event);

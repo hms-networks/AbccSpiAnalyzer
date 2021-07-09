@@ -292,7 +292,7 @@ bool AbccLogFileParser::ParseMessage(ABP_MsgType& message)
 
 INT8 AbccLogFileParser::ParseAnbState(const std::string& line)
 {
-	const UINT8 abAnybusStsValues[] =
+	const UINT8 anybusStsValues[] =
 	{
 		ABP_ANB_STATE_SETUP,
 		ABP_ANB_STATE_NW_INIT,
@@ -303,7 +303,7 @@ INT8 AbccLogFileParser::ParseAnbState(const std::string& line)
 		ABP_ANB_STATE_EXCEPTION
 	};
 
-	const char* asAnybusStsNames[] =
+	const char* anybusStsNames[] =
 	{
 		"ABP_ANB_STATE_SETUP",
 		"ABP_ANB_STATE_NW_INIT",
@@ -316,14 +316,14 @@ INT8 AbccLogFileParser::ParseAnbState(const std::string& line)
 
 	INT8 state = -1;
 
-	for (int i = 0; i < sizeof(abAnybusStsValues); i++)
+	for (int i = 0; i < sizeof(anybusStsValues); i++)
 	{
-		size_t matchOffset = line.find(asAnybusStsNames[i]);
+		size_t matchOffset = line.find(anybusStsNames[i]);
 
 		if ((matchOffset != std::string::npos) &&
-			((line.length() - matchOffset) == strlen(asAnybusStsNames[i])))
+			((line.length() - matchOffset) == strlen(anybusStsNames[i])))
 		{
-			state = abAnybusStsValues[i];
+			state = anybusStsValues[i];
 			break;
 		}
 	}

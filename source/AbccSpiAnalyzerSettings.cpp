@@ -23,7 +23,7 @@
 #include "AbccSpiAnalyzerTypes.h"
 #include "AbccSpiAnalyzerHelpers.h"
 
-/* Anytime behavior or definition of settings change where some level of
+/* Any time behavior or definition of settings change where some level of
 ** incompatibility is introduced, increment this counter. This should be
 ** maintained at the commit level to improve reliability of custom builds
 ** at any point in the commit history. */
