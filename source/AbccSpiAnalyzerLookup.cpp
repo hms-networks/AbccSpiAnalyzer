@@ -105,7 +105,7 @@ typedef struct CommandNameTable
 
 typedef struct NcInstNameTable
 {
-	const U8 object_num;
+	const U8 nw_type;
 	const U8 num_inst_names;
 	const LookupTable_t* inst_names;
 } NcInstNameTable_t;
@@ -2686,7 +2686,7 @@ NotifEvent_t GetCmdString(U8 val, U8 obj, char* str, U16 max_str_len, DisplayBas
 	return notification;
 }
 
-bool GetInstString(U8 /* nw_type_idx */, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base)
+bool GetInstString(U8 nw_type_idx, U8 obj, U16 val, char* str, U16 max_str_len, NotifEvent_t* notif_ptr, DisplayBase display_base)
 {
 	bool objFound = false;
 
@@ -2694,7 +2694,7 @@ bool GetInstString(U8 /* nw_type_idx */, U8 obj, U16 val, char* str, U16 max_str
 	{
 		for (U8 i = 0; i < sizeof(asNcInstNameTables) / sizeof(NcInstNameTable_t); i++)
 		{
-			if (asNcInstNameTables[i].object_num == obj)
+			if (asNcInstNameTables[i].nw_type == abNetworkTypeValue[nw_type_idx])
 			{
 				objFound = true;
 				*notif_ptr = GetNamedInstString(
