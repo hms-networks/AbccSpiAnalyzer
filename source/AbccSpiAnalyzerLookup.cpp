@@ -1314,7 +1314,7 @@ static const AttrLookupTable_t asSyncInstAttrNames[] =
 
 
 // Entries contained in this table shall be sorted by object number.
-// { Object, Object names pointer, Num object names, Instance names pointer, Num instance names } */
+// { Object, Num object names, Num instance names, Object names pointer, Instance names pointer } */
 AttributeNameTable_t asAttributeNameTables[] = {
 	{ ABP_OBJ_NUM_ANB,		0,									NUM_ENTRIES(asAnbInstAttrNames),	nullptr,			asAnbInstAttrNames },
 	{ ABP_OBJ_NUM_DI,		NUM_ENTRIES(asDiObjAttrNames),		NUM_ENTRIES(asDiInstAttrNames),		asDiObjAttrNames,	asDiInstAttrNames },
