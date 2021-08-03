@@ -145,6 +145,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR_IIOT,		"PROFINET IRT IIoT", "");
 	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::PIR_FO_IIOT,		"PROFINET IRT FO IIoT", "");
 	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CET_IIOT,		"Common Ethernet IIoT", "");
+	mNetworkTypeInterface->AddNumber(NetworkTypeIndex::CIET,			"CC-Link IE TSN", "");
 	mNetworkTypeInterface->SetNumber(mNetworkType);
 
 	mIndexErrorsInterface.reset(new AnalyzerSettingInterfaceBool());

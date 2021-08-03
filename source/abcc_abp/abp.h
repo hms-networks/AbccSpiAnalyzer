@@ -402,6 +402,7 @@ ABP_AppStatusType;
 #define ABP_NW_TYPE_PIR_IIOT              0x00AD  /* PROFINET IRT IIoT */
 #define ABP_NW_TYPE_PIR_FO_IIOT           0x00AE  /* PROFINET IRT FO IIoT */
 #define ABP_NW_TYPE_CET_IIOT              0x00AF  /* Common Ethernet IIoT */
+#define ABP_NW_TYPE_CIET                  0x00B2  /* CC-Link IE TSN */
 
 
 /*******************************************************************************
@@ -621,6 +622,7 @@ ABP_LangType;
 #define ABP_OBJ_NUM_DPV0DI           16   /* PROFIBUS DP-V0 Diagnostic        */
 #define ABP_OBJ_NUM_FUSM             17   /* Functional Safety Module         */
 #define ABP_OBJ_NUM_NWCFN            18   /* Network CC-Link IE Field Network */
+#define ABP_OBJ_NUM_TIME             19   /* Time object                      */
 
 
 /*------------------------------------------------------------------------------
@@ -826,6 +828,7 @@ typedef enum ABP_AnbExceptionCodeType
    ABP_ANB_EXCPT_MISSING_SERIAL_NUM  = 0x0B, /* Missing serial number          */
    ABP_ANB_EXCPT_CORRUPT_FILE_SYSTEM = 0x0C, /* File system is corrupt         */
    ABP_ANB_EXCPT_SECURITY_ERROR      = 0x0D, /* Security related error         */
+   ABP_ANB_EXCPT_INVALID_CFG_FILE    = 0x0E, /* Invalid config file in file system */
 
    ABP_ANB_EXCPT_NUM_CODES                   /* Number of exception codes      */
 }

@@ -113,6 +113,7 @@
 #define ABP_ETN_IA_DHCP_OPTION_61_SOURCE_DS        ABP_ENUM_SIZEOF
 #define ABP_ETN_IA_DHCP_OPTION_61_GENERIC_STR_DS   ( 64 * ABP_UINT8_SIZEOF )
 #define ABP_ETN_IA_ENABLE_DHCP_CLIENT_DS           ABP_BOOL_SIZEOF
+#define ABP_ETN_IA_ENABLE_WEBDAV_DS                ABP_BOOL_SIZEOF
 
 
 /*------------------------------------------------------------------------------

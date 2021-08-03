@@ -61,6 +61,7 @@
 #include "abcc_abp/abp_soc.h"
 #include "abcc_abp/abp_src3.h"
 #include "abcc_abp/abp_sync.h"
+#include "abcc_abp/abp_time.h"
 
 #define IS_CMD_STANDARD(cmd)			(cmd > 0) && (cmd < 9)
 #define IS_CMD_OBJECT_SPECIFIC(cmd) 	(((cmd >= 0x10) && (cmd <= 0x30)) || \
@@ -366,7 +367,8 @@ const U8 abNetworkTypeValue[] =
 	ABP_NW_TYPE_EIP_2P_BB_IIOT,	// EtherNet/IP IIoT
 	ABP_NW_TYPE_PIR_IIOT,		// PROFINET IRT IIoT
 	ABP_NW_TYPE_PIR_FO_IIOT,	// PROFINET IRT FO IIoT
-	ABP_NW_TYPE_CET_IIOT		// Common Ethernet IIoT
+	ABP_NW_TYPE_CET_IIOT,		// Common Ethernet IIoT
+	ABP_NW_TYPE_CIET			// CC-Link IE TSN
 };
 
 /*******************************************************************************
@@ -477,7 +479,10 @@ static const LookupTable_t asEipNcInstNames[] =
 	{ 17,	"MDI 2 Settings",						NotifEvent::None },
 	{ 18,	"Reserved",								NotifEvent::None },
 	{ 19,	"Reserved",								NotifEvent::None },
-	{ 20,	"QuickConnect",							NotifEvent::None }
+	{ 20,	"QuickConnect",							NotifEvent::None },
+	{ 40,	"OPC UA TCP Port",						NotifEvent::None },
+	{ 41,	"OPC UA Discovery Server URL",			NotifEvent::None },
+	{ 42,	"OPC UA SecurityPolicyNone",			NotifEvent::None }
 };
 
 static const LookupTable_t asEplNcInstNames[] =
@@ -527,7 +532,10 @@ static const LookupTable_t asPirNcInstNames[] =
 	{ 18,	"Reserved",								NotifEvent::None },
 	{ 19,	"Reserved",								NotifEvent::None },
 	{ 20,	"Station Name",							NotifEvent::None },
-	{ 21,	"F-Address",							NotifEvent::None }
+	{ 21,	"F-Address",							NotifEvent::None },
+	{ 40,	"OPC UA TCP Port",						NotifEvent::None },
+	{ 41,	"OPC UA Discovery Server URL",			NotifEvent::None },
+	{ 42,	"OPC UA SecurityPolicyNone",			NotifEvent::None }
 };
 
 NcInstNameTable_t asNcInstNameTables[] =
@@ -1309,9 +1317,14 @@ static const AttrLookupTable_t asSyncInstAttrNames[] =
 	{ ABP_SYNC_IA_MIN_CYCLE_TIME,		"Minimum Cycle Time",			BaseType::Numeric,	NotifEvent::None },
 	{ ABP_SYNC_IA_SYNC_MODE,			"Sync Mode",					BaseType::Numeric,	NotifEvent::None },
 	{ ABP_SYNC_IA_SUPPORTED_SYNC_MODES,	"Supported Sync Modes",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	BaseType::Numeric,	NotifEvent::None },
+	{ ABP_SYNC_IA_CONTROL_CYCLE_FACTOR,	"Control task cycle factor",	BaseType::Numeric,	NotifEvent::None }
 };
 
+static const AttrLookupTable_t asTimeInstAttrNames[] =
+{
+	{ ABP_TIME_IA_PROTOCOL,		"Protocol",		BaseType::Numeric,	NotifEvent::None },
+	{ ABP_TIME_IA_CURRENT_TIME,	"Current time",	BaseType::Numeric,	NotifEvent::None }
+};
 
 // Entries contained in this table shall be sorted by object number.
 // { Object, Num object names, Num instance names, Object names pointer, Instance names pointer } */
@@ -1331,6 +1344,7 @@ AttributeNameTable_t asAttributeNameTables[] = {
 	{ ABP_OBJ_NUM_NWPNIO,	0,									NUM_ENTRIES(asNwPnioInstAttrNames),	nullptr,			asNwPnioInstAttrNames },
 	{ ABP_OBJ_NUM_FUSM,		0,									NUM_ENTRIES(asFusmInstAttrNames),	nullptr,			asFusmInstAttrNames },
 	{ ABP_OBJ_NUM_NWCFN,	0,									NUM_ENTRIES(asNwCfnInstAttrNames),	nullptr,			asNwCfnInstAttrNames },
+	{ ABP_OBJ_NUM_TIME,		0,									NUM_ENTRIES(asTimeInstAttrNames),	nullptr,			asTimeInstAttrNames },
 
 	{ ABP_OBJ_NUM_MQTT,		0,									NUM_ENTRIES(asMqttInstAttrNames),	nullptr,			asMqttInstAttrNames },
 	{ ABP_OBJ_NUM_OPCUA,	0,									NUM_ENTRIES(asOpcuaInstAttrNames),	nullptr,			asOpcuaInstAttrNames },
@@ -1573,6 +1587,11 @@ static const CmdLookupTable_t asNwPnioCmdNames[] =
 	{ ABP_NWPNIO_CMD_IDENT_CHANGE_DONE,		"Ident_Change_Done",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None }
 };
 
+static const CmdLookupTable_t asOpcuaCmdNames[] =
+{
+	{ ABP_OPCUA_CMD_METHOD_CALL,	"Method_Call",	BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
+};
+
 static const CmdLookupTable_t asPnioCmdNames[] =
 {
 	{ ABP_PNIO_CMD_GET_RECORD,			"Get_Record",			BaseType::Numeric,	BaseType::Numeric,	NotifEvent::None },
@@ -1617,6 +1636,7 @@ CommandNameTable_t asCommandNameTables[] =
 	{ ABP_OBJ_NUM_MOD,		NUM_ENTRIES(asModCmdNames),		asModCmdNames },
 	{ ABP_OBJ_NUM_MDD,		NUM_ENTRIES(asMddCmdNames),		asMddCmdNames },
 	{ ABP_OBJ_NUM_MQTT,		NUM_ENTRIES(asMqttCmdNames),	asMqttCmdNames },
+	{ ABP_OBJ_NUM_OPCUA,	NUM_ENTRIES(asOpcuaCmdNames),	asOpcuaCmdNames },
 	{ ABP_OBJ_NUM_PNIO,		NUM_ENTRIES(asPnioCmdNames),	asPnioCmdNames },
 	{ ABP_OBJ_NUM_EIP,		NUM_ENTRIES(asEipCmdNames),		asEipCmdNames },
 	{ ABP_OBJ_NUM_ECT,		NUM_ENTRIES(asEctCmdNames),		asEctCmdNames },
@@ -1979,20 +1999,21 @@ static const LookupTable_t asNwPnioExcptNames[] =
 
 static const LookupTable_t asAnbExcptNames[] =
 {
-	{ ABP_ANB_EXCPT_NONE,					"No exception",						NotifEvent::None },
-	{ ABP_ANB_EXCPT_APP_TO,					"Application timeout",				NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_INV_DEV_ADDR,			"Invalid device address",			NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_INV_COM_SETTINGS,		"Invalid communication settings",	NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_MAJ_UNREC_APP_EVNT,		"Major unrecoverable app event",	NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_WAIT_APP_RESET,			"Waiting for application reset",	NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_INV_PRD_CFG,			"Invalid process data config",		NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_INV_APP_RESPONSE,		"Invalid application response",		NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_NVS_CHECKSUM_ERROR,		"NVS memory checksum error",		NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_FUSM_ERROR,				"Functional Safety Module error",	NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_INSUFF_APPL_IMPL,		"Insufficient application impl.",	NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_MISSING_SERIAL_NUM,		"Missing serial number",			NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_CORRUPT_FILE_SYSTEM,	"File system is corrupt",			NotifEvent::Alert },
-	{ ABP_ANB_EXCPT_SECURITY_ERROR,			"Security Error",					NotifEvent::Alert }
+	{ ABP_ANB_EXCPT_NONE,					"No exception",							NotifEvent::None },
+	{ ABP_ANB_EXCPT_APP_TO,					"Application timeout",					NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_DEV_ADDR,			"Invalid device address",				NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_COM_SETTINGS,		"Invalid communication settings",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_MAJ_UNREC_APP_EVNT,		"Major unrecoverable app event",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_WAIT_APP_RESET,			"Waiting for application reset",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_PRD_CFG,			"Invalid process data config",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INV_APP_RESPONSE,		"Invalid application response",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_NVS_CHECKSUM_ERROR,		"NVS memory checksum error",			NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_FUSM_ERROR,				"Functional Safety Module error",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INSUFF_APPL_IMPL,		"Insufficient application impl.",		NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_MISSING_SERIAL_NUM,		"Missing serial number",				NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_CORRUPT_FILE_SYSTEM,	"File system is corrupt",				NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_SECURITY_ERROR,			"Security Error",						NotifEvent::Alert },
+	{ ABP_ANB_EXCPT_INVALID_CFG_FILE,		"Invalid config file in file system",	NotifEvent::Alert },
 };
 
 /*******************************************************************************

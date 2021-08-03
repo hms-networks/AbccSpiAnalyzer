@@ -54,7 +54,8 @@
 typedef enum ABP_OpcuaModel
 {
    ABP_OPCUA_MODEL_DISABLED            = 0,
-   ABP_OPCUA_MODEL_CC40                = 1
+   ABP_OPCUA_MODEL_CC40                = 1,
+   ABP_OPCUA_MODEL_APPLICATION         = 2
 }
 ABP_OpcuaModelType;
 
@@ -66,5 +67,24 @@ ABP_OpcuaModelType;
 #define ABP_OPCUA_IA_LIMITS_MAX_MON_ITEMS_MAX    ( 100 )
 #define ABP_OPCUA_IA_LIMITS_MIN_PUB_INT_MIN      ( 1000 )
 #define ABP_OPCUA_IA_LIMITS_MIN_PUB_INT_MAX      ( 1000 * 3600 * 24 )
+
+/*------------------------------------------------------------------------------
+** OPC UA Object specific commands
+**------------------------------------------------------------------------------
+*/
+
+#define ABP_OPCUA_CMD_METHOD_CALL   0x10
+
+/*------------------------------------------------------------------------------
+** Application data value types
+**------------------------------------------------------------------------------
+*/
+typedef enum ABP_OpcuaApplicationDataValue
+{
+   ABP_OPCUA_DATA_VALUE_SCALAR   = 0,
+   ABP_OPCUA_DATA_VALUE_ARRAY    = 1
+}
+ABP_OpcuaApplicationDataValueType;
+
 
 #endif  /* inclusion lock */

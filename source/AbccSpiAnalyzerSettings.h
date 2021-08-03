@@ -76,7 +76,8 @@ namespace NetworkTypeIndex
 		EIP_2P_BB_IIOT,		/* EtherNet/IP IIoT */
 		PIR_IIOT,			/* PROFINET IRT IIoT */
 		PIR_FO_IIOT,		/* PROFINET IRT FO IIoT */
-		CET_IIOT			/* Common Ethernet IIoT */
+		CET_IIOT,			/* Common Ethernet IIoT */
+		CIET				/* CC-Link IE TSN */
 	} Enum;
 };
 
