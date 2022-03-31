@@ -15,7 +15,6 @@
 #include <sstream>
 #include <algorithm>
 
-#include "AnalyzerHelpers.h"
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 #include "AbccLogFileParser.h"
@@ -93,7 +92,7 @@ MessageReturnType AbccLogFileParser::GetNextMessage(ABP_MsgType& message)
 		else if (line.find(anbStatus) != std::string::npos)
 		{
 			// Line indicates the Anybus State
-			S8 newStatus = ParseAnbState(line);
+			INT8 newStatus = ParseAnbState(line);
 
 			msgType = MessageReturnType::StateChange;
 
