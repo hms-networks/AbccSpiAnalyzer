@@ -149,7 +149,7 @@ const AbccMosiInfo_t asMosiStates[] =
 	{ AbccMosiStates::WriteProcessData,					"PD",		1 },
 	{ AbccMosiStates::Crc32,							"CRC32",	4 },
 	{ AbccMosiStates::Pad,								"PAD",		2 },
-	{ AbccMosiStates::MessageField_DataNotValid, 		"--",		1 }
+	{ AbccMosiStates::MessageField_DataNotValid,		"--",		1 }
 };
 
 const AbccMisoInfo_t asMisoStates[] =
@@ -724,13 +724,13 @@ static const AttrLookupTable_t asCfnInstAttrNames[] =
 
 static const AttrLookupTable_t asCipIdInstAttrNames[] =
 {
-	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_REVISION,		"Revision",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_STATUS,			"Status",			BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	BaseType::Numeric,	NotifEvent::None },
-	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		BaseType::Numeric,	NotifEvent::None }
+	{ ABP_CIPID_IA_VENDOR_ID,		"Vendor ID",		BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_DEVICE_TYPE,		"Device Type",		BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_PRODUCT_CODE,	"Product Code",		BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_REVISION,		"Revision",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_STATUS,			"Status",			BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_SERIAL_NUMBER,	"Serial Number",	BaseType::Numeric,		NotifEvent::None },
+	{ ABP_CIPID_IA_PRODUCT_NAME,	"Product Name",		BaseType::Character,	NotifEvent::None }
 };
 
 static const AttrLookupTable_t asCntInstAttrNames[] =
@@ -1896,7 +1896,7 @@ ErrorNameTable_t asErrorNameTables[] =
 
 static const LookupTable_t asNwExcptNames[] =
 {
-	{ ABP_NW_EXCPT_INFO_NONE,	"No exception",	NotifEvent::None }
+	{ ABP_NW_EXCPT_INFO_NONE,	"No information",	NotifEvent::None }
 };
 
 static const LookupTable_t asNwBacExcptNames[] =
