@@ -13,7 +13,7 @@ and x64 architectures.
 
 # If MSBuild is not included in system path, full path can be specified here
 MSBUILD_EXE = "MSBuild.exe"
-VS_PROJECT_PATH = "project/vs2019/AbccSpiAnalyzer.vcxproj"
+VS_PROJECT_PATH = "project/vs2022/AbccSpiAnalyzer.vcxproj"
 RELEASE_TARGET = "-p:Configuration=Release"
 DEBUG_TARGET = "-p:Configuration=Debug"
 X64_ARCH = "-p:Platform=x64"
@@ -122,7 +122,7 @@ def _msbuild() -> None:
 
     except FileNotFoundError:
         print("ERROR: Build for Windows failed. Ensure MSBuild is part of system's \"path\" variable.")
-        print(r'  Example: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin"')
+        print(r'  Example: "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin"')
         build_error = True
 
     exit(build_error)

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_FILE_PATH: ./project/vs2019/AbccSpiAnalyzer.vcxproj
+  PROJECT_FILE_PATH: ./project/vs2022/AbccSpiAnalyzer.vcxproj
   BUILD_CONFIGURATION: Release
 
 jobs:
