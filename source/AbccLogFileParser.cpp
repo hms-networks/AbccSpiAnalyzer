@@ -8,21 +8,61 @@
 **
 *******************************************************************************
 ******************************************************************************/
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include <string>
 #include <cstring>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <locale>
+#include <codecvt>
 
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 #include "AbccLogFileParser.h"
 #include "AbccSpiAnalyzerHelpers.h"
+#include <iostream>
+
+// Convert a wide Unicode string to UTF8
+static void Utf16ToUtf8(const std::wstring& wstr, std::string& str)
+{
+	if (wstr.empty())
+	{
+		str.clear();
+	}
+	else
+	{
+		str.assign(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(wstr));
+	}
+}
 
 AbccLogFileParser::AbccLogFileParser(const std::string& filepath, const ABP_AnbStateType state)
 {
+	mLineDelimiter = L'\n';
 	mLogFileStream.open(filepath);
+	DetectFileEncoding();
+
+	if ((mEncoding == FileEncoding::Utf16Be) || (mEncoding == FileEncoding::Utf16Le))
+	{
+		const int bom = 0xFEFF;
+
+		if (mLogFileStream.is_open())
+		{
+			mLogFileStream.close();
+		}
+
+		mLogFileWStream.open(filepath, std::ios::binary);
+		mLogFileWStream.imbue(std::locale(mLogFileWStream.getloc(),
+			new std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>));
+		mSwapEndianness = mLogFileWStream.get() != bom;
+	}
+
+	if (mSwapEndianness)
+	{
+		mLineDelimiter = bswap_16(mLineDelimiter);
+	}
+
 	mAnbState = state;
 }
 
@@ -32,11 +72,94 @@ AbccLogFileParser::~AbccLogFileParser()
 	{
 		mLogFileStream.close();
 	}
+
+	if (mLogFileWStream.is_open())
+	{
+		mLogFileWStream.close();
+	}
 }
 
 bool AbccLogFileParser::IsOpen()
 {
-	return mLogFileStream.is_open();
+	return (mLogFileStream.is_open() || mLogFileWStream.is_open());
+}
+
+void AbccLogFileParser::DetectFileEncoding()
+{
+	if (!mLogFileStream.is_open())
+	{
+		mEncoding = FileEncoding::Unknown;
+		return;
+	}
+
+	int ch1 = mLogFileStream.get();
+	int ch2 = mLogFileStream.get();
+
+	// Check for Byte Order Mark 0xFEFF in LE and BE form
+	if (ch1 == 0xFF && ch2 == 0xFE)
+	{
+		mEncoding = FileEncoding::Utf16Le;
+	}
+	else if (ch1 == 0xFE && ch2 == 0xFF)
+	{
+		mEncoding = FileEncoding::Utf16Be;
+	}
+	else
+	{
+		int ch3 = mLogFileStream.get();
+		bool bomPresent = (ch1 == 0xEF && ch2 == 0xBB && ch3 == 0xBF);
+		mEncoding = FileEncoding::Utf8;
+
+		if (!bomPresent)
+		{
+			// Start from beginning before parsing log.
+			mLogFileStream.seekg(0);
+		}
+	}
+}
+
+bool AbccLogFileParser::GetLine(std::string& line)
+{
+	bool error = false;
+	bool continueReading = false;
+
+	line.clear();
+
+	if (mEncoding == FileEncoding::Utf8)
+	{
+		getline(mLogFileStream, line, static_cast<char>(mLineDelimiter));
+		error = mLogFileStream.bad() || mLogFileStream.fail();
+		continueReading = !(error || mLogFileStream.eof());
+	}
+	else if (mEncoding == FileEncoding::Utf16Be || mEncoding == FileEncoding::Utf16Le)
+	{
+		std::wstring wstr;
+
+		if (mSwapEndianness)
+		{
+			getline(mLogFileWStream, wstr, mLineDelimiter);
+
+			for (size_t i = 0; i < wstr.length(); i++)
+			{
+				wstr[i] = bswap_16(wstr[i]);
+			}
+		}
+		else
+		{
+			getline(mLogFileWStream, wstr);
+		}
+
+		Utf16ToUtf8(wstr, line);
+		error = mLogFileWStream.bad() || mLogFileWStream.fail();
+		continueReading = !(error || mLogFileWStream.eof());
+	}
+
+	if (error)
+	{
+		line.clear();
+	}
+
+	return continueReading;
 }
 
 ABP_AnbStateType AbccLogFileParser::GetAnbStatus()
@@ -49,12 +172,12 @@ MessageReturnType AbccLogFileParser::GetNextMessage(ABP_MsgType& message)
 	MessageReturnType msgType = MessageReturnType::EndOfFile;
 	std::string line;
 
-	if (!mLogFileStream.is_open())
+	if (!(mLogFileStream.is_open() || mLogFileWStream.is_open()))
 	{
 		return MessageReturnType::IoError;
 	}
 
-	while (getline(mLogFileStream, line))
+	while (GetLine(line))
 	{
 		const char* msgRx = "Msg received:";
 		const char* msgTx = "Msg sent:";
@@ -116,7 +239,7 @@ bool AbccLogFileParser::ParseMessage(ABP_MsgType& message)
 	UINT32 dataStartCount = 0;
 	bool checkForStartToken = true;
 
-	while (getline(mLogFileStream, line))
+	while (GetLine(line))
 	{
 		const char* line1Format = "[ MsgBuf:0x%llx Size:0x%x SrcId  :0x%x DestObj:0x%x";
 		const char* line2Format = "  Inst  :0x%x     Cmd :0x%x   CmdExt0:0x%x CmdExt1:0x%x ]";

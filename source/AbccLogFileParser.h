@@ -19,10 +19,17 @@
 #include "abcc_td.h"
 #include "abcc_abp/abp.h"
 
-#ifdef _WIN32
-#define SSCANF sscanf_s
+#ifdef _MSC_VER
+	#include <stdlib.h>
+	#define bswap_16(x) _byteswap_ushort(x)
+	#define SSCANF sscanf_s
+#elif defined(__APPLE__)
+	#include <libkern/OSByteOrder.h>
+	#define bswap_16(x) OSSwapInt16(x)
+	#define SSCANF sscanf
 #else
-#define SSCANF sscanf
+	#include <byteswap.h>
+	#define SSCANF sscanf
 #endif
 
 /*
@@ -37,6 +44,17 @@ enum class MessageReturnType
 	TxError,
 	RxError,
 	IoError
+};
+
+/*
+** @brief Enum class indicating the file encoding.
+*/
+enum class FileEncoding
+{
+	Unknown,
+	Utf8,
+	Utf16Le,
+	Utf16Be
 };
 
 /*
@@ -95,9 +113,44 @@ private:
 	std::ifstream mLogFileStream;
 
 	/*
+	** @brief The ABCC SDK log file stream (for wide-char support).
+	*/
+	std::wifstream mLogFileWStream;
+
+	/*
 	** @brief The Anybus State.
 	*/
 	ABP_AnbStateType mAnbState;
+
+	/*
+	** @brief The encoding to use for parsing the log file.
+	*/
+	FileEncoding mEncoding;
+
+	/*
+	** @brief Indicates that the file stream endianness must be swapped for processing.
+	*/
+	bool mSwapEndianness;
+
+	/*
+	** @brief The line delimiter to use when reading a line via getline().
+	*/
+	wchar_t mLineDelimiter;
+
+	/*******************************************************************************
+	** @brief Attempts to detect whether the file encoding is UTF8, UTF16,
+	**        and whether or not a BOM is present.
+	*/
+	void DetectFileEncoding();
+
+	/*******************************************************************************
+	** @brief Gets a line from the file stream.
+	**
+	** @param  line    - The line read from the stream.
+	** @retval True    - A line was read and EOF has not been reached.
+	** @retval False   - A line was not read.
+	*/
+	bool GetLine(std::string& line);
 
 	/*******************************************************************************
 	** @brief Parses an ABCC SDK log file message.

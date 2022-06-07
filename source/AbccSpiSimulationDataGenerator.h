@@ -16,16 +16,6 @@
 #include "abcc_abp/abp.h"
 #include "AbccLogFileParser.h"
 
-#ifdef _MSC_VER
-	#include <stdlib.h>
-	#define bswap_16(x) _byteswap_ushort(x)
-#elif defined(__APPLE__)
-	#include <libkern/OSByteOrder.h>
-	#define bswap_16(x) OSSwapInt16(x)
-#else
-	#include <byteswap.h>
-#endif
-
 #define ABCC_CFG_MAX_MSG_SIZE				( 1524 )
 #define ABCC_CFG_MAX_PROCESS_DATA_SIZE		( 4 )
 
