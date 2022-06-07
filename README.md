@@ -4,7 +4,7 @@
 [![ubuntu_build](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/ubuntu_build.yml/badge.svg)](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/ubuntu_build.yml)
 [![macos_build](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/macos_build.yml/badge.svg)](https://github.com/hms-networks/AbccSpiAnalyzer/actions/workflows/macos_build.yml)
 
-## Copyright &copy; 2015-2021 HMS Industrial Networks, Inc.
+## Copyright &copy; 2015-2022 HMS Industrial Networks, Inc.
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT
 WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR
@@ -54,10 +54,10 @@ process data using either local timestamp information or the network timestamps
 ## [System Requirements](#table-of-contents)
 
 * Saleae Logic Software
-  * __Recommended Version__: 1.2.29
+  * **Recommended Version**: 1.2.29
   * Other versions will work so long as **Analyzer SDK version 1.1.32** is
     compatible.
-  * __NOTE__: At this time, Saleae Logic V2 is not supported.
+  * **NOTE**: At this time, Saleae Logic V2 is not supported.
 * Saleae Logic Hardware
   * While any of Saleae Logic hardware offerings is expected to be compatible,
   it is important to consider sample rate limitations of the Logic hardware and
@@ -70,7 +70,13 @@ process data using either local timestamp information or the network timestamps
   channels on the analyzer are active, so it is imperative that the hardware
   is able to sufficiently sample the SPI bus for the number of channels required.
 * PC running:
-  * Windows 7 or later
+  * Windows 7 through Windows 10
+    * NOTE: At this time Window 11 has compatibility issues with version 1.2.29.
+      Version 1.2.40 resolves this compatibility issue but Saleae dropped
+      support for the decoded protocols subwindow for this version. An
+      alternative solution for using 1.2.29 on Windows 11 would be to use `WSLg`
+      and attach the Saleae Logic interface via `usbpid.exe`.
+      See [How-To: Connect USB devices](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
   * Ubuntu 12.04.2+
   * Mac OSX 10.7 Lion+
 * USB 2.0 or better
@@ -86,7 +92,7 @@ Precompiled plugins and documentation are available here: [Plugin Releases][link
 
 While tagged releases are provided which contain pre-compiled libraries and
 associated documentation, the user may still opt to compile the libraries
-for themself.
+for themselves.
 
 ### [Initial Steps](#table-of-contents)
 
