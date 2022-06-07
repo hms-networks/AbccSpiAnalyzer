@@ -1,5 +1,5 @@
 /******************************************************************************
-**  Copyright (C) 2015-2021 HMS Industrial Networks Inc, all rights reserved
+**  Copyright (C) 2015-2022 HMS Industrial Networks Inc, all rights reserved
 *******************************************************************************
 **
 **       File: AbccSpiMetadata.cpp
@@ -38,7 +38,7 @@
 #define ABCC_SPI_METADATA_COMPANYNAME		"HMS Industrial Networks, Inc."
 #define ABCC_SPI_METADATA_FILEDESCRIPTION	"Anybus CompactCom SPI Protocol Analyzer for Saleae Logic"
 #define ABCC_SPI_METADATA_INTERNALNAME		"AbccSpiAnalyzer"
-#define ABCC_SPI_METADATA_LEGALCOPYRIGHT	"(C) 2015-2021 HMS Networks"
+#define ABCC_SPI_METADATA_LEGALCOPYRIGHT	"(C) 2015-2022 HMS Networks"
 #define ABCC_SPI_METADATA_LEGALTRADEMARKS	"Anybus CompactCom"
 #define ABCC_SPI_METADATA_ORIGINALFILENAME	"AbccSpiAnalyzer.dll"
 #define ABCC_SPI_METADATA_PRODUCTNAME		"ABCC SPI Protocol Analyzer"

@@ -1,5 +1,5 @@
 /******************************************************************************
-**  Copyright (C) 2015-2021 HMS Industrial Networks Inc, all rights reserved
+**  Copyright (C) 2015-2022 HMS Industrial Networks Inc, all rights reserved
 *******************************************************************************
 **
 **       File: AbccLogFileParser.cpp
