@@ -12,7 +12,7 @@
 #define ABCC_SPI_METADATA_H_
 
 #ifndef FILEVERSION_YEAR
-#define FILEVERSION_YEAR					2021
+#define FILEVERSION_YEAR					2022
 #endif
 
 #ifndef FILEVERSION_MONTH
@@ -20,7 +20,7 @@
 #endif
 
 #ifndef FILEVERSION_DAY
-#define FILEVERSION_DAY						8
+#define FILEVERSION_DAY						10
 #endif
 
 #ifndef FILEVERSION_BUILD

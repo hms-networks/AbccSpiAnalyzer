@@ -1,5 +1,24 @@
 # Changelog
 
+## Version 2022.6.10.1
+
+### Changes
+
+* Code refactoring.
+* Updated ABP headers and lookup tables.
+* Improved support for log files containing BOM and added support for UTF16.
+  This means the following formats are acceptable: ASCII, UTF-8, UTF-8-BOM,
+  UTF-16-BOM.
+* Updated ABP_CIPID_IA_PRODUCT_NAME to support both numeric and character
+  display.
+
+### Fixes
+
+* Fixed NC object's instance name lookup logic.
+* Fixed ABP_NW_EXCPT_INFO_NONE, the verbose string was incorrect.
+
+---
+
 ## Version 2021.6.1.1
 
 ### Changes
